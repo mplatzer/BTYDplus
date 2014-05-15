@@ -3,3 +3,6 @@
 useDynLib(BTYDplus)
 exportPattern("^[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)
+import(data.table)
+import(coda)
+import(plyr)
