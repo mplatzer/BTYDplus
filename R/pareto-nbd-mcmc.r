@@ -1,4 +1,7 @@
 
+# TODO: normalize time so that T.cal~1
+
+
 #' Hierarchical Bayes variant of Pareto/NBD
 #'
 #' \code{pnbd.mcmc.DrawParameters} samples parameters via MCMC for a given CBS
@@ -31,7 +34,7 @@
 #' @param param_init list of 2nd-level parameter start values
 #' @param hyper_prior list of hyper parameters for 2nd-level parameters
 #' @return list
-#' @import coda Rcpp
+#' @import coda Rcpp parallel
 #' @export
 #' @examples
 #' #params <- list(r=1.4, alpha=1.3, s=0.7, beta=7)
@@ -76,7 +79,7 @@ pnbd.mcmc.DrawParameters <-
     for (i in 1:steps) {
       
       # generate new proposal
-      new_shape <- cur_shape * exp(scale * max(-100, min(100, scale * rt(1, df=3))))
+      new_shape <- cur_shape * exp(max(-100, min(100, scale * rt(1, df=3))))
       new_prior <- calc_prior(new_shape)
       new_likel <- calc_likel(new_shape)
 

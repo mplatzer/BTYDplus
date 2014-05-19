@@ -14,7 +14,7 @@
 #' @param param_init list of 2nd-level parameter start values
 #' @param hyper_prior list of hyper parameters for 2nd-level parameters
 #' @return list
-#' @import coda Rcpp
+#' @import coda Rcpp parallel
 #' @export
 #' @examples
 #' #params <- list(r=1.4, alpha=1.3, s=0.7, beta=7, t=1.5, gamma=1)
@@ -27,6 +27,7 @@ pcnbd.mcmc.DrawParameters <-
   function(data,
            mcmc = 10000, burnin = 0, thin = 1, chains = 1,           
            param_init = list(t=1, gamma=1, r=1, alpha=1, s=1, beta=1),
+           mc.cores = 1,
            hyper_prior = list(t_1=1/1000, t_2=1/1000,
                               gamma_1=1/1000, gamma_2=1/1000,
                               r_1=1/1000, r_2=1/1000,
@@ -50,7 +51,7 @@ pcnbd.mcmc.DrawParameters <-
     for (i in 1:steps) {
       
       # generate new proposal
-      new_shape <- cur_shape * exp(scale * max(-100, min(100, scale * rt(1, df=3))))
+      new_shape <- cur_shape * exp(max(-100, min(100, scale * rt(1, df=3))))
       new_prior <- calc_prior(new_shape)
       new_likel <- calc_likel(new_shape)
       
@@ -184,16 +185,26 @@ pcnbd.mcmc.DrawParameters <-
     return(tau)
   }
   
-  run_single_chain <- function(chain_id) {
+  run_single_chain <- function(chain_id, df) {
     
     ## initialize arrays for storing draws ##
     
-    nr_of_cust <- nrow(data)
+    nr_of_cust <- nrow(df)
     nr_of_draws <- (mcmc-1) %/% thin + 1
     level_2_draws <- array(NA_real_, dim=c(nr_of_draws, 6))
     dimnames(level_2_draws)[[2]] <- c("t", "gamma", "r", "alpha", "s", "beta")
     level_1_draws <- array(NA_real_, dim=c(nr_of_draws, 4, nr_of_cust))
     dimnames(level_1_draws)[[2]] <- c("k", "lambda", "mu", "tau")
+    
+    # scale time-dimension so that T~1
+    
+#     scale <- 1 / mean(df$T.cal)
+#     cat("scale1", scale, "\n")
+#     df <- transform(df,
+#                     t.x = t.x * scale,
+#                     T.cal = T.cal * scale,
+#                     T.star = T.star * scale,
+#                     litt = litt + x * log(scale))
     
     ## initialize parameters ##
     
@@ -201,14 +212,14 @@ pcnbd.mcmc.DrawParameters <-
     level_2["t"]     <- param_init$t
     level_2["gamma"] <- param_init$gamma
     level_2["r"]     <- param_init$r
-    level_2["alpha"] <- param_init$alpha
+    level_2["alpha"] <- param_init$alpha # FIXME
     level_2["s"]     <- param_init$s
     level_2["beta"]  <- param_init$beta
     
     level_1            <- level_1_draws[1,,]
     level_1["k",]      <- 1
-    level_1["lambda",] <- mean(data$x) / mean(ifelse(data$t.x==0, data$T.cal, data$t.x))
-    level_1["tau",]    <- data$t.x + 0.5/level_1["lambda",]
+    level_1["lambda",] <- mean(df$x) / mean(ifelse(df$t.x==0, df$T.cal, df$t.x))
+    level_1["tau",]    <- df$t.x + 0.5/level_1["lambda",]
     level_1["mu",]     <- 1/level_1["tau",]
     
     ## run MCMC chain ##
@@ -224,10 +235,10 @@ pcnbd.mcmc.DrawParameters <-
       }
       
       # draw individual-level parameters
-      level_1["k", ]      <- draw_k(data, level_1, level_2)
-      level_1["lambda", ] <- draw_lambda(data, level_1, level_2)
-      level_1["mu", ]     <- draw_mu(data, level_1, level_2)
-      level_1["tau", ]    <- draw_tau(data, level_1, level_2)
+      level_1["k", ]      <- draw_k(df, level_1, level_2)
+      level_1["lambda", ] <- draw_lambda(df, level_1, level_2)
+      level_1["mu", ]     <- draw_mu(df, level_1, level_2)
+      level_1["tau", ]    <- draw_tau(df, level_1, level_2)
       
       # draw heterogeneity parameters
       level_2["t"]        <- draw_t(level_1, level_2, hyper_prior)
@@ -237,6 +248,14 @@ pcnbd.mcmc.DrawParameters <-
       level_2["s"]        <- draw_s(level_1, level_2, hyper_prior)
       level_2["beta"]     <- draw_beta(level_1, level_2, hyper_prior)
     }
+    
+    # rescale time-dimension back 
+#     cat("scale2", scale, "\n")
+#     level_1_draws[,"lambda",] <- level_1_draws[,"lambda",] * scale
+#     level_1_draws[,"mu",]     <- level_1_draws[,"mu",] * scale
+#     level_1_draws[,"tau",]    <- level_1_draws[,"tau",] / scale
+#     level_2_draws[,"alpha"]   <- level_2_draws[,"alpha"] / scale
+#     level_2_draws[,"beta"]    <- level_2_draws[,"beta"] / scale
     
     # convert MCMC draws into coda::mcmc objects
     return(list(
@@ -250,8 +269,8 @@ pcnbd.mcmc.DrawParameters <-
   stopifnot(all(is.finite(data$litt)))
   
   # run multiple chains
-  draws <- lapply(1:chains, function(i) run_single_chain(i))
-  
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, data), mc.cores=mc.cores)
+
   # merge chains into code::mcmc.list objects
   return(list(
     level_1 = lapply(1:1:nrow(data), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
