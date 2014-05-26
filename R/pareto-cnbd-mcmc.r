@@ -13,7 +13,9 @@
 #' @param use_data_augmentation determines MCMC method to be used
 #' @param param_init list of 2nd-level parameter start values
 #' @param hyper_prior list of hyper parameters for 2nd-level parameters
-#' @return list
+#' @return 2-element list
+#' level_1:  list of coda::mcmc.list objects; one for each customer, containing individual-level draws
+#' level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
 #' @import coda Rcpp parallel
 #' @export
 #' @examples
@@ -27,14 +29,13 @@ pcnbd.mcmc.DrawParameters <-
   function(data,
            mcmc = 10000, burnin = 0, thin = 1, chains = 1,           
            param_init = list(t=1, gamma=1, r=1, alpha=1, s=1, beta=1),
-           mc.cores = 1,
            hyper_prior = list(t_1=1/1000, t_2=1/1000,
                               gamma_1=1/1000, gamma_2=1/1000,
                               r_1=1/1000, r_2=1/1000,
                               alpha_1=1/1000, alpha_2=1/1000,
                               s_1=1/1000, s_2=1/1000,
                               beta_1=1/1000, beta_2=1/1000)) {
-    
+  
   ## methods to sample heterogeneity parameters {r, alpha, s, beta, t, gamma} ##
   
   draw_shape <- function(x, shape, rate, prior1, prior2, steps=20) {
@@ -46,7 +47,7 @@ pcnbd.mcmc.DrawParameters <-
     cur_prior <- calc_prior(cur_shape)
     cur_likel <- calc_likel(cur_shape)
     
-    scale <- mean(x)
+    step_scale <- mean(x) * rate
     
     for (i in 1:steps) {
       
@@ -117,7 +118,7 @@ pcnbd.mcmc.DrawParameters <-
               prior1 = hyper_prior$beta_1,
               prior2 = hyper_prior$beta_2)
   }
-    
+  
   ## methods to sample individual-level parameters ##
   
   draw_k <- function(data, level_1, level_2) {
@@ -175,11 +176,11 @@ pcnbd.mcmc.DrawParameters <-
     # Case: churned     - distribution of min(t_(x+1), tau), truncated to [tx, Tcal]
     if (any(!alive)) {
       tau[!alive] <- pcnbd_slice_sample("tau",
-                         x = data[!alive,"x"], tx = data[!alive,"t.x"], Tcal = data[!alive,"T.cal"], litt = data[!alive,"litt"],
-                         k = level_1["k",!alive], lambda = level_1["lambda",!alive], mu = level_1["mu",!alive], tau = level_1["tau",!alive],
-                         t = level_2["t"], gamma = level_2["gamma"],
-                         r = level_2["r"], alpha = level_2["alpha"], 
-                         s = level_2["s"], beta  = level_2["beta"])
+                                        x = data[!alive,"x"], tx = data[!alive,"t.x"], Tcal = data[!alive,"T.cal"], litt = data[!alive,"litt"],
+                                        k = level_1["k",!alive], lambda = level_1["lambda",!alive], mu = level_1["mu",!alive], tau = level_1["tau",!alive],
+                                        t = level_2["t"], gamma = level_2["gamma"],
+                                        r = level_2["r"], alpha = level_2["alpha"], 
+                                        s = level_2["s"], beta  = level_2["beta"])
     }
     
     return(tau)
@@ -196,23 +197,13 @@ pcnbd.mcmc.DrawParameters <-
     level_1_draws <- array(NA_real_, dim=c(nr_of_draws, 4, nr_of_cust))
     dimnames(level_1_draws)[[2]] <- c("k", "lambda", "mu", "tau")
     
-    # scale time-dimension so that T~1
-    
-#     scale <- 1 / mean(df$T.cal)
-#     cat("scale1", scale, "\n")
-#     df <- transform(df,
-#                     t.x = t.x * scale,
-#                     T.cal = T.cal * scale,
-#                     T.star = T.star * scale,
-#                     litt = litt + x * log(scale))
-    
     ## initialize parameters ##
     
     level_2          <- level_2_draws[1,]
     level_2["t"]     <- param_init$t
     level_2["gamma"] <- param_init$gamma
     level_2["r"]     <- param_init$r
-    level_2["alpha"] <- param_init$alpha # FIXME
+    level_2["alpha"] <- param_init$alpha
     level_2["s"]     <- param_init$s
     level_2["beta"]  <- param_init$beta
     
@@ -249,28 +240,20 @@ pcnbd.mcmc.DrawParameters <-
       level_2["beta"]     <- draw_beta(level_1, level_2, hyper_prior)
     }
     
-    # rescale time-dimension back 
-#     cat("scale2", scale, "\n")
-#     level_1_draws[,"lambda",] <- level_1_draws[,"lambda",] * scale
-#     level_1_draws[,"mu",]     <- level_1_draws[,"mu",] * scale
-#     level_1_draws[,"tau",]    <- level_1_draws[,"tau",] / scale
-#     level_2_draws[,"alpha"]   <- level_2_draws[,"alpha"] / scale
-#     level_2_draws[,"beta"]    <- level_2_draws[,"beta"] / scale
-    
     # convert MCMC draws into coda::mcmc objects
     return(list(
       level_1 = lapply(1:nr_of_cust, function(i) mcmc(level_1_draws[,,i], start=burnin, thin=thin)),
       level_2 = mcmc(level_2_draws, start=burnin, thin=thin)))
   }
-
+  
   ## check whether input data meets requirements
   stopifnot(is.data.frame(data))
   stopifnot(all(c("x", "t.x", "T.cal", "litt") %in% names(data)))
   stopifnot(all(is.finite(data$litt)))
   
   # run multiple chains
-  draws <- mclapply(1:chains, function(i) run_single_chain(i, data), mc.cores=mc.cores)
-
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, data), mc.cores=1)
+  
   # merge chains into code::mcmc.list objects
   return(list(
     level_1 = lapply(1:1:nrow(data), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
@@ -285,7 +268,7 @@ pcnbd.mcmc.DrawParameters <-
 #' @return numeric vector of probabilities
 #' @export
 pcnbd.mcmc.PAlive <- function(data, draws) {
-
+  
   nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
   nr_of_cust <- length(draws$level_1)
   parameters <- nvar(draws$level_2[[1]])
@@ -305,7 +288,7 @@ pcnbd.mcmc.PAlive <- function(data, draws) {
 #' @return 2-dim array [draw x cust] with sampled future transactions
 #' @export
 pcnbd.mcmc.DrawFutureTransactions <- function(data, draws, T.star=data$T.star) {
-
+  
   nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
   nr_of_cust <- length(draws$level_1)
   parameters <- varnames(draws$level_1[[1]])
@@ -314,7 +297,7 @@ pcnbd.mcmc.DrawFutureTransactions <- function(data, draws, T.star=data$T.star) {
     stop("mismatch between number of customers in parameters 'data' and 'draws'")
   if (is.null(T.star))
     stop("T.star is missing")
-
+  
   x.stars <- array(NA_real_, dim=c(nr_of_draws, nr_of_cust))
   if (length(T.star)==1) T.star <- rep(T.star, nr_of_cust)
   
@@ -373,10 +356,10 @@ pcnbd.mcmc.DrawFutureTransactions <- function(data, draws, T.star=data$T.star) {
 #' @return 2-elemnt list
 #' @export
 pcnbd.GenerateData <- function(N, T.cal, T.star, params, return.elog=F) {
-
+  
   if (length(T.star)==1) T.star <- rep(T.star, N)
   if (length(T.cal)==1) T.cal <- rep(T.cal, N)
-
+  
   # sample regularity parameter k for each customer
   if (all(c("t", "gamma") %in% names(params))) {
     # Case A: regularity parameter k is gamma-distributed across customers

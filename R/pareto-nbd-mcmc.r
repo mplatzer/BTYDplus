@@ -1,7 +1,4 @@
 
-# TODO: normalize time so that T.cal~1
-
-
 #' Hierarchical Bayes variant of Pareto/NBD
 #'
 #' \code{pnbd.mcmc.DrawParameters} samples parameters via MCMC for a given CBS
@@ -33,7 +30,9 @@
 #' @param use_data_augmentation determines MCMC method to be used
 #' @param param_init list of 2nd-level parameter start values
 #' @param hyper_prior list of hyper parameters for 2nd-level parameters
-#' @return list
+#' @return 2-element list
+#' level_1:  list of coda::mcmc.list objects; one for each customer, containing individual-level draws
+#' level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
 #' @import coda Rcpp parallel
 #' @export
 #' @examples
@@ -54,50 +53,42 @@ pnbd.mcmc.DrawParameters <-
                               alpha_1=1/1000, alpha_2=1/1000,
                               s_1=1/1000, s_2=1/1000,
                               beta_1=1/1000, beta_2=1/1000)) {
-  ## Estimated model parameters for given data by running MCMC chain
-  ## 
-  ##
-  ## Returns:
-  ##   2-element list
-  ##     level_1:  list of coda::mcmc.list objects; one for each customer, containing individual-level draws
-  ##     level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
   
-
   ## methods to sample heterogeneity parameters {r, alpha, s, beta} ##
-    
-  draw_shape <- function(x, shape, rate, prior1, prior2, steps=20) {
 
+  draw_shape <- function(x, shape, rate, prior1, prior2, steps=20) {
+    
     calc_prior <- function(r) (prior1 - 1) * log(r) - (r * prior2)
     calc_likel <- function(r) (r - 1) * sum(log(x)) + length(x) * (r * log(rate) - lgamma(r))
-
+    
     cur_shape <- shape
     cur_prior <- calc_prior(cur_shape)
     cur_likel <- calc_likel(cur_shape)
     
-    scale <- mean(x)
+    step_scale <- mean(x) * rate
     
     for (i in 1:steps) {
       
       # generate new proposal
-      new_shape <- cur_shape * exp(max(-100, min(100, scale * rt(1, df=3))))
+      new_shape <- cur_shape * exp(max(-100, min(100, step_scale * rt(1, df=3))))
       new_prior <- calc_prior(new_shape)
       new_likel <- calc_likel(new_shape)
-
+      
       # accept/reject new proposal
       mhratio <- exp(new_prior+new_likel-cur_prior-cur_likel)
       if (mhratio > runif(n=1))
         cur_shape <- new_shape
-
+      
     }
     return(cur_shape)
   }
-
+  
   draw_rate <- function(x, shape, rate, prior1, prior2) {
     rgamma(n     = 1, 
            shape = prior1 + length(x) * shape,
            rate  = prior2 + sum(x))
   }
-
+  
   draw_r <- function(level_1, level_2, hyper_prior) {
     draw_shape(x      = level_1["lambda",], 
                shape  = level_2["r"],
@@ -121,7 +112,7 @@ pnbd.mcmc.DrawParameters <-
                prior1 = hyper_prior$s_1,
                prior2 = hyper_prior$s_2)
   }
-
+  
   draw_beta <- function(level_1, level_2, hyper_prior) {
     draw_rate(x      = level_1["mu",],
               shape  = level_2["s"],
@@ -166,7 +157,7 @@ pnbd.mcmc.DrawParameters <-
     T.cal  <- data[, "T.cal"]
     lambda <- level_1["lambda", ]
     mu     <- level_1["mu", ]
-  
+    
     mu_lam <- mu + lambda
     t_diff <- T.cal - tx
     
@@ -211,7 +202,7 @@ pnbd.mcmc.DrawParameters <-
                         s = level_2["s"], beta = level_2["beta"])
   }
   
-  run_single_chain <- function(chain_id=1) {
+  run_single_chain <- function(chain_id=1, df) {
     
     ## initialize arrays for storing draws ##
     
@@ -221,7 +212,7 @@ pnbd.mcmc.DrawParameters <-
     dimnames(level_2_draws)[[2]] <- c("r", "alpha", "s", "beta")
     level_1_draws <- array(NA_real_, dim=c(nr_of_draws, 3, nr_of_cust))
     dimnames(level_1_draws)[[2]] <- c("lambda", "mu", "tau")
-    
+
     ## initialize parameters ##
     
     level_2          <- level_2_draws[1,]
@@ -231,28 +222,28 @@ pnbd.mcmc.DrawParameters <-
     level_2["beta"]  <- param_init$beta
     
     level_1            <- level_1_draws[1,,]
-    level_1["lambda",] <- mean(data$x) / mean(ifelse(data$t.x==0, data$T.cal, data$t.x))
-    level_1["tau",]    <- data$t.x + 0.5/level_1["lambda",]
+    level_1["lambda",] <- mean(df$x) / mean(ifelse(df$t.x==0, df$T.cal, df$t.x))
+    level_1["tau",]    <- df$t.x + 0.5/level_1["lambda",]
     level_1["mu",]     <- 1/level_1["tau",]  
     
     ## run MCMC chain ##
     
     for (step in 1:(burnin+mcmc)) {
       if (step%%100==0) cat("chain:", chain_id, "step:", step, "of", (burnin+mcmc), "\n")
-  
+      
       # store
       if ((step-burnin)>0 & (step-1-burnin)%%thin==0) {
         idx <- (step-1-burnin)%/%thin + 1
         level_1_draws[idx,,] <- level_1
         level_2_draws[idx,]  <- level_2
       }
-  
+      
       # draw individual-level parameters
       draw_lambda <- if (use_data_augmentation) draw_lambda_conoor else draw_lambda_ma_liu
       draw_mu     <- if (use_data_augmentation) draw_mu_conoor else draw_mu_ma_liu
-      level_1["lambda", ] <- draw_lambda(data, level_1, level_2)
-      level_1["mu", ]     <- draw_mu(data, level_1, level_2)
-      level_1["tau", ]    <- draw_tau(data, level_1)
+      level_1["lambda", ] <- draw_lambda(df, level_1, level_2)
+      level_1["mu", ]     <- draw_mu(df, level_1, level_2)
+      level_1["tau", ]    <- draw_tau(df, level_1)
       
       # draw heterogeneity parameters
       level_2["alpha"]    <- draw_alpha(level_1, level_2, hyper_prior)
@@ -260,15 +251,15 @@ pnbd.mcmc.DrawParameters <-
       level_2["beta"]     <- draw_beta(level_1, level_2, hyper_prior)
       level_2["s"]        <- draw_s(level_1, level_2, hyper_prior)
     }
-
+    
     # convert MCMC draws into coda::mcmc objects
     return(list(
       level_1 = lapply(1:nr_of_cust, function(i) mcmc(level_1_draws[,,i], start=burnin, thin=thin)),
       level_2 = mcmc(level_2_draws, start=burnin, thin=thin)))
   }
-
+  
   # run multiple chains
-  draws <- lapply(1:chains, function(i) run_single_chain(i))
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, data), mc.cores=1)
   
   # merge chains into code::mcmc.list objects
   return(list(
