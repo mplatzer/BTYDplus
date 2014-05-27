@@ -5,6 +5,14 @@ slice_sample_gamma <- function(alpha, beta, lower, upper) {
     .Call('BTYDplus_slice_sample_gamma', PACKAGE = 'BTYDplus', alpha, beta, lower, upper)
 }
 
+slice_sample_mvnorm <- function(sigma) {
+    .Call('BTYDplus_slice_sample_mvnorm', PACKAGE = 'BTYDplus', sigma)
+}
+
+slice_sample_gamma_parameters <- function(data, init, hyper, steps = 20, w = 1) {
+    .Call('BTYDplus_slice_sample_gamma_parameters', PACKAGE = 'BTYDplus', data, init, hyper, steps, w)
+}
+
 slice_sample_ma_liu <- function(what, x, tx, Tcal, lambda, mu, r, alpha, s, beta) {
     .Call('BTYDplus_slice_sample_ma_liu', PACKAGE = 'BTYDplus', what, x, tx, Tcal, lambda, mu, r, alpha, s, beta)
 }

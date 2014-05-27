@@ -6,7 +6,7 @@
 using namespace Rcpp;
 
 // slice_sample_gamma
-double slice_sample_gamma(double alpha, double beta, double lower, double upper);
+NumericVector slice_sample_gamma(double alpha, double beta, double lower, double upper);
 RcppExport SEXP BTYDplus_slice_sample_gamma(SEXP alphaSEXP, SEXP betaSEXP, SEXP lowerSEXP, SEXP upperSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
@@ -16,7 +16,41 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< double >::type beta(betaSEXP );
         Rcpp::traits::input_parameter< double >::type lower(lowerSEXP );
         Rcpp::traits::input_parameter< double >::type upper(upperSEXP );
-        double __result = slice_sample_gamma(alpha, beta, lower, upper);
+        NumericVector __result = slice_sample_gamma(alpha, beta, lower, upper);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// slice_sample_mvnorm
+NumericVector slice_sample_mvnorm(NumericVector sigma);
+RcppExport SEXP BTYDplus_slice_sample_mvnorm(SEXP sigmaSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericVector >::type sigma(sigmaSEXP );
+        NumericVector __result = slice_sample_mvnorm(sigma);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// slice_sample_gamma_parameters
+NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector init, NumericVector hyper, double steps = 20, double w = 1);
+RcppExport SEXP BTYDplus_slice_sample_gamma_parameters(SEXP dataSEXP, SEXP initSEXP, SEXP hyperSEXP, SEXP stepsSEXP, SEXP wSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericVector >::type data(dataSEXP );
+        Rcpp::traits::input_parameter< NumericVector >::type init(initSEXP );
+        Rcpp::traits::input_parameter< NumericVector >::type hyper(hyperSEXP );
+        Rcpp::traits::input_parameter< double >::type steps(stepsSEXP );
+        Rcpp::traits::input_parameter< double >::type w(wSEXP );
+        NumericVector __result = slice_sample_gamma_parameters(data, init, hyper, steps, w);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

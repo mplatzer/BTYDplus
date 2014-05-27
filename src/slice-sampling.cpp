@@ -125,9 +125,9 @@ NumericVector slice_sample_mvnorm(NumericVector sigma) {
 
 // estimate parameters of gamma distribution
 
-double post_gamma_parameters(NumericVector x, NumericVector params) {
-  double shape = x[0];
-  double rate = x[1];
+double post_gamma_parameters(NumericVector log_x, NumericVector params) {
+  double shape = exp(log_x[0]);
+  double rate = exp(log_x[1]);
   double len_x = params[0];
   double sum_x = params[1];
   double sum_log_x = params[2];
@@ -141,13 +141,11 @@ double post_gamma_parameters(NumericVector x, NumericVector params) {
 }
 
 // [[Rcpp::export]]
-NumericVector slice_sample_gamma_parameters(NumericVector init, NumericVector data, NumericVector hyper) {
-  NumericVector x = NumericVector::create(0.2, 0.3);
+NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector init, 
+                                            NumericVector hyper, double steps = 20, double w = 1) {
   NumericVector params = NumericVector::create(data.size(), sum(data), sum(log(data)), 
                                                 hyper[0], hyper[1], hyper[2], hyper[3]);
-  double steps = 20;
-  double w  = 1;
-  return slice_sample_cpp(post_gamma_parameters, params, init, steps, w, 0, INFINITY);  
+  return exp(slice_sample_cpp(post_gamma_parameters, params, log(init), steps, w, -INFINITY, INFINITY));
 }
 
 /*** R
@@ -174,7 +172,7 @@ NumericVector slice_sample_gamma_parameters(NumericVector init, NumericVector da
   n <- 1e4
   params <- c(1.4, 3.5)
   x <- rgamma(1e4, params[1], params[2])
-  draws <- t(replicate(n, slice_sample_gamma_parameters(c(1,1), x, rep(1e-3, 4))))
+  draws <- t(replicate(n, slice_sample_gamma_parameters(x, c(1,1), rep(1e-3, 4))))
   stopifnot(max(abs(apply(draws, 2, mean) - params))<.1)
 */
 
