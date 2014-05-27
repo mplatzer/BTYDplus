@@ -3,25 +3,23 @@
 
 using namespace Rcpp;
 
-// univariate slice sampling
+// slice sampling
 
-// This is a stripped down, univariate version of diversitree::mcmc
-// that only returns the draw from the last step. 
-// Drawing from gamma distribution is now 300x faster than compared
-// with diversitree::mcmc.
+// This is a stripped down C++ version of diversitree::mcmc thta only returns
+// the draw from the last step. Drawing from gamma distribution is now 300x
+// faster than compared with diversitree::mcmc.
 
-// The algorithm is described in detail in
-//   Neal R.M. 2003. Slice sampling. Annals of Statistics 31:705-767.
-// which describes *why* this algorithm works.  The approach differs
-// from normal Metropolis-Hastings algorithms, and from Gibbs
-// samplers, but shares the Gibbs sampler property of every update
-// being accepted.  Nothing is required except the ability to evaluate
-// the function at every point in continuous parameter space.
+// The algorithm is described in detail in Neal R.M. 2003. Slice sampling.
+// Annals of Statistics 31:705-767. which describes *why* this algorithm works. 
+// The approach differs from normal Metropolis-Hastings algorithms, and from
+// Gibbs samplers, but shares the Gibbs sampler property of every update being
+// accepted.  Nothing is required except the ability to evaluate the function at
+// every point in continuous parameter space.
 
-// Let x0 be the current (possibly multivariate) position in
-// continuous parameter space, and let y0 be the probability at that
-// point.  To update from (x0, y0) -> (x1, y1), we update each of the
-// parameters in turn.  For each parameter
+// Let x0 be the current (possibly multivariate) position in continuous
+// parameter space, and let y0 be the probability at that point.  To update from
+// (x0, y0) -> (x1, y1), we update each of the parameters in turn.  For each
+// parameter
 //
 //   1. Draw a random number 'z' on Uniform(0, y0) -- the new point
 //      must have at least this probability.
@@ -207,7 +205,7 @@ NumericVector slice_sample_ma_liu(String what,
     if (what == "lambda") {
       out[i] = slice_sample_cpp(post_lambda_ma_liu, params, lambda[i], 3, 3 * sqrt(r) / alpha, 0, INFINITY);
     } else if (what == "mu") {
-      out[i] = slice_sample_cpp(post_mu_ma_liu, params, mu[i], 3, 3 * sqrt(s) / beta, 0, INFINITY);
+      out[i] = slice_sample_cpp(post_mu_ma_liu, params, mu[i], 6, 3 * sqrt(s) / beta, 0, INFINITY);
     }
   }
   return out;
@@ -363,12 +361,12 @@ NumericVector pcnbd_slice_sample(String what,
         out[i] = runif(1, tx[i], Tcal[i])[0];
       } else {
         double tau_init;
-        if (tau[i] > Tcal[i]) {
+        if (tau[i] > Tcal[i] || tau[i] < tx[i]) {
           tau_init = tx[i] + (Tcal[i]-tx[i])/2;
         } else {
           tau_init = tau[i];
         }
-        out[i] = slice_sample_cpp(pcnbd_post_tau, params, tau_init, 3, (Tcal[i]-tx[i])/2, tx[i], Tcal[i]);
+        out[i] = slice_sample_cpp(pcnbd_post_tau, params, tau_init, 6, (Tcal[i]-tx[i])/2, tx[i], Tcal[i]);
       }
     }
   }
@@ -385,7 +383,7 @@ NumericVector pcnbd_slice_sample(String what,
   k <- 1
   lambda <- 1.2
   mu <- 0.01
-  n <- 10^5
+  n <- 10^4
   draws1 <- pcnbd_slice_sample("tau", rep(x, n), rep(tx, n), rep(Tcal, n), rep(litt, n), 
                                rep(k, n), rep(lambda, n), rep(mu, n), rep(0, n), 
                                0,0,0,0,0,0)
