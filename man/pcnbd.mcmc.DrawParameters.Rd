@@ -5,10 +5,9 @@
 \usage{
 pcnbd.mcmc.DrawParameters(data, mcmc = 10000, burnin = 0, thin = 1,
   chains = 1, param_init = list(t = 1, gamma = 1, r = 1, alpha = 1, s = 1,
-  beta = 1), mc.cores = 1, hyper_prior = list(t_1 = 1/1000, t_2 = 1/1000,
-  gamma_1 = 1/1000, gamma_2 = 1/1000, r_1 = 1/1000, r_2 = 1/1000, alpha_1 =
-  1/1000, alpha_2 = 1/1000, s_1 = 1/1000, s_2 = 1/1000, beta_1 = 1/1000, beta_2
-  = 1/1000))
+  beta = 1), hyper_prior = list(t_1 = 1/1000, t_2 = 1/1000, gamma_1 = 1/1000,
+  gamma_2 = 1/1000, r_1 = 1/1000, r_2 = 1/1000, alpha_1 = 1/1000, alpha_2 =
+  1/1000, s_1 = 1/1000, s_2 = 1/1000, beta_1 = 1/1000, beta_2 = 1/1000))
 }
 \arguments{
 \item{data}{data.frame with columns 'x', 't.x', 'T.cal'}
@@ -28,7 +27,9 @@ pcnbd.mcmc.DrawParameters(data, mcmc = 10000, burnin = 0, thin = 1,
 \item{hyper_prior}{list of hyper parameters for 2nd-level parameters}
 }
 \value{
-list
+2-element list
+level_1:  list of coda::mcmc.list objects; one for each customer, containing individual-level draws
+level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
 }
 \description{
 Returns 2-element list

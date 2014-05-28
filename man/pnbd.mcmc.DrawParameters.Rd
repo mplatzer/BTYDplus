@@ -27,7 +27,9 @@ pnbd.mcmc.DrawParameters(data, mcmc = 10000, burnin = 0, thin = 1,
 \item{hyper_prior}{list of hyper parameters for 2nd-level parameters}
 }
 \value{
-list
+2-element list
+level_1:  list of coda::mcmc.list objects; one for each customer, containing individual-level draws
+level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
 }
 \description{
 \code{pnbd.mcmc.DrawParameters} samples parameters via MCMC for a given CBS
@@ -45,7 +47,7 @@ method 2) If \code{use_data_augmentation==FALSE} then implementation follows
 Shao-Hui Ma & Jin-Lan Liu paper
 http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404, i.e. no data
 augmentation and draws on individual level need to be done via slice
-sampling. As such it is 3x slower than method 1)
+sampling. As such it is 10x slower than method 1)
 
 Estimating parameters via Pareto/NBD MCMC can be 10x slower than Pareto/NBD
 MLE, which itself can be 10x slower than BG/NBD. Both methods exhibit highly

@@ -466,7 +466,7 @@ NumericVector pcnbd_slice_sample(String what,
   n <- 10^4
   draws1 <- pcnbd_slice_sample("tau", rep(x, n), rep(tx, n), rep(Tcal, n), rep(litt, n), 
                                rep(k, n), rep(lambda, n), rep(mu, n), rep(0, n), 
-                               0,0,0,0,0,0)
+                               1,1,1,1,1,1)
   rand <- runif(n)
   draws2 <- -log( (1-rand)*exp(-(mu+lambda) * tx) + rand*exp(-(mu+lambda) * Tcal)) / (mu+lambda)
   err <- abs(mean(draws1)-mean(draws2))
@@ -477,7 +477,7 @@ NumericVector pcnbd_slice_sample(String what,
   # unit-test P(alive) by comparing C++ result matches R results, matches Pareto/NBD result (k=1)
   x <- 0
   tx <- 7
-  Tcal <- 12
+  Tcal <- 12 # FIXME: if Tcal=50 the integration fails on AWS; probably due to 'too low' integrand value;
   k <- 1
   lambda <- 1.4
   mu <- 0.015
