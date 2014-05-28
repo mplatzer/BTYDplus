@@ -6,14 +6,14 @@
 #' 
 #' method 1) If \code{use_data_augmentation==TRUE} then implementation follows chapter
 #' 3.2 of Sandeep Conoor's dissertation
-#' http://gradworks.umi.com/34/02/3402149.html, i.e. parameter space is expanded
+#' \url{http://gradworks.umi.com/34/02/3402149.html}, i.e. parameter space is expanded
 #' with unobserved lifetime tau_i. Note, however, that  we follow the notation
 #' of original SMC paper with alpha and beta being the 'rate' parameters of the
 #' Gamma distributions, instead of 'scale' parameter.
 #' 
 #' method 2) If \code{use_data_augmentation==FALSE} then implementation follows
 #' Shao-Hui Ma & Jin-Lan Liu paper 
-#' http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404, i.e. no data
+#' \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}, i.e. no data
 #' augmentation and draws on individual level need to be done via slice
 #' sampling. As such it is 10x slower than method 1)
 #' 

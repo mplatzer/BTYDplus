@@ -1,10 +1,36 @@
 
-##########################################
-### Implementation of the BG/NBD model ###
-##########################################
-
-bgnbd.EstimateParameters <- function (cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000) 
-{
+#' Parameter Estimation for the BG/NBD model
+#' 
+#' Estimates parameters for the BG/NBD model via Maximum Likelihood Estimation.
+#' 
+#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
+#'   column 'custs' can be provided, which represents number of customers with a
+#'   specific combination of frequency 'x', recency 't.x' and 'T.cal'.
+#' @param par.start initial BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
+#'   'b' in that order.
+#' @param max.param.value the upper bound on parameters
+#' @return list of estimated parameters
+#' @import BTYD
+#' @export
+#' @references Fader, Peter S., Bruce GS Hardie, and Ka Lok Lee. "Counting Your Customers the Easy Way: An Alternative to the Pareto/NBD Model." Marketing Science 24.2 (2005): 275-284.
+#' @examples
+#' # generate artificial data 
+#' params <- list(r=0.24, alpha=4.41, a=0.79, b=2.42)
+#' cbs <- bgnbd.GenerateData(n=1000, T.cal=32, T.star=32, params=params)$cbs
+#' 
+#' # estimate parameters, and compare to true parameters
+#' est <- bgnbd.EstimateParameters(cbs)
+#' rbind(params, est=round(est, 3))
+#' #        r     alpha a     b    
+#' # params 0.24  4.41  0.79  2.42 
+#' # est    0.238 4.408 0.522 1.288
+#' 
+#' # estimate future transactions, and compare to actuals from holdout period
+#' cbs$x.est <- bgnbd.ConditionalExpectedTransactions(est, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+#' sqrt(mean((cbs$x.star-cbs$x.est)^2))
+#' # 1.34969
+bgnbd.EstimateParameters <- function(cal.cbs, par.start=c(1, 1, 1, 1), max.param.value=10000) {
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "bgnbd.EstimateParameters")
   bgnbd.eLL <- function(params, cal.cbs, max.param.value) {
@@ -21,8 +47,17 @@ bgnbd.EstimateParameters <- function (cal.cbs, par.start = c(1, 1, 1, 1), max.pa
 }
 
 
-bgnbd.cbs.LL <- function (params, cal.cbs) 
-{
+#' Calculate the log-likelihood of the BG/NBD model
+#' 
+#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
+#'   'b' in that order.
+#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
+#'   column 'custs' can be provided, which represents number of customers with a
+#'   specific combination of frequency 'x' and 'T.cal'.
+#' @return the total log-likelihood for the provided data.
+#' @export
+bgnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("r", "alpha", "a", "b"), params, 
    "bgnbd.cbs.LL")  
   tryCatch(x <- cal.cbs[, "x"], error = function(e) stop("Error in bgnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
@@ -37,8 +72,17 @@ bgnbd.cbs.LL <- function (params, cal.cbs)
 }
 
 
-bgnbd.LL <- function (params, x, t.x, T.cal) 
-{
+#' Calculate the log-likelihood of the BG/NBD model
+#' 
+#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
+#'   'b' in that order.
+#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
+#'   column 'custs' can be provided, which represents number of customers with a
+#'   specific combination of frequency 'x' and 'T.cal'.
+#' @return a vector of log-likelihoods
+#' @export
+bgnbd.LL <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -71,9 +115,23 @@ bgnbd.LL <- function (params, x, t.x, T.cal)
 }
 
 
-
-bgnbd.PAlive <- function (params, x, t.x, T.cal) 
-{
+#' BG/NBD P(alive)
+#' 
+#' Uses BG/NBD model parameters and a customer's past transaction behavior to
+#' return the probability that they are still alive at the end of the
+#' calibration period.
+#' 
+#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and 'b' in
+#'   that order.
+#' @param x number of repeat transactions in the calibration period T.cal, or a 
+#'   vector of calibration period frequencies.
+#' @param t.x recency, i.e. length between first and last transaction during
+#'   calibration period.
+#' @param T.cal length of calibration period, or a vector of calibration period 
+#'   lengths.
+#' @return Probability that the customer is still alive at the end of the calibration period.
+#' @export
+bgnbd.PAlive <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -100,8 +158,28 @@ bgnbd.PAlive <- function (params, x, t.x, T.cal)
 }
 
 
-bgnbd.ConditionalExpectedTransactions <- function (params, T.star, x, t.x, T.cal) 
-{
+#' BG/NBD Conditional Expected Transactions
+#' 
+#' Uses BG/NBD model parameters and a customer's past transaction behavior to 
+#' return the number of transactions they are expected to make in a given time 
+#' period.
+#' 
+#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and 'b' in
+#'   that order.
+#' @param T.star length of time for which we are calculating the expected number
+#'   of transactions.
+#' @param x number of repeat transactions in the calibration period T.cal, or a 
+#'   vector of calibration period frequencies.
+#' @param t.x recency, i.e. length between first and last transaction during
+#'   calibration period.
+#' @param T.cal length of calibration period, or a vector of calibration period 
+#'   lengths.
+#' @return Number of transactions a customer is expected to make in a time 
+#'   period of length t, conditional on their past behavior. If any of the input
+#'   parameters has a length greater than 1, this will be a vector of expected 
+#'   number of transactions.
+#' @export
+bgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   max.length <- max(length(T.star), length(x), length(t.x), 
     length(T.cal))
   if (max.length%%length(T.star)) 
@@ -137,8 +215,17 @@ bgnbd.ConditionalExpectedTransactions <- function (params, T.star, x, t.x, T.cal
 }
 
 
-bgnbd.GenerateData <- function (n, T.cal, T.star, params, return.elog=F) 
-{
+#' Simulate data according to BG/NBD model assumptions
+#' 
+#' @param n number of customers
+#' @param T.cal length of calibration period
+#' @param T.star length of holdout period
+#' @param params BG/NBD parameters - a list with 'r', 'alpha', 'a' and 'b'
+#' @param return.elog boolean - if TRUE then the event log is returned in
+#'   addition to the CBS summary
+#' @return list with elements 'cbs' and 'elog' containing data.frames
+#' @export
+bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape=params$r, rate=params$alpha)
 
@@ -167,6 +254,7 @@ bgnbd.GenerateData <- function (n, T.cal, T.star, params, return.elog=F)
     cbs[i, "p"] <- p
     cbs[i, "lambda"] <- lambda
     cbs[i, "churn"] <- churn
+    cbs[i, "T.star"] <- T.star
   }
   elog$date <- as.Date("2001/01/01") + elog$t
   out <- list(cbs=cbs)
