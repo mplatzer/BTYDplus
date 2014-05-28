@@ -205,7 +205,7 @@ pnbd.mcmc.DrawParameters <-
   }
   
   # run multiple chains - executed in parallel on Unix
-  cores <- ifelse(.Platform$OS.type=="windows", 1, detectCores())
+  cores <- max(chains, ifelse(.Platform$OS.type=="windows", 1, detectCores()))
   draws <- mclapply(1:chains, function(i) run_single_chain(i, data), mc.cores=cores)
 
   # merge chains into code::mcmc.list objects
