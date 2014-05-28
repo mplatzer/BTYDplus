@@ -16,7 +16,7 @@
 #' @return 2-element list
 #' level_1:  list of coda::mcmc.list objects; one for each customer, containing individual-level draws
 #' level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
-#' @import coda Rcpp parallel
+#' @import coda parallel
 #' @export
 #' @examples
 #' #params <- list(r=1.4, alpha=1.3, s=0.7, beta=7, t=1.5, gamma=1)
@@ -184,8 +184,9 @@ pcnbd.mcmc.DrawParameters <-
   stopifnot(all(c("x", "t.x", "T.cal", "litt") %in% names(data)))
   stopifnot(all(is.finite(data$litt)))
   
-  # run multiple chains
-  draws <- mclapply(1:chains, function(i) run_single_chain(i, data), mc.cores=1)
+  # run multiple chains - executed in parallel on Unix
+  cores <- ifelse(.Platform$OS.type=="windows", 1, detectCores())
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, data), mc.cores=cores)
   
   # merge chains into code::mcmc.list objects
   return(list(
