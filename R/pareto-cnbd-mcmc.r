@@ -37,86 +37,22 @@ pcnbd.mcmc.DrawParameters <-
                               beta_1=1/1000, beta_2=1/1000)) {
   
   ## methods to sample heterogeneity parameters {r, alpha, s, beta, t, gamma} ##
-  
-  draw_shape <- function(x, shape, rate, prior1, prior2, steps=20) {
     
-    calc_prior <- function(r) (prior1 - 1) * log(r) - (r * prior2)
-    calc_likel <- function(r) (r - 1) * sum(log(x)) + length(x) * (r * log(rate) - lgamma(r))
-    
-    cur_shape <- shape
-    cur_prior <- calc_prior(cur_shape)
-    cur_likel <- calc_likel(cur_shape)
-    
-    step_scale <- mean(x) * rate
-    
-    for (i in 1:steps) {
-      
-      # generate new proposal
-      new_shape <- cur_shape * exp(max(-100, min(100, scale * rt(1, df=3))))
-      new_prior <- calc_prior(new_shape)
-      new_likel <- calc_likel(new_shape)
-      
-      # accept/reject new proposal
-      mhratio <- exp(new_prior+new_likel-cur_prior-cur_likel)
-      if (mhratio > runif(n=1))
-        cur_shape <- new_shape
-      
+  draw_gamma_params <- function(type, level_1, level_2, hyper_prior) {
+    if (type=="lambda") {
+      x <- level_1["lambda",]
+      cur_params <- c(level_2["r"], level_2["alpha"])
+      hyper <- unlist(hyper_prior[c("r_1", "r_2", "alpha_1", "alpha_2")])
+    } else if (type=="mu") {
+      x <- level_1["mu",]
+      cur_params <- c(level_2["s"], level_2["beta"])
+      hyper <- unlist(hyper_prior[c("s_1", "s_2", "beta_1", "beta_2")])
+    } else if (type=="k") {
+      x <- level_1["k",]
+      cur_params <- c(level_2["t"], level_2["gamma"])
+      hyper <- unlist(hyper_prior[c("t_1", "t_2", "gamma_1", "gamma_2")])      
     }
-    return(cur_shape)
-  }
-  
-  draw_rate <- function(x, shape, rate, prior1, prior2) {
-    rgamma(n     = 1, 
-           shape = prior1 + length(x) * shape,
-           rate  = prior2 + sum(x))
-  }
-  
-  draw_t <- function(level_1, level_2, hyper_prior) {
-    draw_shape(x      = level_1["k",], 
-               shape  = level_2["t"],
-               rate   = level_2["gamma"],
-               prior1 = hyper_prior$t_1,
-               prior2 = hyper_prior$t_2)
-  }
-  
-  draw_gamma <- function(level_1, level_2, hyper_prior) {
-    draw_rate(x      = level_1["k",],
-              shape  = level_2["t"],
-              rate   = level_2["gamma"],
-              prior1 = hyper_prior$gamma_1,
-              prior2 = hyper_prior$gamma_2)
-  }
-  
-  draw_r <- function(level_1, level_2, hyper_prior) {
-    draw_shape(x      = level_1["lambda",], 
-               shape  = level_2["r"],
-               rate   = level_2["alpha"],
-               prior1 = hyper_prior$r_1,
-               prior2 = hyper_prior$r_2)
-  }
-  
-  draw_alpha <- function(level_1, level_2, hyper_prior) {
-    draw_rate(x      = level_1["lambda",],
-              shape  = level_2["r"],
-              rate   = level_2["alpha"],
-              prior1 = hyper_prior$alpha_1,
-              prior2 = hyper_prior$alpha_2)
-  }
-  
-  draw_s <- function(level_1, level_2, hyper_prior) {
-    draw_shape(x      = level_1["mu",], 
-               shape  = level_2["s"],
-               rate   = level_2["beta"],
-               prior1 = hyper_prior$s_1,
-               prior2 = hyper_prior$s_2)
-  }
-  
-  draw_beta <- function(level_1, level_2, hyper_prior) {
-    draw_rate(x      = level_1["mu",],
-              shape  = level_2["s"],
-              rate   = level_2["beta"],
-              prior1 = hyper_prior$beta_1,
-              prior2 = hyper_prior$beta_2)
+    slice_sample_gamma_parameters(x, cur_params, hyper, steps=50, w=0.1)
   }
   
   ## methods to sample individual-level parameters ##
@@ -232,12 +168,9 @@ pcnbd.mcmc.DrawParameters <-
       level_1["tau", ]    <- draw_tau(df, level_1, level_2)
       
       # draw heterogeneity parameters
-      level_2["t"]        <- draw_t(level_1, level_2, hyper_prior)
-      level_2["gamma"]    <- draw_gamma(level_1, level_2, hyper_prior)
-      level_2["r"]        <- draw_r(level_1, level_2, hyper_prior)
-      level_2["alpha"]    <- draw_alpha(level_1, level_2, hyper_prior)
-      level_2["s"]        <- draw_s(level_1, level_2, hyper_prior)
-      level_2["beta"]     <- draw_beta(level_1, level_2, hyper_prior)
+      level_2[c("t", "gamma")] <- draw_gamma_params("k", level_1, level_2, hyper_prior)
+      level_2[c("r", "alpha")] <- draw_gamma_params("lambda", level_1, level_2, hyper_prior)
+      level_2[c("s", "beta")]  <- draw_gamma_params("mu", level_1, level_2, hyper_prior)      
     }
     
     # convert MCMC draws into coda::mcmc objects
