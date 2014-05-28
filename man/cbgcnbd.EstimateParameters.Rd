@@ -53,6 +53,6 @@ sqrt(mean((cbs$x.star-cbs$x.est)^2))
 Platzer, Michael. "Stochastic models of noncontractual consumer
   relationships." Master of Science in Business Administration thesis, Vienna
   University of Economics and Business Administration, Austria (2008).
-  https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships
+  \url{https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships}
 }
 
