@@ -52,7 +52,7 @@ pcnbd.mcmc.DrawParameters <-
       cur_params <- c(level_2["t"], level_2["gamma"])
       hyper <- unlist(hyper_prior[c("t_1", "t_2", "gamma_1", "gamma_2")])      
     }
-    slice_sample_gamma_parameters(x, cur_params, hyper, steps=50, w=0.1)
+    slice_sample_gamma_parameters(x, cur_params, hyper, steps=200, w=0.1)
   }
   
   ## methods to sample individual-level parameters ##
