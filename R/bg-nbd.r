@@ -30,7 +30,7 @@
 #' cbs$x.est <- bgnbd.ConditionalExpectedTransactions(est, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 #' sqrt(mean((cbs$x.star-cbs$x.est)^2))
 #' # 1.34969
-bgnbd.EstimateParameters <- function(cal.cbs, par.start=c(1, 1, 1, 1), max.param.value=10000) {
+bgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000) {
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "bgnbd.EstimateParameters")
   bgnbd.eLL <- function(params, cal.cbs, max.param.value) {
