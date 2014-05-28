@@ -280,9 +280,9 @@ NumericVector slice_sample_ma_liu(String what,
     // Rcpp::Rcout << i << " x:" << x[i] << " tx:" << tx[i] << " Tcal:" << Tcal[i] << " lambda:" << lambda[i] << " mu:" << mu[i] << " r:" << r << " alpha:" << alpha << " s:" << s << " beta:" << beta << " - " << std::endl;    
     NumericVector params = NumericVector::create(x[i], tx[i], Tcal[i], lambda[i], mu[i], r, alpha, s, beta);
     if (what == "lambda") {
-      out[i] = slice_sample_cpp(post_lambda_ma_liu, params, NumericVector::create(lambda[i]), 3, 3 * sqrt(r) / alpha, 0, INFINITY)[0];
+      out[i] = slice_sample_cpp(post_lambda_ma_liu, params, NumericVector::create(lambda[i]), 3, 3 * sqrt(r) / alpha, 1e-5, 1e+5)[0];
     } else if (what == "mu") {
-      out[i] = slice_sample_cpp(post_mu_ma_liu, params, NumericVector::create(mu[i]), 6, 3 * sqrt(s) / beta, 0, INFINITY)[0];
+      out[i] = slice_sample_cpp(post_mu_ma_liu, params, NumericVector::create(mu[i]), 6, 3 * sqrt(s) / beta, 1e-5, 1e+5)[0];
     }
   }
   return out;
@@ -432,9 +432,9 @@ NumericVector pcnbd_slice_sample(String what,
                               t, gamma, r, alpha, s, beta);
     //Rcpp::Rcout << i << " - " << x[i] << " - " << tx[i] << " - " << Tcal[i] << " - " << litt[i] << " - " << k[i] << " - " << lambda[i] << " - " << mu[i] << " - " << tau[i] << " - " << t << " - " << gamma << " - " << r << " - " << alpha << " - " << s << " - " << beta << " - " << std::endl;
     if (what == "k") {
-      out[i] = slice_sample_cpp(pcnbd_post_k, params, NumericVector::create(k[i]), 3, 3 * sqrt(t) / gamma, 0, INFINITY)[0];
+      out[i] = slice_sample_cpp(pcnbd_post_k, params, NumericVector::create(k[i]), 3, 3 * sqrt(t) / gamma, 1e-5, 1e+5)[0];
     } else if (what == "lambda") {
-      out[i] = slice_sample_cpp(pcnbd_post_lambda, params, NumericVector::create(lambda[i]), 3, 3 * sqrt(r) / alpha, 0, INFINITY)[0];
+      out[i] = slice_sample_cpp(pcnbd_post_lambda, params, NumericVector::create(lambda[i]), 3, 3 * sqrt(r) / alpha, 1e-5, 1e+5)[0];
     } else if (what == "tau") {
       if (::Rf_pgamma(tx[i], k[i], 1/(k[i]*lambda[i]), 0, 1) < -100) {
         // distribution is 'too flat' to sample properly, so we draw uniformly
