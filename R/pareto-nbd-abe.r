@@ -4,6 +4,8 @@
 ## FIXME: check why we gamma_draws are off
 ## TODO: estimate CDnow and compare to Abe/Korkmaz results
 
+#' FIXME docs
+#' 
 abe.mcmc.DrawParameters <- function(data, mcmc = 20000, burnin = mcmc/2, thin = 1) {
 
   draw_z <- function(data, theta) {

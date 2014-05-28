@@ -1,8 +1,17 @@
 
-# Implementation of the Gamma/Gompertz/NBD model (Bemmaor, Glady, 2012)
-
-ggnbd.EstimateParameters <- function (cal.cbs, par.start = c(1, 1, .5, 1, 1), min.param.value=1e-6, max.param.value=1e+4, trace=0)
-{
+#' Estimates parameters for the Gamma/Gompertz/NBD model (Bemmaor, Glady, 2012) 
+#' via Maximum Likelihood Estimation.
+#' 
+#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
+#'   column 'custs' can be provided, which represents number of customers with a
+#'   specific combination of frequency 'x', recency 't.x' and 'T.cal'.
+#' @param par.start initial Gamma/Gompertz/NBD parameters - a vector with 'r',
+#'   'alpha', 'b', 's' and 'beta' in that order.
+#' @param max.param.value the upper bound on parameters
+#' @return list of estimated parameters
+#' @export
+ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min.param.value=1e-6, max.param.value=1e+4, trace=0) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), par.start, 
     "ggnbd.EstimateParameters")
   count <- 0
@@ -26,8 +35,17 @@ ggnbd.EstimateParameters <- function (cal.cbs, par.start = c(1, 1, .5, 1, 1), mi
 }
 
 
-ggnbd.cbs.LL <- function (params, cal.cbs) 
-{
+#' Calculates the log-likelihood of the Gamma/Gompertz/NBD model.
+#' 
+#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
+#'   'b', 's' and 'beta' in that order.
+#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
+#'   column 'custs' can be provided, which represents number of customers with a
+#'   specific combination of frequency 'x' and 'T.cal'.
+#' @return the total log-likelihood for the provided data.
+#' @export
+ggnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
    "ggnbd.cbs.LL")  
   tryCatch(x <- cal.cbs[, "x"], error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
@@ -42,8 +60,17 @@ ggnbd.cbs.LL <- function (params, cal.cbs)
 }
 
 
-ggnbd.LL <- function (params, x, t.x, T.cal) 
-{
+#' Calculates the log-likelihood of the Gamma/Gompertz/NBD model.
+#' 
+#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha', 
+#'   'b', 's' and 'beta' in that order.
+#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
+#'   column 'custs' can be provided, which represents number of customers with a
+#'   specific combination of frequency 'x' and 'T.cal'.
+#' @return a vector of log-likelihoods
+#' @export
+ggnbd.LL <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -83,9 +110,22 @@ ggnbd.LL <- function (params, x, t.x, T.cal)
 }
 
 
-
-ggnbd.PAlive <- function (params, x, t.x, T.cal) 
-{
+#' Uses Gamma/Gompertz/NBD model parameters and a customer's past transaction
+#' behavior to return the probability that they are still alive at the end of
+#' the calibration period.
+#' 
+#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
+#'   'b', 's' and 'beta' in that order.
+#' @param x number of repeat transactions in the calibration period T.cal, or a 
+#'   vector of calibration period frequencies.
+#' @param t.x recency, i.e. length between first and last transaction during 
+#'   calibration period.
+#' @param T.cal length of calibration period, or a vector of calibration period 
+#'   lengths.
+#' @return Probability that the customer is still alive at the end of the 
+#'   calibration period.
+#' @export
+ggnbd.PAlive <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -115,8 +155,26 @@ ggnbd.PAlive <- function (params, x, t.x, T.cal)
 }
 
 
-ggnbd.ConditionalExpectedTransactions <- function (params, T.star, x, t.x, T.cal) 
-{
+#' Uses Gamma/Gompertz/NBD model parameters and a customer's past transaction
+#' behavior to return the number of transactions they are expected to make in a
+#' given time period.
+#' 
+#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
+#'   'b', 's' and 'beta' in that order.
+#' @param T.star length of time for which we are calculating the expected number
+#'   of transactions.
+#' @param x number of repeat transactions in the calibration period T.cal, or a 
+#'   vector of calibration period frequencies.
+#' @param t.x recency, i.e. length between first and last transaction during 
+#'   calibration period.
+#' @param T.cal length of calibration period, or a vector of calibration period 
+#'   lengths.
+#' @return Number of transactions a customer is expected to make in a time 
+#'   period of length t, conditional on their past behavior. If any of the input
+#'   parameters has a length greater than 1, this will be a vector of expected 
+#'   number of transactions.
+#' @export
+ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   max.length <- max(length(T.star), length(x), length(t.x), 
     length(T.cal))
   if (max.length%%length(T.star)) 
@@ -160,8 +218,18 @@ ggnbd.ConditionalExpectedTransactions <- function (params, T.star, x, t.x, T.cal
 }
 
 
-ggnbd.GenerateData <- function (n, T.cal, T.star, params, return.elog=F) 
-{
+#' Create simulated data set according to Gamma/Gompertz/NBD model assumptions.
+#' 
+#' @param n number of customers
+#' @param T.cal length of calibration period
+#' @param T.star length of holdout period
+#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
+#'   'b', 's' and 'beta' in that order.
+#' @param return.elog boolean - if TRUE then the event log is returned in 
+#'   addition to the CBS summary
+#' @return list with elements 'cbs' and 'elog' containing data.frames
+#' @export
+ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape=params$r, rate=params$alpha)
   

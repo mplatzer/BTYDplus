@@ -1,10 +1,16 @@
 
-##############################################
-### Implementation of the CBG/CNBD-k model ###
-##############################################
-
-cbgcnbd.EstimateParameters <- function (cal.cbs, k, par.start = c(1, k, 1, 1), max.param.value = 10000)
-{
+#' Estimates parameters for the CBG/CNBD-k model via Maximum Likelihood Estimation.
+#' 
+#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
+#'   column 'custs' can be provided, which represents number of customers with a
+#'   specific combination of frequency 'x', recency 't.x' and 'T.cal'.
+#' @param par.start initial CBG/CNBD-k parameters - a vector with 'r', 'alpha', 'a' and
+#'   'b' in that order.
+#' @param max.param.value the upper bound on parameters
+#' @return list of estimated parameters
+#' @export
+cbgcnbd.EstimateParameters <- function(cal.cbs, k, par.start = c(1, k, 1, 1), max.param.value = 10000) {
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "cbgcnbd.EstimateParameters")
   if (!"litt" %in% colnames(cal.cbs)) cal.cbs[, "litt"] <- 0 # for finding optimal parameters the litt-variable is not mandatory
@@ -22,14 +28,23 @@ cbgcnbd.EstimateParameters <- function (cal.cbs, k, par.start = c(1, k, 1, 1), m
 }
 
 
-cbgcnbd.cbs.LL <- function (params, k, cal.cbs) 
-{
+#' Calculates the log-likelihood of the CBG/CNBD-k model.
+#' 
+#' @param params CBG/CNBD-k parameters - a vector with 'r', 'alpha', 'a' and
+#'   'b' in that order.
+#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
+#'   column 'custs' can be provided, which represents number of customers with a
+#'   specific combination of frequency 'x' and 'T.cal'.
+#' @return the total log-likelihood for the provided data.
+#' @export
+cbgcnbd.cbs.LL <- function(params, k, cal.cbs) {
   dc.check.model.params(c("r", "alpha", "a", "b"), params, 
    "cbgcnbd.cbs.LL")
-  tryCatch(x <- cal.cbs[, "x"], error = function(e) stop("Error in pnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
-  tryCatch(t.x <- cal.cbs[, "t.x"], error = function(e) stop("Error in pnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
-  tryCatch(T.cal <- cal.cbs[, "T.cal"], error = function(e) stop("Error in pnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
-  tryCatch(litt <- cal.cbs[, "litt"], error = function(e) stop("Error in pnbd.cbs.LL: cal.cbs must have a column for sum over logarithmic inter-transaction-times labelled \"litt\""))
+  tryCatch(x <- cal.cbs[, "x"], error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(t.x <- cal.cbs[, "t.x"], error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
+  tryCatch(T.cal <- cal.cbs[, "T.cal"], error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  tryCatch(litt <- cal.cbs[, "litt"], error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a column for sum over logarithmic inter-transaction-times labelled \"litt\""))
   if ("custs" %in% colnames(cal.cbs)) {
     custs <- cal.cbs[, "custs"]
   } else {
@@ -39,8 +54,17 @@ cbgcnbd.cbs.LL <- function (params, k, cal.cbs)
 }
 
 
-cbgcnbd.LL <- function (params, k, x, t.x, T.cal, litt) 
-{
+#' Calculates the log-likelihood of the CBG/CNBD-k model.
+#' 
+#' @param params CBG/CNBD-k parameters - a vector with 'r', 'alpha', 'a' and 'b'
+#'   in that order.
+#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
+#'   column 'custs' can be provided, which represents number of customers with a
+#'   specific combination of frequency 'x' and 'T.cal'.
+#' @return a vector of log-likelihoods
+#' @export
+cbgcnbd.LL <- function(params, k, x, t.x, T.cal, litt) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -85,8 +109,22 @@ cbgcnbd.LL <- function (params, k, x, t.x, T.cal, litt)
 }
 
 
-cbgcnbd.PAlive <- function (params, k, x, t.x, T.cal) 
-{
+#' Uses CBG/CNBD-k model parameters and a customer's past transaction behavior
+#' to return the probability that they are still alive at the end of the 
+#' calibration period.
+#' 
+#' @param params CBG/CNBD-k parameters - a vector with 'r', 'alpha', 'a' and 'b'
+#'   in that order.
+#' @param x number of repeat transactions in the calibration period T.cal, or a 
+#'   vector of calibration period frequencies.
+#' @param t.x recency, i.e. length between first and last transaction during 
+#'   calibration period.
+#' @param T.cal length of calibration period, or a vector of calibration period 
+#'   lengths.
+#' @return Probability that the customer is still alive at the end of the
+#'   calibration period.
+#' @export
+cbgcnbd.PAlive <- function(params, k, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -124,8 +162,26 @@ cbgcnbd.PAlive <- function (params, k, x, t.x, T.cal)
 }
 
 
-cbgcnbd.ConditionalExpectedTransactions <- function (params, k=1, T.star, x, t.x, T.cal) 
-{
+#' Uses CBG/CNBD-k model parameters and a customer's past transaction behavior to 
+#' return the number of transactions they are expected to make in a given time 
+#' period.
+#' 
+#' @param params CBG/CNBD-k parameters - a vector with 'r', 'alpha', 'a' and 'b' in
+#'   that order.
+#' @param T.star length of time for which we are calculating the expected number
+#'   of transactions.
+#' @param x number of repeat transactions in the calibration period T.cal, or a 
+#'   vector of calibration period frequencies.
+#' @param t.x recency, i.e. length between first and last transaction during
+#'   calibration period.
+#' @param T.cal length of calibration period, or a vector of calibration period 
+#'   lengths.
+#' @return Number of transactions a customer is expected to make in a time 
+#'   period of length t, conditional on their past behavior. If any of the input
+#'   parameters has a length greater than 1, this will be a vector of expected 
+#'   number of transactions.
+#' @export
+cbgcnbd.ConditionalExpectedTransactions <- function(params, k=1, T.star, x, t.x, T.cal) {
   if (k>1)
     message("Results for k>1 are approximative")
   max.length <- max(length(T.star), length(x), length(t.x), 
@@ -165,8 +221,9 @@ cbgcnbd.ConditionalExpectedTransactions <- function (params, k=1, T.star, x, t.x
 }
 
 
-cbgcnbd.UnconditionalExpectedTransactions <- function (params, k=1, t)
-{
+#' FIXME docs
+#' 
+cbgcnbd.UnconditionalExpectedTransactions <- function(params, k=1, t) {
   if (k>1)
     message("Results for k>1 are approximative")
   dc.check.model.params(c("r", "alpha", "a", "b"), params, 
@@ -184,9 +241,10 @@ cbgcnbd.UnconditionalExpectedTransactions <- function (params, k=1, t)
 }
 
 
-# unconditional probability distribution of purchase frequencies, i.e. P(X(t)=x|r,alpha,a,b)
-cbgcnbd.Px <- function (params, k=1, t, x) 
-{
+#' FIXME docs
+#' 
+#' unconditional probability distribution of purchase frequencies, i.e. P(X(t)=x|r,alpha,a,b)
+cbgcnbd.Px <- function(params, k=1, t, x) {
   nbd.Px <- function(params, t, x) {
     r <- params[1]
     alpha <- params[2]
@@ -206,8 +264,8 @@ cbgcnbd.Px <- function (params, k=1, t, x)
 }
 
 
-cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) 
-{
+#' FIXME docs
+cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
   # Estimate Regularity of a customer cohort
   #  - by either assuming same regularity across all customers; this then only 
   #      require three transactions per customer
@@ -314,8 +372,18 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F)
 }
 
 
-cbgcnbd.GenerateData <- function (n, k, T.cal, T.star=T.cal, params, return.elog=F) 
-{
+#' Create simulated data set according to CBG/CNBD-k model assumptions.
+#' 
+#' @param n number of customers
+#' @param T.cal length of calibration period
+#' @param T.star length of holdout period
+#' @param params CBG/CNBD-k parameters - a vector with 'r', 'alpha', 'a' and 'b'
+#'   in that order.
+#' @param return.elog boolean - if TRUE then the event log is returned in 
+#'   addition to the CBS summary
+#' @return list with elements 'cbs' and 'elog' containing data.frames
+#' @export
+cbgcnbd.GenerateData <- function(n, k, T.cal, T.star=T.cal, params, return.elog=F) {
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape=params$r, rate=params$alpha)
   
