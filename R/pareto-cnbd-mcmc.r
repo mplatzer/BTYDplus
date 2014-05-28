@@ -260,7 +260,7 @@ pcnbd.mcmc.DrawFutureTransactions <- function(data, draws, T.star=data$T.star) {
       if (sum(itts)<minT) itts <- c(itts, rgamma(nr_of_itt_draws * 4, shape=ks[draw], rate=ks[draw]*lambdas[draw]))
       if (sum(itts)<minT) itts <- c(itts, rgamma(nr_of_itt_draws * 8, shape=ks[draw], rate=ks[draw]*lambdas[draw]))
       if (sum(itts)<minT)
-        stop("not enough inter-transaction times sampled: ", sum(itts), " < ", minT)
+        stop("not enough inter-transaction times sampled! cust:", i, " draw:", draw, " ", sum(itts), " < ", minT)
       x.stars[draw, cust] <- sum(cumsum(itts)<minT)
     }
     
