@@ -7,11 +7,11 @@
 # # Maximum Likelihood Estimate
 # params <- BTYD::pnbd.EstimateParameters(data, c(10,10,10,10))
 # 
-# # MCMC Estimate with augmented parameter space; 3secs for 1000 users x 1000 steps
+# # MCMC Estimate with augmented parameter space; 2.5secs for 1000 users x 1000 steps
 # draws1 <- pnbd.mcmc.DrawParameters(data, mcmc=10000, burnin=10000, thin=10, chains=2)
 # plot(draws1$level_2)
 # 
-# # MCMC Estimate without augmented parameter space; 11secs for 1000 users x 1000 steps
+# # MCMC Estimate without augmented parameter space; 25secs for 1000 users x 1000 steps
 # draws2 <- pnbd.mcmc.DrawParameters(data, mcmc=10000, burnin=10000, thin=10, chains=2, use_data_augmentation=F)
 # 
 # round(rbind(params, 

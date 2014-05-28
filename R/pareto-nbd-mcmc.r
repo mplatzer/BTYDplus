@@ -15,7 +15,7 @@
 #' Shao-Hui Ma & Jin-Lan Liu paper 
 #' http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404, i.e. no data
 #' augmentation and draws on individual level need to be done via slice
-#' sampling. As such it is 3x slower than method 1)
+#' sampling. As such it is 10x slower than method 1)
 #' 
 #' Estimating parameters via Pareto/NBD MCMC can be 10x slower than Pareto/NBD
 #' MLE, which itself can be 10x slower than BG/NBD. Both methods exhibit highly
