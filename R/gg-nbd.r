@@ -10,6 +10,7 @@
 #'   specific combination of frequency 'x', recency 't.x' and 'T.cal'.
 #' @param par.start initial Gamma/Gompertz/NBD parameters - a vector with 'r', 
 #'   'alpha', 'b', 's' and 'beta' in that order.
+#' @param min.param.value the lower bound on parameters
 #' @param max.param.value the upper bound on parameters
 #' @return list of estimated parameters
 #' @import BTYD
@@ -17,9 +18,9 @@
 #' @references Bemmaor, Albert C., and Nicolas Glady. "Modeling Purchasing 
 #'   Behavior with Sudden “Death”: A Flexible Customer Lifetime Model." 
 #'   Management Science 58.5 (2012): 1012-1021.
-ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min.param.value=1e-6, max.param.value=1e+4, trace=0) {
+ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min.param.value=1e-5, max.param.value=1e+4, trace=0) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), par.start, 
-    "ggnbd.EstimateParameters")
+                        "ggnbd.EstimateParameters")
   count <- 0
   ggnbd.eLL <- function(params, cal.cbs) {
     params <- exp(params)
@@ -37,6 +38,7 @@ ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min
                    lower = log(min.param.value), 
                    upper = log(max.param.value))
   estimated.params <- exp(results$par)
+  names(estimated.params) <- c("r", "alpha", "b", "s", "beta")
   return(estimated.params)
 }
 
@@ -53,7 +55,7 @@ ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min
 #' @export
 ggnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
-   "ggnbd.cbs.LL")  
+                        "ggnbd.cbs.LL")  
   tryCatch(x <- cal.cbs[, "x"], error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
   tryCatch(t.x <- cal.cbs[, "t.x"], error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
   tryCatch(T.cal <- cal.cbs[, "T.cal"], error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
@@ -70,13 +72,14 @@ ggnbd.cbs.LL <- function(params, cal.cbs) {
 #' 
 #' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha', 
 #'   'b', 's' and 'beta' in that order.
-#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
-#'   column 'custs' can be provided, which represents number of customers with a
-#'   specific combination of frequency 'x' and 'T.cal'.
+#' @param x frequency, i.e. number of re-purchases
+#' @param t.x recency, i.e. time elapsed from first purchase to last purchase
+#' @param T.cal total time of observation period
 #' @return a vector of log-likelihoods
 #' @export
 ggnbd.LL <- function(params, x, t.x, T.cal) {
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
+                        "ggnbd.LL")
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -84,8 +87,6 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
     warning("Maximum vector length not a multiple of the length of t.x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
-   "ggnbd.LL")
   if (any(x < 0) || !is.numeric(x)) 
     stop("x must be numeric and may not contain negative numbers.")
   if (any(t.x < 0) || !is.numeric(t.x)) 
@@ -103,6 +104,7 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
   
   intl <- numeric(0)
   for (i in 1:max.length) {
+    i
     intl[i] <- integrate(function(y) (y+alpha)^-(r+x[i]) * (beta+exp(b*y)-1)^-(s+1) * exp(b*y), 
                       lower=t.x[i], upper=T.cal[i])$value
   }
@@ -134,6 +136,8 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
 #'   calibration period.
 #' @export
 ggnbd.PAlive <- function(params, x, t.x, T.cal) {
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
+                        "ggnbd.PAlive")
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -141,7 +145,6 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
     warning("Maximum vector length not a multiple of the length of t.x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.PAlive")
   if (any(x < 0) || !is.numeric(x)) 
     stop("x must be numeric and may not contain negative numbers.")
   if (any(t.x < 0) || !is.numeric(t.x)) 
@@ -185,6 +188,8 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   number of transactions.
 #' @export
 ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
+                        "ggnbd.ConditionalExpectedTransactions")  
   max.length <- max(length(T.star), length(x), length(t.x), 
     length(T.cal))
   if (max.length%%length(T.star)) 
@@ -195,8 +200,6 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
     warning("Maximum vector length not a multiple of the length of t.x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
-    "ggnbd.ConditionalExpectedTransactions")
   if (any(T.star < 0) || !is.numeric(T.star)) 
     stop("T.star must be numeric and may not contain negative numbers.")
   if (any(x < 0) || !is.numeric(x)) 
@@ -233,19 +236,28 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params Gamma/Gompertz/NBD parameters - a list with 'r', 'alpha',
-#'   'b', 's' and 'beta'
+#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
+#'   'b', 's' and 'beta' in that order
 #' @param return.elog boolean - if TRUE then the event log is returned in 
 #'   addition to the CBS summary
 #' @return list with elements 'cbs' and 'elog' containing data.frames
 #' @export
 ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
+  # check model parameters
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params,
+                        "ggnbd.GenerateData")
+  r <- params[1]
+  alpha <- params[2]
+  b <- params[3]
+  s <- params[4]
+  beta <- params[5]  
+  
   # sample intertransaction timings parameter lambda for each customer
-  lambdas <- rgamma(n, shape=params$r, rate=params$alpha)
+  lambdas <- rgamma(n, shape=r, rate=alpha)
   
   # sample lifetimes for each customer  
-  taus <- (1/params$b)*log(1-params$beta+params$beta/(1-runif(n))^(1/params$s))
-  #etas <- rgamma(n, shape=params$s, rate=params$beta)
+  taus <- (1/b)*log(1-beta+beta/(1-runif(n))^(1/s))
+  #etas <- rgamma(n, shape=s, rate=beta)
   #taus <- flexsurv::rgompertz(n, shape=etas, rate=b)
   
   # sample intertransaction timings & churn
@@ -278,10 +290,7 @@ ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
     #cbs[i, "eta"] <- eta
     cbs[i, "tau"] <- tau
   }
-  elog$date <- as.Date("2001/01/01") + elog$t
   out <- list(cbs=cbs)
-  if (return.elog) {
-    out$elog <- transform(elog, date=as.Date("2001/01/01") + t)
-  }
+  if (return.elog) out$elog <- elog
   return(out)
 }
