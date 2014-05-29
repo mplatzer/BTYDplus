@@ -4,7 +4,7 @@
 \title{Parameter Estimation for Gamma/Gompertz/NBD model}
 \usage{
 ggnbd.EstimateParameters(cal.cbs, par.start = c(1, 1, 0.5, 1, 1),
-  min.param.value = 1e-06, max.param.value = 10000, trace = 0)
+  min.param.value = 1e-05, max.param.value = 10000, trace = 0)
 }
 \arguments{
 \item{cal.cbs}{calibration period CBS. It must contain columns for frequency
@@ -14,6 +14,8 @@ specific combination of frequency 'x', recency 't.x' and 'T.cal'.}
 
 \item{par.start}{initial Gamma/Gompertz/NBD parameters - a vector with 'r',
 'alpha', 'b', 's' and 'beta' in that order.}
+
+\item{min.param.value}{the lower bound on parameters}
 
 \item{max.param.value}{the upper bound on parameters}
 }

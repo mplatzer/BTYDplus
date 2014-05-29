@@ -3,14 +3,11 @@
 \alias{cbgcnbd.Px}
 \title{CBD/CNBD-k Unconditional Probability Distribution of Transactions}
 \usage{
-cbgcnbd.Px(params, k = 1, t, x)
+cbgcnbd.Px(params, t, x)
 }
 \arguments{
-\item{params}{CBG/CNBD-k parameters - a vector with 'r', 'alpha', 'a' and 'b'
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a' and 'b'
 in that order.}
-
-\item{k}{specified degree of regularity for Erlang-k distributed
-interpurchase times}
 
 \item{t}{length of time for which we are calculating the expected number of
 transactions.}
@@ -25,5 +22,8 @@ P(X(t)=x|r,alpha,a,b). If any of the input parameters has a length
 Uses CBG/CNBD-k model parameters to return the probability distribution of
 purchase frequencies for a random customer in a given time period, i.e.
 P(X(t)=x|r,alpha,a,b)
+}
+\seealso{
+cbgcnbd.EstimateParameters
 }
 

@@ -3,24 +3,25 @@
 \alias{cbgcnbd.cbs.LL}
 \title{Calculate the log-likelihood of the CBG/CNBD-k model}
 \usage{
-cbgcnbd.cbs.LL(params, k, cal.cbs)
+cbgcnbd.cbs.LL(params, cal.cbs)
 }
 \arguments{
-\item{params}{CBG/CNBD-k parameters - a vector with 'r', 'alpha', 'a' and 'b'
-in that order.}
-
-\item{k}{specified degree of regularity for Erlang-k distributed
-interpurchase times}
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a'
+and 'b' in that order.}
 
 \item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a
-column 'custs' can be provided, which represents number of customers with a
-specific combination of frequency 'x' and 'T.cal'.}
+'x', for recency 't.x.', for sum of logarithmic interpurchase times 'litt'
+and total time observed 'T.cal'. Optionally a column 'custs' can be
+provided, which represents number of customers with a specific combination
+of frequency 'x' and 'T.cal'.}
 }
 \value{
 the total log-likelihood for the provided data.
 }
 \description{
 Calculate the log-likelihood of the CBG/CNBD-k model
+}
+\seealso{
+cbgcnbd.EstimateParameters
 }
 

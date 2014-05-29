@@ -3,7 +3,7 @@
 \alias{cbgcnbd.GenerateData}
 \title{Simulate data according to CBG/CNBD-k model assumptions}
 \usage{
-cbgcnbd.GenerateData(n, k, T.cal, T.star = T.cal, params, return.elog = F)
+cbgcnbd.GenerateData(n, T.cal, T.star = T.cal, params, return.elog = F)
 }
 \arguments{
 \item{n}{number of customers}
@@ -12,7 +12,8 @@ cbgcnbd.GenerateData(n, k, T.cal, T.star = T.cal, params, return.elog = F)
 
 \item{T.star}{length of holdout period}
 
-\item{params}{CBG/CNBD-k parameters - a list with 'r', 'alpha', 'a' and 'b'}
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a' and 'b'
+in that order.}
 
 \item{return.elog}{boolean - if TRUE then the event log is returned in
 addition to the CBS summary}

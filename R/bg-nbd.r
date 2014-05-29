@@ -14,22 +14,7 @@
 #' @import BTYD
 #' @export
 #' @references Fader, Peter S., Bruce GS Hardie, and Ka Lok Lee. "Counting Your Customers the Easy Way: An Alternative to the Pareto/NBD Model." Marketing Science 24.2 (2005): 275-284.
-#' @examples
-#' # generate artificial data 
-#' params <- list(r=0.24, alpha=4.41, a=0.79, b=2.42)
-#' cbs <- bgnbd.GenerateData(n=1000, T.cal=32, T.star=32, params=params)$cbs
-#' 
-#' # estimate parameters, and compare to true parameters
-#' est <- bgnbd.EstimateParameters(cbs)
-#' rbind(params, est=round(est, 3))
-#' #        r     alpha a     b    
-#' # params 0.24  4.41  0.79  2.42 
-#' # est    0.238 4.408 0.522 1.288
-#' 
-#' # estimate future transactions, and compare to actuals from holdout period
-#' cbs$x.est <- bgnbd.ConditionalExpectedTransactions(est, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-#' sqrt(mean((cbs$x.star-cbs$x.est)^2))
-#' # 1.34969
+#' @example demos/bg-nbd.r
 bgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000) {
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "bgnbd.EstimateParameters")
@@ -43,6 +28,7 @@ bgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.par
     max.param.value = max.param.value, method = "L-BFGS-B")
   estimated.params <- exp(results$par)
   estimated.params[estimated.params > max.param.value] <- max.param.value
+  names(estimated.params) <- c("r", "alpha", "a", "b")
   return(estimated.params)
 }
 
@@ -57,6 +43,7 @@ bgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.par
 #'   specific combination of frequency 'x' and 'T.cal'.
 #' @return the total log-likelihood for the provided data.
 #' @export
+#' @seealso bgnbd.EstimateParameters
 bgnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("r", "alpha", "a", "b"), params, 
    "bgnbd.cbs.LL")  
@@ -76,12 +63,12 @@ bgnbd.cbs.LL <- function(params, cal.cbs) {
 #' 
 #' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
 #'   'b' in that order.
-#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
-#'   column 'custs' can be provided, which represents number of customers with a
-#'   specific combination of frequency 'x' and 'T.cal'.
+#' @param x frequency, i.e. number of re-purchases
+#' @param t.x recency, i.e. time elapsed from first purchase to last purchase
+#' @param T.cal total time of observation period
 #' @return a vector of log-likelihoods
 #' @export
+#' @seealso bgnbd.EstimateParameters
 bgnbd.LL <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
@@ -131,6 +118,8 @@ bgnbd.LL <- function(params, x, t.x, T.cal) {
 #'   lengths.
 #' @return Probability that the customer is still alive at the end of the calibration period.
 #' @export
+#' @seealso bgnbd.EstimateParameters
+#' @example demos/bg-nbd.r
 bgnbd.PAlive <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
@@ -178,7 +167,10 @@ bgnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   period of length t, conditional on their past behavior. If any of the input
 #'   parameters has a length greater than 1, this will be a vector of expected 
 #'   number of transactions.
+#' @import gsl
 #' @export
+#' @seealso bgnbd.EstimateParameters
+#' @example demos/bg-nbd.r
 bgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   max.length <- max(length(T.star), length(x), length(t.x), 
     length(T.cal))
@@ -225,11 +217,13 @@ bgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #'   addition to the CBS summary
 #' @return list with elements 'cbs' and 'elog' containing data.frames
 #' @export
+#' @seealso bgnbd.EstimateParameters
+#' @example demos/bg-nbd.r
 bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape=params$r, rate=params$alpha)
 
-  # sample churn-probability p for each customer
+  # sample dropout probability p for each customer
   ps <- rbeta(n, params$a, params$b)
   
   # sample intertransaction timings & churn
@@ -256,10 +250,7 @@ bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
     cbs[i, "churn"] <- churn
     cbs[i, "T.star"] <- T.star
   }
-  elog$date <- as.Date("2001/01/01") + elog$t
   out <- list(cbs=cbs)
-  if (return.elog) {
-    out$elog <- transform(elog, date=as.Date("2001/01/01") + t)
-  }
+  if (return.elog) out$elog <- elog
   return(out)
 }

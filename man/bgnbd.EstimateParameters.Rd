@@ -24,21 +24,45 @@ list of estimated parameters
 Estimates parameters for the BG/NBD model via Maximum Likelihood Estimation.
 }
 \examples{
-# generate artificial data
-params <- list(r=0.24, alpha=4.41, a=0.79, b=2.42)
-cbs <- bgnbd.GenerateData(n=1000, T.cal=32, T.star=32, params=params)$cbs
+
+set.seed(1)
+
+# generate artificial BG/NBD data 
+n      <- 1000 # no. of customers
+T.cal  <- 32   # length of calibration period
+T.star <- 32   # length of hold-out period
+params <- list(r=0.85, alpha=4.45, # purchase frequency lambda_i ~ Gamma(r, alpha)
+               a=0.79, b=2.42)     # dropout probability p_i ~ Beta(a, b)
+
+cbs <- bgnbd.GenerateData(n, T.cal, T.star, params)$cbs
 
 # estimate parameters, and compare to true parameters
-est <- bgnbd.EstimateParameters(cbs)
-rbind(params, est=round(est, 3))
-#        r     alpha a     b
-# params 0.24  4.41  0.79  2.42
-# est    0.238 4.408 0.522 1.288
+est <- bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal")])
+rbind(params, est=round(est, 2))
+#        r    alpha a    b   
+# params 0.85 4.45  0.79 2.42
+# est    0.82 4.32  0.62 1.98
+# -> underlying parameters are successfully identified via Maximum Likelihood Estimation
 
-# estimate future transactions, and compare to actuals from holdout period
+# estimate future transactions in holdout-period
 cbs$x.est <- bgnbd.ConditionalExpectedTransactions(est, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-sqrt(mean((cbs$x.star-cbs$x.est)^2))
-# 1.34969
+
+# compare forecast accuracy to naive forecast
+c("bgnbd"=sqrt(mean((cbs$x.star-cbs$x.est)^2)),
+  "naive"=sqrt(mean((cbs$x.star-cbs$x)^2)))
+#    bgnbd    naive 
+# 2.386392 3.688767
+# -> BG/NBD forecast better than naive forecast
+
+# estimate P(alive)
+cbs$palive <- bgnbd.PAlive(est, cbs$x, cbs$t.x, cbs$T.cal)
+
+# compare to true (usually unobserved) alive status
+prop.table(table(cbs$palive>.5, cbs$alive))
+#       FALSE  TRUE
+# FALSE 0.375 0.065
+# TRUE  0.176 0.384
+# -> 76\% of customers are correctly classified
 }
 \references{
 Fader, Peter S., Bruce GS Hardie, and Ka Lok Lee. "Counting Your Customers the Easy Way: An Alternative to the Pareto/NBD Model." Marketing Science 24.2 (2005): 275-284.

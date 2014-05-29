@@ -9,10 +9,11 @@ ggnbd.LL(params, x, t.x, T.cal)
 \item{params}{Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
 'b', 's' and 'beta' in that order.}
 
-\item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a
-column 'custs' can be provided, which represents number of customers with a
-specific combination of frequency 'x' and 'T.cal'.}
+\item{x}{frequency, i.e. number of re-purchases}
+
+\item{t.x}{recency, i.e. time elapsed from first purchase to last purchase}
+
+\item{T.cal}{total time of observation period}
 }
 \value{
 a vector of log-likelihoods

@@ -20,4 +20,7 @@ the total log-likelihood for the provided data.
 \description{
 Calculate the log-likelihood of the BG/NBD model
 }
+\seealso{
+bgnbd.EstimateParameters
+}
 

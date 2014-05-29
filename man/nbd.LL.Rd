@@ -9,11 +9,9 @@ nbd.LL(params, x, T.cal)
 \item{params}{NBD parameters - a vector with r and alpha, in that
 order.}
 
-\item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x' and total time observed 'T.cal'. Optionally a column 'custs' can be
-provided, which represents number of customers with a specific combination
-of frequency 'x' and 'T.cal' data.frame with columns 'x' and 'T.cal' and
-optional 'custs'.}
+\item{x}{frequency, i.e. number of re-purchases}
+
+\item{T.cal}{total time of observation period}
 }
 \value{
 a vector of log-likelihoods

@@ -44,6 +44,7 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
     max.param.value = max.param.value, method = "L-BFGS-B")
   estimated.params <- exp(results$par)
   estimated.params[estimated.params > max.param.value] <- max.param.value
+  names(estimated.params) <- c("r", "alpha")
   return(estimated.params)
 }
 
@@ -78,11 +79,8 @@ nbd.cbs.LL <- function(params, cal.cbs) {
 #' 
 #' @param params NBD parameters - a vector with r and alpha, in that
 #'   order.
-#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   'x' and total time observed 'T.cal'. Optionally a column 'custs' can be 
-#'   provided, which represents number of customers with a specific combination 
-#'   of frequency 'x' and 'T.cal' data.frame with columns 'x' and 'T.cal' and 
-#'   optional 'custs'.
+#' @param x frequency, i.e. number of re-purchases
+#' @param T.cal total time of observation period
 #' @return a vector of log-likelihoods
 #' @export
 #' @seealso nbd.EstimateParameters
@@ -186,8 +184,6 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
     cbs[i, "lambda"] <- lambda
   }
   out <- list(cbs=cbs)
-  if (return.elog) {
-    out$elog <- transform(elog, date=as.Date("2001/01/01") + t)
-  }
+  if (return.elog) out$elog <- elog
   return(out)
 }

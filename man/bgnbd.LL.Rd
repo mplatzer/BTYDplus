@@ -9,15 +9,19 @@ bgnbd.LL(params, x, t.x, T.cal)
 \item{params}{BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
 'b' in that order.}
 
-\item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a
-column 'custs' can be provided, which represents number of customers with a
-specific combination of frequency 'x' and 'T.cal'.}
+\item{x}{frequency, i.e. number of re-purchases}
+
+\item{t.x}{recency, i.e. time elapsed from first purchase to last purchase}
+
+\item{T.cal}{total time of observation period}
 }
 \value{
 a vector of log-likelihoods
 }
 \description{
 Calculate the log-likelihood of the BG/NBD model
+}
+\seealso{
+bgnbd.EstimateParameters
 }
 

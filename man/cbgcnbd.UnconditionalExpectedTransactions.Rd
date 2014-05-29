@@ -3,14 +3,11 @@
 \alias{cbgcnbd.UnconditionalExpectedTransactions}
 \title{CBD/CNBD-k Unconditional Expected Transactions}
 \usage{
-cbgcnbd.UnconditionalExpectedTransactions(params, k = 1, t)
+cbgcnbd.UnconditionalExpectedTransactions(params, t)
 }
 \arguments{
-\item{params}{CBG/CNBD-k parameters - a vector with 'r', 'alpha', 'a' and 'b'
-in that order.}
-
-\item{k}{specified degree of regularity for Erlang-k distributed
-interpurchase times}
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a'
+and 'b' in that order.}
 
 \item{t}{length of time for which we are calculating the expected number of
 transactions.}
@@ -23,5 +20,8 @@ Number of transactions a customer is expected to make in a time
 \description{
 Uses CBG/CNBD-k model parameters to return the number of transactions a
 random customer is expected to make in a given time period.
+}
+\seealso{
+cbgcnbd.EstimateParameters
 }
 
