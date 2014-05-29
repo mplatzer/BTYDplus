@@ -1,39 +1,28 @@
 
-###   Step 0: simulate NBD data   ###
-
-n      <- 5000 # no. of customers
-T.cal  <- 9    # length of calibration period
-T.star <- 30   # length of hold-out period
-
-# parameters of heterogeneity in intertransaction timings
-params <- list(r=1.9, alpha=4.2)
-
-# generate data according to NBD assumptions
 set.seed(1)
-data <- nbd.GenerateData(n=n, T.cal=T.cal, T.star=T.star, params=params)
-cbs <- data$cbs
 
+# generate artificial NBD data 
+n      <- 1000 # no. of customers
+T.cal  <- 32   # length of calibration period
+T.star <- 32   # length of hold-out period
+params <- list(r=0.85, alpha=4.45) # purchase frequency lambda_i ~ Gamma(r, alpha)
 
-###   Step 1: Estimate Heterogeneity Parameters from Simulated Data   ###
+cbs <- nbd.GenerateData(n, T.cal, T.star, params)$cbs
 
-params.est <- nbd.EstimateParameters(cbs)
+# estimate parameters, and compare to true parameters
+est <- nbd.EstimateParameters(cbs[, c("x", "T.cal")])
+rbind(params, est=round(est, 2))
+#        r    alpha
+# params 0.85 4.45
+# est    0.84 4.56
+# -> underlying parameters are successfully identified via Maximum Likelihood Estimation
 
-# compare with actual parameters
-rbind("actual"=params, "NBD"=round(params.est, 1))
-#        r   alpha
-# actual 1.9 4.2  
-# NBD    1.9 4.2 
-# --> we are able to re-estimate underlying heterogeneity parameters with maximum-likelihood-estimator
+# estimate future transactions in holdout-period
+cbs$x.est <- nbd.ConditionalExpectedTransactions(est, cbs$T.star, cbs$x, cbs$T.cal)
 
-
-###   Step 2: Estimate No. of Transactions in Hold-Out Period   ###
-
-cbs$est <- nbd.ConditionalExpectedTransactions(params.est, T.star, cbs$x, cbs$T.cal)
-
-round(sum(cbs$x.star) / sum(cbs$est) - 1, 4)
-# 0.0061
-# --> Total No. of Transactions is missed by less than 1%
-
-cor(cbs$est, cbs$x.star)
-# 0.7735612
-# --> correlation between estimates and actuals
+# compare forecast accuracy to naive forecast
+c("nbd"=sqrt(mean((cbs$x.star-cbs$x.est)^2)),
+  "naive"=sqrt(mean((cbs$x.star-cbs$x)^2)))
+#      nbd    naive 
+# 3.446776 3.469582
+# -> NBD forecast only marginally better than naive forecast

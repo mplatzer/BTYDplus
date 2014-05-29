@@ -1,52 +1,39 @@
 
-###   Step 0: simulate BG/NBD data   ###
-
-n      <- 5000 # no. of customers
-T.cal  <- 9    # length of calibration period
-T.star <- 30   # length of hold-out period
-
-# parameters of heterogeneity in intertransaction timings & churn probability
-params <- list(r=1.9, alpha=4.2, a=1.3, b=3.5)
-
-# generate data according to BG/NBD assumptions
 set.seed(1)
-data <- bgnbd.GenerateData(n=n, T.cal=T.cal, T.star=T.star, params=params)
-cbs <- data$cbs
 
-sum(cbs$alive) / nrow(cbs)
-# 0.391
-# --> 61% of customers have already churned before the end of calibration period
+# generate artificial BG/NBD data 
+n      <- 1000 # no. of customers
+T.cal  <- 32   # length of calibration period
+T.star <- 32   # length of hold-out period
+params <- list(r=0.85, alpha=4.45, # purchase frequency lambda_i ~ Gamma(r, alpha)
+               a=0.79, b=2.42)     # dropout probability p_i ~ Beta(a, b)
 
+cbs <- bgnbd.GenerateData(n, T.cal, T.star, params)$cbs
 
-###   Step 1: Estimate Heterogeneity Parameters from Simulated Data   ###
+# estimate parameters, and compare to true parameters
+est <- bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal")])
+rbind(params, est=round(est, 2))
+#        r    alpha a    b   
+# params 0.85 4.45  0.79 2.42
+# est    0.82 4.32  0.62 1.98
+# -> underlying parameters are successfully identified via Maximum Likelihood Estimation
 
-params.est <- bgnbd.EstimateParameters(cbs)
+# estimate future transactions in holdout-period
+cbs$x.est <- bgnbd.ConditionalExpectedTransactions(est, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 
-# compare with actual parameters
-rbind("actual"=params, "BG/NBD"=round(params.est, 1))
-#        r   alpha a   b  
-# actual 1.9 4.2   1.3 3.5
-# BG/NBD 2.1 4.6   1.4 3.9
-# --> we are able to re-estimate underlying heterogeneity parameters with maximum-likelihood-estimator
+# compare forecast accuracy to naive forecast
+c("bgnbd"=sqrt(mean((cbs$x.star-cbs$x.est)^2)),
+  "naive"=sqrt(mean((cbs$x.star-cbs$x)^2)))
+#    bgnbd    naive 
+# 2.386392 3.688767
+# -> BG/NBD forecast better than naive forecast
 
+# estimate P(alive)
+cbs$palive <- bgnbd.PAlive(est, cbs$x, cbs$t.x, cbs$T.cal)
 
-###   Step 2: Estimate Probability of a Customer still being Alive   ###
-
-cbs$palive <- bgnbd.PAlive(params.est, cbs$x, cbs$t.x, cbs$T.cal)
-
-sum((cbs$palive<.5)!=cbs$alive)/nrow(cbs)
-# 0.7154
-# --> 72% of customers are correctly classified
-
-
-###   Step 3: Estimate No. of Transactions in Hold-Out Period   ###
-
-cbs$est <- bgnbd.ConditionalExpectedTransactions(params.est, T.star, cbs$x, cbs$t.x, cbs$T.cal)
-
-round(sum(cbs$x.star) / sum(cbs$est) - 1, 4)
-# 0.0101
-# --> Total No. of Transactions is missed by only 1%
-
-cor(cbs$est, cbs$x.star)
-# 0.512
-# --> correlation between estimates and actuals
+# compare to true (usually unobserved) alive status
+prop.table(table(cbs$palive>.5, cbs$alive))
+#       FALSE  TRUE
+# FALSE 0.375 0.065
+# TRUE  0.176 0.384
+# -> 76% of customers are correctly classified
