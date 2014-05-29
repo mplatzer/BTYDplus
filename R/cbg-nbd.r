@@ -1,9 +1,10 @@
 
 #' Parameter Estimation for the CBG/NBD model
-#' 
+#'
 #' @seealso cbgcnbd.EstimateParameters
 cbgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000) {
-  return(cbgcnbd.EstimateParameters(cal.cbs, k=1, par.start, max.param.value))
+  params <- cbgcnbd.EstimateParameters(cal.cbs, par.start, max.param.value, k=1)
+  return(params[2:5])
 }
 
 
@@ -11,7 +12,8 @@ cbgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.pa
 #' 
 #' @seealso cbgcnbd.cbs.LL
 cbgnbd.cbs.LL <- function(params, cal.cbs) {
-  return(cbgcnbd.cbs.LL(params, k=1, cal.cbs))
+  if (length(params)==4) params <- c(k=1, params)
+  return(cbgcnbd.cbs.LL(params, cal.cbs))
 }
 
 
@@ -19,7 +21,8 @@ cbgnbd.cbs.LL <- function(params, cal.cbs) {
 #' 
 #' @seealso cbgcnbd.LL
 cbgnbd.LL <- function(params, x, t.x, T.cal) {
-  return(cbgcnbd.LL(params, k=1, x, t.x, T.cal))
+  if (length(params)==4) params <- c(k=1, params)
+  return(cbgcnbd.LL(params, x, t.x, T.cal))
 }
 
 
@@ -27,7 +30,8 @@ cbgnbd.LL <- function(params, x, t.x, T.cal) {
 #' 
 #' @seealso cbgcnbd.PAlive
 cbgnbd.PAlive <- function(params, x, t.x, T.cal) {
-  return(cbgcnbd.PAlive(params, k=1, x, t.x, T.cal))
+  if (length(params)==4) params <- c(k=1, params)
+  return(cbgcnbd.PAlive(params, x, t.x, T.cal))
 }
 
 
@@ -35,7 +39,8 @@ cbgnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' 
 #' @seealso cbgcnbd.ConditionalExpectedTransactions
 cbgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
-  return(cbgcnbd.ConditionalExpectedTransactions(params, k=1, T.star, x, t.x, T.cal))
+  if (length(params)==4) params <- c(k=1, params)
+  return(cbgcnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal))
 }
 
 
@@ -43,5 +48,6 @@ cbgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 #' 
 #' @seealso cbgcnbd.GenerateData
 cbgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
-  return(cbgcnbd.GenerateData(n, k=1, T.cal, T.star, params, return.elog))
+  if (length(params)==4) params <- c(k=1, params)
+  return(cbgcnbd.GenerateData(n, T.cal, T.star, params, return.elog))
 }
