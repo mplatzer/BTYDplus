@@ -5,7 +5,7 @@
 #'   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
 #'   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
 #'
-#' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}, 'litt'; e.g. output of \code{\link{elog2cbs}}
+#' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}, \code{litt}; e.g. output of \code{\link{elog2cbs}}
 #' @param mcmc number of MCMC steps
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
@@ -21,7 +21,7 @@
 #' @import coda parallel
 #' @export
 #' @example demo/pareto-cnbd.r
-#' @seealso pcnbd.GenerateData elog2cbs
+#' @seealso \code{link{pcnbd.GenerateData}} \code{\link{elog2cbs}}
 pcnbd.mcmc.DrawParameters <-
   function(cal.cbs,
            mcmc = 1500, burnin = 500, thin = 1, chains = 2,

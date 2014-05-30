@@ -134,7 +134,7 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
 #' @param k specified degree of regularity for Erlang-k distributed 
 #'   interpurchase times; needs to be integer-value; if this is not specified, 
 #'   then grid search from 1 to 12 is performed; this however requires column
-#'   'litt' to be present in cal.cbs, which represents sum of logarithmic
+#'   \code{litt} to be present in cal.cbs, which represents sum of logarithmic
 #'   interpurchase times during calibration period;
 #' @return list of estimated parameters
 #' @import BTYD
@@ -150,9 +150,9 @@ cbgcnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.p
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "cbgcnbd.EstimateParameters")
   
-  # Either 'k' or 'litt' need to be present
+  # Either 'k' or \code{litt} need to be present
   if (is.null(k) & !"litt" %in% colnames(cal.cbs))
-    stop("Either regularity parameter k need to be specified, or a column with logarithmic interpurchase times 'litt' need to be present in cal.cbs")
+    stop("Either regularity parameter k need to be specified, or a column with logarithmic interpurchase times \code{litt} need to be present in cal.cbs")
   
   # if k is not specified we do grid search for k
   if (is.null(k)) {
@@ -167,7 +167,7 @@ cbgcnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.p
     return(params[[k]])
   }
   
-  # if 'litt' is missing, we set it to zero, so that cbgcnbd.cbs.LL does not
+  # if \code{litt} is missing, we set it to zero, so that cbgcnbd.cbs.LL does not
   # complain; however this makes LL values for different k values not comparable
   if (!"litt" %in% colnames(cal.cbs))
     cal.cbs[, "litt"] <- 0 
@@ -195,7 +195,7 @@ cbgcnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.p
 #' @param params CBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} 
 #'   and \code{b} in that order.
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   \code{x}, for recency \code{t.x}, for sum of logarithmic interpurchase times 'litt'
+#'   \code{x}, for recency \code{t.x}, for sum of logarithmic interpurchase times \code{litt}
 #'   and total time observed \code{T.cal}. Optionally a column \code{custs} can be
 #'   provided, which represents number of customers with a specific combination
 #'   of frequency \code{x} and \code{T.cal}.
