@@ -27,9 +27,11 @@ pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 1,
 \item{hyper_prior}{list of hyper parameters for 2nd-level parameters}
 }
 \value{
-2-element list
-level_1:  list of coda::mcmc.list objects; one for each customer, containing individual-level draws
-level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
+2-element list:
+\itemize{
+ \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
+ \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
+}
 }
 \description{
 \code{pnbd.mcmc.DrawParameters} samples parameters via MCMC for a given CBS
@@ -55,18 +57,64 @@ autocorrelated draws of {r, alpha, s, beta} and hence need to be run long, to
 generate 'enough' draws
 }
 \examples{
-#params <- list(r=1.4, alpha=1.3, s=0.7, beta=7)
-#cbs <- pcnbd.GenerateData(1000, 10, 5, params)$cbs
-#draws <- pnbd.mcmc.DrawParameters(cbs, mcmc=10000, burnin=10000, thin=10, chains=2)
-#plot(draws$level_2)
-#rbind("actual"=unlist(params), "estimated"=summary(draws$level_2, quantiles=0.5)$quantiles)
+
+# Load CDNow event log
+data(cdnowElog, package="BTYD")
+elog <- data.frame(t(sapply(2:nrow(cdnowElog), function(i) strsplit(as.character(cdnowElog[i,]), split=",")[[1]])))
+names(elog) <- c("cust", "sampleid", "date", "cds", "sales")
+elog$date <- as.Date(elog$date, "\%Y\%m\%d")
+
+# Transform to CBS (including extra column 'litt')
+cbs <- elog2cbs(elog, per="week", T.cal=as.Date("1997-09-30"))
+
+# Pareto/NBD MCMC
+set.seed(1)
+pnbd.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc=1000, burnin=1000, chains=2, thin=10)
+summary(pnbd.draws$level_2)
+plot(pnbd.draws$level_2)
+summary(pnbd.draws$level_2)$quantiles[, "50\%"]
+
+# Pareto/CNBD MCMC
+set.seed(2)
+param_init <- params.pnbd.mcmc
+param_init$t <- 10
+param_init$gamma <- 10
+pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=100, burnin=100, chains=2, thin=2, param_init=param_init)
+# Note: MCMC chain should be run longer; for demo purposes we keep runtime short here
+
+plot(pcnbd.draws$level_2, density=FALSE)
+plot(pcnbd.draws$level_2, trace=FALSE)
+
+coda::gelman.diag(pcnbd.draws$level_2)
+# -> MCMC chains have not converged yet
+
+summary(pcnbd.draws$level_2)$quantiles[, "50\%"]
+
+pcnbd.mcmc.plotRegularityRateHeterogeneity(pcnbd.draws)
+# -> very narrow distribution around k=1; 
+# CDNow customers purchases indeed seem to follow Poisson process
+
+round(effectiveSize(pcnbd.draws$level_2))
+# -> effective sample size are small for such a short chain
+
+# draw future transaction
+pnbd.xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star=cbs$T.star)
+pcnbd.xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, pcnbd.draws, T.star=cbs$T.star)
+
+# calculate mean over future transaction draws for each customer
+cbs$pnbd.mcmc <- apply(pnbd.xstar, 2, mean)
+cbs$pcnbd.mcmc <- apply(pcnbd.xstar, 2, mean)
+
+# calculate P(active)
+cbs$pactive.pnbd.mcmc <- apply(pnbd.xstar, 2, function(x) mean(x>0))
+cbs$pactive.pcnbd.mcmc <- apply(pcnbd.xstar, 2, function(x) mean(x>0))
 }
 \references{
-http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404
+Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
 
-http://gradworks.umi.com/34/02/3402149.html
+Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010. \url{http://gradworks.umi.com/34/02/3402149.html}
 }
 \seealso{
-pcnbd.GenerateData
+\code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.DrawFutureTransactions}}
 }
 

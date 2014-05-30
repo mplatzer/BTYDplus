@@ -18,12 +18,7 @@
 #' level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
 #' @import coda parallel
 #' @export
-#' @examples
-#' #params <- list(r=1.4, alpha=1.3, s=0.7, beta=7, t=1.5, gamma=1)
-#' #cbs <- pcnbd.GenerateData(1000, 10, 5, params)$cbs
-#' #draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=1000, chains=2)
-#' #plot(draws$level_2, ask=F)
-#' #rbind("actual"=unlist(params), "estimated"=summary(draws$level_2, quantiles=0.5)$quantiles)
+#' @example demo/pareto-cnbd.r
 #' @seealso pcnbd.GenerateData elog2cbs
 pcnbd.mcmc.DrawParameters <-
   function(cal.cbs,

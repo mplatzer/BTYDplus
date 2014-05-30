@@ -30,20 +30,17 @@
 #' @param use_data_augmentation determines MCMC method to be used
 #' @param param_init list of 2nd-level parameter start values
 #' @param hyper_prior list of hyper parameters for 2nd-level parameters
-#' @return 2-element list
-#' level_1:  list of coda::mcmc.list objects; one for each customer, containing individual-level draws
-#' level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
+#' @return 2-element list:
+##' \itemize{
+##'  \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
+##'  \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
+##' }
 #' @import coda parallel
 #' @export
-#' @examples
-#' #params <- list(r=1.4, alpha=1.3, s=0.7, beta=7)
-#' #cbs <- pcnbd.GenerateData(1000, 10, 5, params)$cbs
-#' #draws <- pnbd.mcmc.DrawParameters(cbs, mcmc=10000, burnin=10000, thin=10, chains=2)
-#' #plot(draws$level_2)
-#' #rbind("actual"=unlist(params), "estimated"=summary(draws$level_2, quantiles=0.5)$quantiles)
-#' @seealso pcnbd.GenerateData
-#' @references http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404
-#' @references http://gradworks.umi.com/34/02/3402149.html
+#' @example demo/pareto-cnbd.r
+#' @seealso \code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.DrawFutureTransactions}}
+#' @references Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
+#' @references Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010. \url{http://gradworks.umi.com/34/02/3402149.html}
 pnbd.mcmc.DrawParameters <-
   function(cal.cbs,
            mcmc = 1500, burnin = 500, thin = 1, chains = 2,
