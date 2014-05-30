@@ -1,5 +1,6 @@
 
 library(BTYD)
+library(coda)
 
 # Load CDNow event log
 data(cdnowElog, package="BTYD")
@@ -20,7 +21,7 @@ x <- readline("Estimate Models via MLE (press Enter)")
 (params.nbd <- nbd.EstimateParameters(cbs))
 
 # Pareto/NBD (from BTYD package)
-(params.pnbd <- pnbd.EstimateParameters(cbs))
+(params.pnbd <- BTYD::pnbd.EstimateParameters(cbs))
 
 # Gamma/Gompertz/NBD
 #(params.ggnbd <- ggnbd.EstimateParameters(cbs, trace=10)) # would take several minutes
@@ -116,10 +117,10 @@ pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=500, burnin=100, chains=2, th
 plot(pcnbd.draws$level_2, density=FALSE)
 plot(pcnbd.draws$level_2, trace=FALSE)
 
-gelman.diag(pcnbd.draws$level_2)
+coda::gelman.diag(pcnbd.draws$level_2)
 # -> MCMC chains have not converged yet
 
-(params.pcnbd.mcmc <- as.list(summary(pcnbd.draws$level_2)$quantiles[, "50%"]))
+(summary(pcnbd.draws$level_2)$quantiles[, "50%"])
 
 pcnbd.mcmc.plotRegularityRateHeterogeneity(pcnbd.draws)
 # -> very narrow distribution around k=1; 
