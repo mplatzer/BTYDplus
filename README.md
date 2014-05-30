@@ -9,6 +9,8 @@ Installation
 ```
 devtools::install_github("mplatzer/BTYDplus")
 library(BTYDplus)
+demo(package="BTYDplus")
+demo("cdnow")
 ```
 
 BTYD Models
@@ -33,7 +35,6 @@ Platzer, Michael. "Stochastic models of noncontractual consumer relationships." 
 https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships
 
 * Pareto/NBD MCMC
-* Pareto/NBD Abe
 * Pareto/CNBD MCMC
 
 Note, that the Pareto/NBD model is already included as part of the BTYD-package, but we provide a helper method to generate artificial data following the Pareto/NBD assumptions.

@@ -22,7 +22,7 @@
 #' autocorrelated draws of {r, alpha, s, beta} and hence need to be run long, to
 #' generate 'enough' draws
 #'
-#' @param data data.frame with columns 'x', 't.x', 'T.cal'
+#' @param cal.cbs data.frame with columns 'x', 't.x', 'T.cal'
 #' @param mcmc number of MCMC steps
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
@@ -45,8 +45,8 @@
 #' @references http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404
 #' @references http://gradworks.umi.com/34/02/3402149.html
 pnbd.mcmc.DrawParameters <-
-  function(data,
-           mcmc = 10000, burnin = 0, thin = 1, chains = 1,
+  function(cal.cbs,
+           mcmc = 1500, burnin = 500, thin = 1, chains = 2,
            use_data_augmentation = TRUE,
            param_init = list(r=1, alpha=1, s=1, beta=1),
            hyper_prior = list(r_1=1/1000, r_2=1/1000,
@@ -150,7 +150,7 @@ pnbd.mcmc.DrawParameters <-
                         s = level_2["s"], beta = level_2["beta"])
   }
   
-  run_single_chain <- function(chain_id=1, df) {
+  run_single_chain <- function(chain_id=1, data) {
     
     ## initialize arrays for storing draws ##
     
@@ -170,8 +170,8 @@ pnbd.mcmc.DrawParameters <-
     level_2["beta"]  <- param_init$beta
     
     level_1            <- level_1_draws[1,,]
-    level_1["lambda",] <- mean(df$x) / mean(ifelse(df$t.x==0, df$T.cal, df$t.x))
-    level_1["tau",]    <- df$t.x + 0.5/level_1["lambda",]
+    level_1["lambda",] <- mean(data$x) / mean(ifelse(data$t.x==0, data$T.cal, data$t.x))
+    level_1["tau",]    <- data$t.x + 0.5/level_1["lambda",]
     level_1["mu",]     <- 1/level_1["tau",]  
     
     ## run MCMC chain ##
@@ -189,9 +189,9 @@ pnbd.mcmc.DrawParameters <-
       # draw individual-level parameters
       draw_lambda <- if (use_data_augmentation) draw_lambda_conoor else draw_lambda_ma_liu
       draw_mu     <- if (use_data_augmentation) draw_mu_conoor else draw_mu_ma_liu
-      level_1["lambda", ] <- draw_lambda(df, level_1, level_2)
-      level_1["mu", ]     <- draw_mu(df, level_1, level_2)
-      level_1["tau", ]    <- draw_tau(df, level_1)
+      level_1["lambda", ] <- draw_lambda(data, level_1, level_2)
+      level_1["mu", ]     <- draw_mu(data, level_1, level_2)
+      level_1["tau", ]    <- draw_tau(data, level_1)
       
       # draw heterogeneity parameters
       level_2[c("r", "alpha")] <- draw_gamma_params("lambda", level_1, level_2, hyper_prior)
@@ -204,12 +204,17 @@ pnbd.mcmc.DrawParameters <-
       level_2 = mcmc(level_2_draws, start=burnin, thin=thin)))
   }
   
+  ## check whether input data meets requirements
+  stopifnot(is.data.frame(cal.cbs))
+  stopifnot(all(c("x", "t.x", "T.cal") %in% names(cal.cbs)))
+  stopifnot(all(is.finite(cal.cbs$litt)))
+  
   # run multiple chains - executed in parallel on Unix
   cores <- ifelse(.Platform$OS.type=="windows", 1, max(chains, detectCores()))  
-  draws <- mclapply(1:chains, function(i) run_single_chain(i, data), mc.cores=cores)
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores=cores)
 
   # merge chains into code::mcmc.list objects
   return(list(
-    level_1 = lapply(1:nrow(data), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
+    level_1 = lapply(1:nrow(cal.cbs), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
     level_2 = mcmc.list(lapply(draws, function(draw) draw$level_2))))
 }

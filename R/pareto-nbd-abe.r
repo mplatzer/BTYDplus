@@ -1,12 +1,13 @@
 
+# ! not yet ready for use !
+
 ## Implementation of Pareto/NBD HB as describe in Abe (2009) and Korkmaz (2013)
 ## FIXME: implement passing of covariates
 ## FIXME: check why we gamma_draws are off
 ## TODO: estimate CDnow and compare to Abe/Korkmaz results
 
-#' FIXME docs
-#' 
-abe.mcmc.DrawParameters <- function(data, mcmc = 20000, burnin = mcmc/2, thin = 1) {
+# FIXME docs
+abe.mcmc.DrawParameters <- function(cal.cbs, mcmc = 20000, burnin = mcmc/2, thin = 1) {
 
   draw_z <- function(data, theta) {
     tx     <- data[, "t.x"]
@@ -111,6 +112,7 @@ abe.mcmc.DrawParameters <- function(data, mcmc = 20000, burnin = mcmc/2, thin = 
     return(list(lambda=cur_theta[1,], mu=cur_theta[2,]))
   }
   
+  data <- cal.cbs
   
   # Setup Regressors (Covariates) for location of 1st-stage prior, i.e. beta = [log(lambda), log(mu)]
   covariates <- matrix(1, nrow=nrow(data), ncol=1) # ncol=1 # we use a single intercept as regressor here

@@ -5,7 +5,7 @@
 #'   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
 #'   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
 #'
-#' @param data data.frame with columns 'x', 't.x', 'T.cal'
+#' @param cal.cbs data.frame with columns 'x', 't.x', 'T.cal', 'litt'; e.g. output of \code{\link{elog2cbs}}
 #' @param mcmc number of MCMC steps
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
@@ -24,10 +24,10 @@
 #' #draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=1000, chains=2)
 #' #plot(draws$level_2, ask=F)
 #' #rbind("actual"=unlist(params), "estimated"=summary(draws$level_2, quantiles=0.5)$quantiles)
-#' @seealso pcnbd.GenerateData
+#' @seealso pcnbd.GenerateData elog2cbs
 pcnbd.mcmc.DrawParameters <-
-  function(data,
-           mcmc = 10000, burnin = 0, thin = 1, chains = 1,           
+  function(cal.cbs,
+           mcmc = 1500, burnin = 500, thin = 1, chains = 2,
            param_init = list(t=1, gamma=1, r=1, alpha=1, s=1, beta=1),
            hyper_prior = list(t_1=1/1000, t_2=1/1000,
                               gamma_1=1/1000, gamma_2=1/1000,
@@ -122,11 +122,11 @@ pcnbd.mcmc.DrawParameters <-
     return(tau)
   }
   
-  run_single_chain <- function(chain_id, df) {
+  run_single_chain <- function(chain_id, data) {
     
     ## initialize arrays for storing draws ##
     
-    nr_of_cust <- nrow(df)
+    nr_of_cust <- nrow(data)
     nr_of_draws <- (mcmc-1) %/% thin + 1
     level_2_draws <- array(NA_real_, dim=c(nr_of_draws, 6))
     dimnames(level_2_draws)[[2]] <- c("t", "gamma", "r", "alpha", "s", "beta")
@@ -145,8 +145,8 @@ pcnbd.mcmc.DrawParameters <-
     
     level_1            <- level_1_draws[1,,]
     level_1["k",]      <- 1
-    level_1["lambda",] <- mean(df$x) / mean(ifelse(df$t.x==0, df$T.cal, df$t.x))
-    level_1["tau",]    <- df$t.x + 0.5/level_1["lambda",]
+    level_1["lambda",] <- mean(data$x) / mean(ifelse(data$t.x==0, data$T.cal, data$t.x))
+    level_1["tau",]    <- data$t.x + 0.5/level_1["lambda",]
     level_1["mu",]     <- 1/level_1["tau",]
     
     ## run MCMC chain ##
@@ -162,10 +162,10 @@ pcnbd.mcmc.DrawParameters <-
       }
       
       # draw individual-level parameters
-      level_1["k", ]      <- draw_k(df, level_1, level_2)
-      level_1["lambda", ] <- draw_lambda(df, level_1, level_2)
-      level_1["mu", ]     <- draw_mu(df, level_1, level_2)
-      level_1["tau", ]    <- draw_tau(df, level_1, level_2)
+      level_1["k", ]      <- draw_k(data, level_1, level_2)
+      level_1["lambda", ] <- draw_lambda(data, level_1, level_2)
+      level_1["mu", ]     <- draw_mu(data, level_1, level_2)
+      level_1["tau", ]    <- draw_tau(data, level_1, level_2)
       
       # draw heterogeneity parameters
       level_2[c("t", "gamma")] <- draw_gamma_params("k", level_1, level_2, hyper_prior)
@@ -180,55 +180,55 @@ pcnbd.mcmc.DrawParameters <-
   }
   
   ## check whether input data meets requirements
-  stopifnot(is.data.frame(data))
-  stopifnot(all(c("x", "t.x", "T.cal", "litt") %in% names(data)))
-  stopifnot(all(is.finite(data$litt)))
+  stopifnot(is.data.frame(cal.cbs))
+  stopifnot(all(c("x", "t.x", "T.cal", "litt") %in% names(cal.cbs)))
+  stopifnot(all(is.finite(cal.cbs$litt)))
   
   # run multiple chains - executed in parallel on Unix
   cores <- ifelse(.Platform$OS.type=="windows", 1, max(chains, detectCores()))
-  draws <- mclapply(1:chains, function(i) run_single_chain(i, data), mc.cores=cores)
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores=cores)
   
   # merge chains into code::mcmc.list objects
   return(list(
-    level_1 = lapply(1:1:nrow(data), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
+    level_1 = lapply(1:1:nrow(cal.cbs), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
     level_2 = mcmc.list(lapply(draws, function(draw) draw$level_2))))
 }
 
 
 #' Calculates P(alive) based on MCMC draws
 #'
-#' @param data data.frame with column 'T.cal'
-#' @param draws MCMC draws returned by \code{pcnbd.mcmc.DrawParameters}
+#' @param cal.cbs data.frame with column 'T.cal'
+#' @param draws MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}
 #' @return numeric vector of probabilities
 #' @export
-pcnbd.mcmc.PAlive <- function(data, draws) {
+pcnbd.mcmc.PAlive <- function(cal.cbs, draws) {
   
   nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
   nr_of_cust <- length(draws$level_1)
   parameters <- nvar(draws$level_2[[1]])
-  if (nr_of_cust != nrow(data))
-    stop("mismatch between number of customers in parameters 'data' and 'draws'")
+  if (nr_of_cust != nrow(cal.cbs))
+    stop("mismatch between number of customers in parameters 'cal.cbs' and 'draws'")
   
-  p.alives <- sapply(1:nr_of_cust, function(i) mean(as.matrix(draws$level_1[[i]][, "tau"]) > data$T.cal[i]))
+  p.alives <- sapply(1:nr_of_cust, function(i) mean(as.matrix(draws$level_1[[i]][, "tau"]) > cal.cbs$T.cal[i]))
   return(p.alives)
 }
 
 
 #' Samples number of future transactions based on drawn parameters
 #'
-#' @param data data.frame with column 't.x' and 'T.cal'
-#' @param draws MCMC draws returned by \code{pcnbd.mcmc.DrawParameters}
+#' @param cal.cbs data.frame with column 't.x' and 'T.cal'
+#' @param draws MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}
 #' @param T.star length of period for which future transactions are counted
 #' @return 2-dim array [draw x cust] with sampled future transactions
 #' @export
-pcnbd.mcmc.DrawFutureTransactions <- function(data, draws, T.star=data$T.star) {
+pcnbd.mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star=cal.cbs$T.star) {
   
   nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
   nr_of_cust <- length(draws$level_1)
   parameters <- varnames(draws$level_1[[1]])
   
-  if (nr_of_cust != nrow(data))
-    stop("mismatch between number of customers in parameters 'data' and 'draws'")
+  if (nr_of_cust != nrow(cal.cbs))
+    stop("mismatch between number of customers in parameters 'cal.cbs' and 'draws'")
   if (is.null(T.star))
     stop("T.star is missing")
   
@@ -240,10 +240,10 @@ pcnbd.mcmc.DrawFutureTransactions <- function(data, draws, T.star=data$T.star) {
     qgamma(rand, k, k*lambda)
   }
   
-  for (cust in 1:nrow(data)) {
-    Tcal    <- data[cust, "T.cal"]
+  for (cust in 1:nrow(cal.cbs)) {
+    Tcal    <- cal.cbs[cust, "T.cal"]
     Tstar   <- T.star[cust]
-    tx      <- data[cust, "t.x"]
+    tx      <- cal.cbs[cust, "t.x"]
     taus    <- as.matrix(draws$level_1[[cust]][, "tau"])
     ks      <- if ("k" %in% parameters) as.matrix(draws$level_1[[cust]][, "k"]) else rep(1, nr_of_draws)
     lambdas <- as.matrix(draws$level_1[[cust]][, "lambda"])
@@ -360,4 +360,21 @@ pcnbd.GenerateData <- function(N, T.cal, T.star, params, return.elog=F) {
     out$elog <- elog
   }
   return(out)
+}
+
+
+#' Pareto/CNBD Plot Regularity Rate Heterogeneity
+#' 
+#' Plots and returns the estimated gamma distribution of k (customers' regularity in interpurchase times).
+#' 
+#' @param draws MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}
+#' @param xmax upper bound for x-scale
+#'
+#' @export
+pcnbd.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax=NULL) {
+  ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
+  if (is.null(xmax)) xmax <- min(10, quantile(ks, 0.95)*1.5)
+  plot(density(ks), xlim=c(0, xmax), main="Distribution of Regularity Rate k", xlab="", ylab="", frame=F)
+  abline(v=1, lty=3)
+  abline(v=mean(ks), col="red")
 }
