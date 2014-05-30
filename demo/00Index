@@ -2,5 +2,5 @@ nbd           Demonstration of NBD model
 gg-nbd        Demonstration of Gamma/Gompertz/NBD model
 bg-nbd        Demonstration of BG/NBD model
 cbg-cnbd-k    Demonstration of CBG/CNBD-k model
-pareto-cnbd   Demonstration of Pareto/CNBD model
+pareto-cnbd   Demonstration of Pareto/NBD & Pareto/CNBD model
 cdnow         Demonstration of fitting various models to the CDNow data set

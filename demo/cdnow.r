@@ -53,7 +53,7 @@ rbind("NBD"=nbd.cbs.LL(params.nbd, cbs),
 x <- readline("Estimate Transactions in Holdout period (press Enter)")
 
 cbs$nbd <- nbd.ConditionalExpectedTransactions(params.nbd, cbs$T.star, cbs$x, cbs$T.cal)
-cbs$pnbd <- pnbd.ConditionalExpectedTransactions(params.pnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$ggnbd <- ggnbd.ConditionalExpectedTransactions(params.ggnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$bgnbd <- bgnbd.ConditionalExpectedTransactions(params.bgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$cbgnbd <- cbgnbd.ConditionalExpectedTransactions(params.cbgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
@@ -63,7 +63,7 @@ cbs$cbgcnbd <- cbgcnbd.ConditionalExpectedTransactions(params.cbgcnbd, cbs$T.sta
 x <- readline("Estimate P(alive) (press Enter)")
 
 cbs$palive.nbd <- 1
-cbs$palive.pnbd <- pnbd.PAlive(params=params.pnbd, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$palive.pnbd <- BTYD::pnbd.PAlive(params=params.pnbd, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$palive.ggnbd <- ggnbd.PAlive(params=params.ggnbd, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$palive.bgnbd <- bgnbd.PAlive(params=params.bgnbd, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$palive.cbgnbd <- cbgnbd.PAlive(params=params.cbgnbd, cbs$x, cbs$t.x, cbs$T.cal)
@@ -126,7 +126,7 @@ pcnbd.mcmc.plotRegularityRateHeterogeneity(pcnbd.draws)
 # -> very narrow distribution around k=1; 
 # CDNow customers purchases indeed seem to follow Poisson process
 
-round(effectiveSize(pcnbd.draws$level_2))
+round(coda::effectiveSize(pcnbd.draws$level_2))
 # -> effective sample size are small for such a short chain
 
 
