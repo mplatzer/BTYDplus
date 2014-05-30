@@ -3,12 +3,12 @@
 \alias{pcnbd.mcmc.DrawFutureTransactions}
 \title{Samples number of future transactions based on drawn parameters}
 \usage{
-pcnbd.mcmc.DrawFutureTransactions(data, draws, T.star = data$T.star)
+pcnbd.mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star)
 }
 \arguments{
-\item{data}{data.frame with column 't.x' and 'T.cal'}
+\item{cal.cbs}{data.frame with column 't.x' and 'T.cal'}
 
-\item{draws}{MCMC draws returned by \code{pcnbd.mcmc.DrawParameters}}
+\item{draws}{MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}}
 
 \item{T.star}{length of period for which future transactions are counted}
 }

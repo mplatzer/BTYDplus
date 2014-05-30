@@ -3,14 +3,14 @@
 \alias{pcnbd.mcmc.DrawParameters}
 \title{Hierarchical Bayes implementation of Pareto/CNBD}
 \usage{
-pcnbd.mcmc.DrawParameters(data, mcmc = 10000, burnin = 0, thin = 1,
-  chains = 1, param_init = list(t = 1, gamma = 1, r = 1, alpha = 1, s = 1,
+pcnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 1,
+  chains = 2, param_init = list(t = 1, gamma = 1, r = 1, alpha = 1, s = 1,
   beta = 1), hyper_prior = list(t_1 = 1/1000, t_2 = 1/1000, gamma_1 = 1/1000,
   gamma_2 = 1/1000, r_1 = 1/1000, r_2 = 1/1000, alpha_1 = 1/1000, alpha_2 =
   1/1000, s_1 = 1/1000, s_2 = 1/1000, beta_1 = 1/1000, beta_2 = 1/1000))
 }
 \arguments{
-\item{data}{data.frame with columns 'x', 't.x', 'T.cal'}
+\item{cal.cbs}{data.frame with columns 'x', 't.x', 'T.cal', 'litt'; e.g. output of \code{\link{elog2cbs}}}
 
 \item{mcmc}{number of MCMC steps}
 
@@ -44,6 +44,6 @@ Returns 2-element list
 #rbind("actual"=unlist(params), "estimated"=summary(draws$level_2, quantiles=0.5)$quantiles)
 }
 \seealso{
-pcnbd.GenerateData
+pcnbd.GenerateData elog2cbs
 }
 

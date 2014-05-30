@@ -3,14 +3,14 @@
 \alias{pnbd.mcmc.DrawParameters}
 \title{Hierarchical Bayes variant of Pareto/NBD}
 \usage{
-pnbd.mcmc.DrawParameters(data, mcmc = 10000, burnin = 0, thin = 1,
-  chains = 1, use_data_augmentation = TRUE, param_init = list(r = 1, alpha
+pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 1,
+  chains = 2, use_data_augmentation = TRUE, param_init = list(r = 1, alpha
   = 1, s = 1, beta = 1), hyper_prior = list(r_1 = 1/1000, r_2 = 1/1000,
   alpha_1 = 1/1000, alpha_2 = 1/1000, s_1 = 1/1000, s_2 = 1/1000, beta_1 =
   1/1000, beta_2 = 1/1000))
 }
 \arguments{
-\item{data}{data.frame with columns 'x', 't.x', 'T.cal'}
+\item{cal.cbs}{data.frame with columns 'x', 't.x', 'T.cal'}
 
 \item{mcmc}{number of MCMC steps}
 

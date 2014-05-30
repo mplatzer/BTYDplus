@@ -3,12 +3,12 @@
 \alias{pcnbd.mcmc.PAlive}
 \title{Calculates P(alive) based on MCMC draws}
 \usage{
-pcnbd.mcmc.PAlive(data, draws)
+pcnbd.mcmc.PAlive(cal.cbs, draws)
 }
 \arguments{
-\item{data}{data.frame with column 'T.cal'}
+\item{cal.cbs}{data.frame with column 'T.cal'}
 
-\item{draws}{MCMC draws returned by \code{pcnbd.mcmc.DrawParameters}}
+\item{draws}{MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}}
 }
 \value{
 numeric vector of probabilities
