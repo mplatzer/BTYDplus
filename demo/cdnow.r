@@ -1,4 +1,6 @@
 
+library(BTYD)
+
 # Load CDNow event log
 data(cdnowElog, package="BTYD")
 elog <- data.frame(t(sapply(2:nrow(cdnowElog), function(i) strsplit(as.character(cdnowElog[i,]), split=",")[[1]])))
