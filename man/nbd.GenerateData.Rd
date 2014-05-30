@@ -12,7 +12,7 @@ nbd.GenerateData(n, T.cal, T.star, params, return.elog = F)
 
 \item{T.star}{length of holdout period}
 
-\item{params}{NBD parameters - a list with 'r' and 'alpha'}
+\item{params}{NBD parameters - a vector with 'r' and 'alpha' in that order}
 
 \item{return.elog}{boolean - if TRUE then the event log is returned in
 addition to the CBS summary}
