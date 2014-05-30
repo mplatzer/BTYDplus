@@ -10,8 +10,6 @@ Description: Extends the functionality of BTYD package by providing methods for
     CBG/CNBD-k models.
 License: GPL-3
 LinkingTo: Rcpp
-Imports:
-    BTYD,
-    coda,
-    Rcpp (>= 0.11.1)
+Depends: BTYD, coda, data.table
+Imports: Rcpp (>= 0.11.1)
 Roxygen: list(wrap = FALSE)
