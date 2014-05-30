@@ -6,8 +6,8 @@
 cbgcnbd.PAlive(params, x, t.x, T.cal)
 }
 \arguments{
-\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a'
-and 'b' in that order.}
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+and \code{b} in that order.}
 
 \item{x}{number of repeat transactions in the calibration period T.cal, or a
 vector of calibration period frequencies.}
@@ -111,6 +111,6 @@ axis(1, pos=0)
 legend(xlim*.6, max(y)*.9, c("Actual", "CBG/CNBD-k", "CBG/NBD"), col=c("black", "red", "blue"), pch=15, bty="n")
 }
 \seealso{
-cbgcnbd.EstimateParameters
+\code{\link{cbgcnbd.EstimateParameters}}
 }
 

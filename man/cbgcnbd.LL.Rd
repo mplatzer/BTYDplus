@@ -6,8 +6,8 @@
 cbgcnbd.LL(params, x, t.x, T.cal, litt)
 }
 \arguments{
-\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a'
-and 'b' in that order.}
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+and \code{b} in that order.}
 
 \item{x}{frequency, i.e. number of re-purchases}
 
@@ -24,6 +24,6 @@ a vector of log-likelihoods
 Calculate the log-likelihood of the CBG/CNBD-k model
 }
 \seealso{
-cbgcnbd.EstimateParameters
+\code{\link{cbgcnbd.EstimateParameters}}
 }
 

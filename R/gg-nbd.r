@@ -5,13 +5,14 @@
 #' Estimation.
 #' 
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
-#'   column 'custs' can be provided, which represents number of customers with a
-#'   specific combination of frequency 'x', recency 't.x' and 'T.cal'.
-#' @param par.start initial Gamma/Gompertz/NBD parameters - a vector with 'r', 
-#'   'alpha', 'b', 's' and 'beta' in that order.
+#'   \code{x}, for recency \code{t.x} and total time observed \code{T.cal}. Optionally a 
+#'   column \code{custs} can be provided, which represents number of customers with a
+#'   specific combination of frequency \code{x}, recency \code{t.x} and \code{T.cal}.
+#' @param par.start initial Gamma/Gompertz/NBD parameters - a vector with \code{r}, 
+#'   \code{alpha}, \code{b}, \code{s} and \code{beta} in that order.
 #' @param min.param.value the lower bound on parameters
 #' @param max.param.value the upper bound on parameters
+#' @param trace print logging step every \code{trace} iteration
 #' @return list of estimated parameters
 #' @import BTYD
 #' @export
@@ -46,14 +47,15 @@ ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min
 
 #' Calculate the log-likelihood of the Gamma/Gompertz/NBD model
 #' 
-#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
-#'   'b', 's' and 'beta' in that order.
+#' @param params Gamma/Gompertz/NBD parameters - a vector with \code{r},
+#'   \code{alpha}, \code{b}, \code{s} and \code{beta} in that order.
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
-#'   column 'custs' can be provided, which represents number of customers with a
-#'   specific combination of frequency 'x' and 'T.cal'.
+#'   \code{x}, for recency \code{t.x} and total time observed \code{T.cal}.
+#'   Optionally a column \code{custs} can be provided, which represents number
+#'   of customers with a specific combination of frequency \code{x} and
+#'   \code{T.cal}.
 #' @return the total log-likelihood for the provided data.
-#' @seealso ggnbd.EstimateParameters
+#' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
 ggnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
@@ -72,13 +74,13 @@ ggnbd.cbs.LL <- function(params, cal.cbs) {
 
 #' Calculate the log-likelihood of the Gamma/Gompertz/NBD model
 #' 
-#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha', 
-#'   'b', 's' and 'beta' in that order.
+#' @param params Gamma/Gompertz/NBD parameters - a vector with \code{r}, \code{alpha}, 
+#'   \code{b}, \code{s} and \code{beta} in that order.
 #' @param x frequency, i.e. number of re-purchases
 #' @param t.x recency, i.e. time elapsed from first purchase to last purchase
 #' @param T.cal total time of observation period
 #' @return a vector of log-likelihoods
-#' @seealso ggnbd.EstimateParameters
+#' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
 ggnbd.LL <- function(params, x, t.x, T.cal) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
@@ -127,8 +129,8 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
 #' behavior to return the probability that they are still alive at the end of
 #' the calibration period.
 #' 
-#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
-#'   'b', 's' and 'beta' in that order.
+#' @param params Gamma/Gompertz/NBD parameters - a vector with \code{r}, \code{alpha},
+#'   \code{b}, \code{s} and \code{beta} in that order.
 #' @param x number of repeat transactions in the calibration period T.cal, or a 
 #'   vector of calibration period frequencies.
 #' @param t.x recency, i.e. length between first and last transaction during 
@@ -137,7 +139,7 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
 #'   lengths.
 #' @return Probability that the customer is still alive at the end of the 
 #'   calibration period.
-#' @seealso ggnbd.EstimateParameters
+#' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
 #' @example demo/gg-nbd.r
 ggnbd.PAlive <- function(params, x, t.x, T.cal) {
@@ -177,8 +179,8 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' behavior to return the number of transactions they are expected to make in a
 #' given time period.
 #' 
-#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
-#'   'b', 's' and 'beta' in that order.
+#' @param params Gamma/Gompertz/NBD parameters - a vector with \code{r}, \code{alpha},
+#'   \code{b}, \code{s} and \code{beta} in that order.
 #' @param T.star length of time for which we are calculating the expected number
 #'   of transactions.
 #' @param x number of repeat transactions in the calibration period T.cal, or a 
@@ -192,7 +194,7 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   parameters has a length greater than 1, this will be a vector of expected 
 #'   number of transactions.
 #' @export
-#' @seealso ggnbd.EstimateParameters
+#' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @example demo/gg-nbd.r
 ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
@@ -243,13 +245,13 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
-#'   'b', 's' and 'beta' in that order
-#' @param return.elog boolean - if TRUE then the event log is returned in 
+#' @param params Gamma/Gompertz/NBD parameters - a vector with \code{r}, \code{alpha},
+#'   \code{b}, \code{s} and \code{beta} in that order
+#' @param return.elog boolean - if \code{TRUE} then the event log is returned in 
 #'   addition to the CBS summary
-#' @return list with elements 'cbs' and 'elog' containing data.frames
+#' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
-#' @seealso ggnbd.EstimateParameters
+#' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @example demo/gg-nbd.r
 ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   # check model parameters

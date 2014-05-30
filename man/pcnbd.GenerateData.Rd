@@ -3,10 +3,10 @@
 \alias{pcnbd.GenerateData}
 \title{Generate artificial data which follows Pareto/CNBD model assumptions}
 \usage{
-pcnbd.GenerateData(N, T.cal, T.star, params, return.elog = F)
+pcnbd.GenerateData(n, T.cal, T.star, params, return.elog = F)
 }
 \arguments{
-\item{N}{number of customers}
+\item{n}{number of customers}
 
 \item{T.cal}{length of calibration period}
 
@@ -14,16 +14,16 @@ pcnbd.GenerateData(N, T.cal, T.star, params, return.elog = F)
 
 \item{params}{list of parameters: {r, alpha, s, beta, t, gamma}}
 
-\item{return.elog}{if TRUE then the event-log is returned as well; decreases performance}
+\item{return.elog}{if \code{TRUE} then the event-log is returned as well; decreases performance}
 }
 \value{
 2-elemnt list
 }
 \description{
 Returns 2-element list
-* cbs: data.frame with 'cust', 'x', 't.x', 'T.cal', 'T.star', 'x.star'
+* cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star'
        this is the summary statistics data.frame which contains all
        needed information for parameter estimation
-* elog: data.frame with 'cust', 't'
+* elog: data.frame with 'cust', \code{t}
 }
 

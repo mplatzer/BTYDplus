@@ -6,8 +6,8 @@
 bgnbd.LL(params, x, t.x, T.cal)
 }
 \arguments{
-\item{params}{BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
-'b' in that order.}
+\item{params}{BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and
+\code{b} in that order.}
 
 \item{x}{frequency, i.e. number of re-purchases}
 
@@ -22,6 +22,6 @@ a vector of log-likelihoods
 Calculate the log-likelihood of the BG/NBD model
 }
 \seealso{
-bgnbd.EstimateParameters
+\code{\link{bgnbd.EstimateParameters}}
 }
 

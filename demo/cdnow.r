@@ -75,7 +75,6 @@ x <- readline("Compare Forecasting Accuracy (press Enter)")
 MAPE <- function(a, f) { return(sum(abs(a-f)/sum(a))) }
 RMSE <- function(a, f) { return(sqrt(mean((a-f)^2))) }
 MSLE <- function(a, f) { return(mean(((log(a+1) - log(f+1)))^2)) }
-
 bench <- function(cbs, models) {
   acc <- t(sapply(models, function(model) c(MAPE(cbs$x.star, cbs[, model]),
                                             RMSE(cbs$x.star, cbs[, model]),
@@ -83,6 +82,7 @@ bench <- function(cbs, models) {
   colnames(acc) <- c("MAPE", "RMSE", "MSLE")
   round(acc, 3)  
 }
+
 bench(cbs, c("nbd", "pnbd", "ggnbd", "bgnbd", "cbgnbd", "cbgcnbd"))
 
 

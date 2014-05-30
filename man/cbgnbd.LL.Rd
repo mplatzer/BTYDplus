@@ -9,6 +9,6 @@ cbgnbd.LL(params, x, t.x, T.cal)
 Calculates the log-likelihood of the CBG/NBD model
 }
 \seealso{
-cbgcnbd.LL
+\code{\link{cbgcnbd.LL}}
 }
 

@@ -8,11 +8,11 @@ nbd.EstimateParameters(cal.cbs, par.start = c(1, 1),
 }
 \arguments{
 \item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x' and total time observed 'T.cal'. Optionally a column 'custs' can be
+\code{x} and total time observed \code{T.cal}. Optionally a column \code{custs} can be
 provided, which represents number of customers with a specific combination
-of frequency 'x' and 'T.cal'.}
+of frequency \code{x} and \code{T.cal}.}
 
-\item{par.start}{initial NBD parameters - a vector with 'r' and 'alpha' in
+\item{par.start}{initial NBD parameters - a vector with \code{r} and \code{alpha} in
 that order.}
 
 \item{max.param.value}{the upper bound on parameters}

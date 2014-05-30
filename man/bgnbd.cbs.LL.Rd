@@ -6,13 +6,13 @@
 bgnbd.cbs.LL(params, cal.cbs)
 }
 \arguments{
-\item{params}{BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
-'b' in that order.}
+\item{params}{BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and
+\code{b} in that order.}
 
 \item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a
-column 'custs' can be provided, which represents number of customers with a
-specific combination of frequency 'x' and 'T.cal'.}
+\code{x}, for recency \code{t.x} and total time observed \code{T.cal}. Optionally a
+column \code{custs} can be provided, which represents number of customers with a
+specific combination of frequency \code{x} and \code{T.cal}.}
 }
 \value{
 the total log-likelihood for the provided data.
@@ -21,6 +21,6 @@ the total log-likelihood for the provided data.
 Calculate the log-likelihood of the BG/NBD model
 }
 \seealso{
-bgnbd.EstimateParameters
+\code{\link{bgnbd.EstimateParameters}}
 }
 

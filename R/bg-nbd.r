@@ -4,11 +4,11 @@
 #' Estimates parameters for the BG/NBD model via Maximum Likelihood Estimation.
 #' 
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
-#'   column 'custs' can be provided, which represents number of customers with a
-#'   specific combination of frequency 'x', recency 't.x' and 'T.cal'.
-#' @param par.start initial BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
-#'   'b' in that order.
+#'   \code{x}, for recency \code{t.x} and total time observed \code{T.cal}. Optionally a 
+#'   column \code{custs} can be provided, which represents number of customers with a
+#'   specific combination of frequency \code{x}, recency \code{t.x} and \code{T.cal}.
+#' @param par.start initial BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and
+#'   \code{b} in that order.
 #' @param max.param.value the upper bound on parameters
 #' @return list of estimated parameters
 #' @import BTYD
@@ -35,15 +35,15 @@ bgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.par
 
 #' Calculate the log-likelihood of the BG/NBD model
 #' 
-#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
-#'   'b' in that order.
+#' @param params BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and
+#'   \code{b} in that order.
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a 
-#'   column 'custs' can be provided, which represents number of customers with a
-#'   specific combination of frequency 'x' and 'T.cal'.
+#'   \code{x}, for recency \code{t.x} and total time observed \code{T.cal}. Optionally a 
+#'   column \code{custs} can be provided, which represents number of customers with a
+#'   specific combination of frequency \code{x} and \code{T.cal}.
 #' @return the total log-likelihood for the provided data.
 #' @export
-#' @seealso bgnbd.EstimateParameters
+#' @seealso \code{\link{bgnbd.EstimateParameters}}
 bgnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("r", "alpha", "a", "b"), params, 
    "bgnbd.cbs.LL")  
@@ -61,14 +61,14 @@ bgnbd.cbs.LL <- function(params, cal.cbs) {
 
 #' Calculate the log-likelihood of the BG/NBD model
 #' 
-#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
-#'   'b' in that order.
+#' @param params BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and
+#'   \code{b} in that order.
 #' @param x frequency, i.e. number of re-purchases
 #' @param t.x recency, i.e. time elapsed from first purchase to last purchase
 #' @param T.cal total time of observation period
 #' @return a vector of log-likelihoods
 #' @export
-#' @seealso bgnbd.EstimateParameters
+#' @seealso \code{\link{bgnbd.EstimateParameters}}
 bgnbd.LL <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
@@ -108,7 +108,7 @@ bgnbd.LL <- function(params, x, t.x, T.cal) {
 #' return the probability that they are still alive at the end of the
 #' calibration period.
 #' 
-#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and 'b' in
+#' @param params BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and \code{b} in
 #'   that order.
 #' @param x number of repeat transactions in the calibration period T.cal, or a 
 #'   vector of calibration period frequencies.
@@ -118,7 +118,7 @@ bgnbd.LL <- function(params, x, t.x, T.cal) {
 #'   lengths.
 #' @return Probability that the customer is still alive at the end of the calibration period.
 #' @export
-#' @seealso bgnbd.EstimateParameters
+#' @seealso \code{\link{bgnbd.EstimateParameters}}
 #' @example demo/bg-nbd.r
 bgnbd.PAlive <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
@@ -153,7 +153,7 @@ bgnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' return the number of transactions they are expected to make in a given time 
 #' period.
 #' 
-#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and 'b' in
+#' @param params BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and \code{b} in
 #'   that order.
 #' @param T.star length of time for which we are calculating the expected number
 #'   of transactions.
@@ -169,7 +169,7 @@ bgnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   number of transactions.
 #' @import gsl
 #' @export
-#' @seealso bgnbd.EstimateParameters
+#' @seealso \code{\link{bgnbd.EstimateParameters}}
 #' @example demo/bg-nbd.r
 bgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   max.length <- max(length(T.star), length(x), length(t.x), 
@@ -212,13 +212,13 @@ bgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
-#'   'b' in that order.
-#' @param return.elog boolean - if TRUE then the event log is returned in
+#' @param params BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and
+#'   \code{b} in that order.
+#' @param return.elog boolean - if \code{TRUE} then the event log is returned in
 #'   addition to the CBS summary
-#' @return list with elements 'cbs' and 'elog' containing data.frames
+#' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
-#' @seealso bgnbd.EstimateParameters
+#' @seealso \code{\link{bgnbd.EstimateParameters}}
 #' @example demo/bg-nbd.r
 bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   # check model parameters

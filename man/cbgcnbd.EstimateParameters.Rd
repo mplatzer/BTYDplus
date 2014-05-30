@@ -8,12 +8,12 @@ cbgcnbd.EstimateParameters(cal.cbs, par.start = c(1, 1, 1, 1),
 }
 \arguments{
 \item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a
-column 'custs' can be provided, which represents number of customers with a
-specific combination of frequency 'x', recency 't.x' and 'T.cal'.}
+\code{x}, for recency \code{t.x} and total time observed \code{T.cal}. Optionally a
+column \code{custs} can be provided, which represents number of customers with a
+specific combination of frequency \code{x}, recency \code{t.x} and \code{T.cal}.}
 
-\item{par.start}{initial CBG/CNBD-k parameters - a vector with 'r', 'alpha',
-'a' and 'b' in that order.}
+\item{par.start}{initial CBG/CNBD-k parameters - a vector with \code{r}, \code{alpha},
+\code{a} and \code{b} in that order.}
 
 \item{max.param.value}{the upper bound on parameters}
 
@@ -120,6 +120,6 @@ Platzer, Michael. "Stochastic models of noncontractual consumer
   \url{https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships}
 }
 \seealso{
-elog2cbs
+\code{\link{elog2cbs}}
 }
 

@@ -6,8 +6,8 @@
 ggnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal)
 }
 \arguments{
-\item{params}{Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
-'b', 's' and 'beta' in that order.}
+\item{params}{Gamma/Gompertz/NBD parameters - a vector with \code{r}, \code{alpha},
+\code{b}, \code{s} and \code{beta} in that order.}
 
 \item{T.star}{length of time for which we are calculating the expected number
 of transactions.}
@@ -74,6 +74,6 @@ prop.table(table(cbs$palive>.5, cbs$alive))
 # -> 83\% of customers are correctly classified
 }
 \seealso{
-ggnbd.EstimateParameters
+\code{\link{ggnbd.EstimateParameters}}
 }
 

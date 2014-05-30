@@ -6,14 +6,14 @@
 cbgcnbd.cbs.LL(params, cal.cbs)
 }
 \arguments{
-\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a'
-and 'b' in that order.}
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+and \code{b} in that order.}
 
 \item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x', for recency 't.x.', for sum of logarithmic interpurchase times 'litt'
-and total time observed 'T.cal'. Optionally a column 'custs' can be
+\code{x}, for recency \code{t.x}, for sum of logarithmic interpurchase times 'litt'
+and total time observed \code{T.cal}. Optionally a column \code{custs} can be
 provided, which represents number of customers with a specific combination
-of frequency 'x' and 'T.cal'.}
+of frequency \code{x} and \code{T.cal}.}
 }
 \value{
 the total log-likelihood for the provided data.
@@ -22,6 +22,6 @@ the total log-likelihood for the provided data.
 Calculate the log-likelihood of the CBG/CNBD-k model
 }
 \seealso{
-cbgcnbd.EstimateParameters
+\code{\link{cbgcnbd.EstimateParameters}}
 }
 

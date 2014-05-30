@@ -8,16 +8,18 @@ ggnbd.EstimateParameters(cal.cbs, par.start = c(1, 1, 0.5, 1, 1),
 }
 \arguments{
 \item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a
-column 'custs' can be provided, which represents number of customers with a
-specific combination of frequency 'x', recency 't.x' and 'T.cal'.}
+\code{x}, for recency \code{t.x} and total time observed \code{T.cal}. Optionally a
+column \code{custs} can be provided, which represents number of customers with a
+specific combination of frequency \code{x}, recency \code{t.x} and \code{T.cal}.}
 
-\item{par.start}{initial Gamma/Gompertz/NBD parameters - a vector with 'r',
-'alpha', 'b', 's' and 'beta' in that order.}
+\item{par.start}{initial Gamma/Gompertz/NBD parameters - a vector with \code{r},
+\code{alpha}, \code{b}, \code{s} and \code{beta} in that order.}
 
 \item{min.param.value}{the lower bound on parameters}
 
 \item{max.param.value}{the upper bound on parameters}
+
+\item{trace}{print logging step every \code{trace} iteration}
 }
 \value{
 list of estimated parameters

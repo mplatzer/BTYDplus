@@ -9,6 +9,6 @@ cbgnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal)
 CBG/NBD Conditional Expected Transactions
 }
 \seealso{
-cbgcnbd.ConditionalExpectedTransactions
+\code{\link{cbgcnbd.ConditionalExpectedTransactions}}
 }
 

@@ -10,6 +10,6 @@ cbgnbd.EstimateParameters(cal.cbs, par.start = c(1, 1, 1, 1),
 Parameter Estimation for the CBG/NBD model
 }
 \seealso{
-cbgcnbd.EstimateParameters
+\code{\link{cbgcnbd.EstimateParameters}}
 }
 

@@ -12,18 +12,18 @@ nbd.GenerateData(n, T.cal, T.star, params, return.elog = F)
 
 \item{T.star}{length of holdout period}
 
-\item{params}{NBD parameters - a vector with 'r' and 'alpha' in that order}
+\item{params}{NBD parameters - a vector with \code{r} and \code{alpha} in that order}
 
-\item{return.elog}{boolean - if TRUE then the event log is returned in
+\item{return.elog}{boolean - if \code{TRUE} then the event log is returned in
 addition to the CBS summary}
 }
 \value{
-list with elements 'cbs' and 'elog' containing data.frames
+list with elements \code{cbs} and \code{elog} containing data.frames
 }
 \description{
 Simulate data according to NBD model assumptions
 }
 \seealso{
-nbd.EstimateParameters
+\code{\link{nbd.EstimateParameters}}
 }
 

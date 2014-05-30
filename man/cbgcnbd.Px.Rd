@@ -6,7 +6,7 @@
 cbgcnbd.Px(params, t, x)
 }
 \arguments{
-\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a' and 'b'
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} and \code{b}
 in that order.}
 
 \item{t}{length of time for which we are calculating the expected number of
@@ -24,6 +24,6 @@ purchase frequencies for a random customer in a given time period, i.e.
 P(X(t)=x|r,alpha,a,b)
 }
 \seealso{
-cbgcnbd.EstimateParameters
+\code{\link{cbgcnbd.EstimateParameters}}
 }
 

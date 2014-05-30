@@ -6,7 +6,7 @@
 bgnbd.PAlive(params, x, t.x, T.cal)
 }
 \arguments{
-\item{params}{BG/NBD parameters - a vector with 'r', 'alpha', 'a' and 'b' in
+\item{params}{BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and \code{b} in
 that order.}
 
 \item{x}{number of repeat transactions in the calibration period T.cal, or a
@@ -68,6 +68,6 @@ prop.table(table(cbs$palive>.5, cbs$alive))
 # -> 76\% of customers are correctly classified
 }
 \seealso{
-bgnbd.EstimateParameters
+\code{\link{bgnbd.EstimateParameters}}
 }
 

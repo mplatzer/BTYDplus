@@ -6,7 +6,7 @@
 nbd.LL(params, x, T.cal)
 }
 \arguments{
-\item{params}{NBD parameters - a vector with r and alpha, in that
+\item{params}{NBD parameters - a vector with \code{r} and \code{alpha}, in that
 order.}
 
 \item{x}{frequency, i.e. number of re-purchases}
@@ -20,6 +20,6 @@ a vector of log-likelihoods
 Calculate the log-likelihood of the NBD model
 }
 \seealso{
-nbd.EstimateParameters
+\code{\link{nbd.EstimateParameters}}
 }
 

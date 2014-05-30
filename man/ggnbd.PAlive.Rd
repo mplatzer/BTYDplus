@@ -6,8 +6,8 @@
 ggnbd.PAlive(params, x, t.x, T.cal)
 }
 \arguments{
-\item{params}{Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
-'b', 's' and 'beta' in that order.}
+\item{params}{Gamma/Gompertz/NBD parameters - a vector with \code{r}, \code{alpha},
+\code{b}, \code{s} and \code{beta} in that order.}
 
 \item{x}{number of repeat transactions in the calibration period T.cal, or a
 vector of calibration period frequencies.}
@@ -69,6 +69,6 @@ prop.table(table(cbs$palive>.5, cbs$alive))
 # -> 83\% of customers are correctly classified
 }
 \seealso{
-ggnbd.EstimateParameters
+\code{\link{ggnbd.EstimateParameters}}
 }
 

@@ -6,13 +6,14 @@
 ggnbd.cbs.LL(params, cal.cbs)
 }
 \arguments{
-\item{params}{Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
-'b', 's' and 'beta' in that order.}
+\item{params}{Gamma/Gompertz/NBD parameters - a vector with \code{r},
+\code{alpha}, \code{b}, \code{s} and \code{beta} in that order.}
 
 \item{cal.cbs}{calibration period CBS. It must contain columns for frequency
-'x', for recency 't.x.' and total time observed 'T.cal'. Optionally a
-column 'custs' can be provided, which represents number of customers with a
-specific combination of frequency 'x' and 'T.cal'.}
+\code{x}, for recency \code{t.x} and total time observed \code{T.cal}.
+Optionally a column \code{custs} can be provided, which represents number
+of customers with a specific combination of frequency \code{x} and
+\code{T.cal}.}
 }
 \value{
 the total log-likelihood for the provided data.
@@ -21,6 +22,6 @@ the total log-likelihood for the provided data.
 Calculate the log-likelihood of the Gamma/Gompertz/NBD model
 }
 \seealso{
-ggnbd.EstimateParameters
+\code{\link{ggnbd.EstimateParameters}}
 }
 

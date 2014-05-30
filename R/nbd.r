@@ -4,10 +4,10 @@
 #' Estimates parameters for the NBD model via Maximum Likelihood Estimation.
 #' 
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   'x' and total time observed 'T.cal'. Optionally a column 'custs' can be 
+#'   \code{x} and total time observed \code{T.cal}. Optionally a column \code{custs} can be 
 #'   provided, which represents number of customers with a specific combination 
-#'   of frequency 'x' and 'T.cal'.
-#' @param par.start initial NBD parameters - a vector with 'r' and 'alpha' in 
+#'   of frequency \code{x} and \code{T.cal}.
+#' @param par.start initial NBD parameters - a vector with \code{r} and \code{alpha} in 
 #'   that order.
 #' @param max.param.value the upper bound on parameters
 #' @return list of estimated parameters
@@ -39,13 +39,13 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
 #' @param params NBD parameters - a vector with r and alpha, in that
 #'   order.
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   'x' and total time observed 'T.cal'. Optionally a column 'custs' can be 
+#'   \code{x} and total time observed \code{T.cal}. Optionally a column \code{custs} can be 
 #'   provided, which represents number of customers with a specific combination 
-#'   of frequency 'x' and 'T.cal' data.frame with columns 'x' and 'T.cal' and 
-#'   optional 'custs'.
+#'   of frequency \code{x} and \code{T.cal} data.frame with columns \code{x} and \code{T.cal} and 
+#'   optional \code{custs}.
 #' @return the total log-likelihood for the provided data.
 #' @export
-#' @seealso nbd.EstimateParameters
+#' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("r", "alpha"), params, 
                         "nbd.cbs.LL")  
@@ -62,13 +62,13 @@ nbd.cbs.LL <- function(params, cal.cbs) {
 
 #' Calculate the log-likelihood of the NBD model
 #' 
-#' @param params NBD parameters - a vector with r and alpha, in that
+#' @param params NBD parameters - a vector with \code{r} and \code{alpha}, in that
 #'   order.
 #' @param x frequency, i.e. number of re-purchases
 #' @param T.cal total time of observation period
 #' @return a vector of log-likelihoods
 #' @export
-#' @seealso nbd.EstimateParameters
+#' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.LL <- function(params, x, T.cal) {
   max.length <- max(length(x), length(T.cal))
   if (max.length%%length(x)) 
@@ -98,10 +98,10 @@ nbd.LL <- function(params, x, T.cal) {
 #' return the number of transactions they are expected to make in a given time
 #' period.
 #' 
-#' @param params NBD parameters - a vector with r and alpha, in that order.
+#' @param params NBD parameters - a vector with \code{r} and \code{alpha}, in that order.
 #' @param T.star length of time for which we are calculating the expected number
 #'   of transactions.
-#' @param x number of repeat transactions in the calibration period T.cal, or a
+#' @param x number of repeat transactions in the calibration period \code{T.cal}, or a
 #'   vector of calibration period frequencies.
 #' @param T.cal length of calibration period, or a vector of calibration period
 #'   lengths.
@@ -110,7 +110,7 @@ nbd.LL <- function(params, x, T.cal) {
 #'   parameters has a length greater than 1, this will be a vector of expected
 #'   number of transactions.
 #' @export
-#' @seealso nbd.EstimateParameters
+#' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
   max.length <- max(length(T.star), length(x), length(T.cal))
   if (max.length%%length(T.star)) 
@@ -141,12 +141,12 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params NBD parameters - a vector with 'r' and 'alpha' in that order
-#' @param return.elog boolean - if TRUE then the event log is returned in
+#' @param params NBD parameters - a vector with \code{r} and \code{alpha} in that order
+#' @param return.elog boolean - if \code{TRUE} then the event log is returned in
 #'   addition to the CBS summary
-#' @return list with elements 'cbs' and 'elog' containing data.frames
+#' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
-#' @seealso nbd.EstimateParameters
+#' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   # check model parameters
   dc.check.model.params(c("r", "alpha"), params,

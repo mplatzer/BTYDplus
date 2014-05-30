@@ -7,11 +7,11 @@ cbgcnbd.EstimateRegularity(elog, method = "wheat", plot = F)
 }
 \arguments{
 \item{elog}{data.frame with transaction logs; requires columns customer-id
-'cust' and transaction time 't' or 'date'}
+'cust' and transaction time \code{t} or 'date'}
 
 \item{method}{'wheat', 'mle', 'mle-minka', 'mle-thom', 'cv'}
 
-\item{plot}{if TRUE then distribution of estimated regularity will be plotted}
+\item{plot}{if \code{TRUE} then distribution of estimated regularity will be plotted}
 }
 \value{
 estimated real-valued regularity parameter; rounded to an integer,
@@ -114,6 +114,6 @@ axis(1, pos=0)
 legend(xlim*.6, max(y)*.9, c("Actual", "CBG/CNBD-k", "CBG/NBD"), col=c("black", "red", "blue"), pch=15, bty="n")
 }
 \seealso{
-cbgcnbd.EstimateParameters
+\code{\link{cbgcnbd.EstimateParameters}}
 }
 

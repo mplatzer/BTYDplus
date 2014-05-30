@@ -6,8 +6,8 @@
 cbgcnbd.UnconditionalExpectedTransactions(params, t)
 }
 \arguments{
-\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a'
-and 'b' in that order.}
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+and \code{b} in that order.}
 
 \item{t}{length of time for which we are calculating the expected number of
 transactions.}
@@ -22,6 +22,6 @@ Uses CBG/CNBD-k model parameters to return the number of transactions a
 random customer is expected to make in a given time period.
 }
 \seealso{
-cbgcnbd.EstimateParameters
+\code{\link{cbgcnbd.EstimateParameters}}
 }
 

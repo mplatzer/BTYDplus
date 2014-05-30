@@ -9,6 +9,6 @@ cbgnbd.GenerateData(n, T.cal, T.star, params, return.elog = F)
 Simulate data according to CBG/NBD model assumptions
 }
 \seealso{
-cbgcnbd.GenerateData
+\code{\link{cbgcnbd.GenerateData}}
 }
 

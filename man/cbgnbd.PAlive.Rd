@@ -9,6 +9,6 @@ cbgnbd.PAlive(params, x, t.x, T.cal)
 CBG/NBD P(alive)
 }
 \seealso{
-cbgcnbd.PAlive
+\code{\link{cbgcnbd.PAlive}}
 }
 

@@ -4,13 +4,11 @@
 \title{Hierarchical Bayes variant of Pareto/NBD}
 \usage{
 pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 1,
-  chains = 2, use_data_augmentation = TRUE, param_init = list(r = 1, alpha
-  = 1, s = 1, beta = 1), hyper_prior = list(r_1 = 1/1000, r_2 = 1/1000,
-  alpha_1 = 1/1000, alpha_2 = 1/1000, s_1 = 1/1000, s_2 = 1/1000, beta_1 =
-  1/1000, beta_2 = 1/1000))
+  chains = 2, use_data_augmentation = TRUE, param_init = NULL,
+  trace = 100)
 }
 \arguments{
-\item{cal.cbs}{data.frame with columns 'x', 't.x', 'T.cal'}
+\item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}}
 
 \item{mcmc}{number of MCMC steps}
 
@@ -24,7 +22,7 @@ pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 1,
 
 \item{param_init}{list of 2nd-level parameter start values}
 
-\item{hyper_prior}{list of hyper parameters for 2nd-level parameters}
+\item{trace}{print logging step every \code{trace} iteration}
 }
 \value{
 2-element list:
@@ -58,41 +56,36 @@ generate 'enough' draws
 }
 \examples{
 
-# Load CDNow event log
-data(cdnowElog, package="BTYD")
-elog <- data.frame(t(sapply(2:nrow(cdnowElog), function(i) strsplit(as.character(cdnowElog[i,]), split=",")[[1]])))
-names(elog) <- c("cust", "sampleid", "date", "cds", "sales")
-elog$date <- as.Date(elog$date, "\%Y\%m\%d")
-
-# Transform to CBS (including extra column 'litt')
-cbs <- elog2cbs(elog, per="week", T.cal=as.Date("1997-09-30"))
-
-# Pareto/NBD MCMC
 set.seed(1)
-pnbd.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc=1000, burnin=1000, chains=2, thin=10)
-summary(pnbd.draws$level_2)
+
+# generate artificial BG/NBD data 
+n      <- 1000 # no. of customers
+T.cal  <- 32   # length of calibration period
+T.star <- 32   # length of hold-out period
+params <- list(t=3.15, gamma=1.35,  # regularity parameter k_i ~ Gamma(t, gamma)
+               r=0.55, alpha=10.57, # purchase frequency lambda_i ~ Gamma(r, alpha)
+               s=0.61, beta=11.74)  # dropout probability mu_i ~ Gamma(s, beta)
+
+data <- pcnbd.GenerateData(n, T.cal, T.star, params, return.elog=T)
+cbs <- data$cbs
+elog <- data$elog
+
+# estimate Pareto/NBD MCMC
+pnbd.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc=2500, burnin=500, chains=3, thin=10)
 plot(pnbd.draws$level_2)
-summary(pnbd.draws$level_2)$quantiles[, "50\%"]
 
-# Pareto/CNBD MCMC
-set.seed(2)
-param_init <- params.pnbd.mcmc
-param_init$t <- 10
-param_init$gamma <- 10
-pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=100, burnin=100, chains=2, thin=2, param_init=param_init)
-# Note: MCMC chain should be run longer; for demo purposes we keep runtime short here
-
-plot(pcnbd.draws$level_2, density=FALSE)
-plot(pcnbd.draws$level_2, trace=FALSE)
+# estimate Pareto/CNBD MCMC
+pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=2500, burnin=500, chains=3, thin=10)
+plot(pcnbd.draws$level_2, density=F)
+rbind("actual"=params, "estimated"=round(summary(pcnbd.draws$level_2)$quantiles[, "50\%"], 2))
+#           t    gamma r    alpha s    beta 
+# actual    3.15 1.35  0.55 10.57 0.61 11.74
+# estimated 3.96 1.99  0.56 12.26 2.28 78.84
 
 coda::gelman.diag(pcnbd.draws$level_2)
 # -> MCMC chains have not converged yet
 
-summary(pcnbd.draws$level_2)$quantiles[, "50\%"]
-
 pcnbd.mcmc.plotRegularityRateHeterogeneity(pcnbd.draws)
-# -> very narrow distribution around k=1; 
-# CDNow customers purchases indeed seem to follow Poisson process
 
 round(effectiveSize(pcnbd.draws$level_2))
 # -> effective sample size are small for such a short chain
@@ -105,9 +98,33 @@ pcnbd.xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, pcnbd.draws, T.star=cbs$T.
 cbs$pnbd.mcmc <- apply(pnbd.xstar, 2, mean)
 cbs$pcnbd.mcmc <- apply(pcnbd.xstar, 2, mean)
 
+MAPE <- function(a, f) { return(sum(abs(a-f)/sum(a))) }
+RMSE <- function(a, f) { return(sqrt(mean((a-f)^2))) }
+MSLE <- function(a, f) { return(mean(((log(a+1) - log(f+1)))^2)) }
+BIAS <- function(a, f) { return(mean(a)-mean(f)) }
+bench <- function(cbs, models) {
+  acc <- t(sapply(models, function(model) c(MAPE(cbs$x.star, cbs[, model]),
+                                            RMSE(cbs$x.star, cbs[, model]),
+                                            MSLE(cbs$x.star, cbs[, model]),
+                                            BIAS(cbs$x.star, cbs[, model]))))
+  colnames(acc) <- c("MAPE", "RMSE", "MSLE", "BIAS")
+  round(acc, 3)
+}
+
+bench(cbs, c("pnbd.mcmc", "pcnbd.mcmc"))
+#            MAPE  RMSE  MSLE   BIAS
+# pnbd.mcmc  0.977 1.072 0.170 -0.085
+# pcnbd.mcmc 0.890 1.064 0.143  0.068
+
 # calculate P(active)
 cbs$pactive.pnbd.mcmc <- apply(pnbd.xstar, 2, function(x) mean(x>0))
 cbs$pactive.pcnbd.mcmc <- apply(pcnbd.xstar, 2, function(x) mean(x>0))
+
+# Brier score
+c("pnbd.mcmc"=mean((cbs$pactive.pnbd.mcmc-(cbs$x.star>0))^2),
+  "pcnbd.mcmc"=mean((cbs$pactive.pcnbd.mcmc-(cbs$x.star>0))^2))
+# pnbd.mcmc pcnbd.mcmc 
+# 0.1075209  0.1037862 
 }
 \references{
 Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}

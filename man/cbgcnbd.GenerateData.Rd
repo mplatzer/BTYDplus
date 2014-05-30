@@ -12,14 +12,14 @@ cbgcnbd.GenerateData(n, T.cal, T.star = T.cal, params, return.elog = F)
 
 \item{T.star}{length of holdout period}
 
-\item{params}{CBG/CNBD-k parameters - a vector with 'k', 'r', 'alpha', 'a' and 'b'
+\item{params}{CBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} and \code{b}
 in that order.}
 
-\item{return.elog}{boolean - if TRUE then the event log is returned in
+\item{return.elog}{boolean - if \code{TRUE} then the event log is returned in
 addition to the CBS summary}
 }
 \value{
-list with elements 'cbs' and 'elog' containing data.frames
+list with elements \code{cbs} and \code{elog} containing data.frames
 }
 \description{
 Simulate data according to CBG/CNBD-k model assumptions

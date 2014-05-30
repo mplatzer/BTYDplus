@@ -12,14 +12,14 @@ bgnbd.GenerateData(n, T.cal, T.star, params, return.elog = F)
 
 \item{T.star}{length of holdout period}
 
-\item{params}{BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
-'b' in that order.}
+\item{params}{BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and
+\code{b} in that order.}
 
-\item{return.elog}{boolean - if TRUE then the event log is returned in
+\item{return.elog}{boolean - if \code{TRUE} then the event log is returned in
 addition to the CBS summary}
 }
 \value{
-list with elements 'cbs' and 'elog' containing data.frames
+list with elements \code{cbs} and \code{elog} containing data.frames
 }
 \description{
 Simulate data according to BG/NBD model assumptions
@@ -66,6 +66,6 @@ prop.table(table(cbs$palive>.5, cbs$alive))
 # -> 76\% of customers are correctly classified
 }
 \seealso{
-bgnbd.EstimateParameters
+\code{\link{bgnbd.EstimateParameters}}
 }
 

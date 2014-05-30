@@ -6,7 +6,7 @@
 pcnbd.mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star)
 }
 \arguments{
-\item{cal.cbs}{data.frame with column 't.x' and 'T.cal'}
+\item{cal.cbs}{data.frame with column \code{t.x} and \code{T.cal}}
 
 \item{draws}{MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}}
 

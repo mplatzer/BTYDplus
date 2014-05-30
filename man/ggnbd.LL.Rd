@@ -6,8 +6,8 @@
 ggnbd.LL(params, x, t.x, T.cal)
 }
 \arguments{
-\item{params}{Gamma/Gompertz/NBD parameters - a vector with 'r', 'alpha',
-'b', 's' and 'beta' in that order.}
+\item{params}{Gamma/Gompertz/NBD parameters - a vector with \code{r}, \code{alpha},
+\code{b}, \code{s} and \code{beta} in that order.}
 
 \item{x}{frequency, i.e. number of re-purchases}
 
@@ -22,6 +22,6 @@ a vector of log-likelihoods
 Calculate the log-likelihood of the Gamma/Gompertz/NBD model
 }
 \seealso{
-ggnbd.EstimateParameters
+\code{\link{ggnbd.EstimateParameters}}
 }
 

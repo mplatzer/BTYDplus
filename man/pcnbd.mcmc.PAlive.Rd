@@ -6,7 +6,7 @@
 pcnbd.mcmc.PAlive(cal.cbs, draws)
 }
 \arguments{
-\item{cal.cbs}{data.frame with column 'T.cal'}
+\item{cal.cbs}{data.frame with column \code{T.cal}}
 
 \item{draws}{MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}}
 }
