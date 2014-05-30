@@ -14,7 +14,7 @@
 #' @import BTYD
 #' @export
 #' @references Fader, Peter S., Bruce GS Hardie, and Ka Lok Lee. "Counting Your Customers the Easy Way: An Alternative to the Pareto/NBD Model." Marketing Science 24.2 (2005): 275-284.
-#' @example demos/bg-nbd.r
+#' @example demo/bg-nbd.r
 bgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000) {
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "bgnbd.EstimateParameters")
@@ -119,7 +119,7 @@ bgnbd.LL <- function(params, x, t.x, T.cal) {
 #' @return Probability that the customer is still alive at the end of the calibration period.
 #' @export
 #' @seealso bgnbd.EstimateParameters
-#' @example demos/bg-nbd.r
+#' @example demo/bg-nbd.r
 bgnbd.PAlive <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
@@ -170,7 +170,7 @@ bgnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' @import gsl
 #' @export
 #' @seealso bgnbd.EstimateParameters
-#' @example demos/bg-nbd.r
+#' @example demo/bg-nbd.r
 bgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   max.length <- max(length(T.star), length(x), length(t.x), 
     length(T.cal))
@@ -212,19 +212,29 @@ bgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params BG/NBD parameters - a list with 'r', 'alpha', 'a' and 'b'
+#' @param params BG/NBD parameters - a vector with 'r', 'alpha', 'a' and
+#'   'b' in that order.
 #' @param return.elog boolean - if TRUE then the event log is returned in
 #'   addition to the CBS summary
 #' @return list with elements 'cbs' and 'elog' containing data.frames
 #' @export
 #' @seealso bgnbd.EstimateParameters
-#' @example demos/bg-nbd.r
+#' @example demo/bg-nbd.r
 bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
+  # check model parameters
+  dc.check.model.params(c("r", "alpha", "a", "b"), params,
+                        "bgnbd.GenerateData")
+  
+  r <- params[1]
+  alpha <- params[2]
+  a <- params[3]
+  b <- params[4]  
+  
   # sample intertransaction timings parameter lambda for each customer
-  lambdas <- rgamma(n, shape=params$r, rate=params$alpha)
+  lambdas <- rgamma(n, shape=r, rate=alpha)
 
   # sample dropout probability p for each customer
-  ps <- rbeta(n, params$a, params$b)
+  ps <- rbeta(n, a, b)
   
   # sample intertransaction timings & churn
   cbs <- data.frame()

@@ -156,13 +156,20 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params NBD parameters - a list with 'r' and 'alpha'
+#' @param params NBD parameters - a vector with 'r' and 'alpha' in that order
 #' @param return.elog boolean - if TRUE then the event log is returned in
 #'   addition to the CBS summary
 #' @return list with elements 'cbs' and 'elog' containing data.frames
 #' @export
 #' @seealso nbd.EstimateParameters
 nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
+  # check model parameters
+  dc.check.model.params(c("r", "alpha"), params,
+                        "nbd.GenerateData")
+  
+  r <- params[1]
+  alpha <- params[2]
+  
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape=params$r, rate=params$alpha)
   

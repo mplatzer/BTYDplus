@@ -18,6 +18,7 @@
 #' @references Bemmaor, Albert C., and Nicolas Glady. "Modeling Purchasing 
 #'   Behavior with Sudden “Death”: A Flexible Customer Lifetime Model." 
 #'   Management Science 58.5 (2012): 1012-1021.
+#' @example demo/gg-nbd.r
 ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min.param.value=1e-5, max.param.value=1e+4, trace=0) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), par.start, 
                         "ggnbd.EstimateParameters")
@@ -52,6 +53,7 @@ ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min
 #'   column 'custs' can be provided, which represents number of customers with a
 #'   specific combination of frequency 'x' and 'T.cal'.
 #' @return the total log-likelihood for the provided data.
+#' @seealso ggnbd.EstimateParameters
 #' @export
 ggnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
@@ -76,6 +78,7 @@ ggnbd.cbs.LL <- function(params, cal.cbs) {
 #' @param t.x recency, i.e. time elapsed from first purchase to last purchase
 #' @param T.cal total time of observation period
 #' @return a vector of log-likelihoods
+#' @seealso ggnbd.EstimateParameters
 #' @export
 ggnbd.LL <- function(params, x, t.x, T.cal) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
@@ -134,7 +137,9 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
 #'   lengths.
 #' @return Probability that the customer is still alive at the end of the 
 #'   calibration period.
+#' @seealso ggnbd.EstimateParameters
 #' @export
+#' @example demo/gg-nbd.r
 ggnbd.PAlive <- function(params, x, t.x, T.cal) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
                         "ggnbd.PAlive")
@@ -187,6 +192,8 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   parameters has a length greater than 1, this will be a vector of expected 
 #'   number of transactions.
 #' @export
+#' @seealso ggnbd.EstimateParameters
+#' @example demo/gg-nbd.r
 ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
                         "ggnbd.ConditionalExpectedTransactions")  
@@ -242,6 +249,8 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #'   addition to the CBS summary
 #' @return list with elements 'cbs' and 'elog' containing data.frames
 #' @export
+#' @seealso ggnbd.EstimateParameters
+#' @example demo/gg-nbd.r
 ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   # check model parameters
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params,
@@ -285,6 +294,7 @@ ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
     cbs[i, "t.x"] <- max(ts.cal)
     cbs[i, "T.cal"] <- T.cal
     cbs[i, "alive"] <- tau>T.cal
+    cbs[i, "T.star"] <- T.star
     cbs[i, "x.star"] <- length(ts.star)
     cbs[i, "lambda"] <- lambda
     #cbs[i, "eta"] <- eta

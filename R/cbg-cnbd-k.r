@@ -20,7 +20,7 @@
 #'   this can be used as 'k' for estimating CBG/CNBD-k models
 #' @export
 #' @seealso cbgcnbd.EstimateParameters
-#' @example demos/cbg-cnbd-k.r
+#' @example demo/cbg-cnbd-k.r
 cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
   if (!"cust" %in% names(elog)) 
     stop("Error in cbgcnbd.EstimateRegularity: elog must have a column labelled \"cust\"")
@@ -144,7 +144,7 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
 #'   relationships." Master of Science in Business Administration thesis, Vienna
 #'   University of Economics and Business Administration, Austria (2008). 
 #'   \url{https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships}
-#' @example demos/cbg-cnbd-k.r
+#' @example demo/cbg-cnbd-k.r
 cbgcnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000, k = NULL) {
   
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
@@ -292,7 +292,7 @@ cbgcnbd.LL <- function(params, x, t.x, T.cal, litt) {
 #' @return Probability that the customer is still alive at the end of the 
 #'   calibration period.
 #' @export
-#' @example demos/cbg-cnbd-k.r
+#' @example demo/cbg-cnbd-k.r
 #' @seealso cbgcnbd.EstimateParameters
 cbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
@@ -355,7 +355,7 @@ cbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   number of transactions.
 #' @import gsl
 #' @export
-#' @example demos/cbg-cnbd-k.r
+#' @example demo/cbg-cnbd-k.r
 #' @seealso cbgcnbd.EstimateParameters
 cbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   max.length <- max(length(T.star), length(x), length(t.x), 

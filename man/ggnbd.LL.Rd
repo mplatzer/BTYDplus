@@ -21,4 +21,7 @@ a vector of log-likelihoods
 \description{
 Calculate the log-likelihood of the Gamma/Gompertz/NBD model
 }
+\seealso{
+ggnbd.EstimateParameters
+}
 
