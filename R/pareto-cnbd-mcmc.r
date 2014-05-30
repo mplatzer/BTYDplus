@@ -5,17 +5,19 @@
 #'   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
 #'   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
 #'
-#' @param cal.cbs data.frame with columns 'x', 't.x', 'T.cal', 'litt'; e.g. output of \code{\link{elog2cbs}}
+#' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}, 'litt'; e.g. output of \code{\link{elog2cbs}}
 #' @param mcmc number of MCMC steps
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
 #' @param chains number of MCMC chains to be run
 #' @param use_data_augmentation determines MCMC method to be used
 #' @param param_init list of 2nd-level parameter start values
-#' @param hyper_prior list of hyper parameters for 2nd-level parameters
-#' @return 2-element list
-#' level_1:  list of coda::mcmc.list objects; one for each customer, containing individual-level draws
-#' level_2:  coda::mcmc.list object containing draws of heterogeneity parameters
+#' @param trace print logging step every \code{trace} iteration
+#' @return 2-element list:
+##' \itemize{
+##'  \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
+##'  \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
+##' }
 #' @import coda parallel
 #' @export
 #' @example demo/pareto-cnbd.r
@@ -23,13 +25,7 @@
 pcnbd.mcmc.DrawParameters <-
   function(cal.cbs,
            mcmc = 1500, burnin = 500, thin = 1, chains = 2,
-           param_init = list(t=1, gamma=1, r=1, alpha=1, s=1, beta=1),
-           hyper_prior = list(t_1=1/1000, t_2=1/1000,
-                              gamma_1=1/1000, gamma_2=1/1000,
-                              r_1=1/1000, r_2=1/1000,
-                              alpha_1=1/1000, alpha_2=1/1000,
-                              s_1=1/1000, s_2=1/1000,
-                              beta_1=1/1000, beta_2=1/1000)) {
+           param_init = NULL, trace = 100) {
   
   ## methods to sample heterogeneity parameters {r, alpha, s, beta, t, gamma} ##
     
@@ -147,7 +143,7 @@ pcnbd.mcmc.DrawParameters <-
     ## run MCMC chain ##
     
     for (step in 1:(burnin+mcmc)) {
-      if (step%%100==0) cat("chain:", chain_id, "step:", step, "of", (burnin+mcmc), "\n")      
+      if (step%%trace==0) cat("chain:", chain_id, "step:", step, "of", (burnin+mcmc), "\n")      
       
       # store
       if ((step-burnin)>0 & (step-1-burnin)%%thin==0) {
@@ -174,7 +170,26 @@ pcnbd.mcmc.DrawParameters <-
       level_2 = mcmc(level_2_draws, start=burnin, thin=thin)))
   }
   
-  ## check whether input data meets requirements
+  # set hyper priors
+  hyper_prior <- list(r_1 = 1e-3, r_2 = 1e-3,
+                      alpha_1 = 1e-3, alpha_2 = 1e-3,
+                      s_1 = 1e-3, s_2 = 1e-3,
+                      beta_1 = 1e-3, beta_2 = 1e-3,
+                      t_1 = 1e-3, t_2 = 1e-3,
+                      gamma_1 = 1e-3, gamma_2 = 1e-3)  
+  
+  # set param_init (if not passed as argument)
+  if (is.null(param_init)) {
+    tryCatch({
+      df <- cal.cbs[sample(nrow(cal.cbs), min(nrow(cal.cbs), 1000)),]
+      param_init <- c(1, 1, pnbd.EstimateParameters(df))
+      names(param_init) <- c("t", "gamma", "r", "alpha", "s", "beta")
+      param_init <- as.list(param_init)
+    }, error = function(e) param_init <- list(t=1, gamma=1, r=1, alpha=1, s=1, beta=1))
+    cat("set param_init:", paste(round(unlist(param_init), 4), collapse=", "), "\n")
+  }
+  
+  # check whether input data meets requirements
   stopifnot(is.data.frame(cal.cbs))
   stopifnot(all(c("x", "t.x", "T.cal", "litt") %in% names(cal.cbs)))
   stopifnot(all(is.finite(cal.cbs$litt)))
@@ -192,7 +207,7 @@ pcnbd.mcmc.DrawParameters <-
 
 #' Calculates P(alive) based on MCMC draws
 #'
-#' @param cal.cbs data.frame with column 'T.cal'
+#' @param cal.cbs data.frame with column \code{T.cal}
 #' @param draws MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}
 #' @return numeric vector of probabilities
 #' @export
@@ -211,7 +226,7 @@ pcnbd.mcmc.PAlive <- function(cal.cbs, draws) {
 
 #' Samples number of future transactions based on drawn parameters
 #'
-#' @param cal.cbs data.frame with column 't.x' and 'T.cal'
+#' @param cal.cbs data.frame with column \code{t.x} and \code{T.cal}
 #' @param draws MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}
 #' @param T.star length of period for which future transactions are counted
 #' @return 2-dim array [draw x cust] with sampled future transactions
@@ -271,50 +286,50 @@ pcnbd.mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star=cal.cbs$T.s
 #' Generate artificial data which follows Pareto/CNBD model assumptions
 #'
 #' Returns 2-element list
-#' * cbs: data.frame with 'cust', 'x', 't.x', 'T.cal', 'T.star', 'x.star' 
+#' * cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star' 
 #'        this is the summary statistics data.frame which contains all 
 #'        needed information for parameter estimation
-#' * elog: data.frame with 'cust', 't'
+#' * elog: data.frame with 'cust', \code{t}
 #'
-#' @param N number of customers
+#' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
 #' @param params list of parameters: {r, alpha, s, beta, t, gamma}
-#' @param return.elog if TRUE then the event-log is returned as well; decreases performance
+#' @param return.elog if \code{TRUE} then the event-log is returned as well; decreases performance
 #' 
 #' @return 2-elemnt list
 #' @export
-pcnbd.GenerateData <- function(N, T.cal, T.star, params, return.elog=F) {
+pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   
-  if (length(T.star)==1) T.star <- rep(T.star, N)
-  if (length(T.cal)==1) T.cal <- rep(T.cal, N)
+  if (length(T.star)==1) T.star <- rep(T.star, n)
+  if (length(T.cal)==1) T.cal <- rep(T.cal, n)
   
   # sample regularity parameter k for each customer
   if (all(c("t", "gamma") %in% names(params))) {
     # Case A: regularity parameter k is gamma-distributed across customers
-    ks <- rgamma(N, shape=params$t, rate=params$gamma)
+    ks <- rgamma(n, shape=params$t, rate=params$gamma)
     ks <- pmax(0.01, ks) # ensure that k is not too small, otherwise itt can be 0
     
   } else if ("k" %in% params) {
     # Case B: regularity parameter k is fixed across customers
-    ks <- rep(param$k, N)
+    ks <- rep(param$k, n)
     
   } else {
     # Case C: k=1 is assumed, i.e. Pareto/NBD
-    ks <- rep(1, N)
+    ks <- rep(1, n)
   }
   
   # sample intertransaction timings parameter lambda for each customer
-  lambdas <- rgamma(N, shape=params$r, rate=params$alpha)
+  lambdas <- rgamma(n, shape=params$r, rate=params$alpha)
   
   # sample lifetime for each customer
-  mus <- rgamma(N, shape=params$s, rate=params$beta)
-  taus <- rexp(N, rate=mus)
+  mus <- rgamma(n, shape=params$s, rate=params$beta)
+  taus <- rexp(n, rate=mus)
   
   # sample intertransaction timings & churn
   cbs_list <- list()
   elog_list <- list()
-  for (i in 1:N) {
+  for (i in 1:n) {
     k      <- ks[i]
     lambda <- lambdas[i]
     mu     <- mus[i]

@@ -22,14 +22,14 @@
 #' autocorrelated draws of {r, alpha, s, beta} and hence need to be run long, to
 #' generate 'enough' draws
 #'
-#' @param cal.cbs data.frame with columns 'x', 't.x', 'T.cal'
+#' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}
 #' @param mcmc number of MCMC steps
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
 #' @param chains number of MCMC chains to be run
 #' @param use_data_augmentation determines MCMC method to be used
 #' @param param_init list of 2nd-level parameter start values
-#' @param hyper_prior list of hyper parameters for 2nd-level parameters
+#' @param trace print logging step every \code{trace} iteration
 #' @return 2-element list:
 ##' \itemize{
 ##'  \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
@@ -44,12 +44,7 @@
 pnbd.mcmc.DrawParameters <-
   function(cal.cbs,
            mcmc = 1500, burnin = 500, thin = 1, chains = 2,
-           use_data_augmentation = TRUE,
-           param_init = list(r=1, alpha=1, s=1, beta=1),
-           hyper_prior = list(r_1=1/1000, r_2=1/1000,
-                              alpha_1=1/1000, alpha_2=1/1000,
-                              s_1=1/1000, s_2=1/1000,
-                              beta_1=1/1000, beta_2=1/1000)) {
+           use_data_augmentation = TRUE, param_init = NULL, trace = 100) {
   
   ## methods to sample heterogeneity parameters {r, alpha, s, beta} ##
   
@@ -174,7 +169,7 @@ pnbd.mcmc.DrawParameters <-
     ## run MCMC chain ##
     
     for (step in 1:(burnin+mcmc)) {
-      if (step%%100==0) cat("chain:", chain_id, "step:", step, "of", (burnin+mcmc), "\n")
+      if (step%%trace==0) cat("chain:", chain_id, "step:", step, "of", (burnin+mcmc), "\n")
       
       # store
       if ((step-burnin)>0 & (step-1-burnin)%%thin==0) {
@@ -201,7 +196,24 @@ pnbd.mcmc.DrawParameters <-
       level_2 = mcmc(level_2_draws, start=burnin, thin=thin)))
   }
   
-  ## check whether input data meets requirements
+  # set hyper priors
+  hyper_prior <- list(r_1 = 1e-3, r_2 = 1e-3,
+                      alpha_1 = 1e-3, alpha_2 = 1e-3,
+                      s_1 = 1e-3, s_2 = 1e-3,
+                      beta_1 = 1e-3, beta_2 = 1e-3)
+  
+  # set param_init (if not passed as argument)
+  if (is.null(param_init)) {
+    tryCatch({
+      df <- cal.cbs[sample(nrow(cal.cbs), min(nrow(cal.cbs), 1000)),]
+      param_init <- pnbd.EstimateParameters(df)
+      names(param_init) <- c("r", "alpha", "s", "beta")
+      param_init <- as.list(param_init)
+    }, error = function(e) param_init <- list(r=1, alpha=1, s=1, beta=1))
+    cat("set param_init:", paste(round(unlist(param_init), 4), collapse=", "), "\n")
+  }
+  
+  # check whether input data meets requirements
   stopifnot(is.data.frame(cal.cbs))
   stopifnot(all(c("x", "t.x", "T.cal") %in% names(cal.cbs)))
   stopifnot(all(is.finite(cal.cbs$litt)))
