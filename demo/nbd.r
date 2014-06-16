@@ -5,7 +5,7 @@ set.seed(1)
 n      <- 1000 # no. of customers
 T.cal  <- 32   # length of calibration period
 T.star <- 32   # length of hold-out period
-params <- list(r=0.85, alpha=4.45) # purchase frequency lambda_i ~ Gamma(r, alpha)
+params <- c(r=0.85, alpha=4.45) # purchase frequency lambda_i ~ Gamma(r, alpha)
 
 cbs <- nbd.GenerateData(n, T.cal, T.star, params)$cbs
 

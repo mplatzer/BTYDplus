@@ -5,7 +5,7 @@ set.seed(1)
 n      <- 1000 # no. of customers
 T.cal  <- 32   # length of calibration period
 T.star <- 32   # length of hold-out period
-params <- list(r=0.85, alpha=4.45, # purchase frequency lambda_i ~ Gamma(r, alpha)
+params <- c(r=0.85, alpha=4.45, # purchase frequency lambda_i ~ Gamma(r, alpha)
                a=0.79, b=2.42)     # dropout probability p_i ~ Beta(a, b)
 
 cbs <- bgnbd.GenerateData(n, T.cal, T.star, params)$cbs
@@ -34,6 +34,6 @@ cbs$palive <- bgnbd.PAlive(est, cbs$x, cbs$t.x, cbs$T.cal)
 # compare to true (usually unobserved) alive status
 prop.table(table(cbs$palive>.5, cbs$alive))
 #       FALSE  TRUE
-# FALSE 0.375 0.065
-# TRUE  0.176 0.384
-# -> 76% of customers are correctly classified
+# FALSE 0.359 0.081
+# TRUE  0.098 0.462
+# -> 82% of customers are correctly classified
