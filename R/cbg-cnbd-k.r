@@ -152,7 +152,7 @@ cbgcnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.p
   
   # Either 'k' or \code{litt} need to be present
   if (is.null(k) & !"litt" %in% colnames(cal.cbs))
-    stop("Either regularity parameter k need to be specified, or a column with logarithmic interpurchase times \code{litt} need to be present in cal.cbs")
+    stop("Either regularity parameter k need to be specified, or a column with logarithmic interpurchase times litt need to be present in cal.cbs")
   
   # if k is not specified we do grid search for k
   if (is.null(k)) {
