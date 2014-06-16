@@ -109,7 +109,6 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
   
   intl <- numeric(0)
   for (i in 1:max.length) {
-    i
     intl[i] <- integrate(function(y) (y+alpha)^-(r+x[i]) * (beta+exp(b*y)-1)^-(s+1) * exp(b*y), 
                       lower=t.x[i], upper=T.cal[i])$value
   }
@@ -226,7 +225,8 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
   b <- params[3]
   s <- params[4]
   beta <- params[5]
-  P1 <- ((r+x)/(alpha+T.cal))
+  
+  P1 <- (r+x) / (alpha+T.cal)
   beta.star <- beta + exp(b*T.cal) - 1
   P2 <- (beta.star/(beta.star+exp(b*T.star)-1))^s * T.star
   P3a <- b * s * beta.star^s
@@ -263,46 +263,53 @@ ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   s <- params[4]
   beta <- params[5]  
   
+  if (length(T.cal)==1) T.cal <- rep(T.cal, n)
+  if (length(T.star)==1) T.star <- rep(T.star, n)
+  
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape=r, rate=alpha)
   
   # sample lifetimes for each customer  
   taus <- (1/b)*log(1-beta+beta/(1-runif(n))^(1/s))
-  #etas <- rgamma(n, shape=s, rate=beta)
-  #taus <- flexsurv::rgompertz(n, shape=etas, rate=b)
   
   # sample intertransaction timings & churn
-  cbs <- data.frame()
-  elog <- data.frame(cust=numeric(0), t=numeric(0))
+  cbs_list <- list()
+  elog_list <- list()
   for (i in 1:n) {
     lambda <- lambdas[i]
     #eta <- etas[i]
     tau <- taus[i]
     # sample 'sufficiently' large amount of inter-transaction times
-    minT <- min(T.cal+T.star, tau)
-    draws <- max(10, minT * lambda)
-    itts <- rexp(draws * 2, rate=lambda)
-    if (sum(itts)<minT) itts <- c(itts, rexp(draws * 4, rate=lambda))
-    if (sum(itts)<minT) itts <- c(itts, rexp(draws * 8, rate=lambda))
+    minT <- min(T.cal[i]+T.star[i], tau)
+    nr_of_itt_draws <- max(10, round(minT * lambda))
+    itts <- rexp(nr_of_itt_draws * 2, rate=lambda)
+    if (sum(itts)<minT) itts <- c(itts, rexp(nr_of_itt_draws * 4, rate=lambda))
+    if (sum(itts)<minT) itts <- c(itts, rexp(nr_of_itt_draws * 800, rate=lambda))
     if (sum(itts)<minT)
-      stop("not enough inter-transaction times sampled: ", sum(itts), " < ", tau)
+      stop("not enough inter-transaction times sampled: ", sum(itts), " < ", minT)
     times <- cumsum(c(0, itts))
     times <- times[times<tau]
-    if (return.elog) elog <- rbind(elog, data.frame(cust=i, t=times[times<(T.cal+T.star)]))
+    if (return.elog) 
+      elog_list[[i]] <- data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])])
     # determine frequency, recency, etc.
-    ts.cal <- times[times<T.cal]
-    ts.star <- times[times>=T.cal & times<(T.cal+T.star)]
-    cbs[i, "x"] <- length(ts.cal)-1
-    cbs[i, "t.x"] <- max(ts.cal)
-    cbs[i, "T.cal"] <- T.cal
-    cbs[i, "alive"] <- tau>T.cal
-    cbs[i, "T.star"] <- T.star
-    cbs[i, "x.star"] <- length(ts.star)
-    cbs[i, "lambda"] <- lambda
-    #cbs[i, "eta"] <- eta
-    cbs[i, "tau"] <- tau
+    ts.cal   <- times[times<T.cal[i]]
+    ts.star  <- times[times>=T.cal[i] & times<(T.cal[i]+T.star[i])]
+    cbs_list[[i]] <- list(cust   = i,
+                          x      = length(ts.cal)-1,
+                          t.x    = max(ts.cal),
+                          alive  = tau>T.cal[i],
+                          x.star = length(ts.star))
   }
+  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs$lambda <- lambdas
+  cbs$tau    <- taus
+  cbs$T.cal  <- T.cal
+  cbs$T.star <- T.star
+  row.names(data) <- NULL
   out <- list(cbs=cbs)
-  if (return.elog) out$elog <- elog
+  if (return.elog) {
+    elog <- do.call(rbind.data.frame, elog_list)
+    out$elog <- elog
+  }
   return(out)
 }

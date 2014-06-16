@@ -155,24 +155,27 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   r <- params[1]
   alpha <- params[2]
   
+  if (length(T.cal)==1) T.cal <- rep(T.cal, n)  
+  if (length(T.star)==1) T.star <- rep(T.star, n)
+  
   # sample intertransaction timings parameter lambda for each customer
-  lambdas <- rgamma(n, shape=params$r, rate=params$alpha)
+  lambdas <- rgamma(n, shape=r, rate=alpha)
   
   # sample intertransaction timings, and generate CBS data frame
   cbs <- data.frame()
   for (i in 1:n) {
     lambda <- lambdas[i]
     # sample transaction times
-    times <- cumsum(c(0, rexp(10*(T.cal+T.star)*lambda, rate=lambda)))
-    if (return.elog) elog <- rbind(elog, data.frame(cust=i, t=times[times<(T.cal+T.star)]))
+    times <- cumsum(c(0, rexp(10*(T.cal[i]+T.star[i])*lambda, rate=lambda)))
+    if (return.elog) elog <- rbind(elog, data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])]))
     # determine frequency, recency, etc.
-    ts.cal <- times[times<T.cal]
-    ts.star <- times[times>=T.cal & times<(T.cal+T.star)]
-    cbs[i, "x"] <- length(ts.cal)-1
+    ts.cal <- times[times<T.cal[i]]
+    ts.star <- times[times>=T.cal[i] & times<(T.cal[i]+T.star[i])]
+    cbs[i, "x"] <- length(ts.cal) - 1
     cbs[i, "t.x"] <- max(ts.cal)
-    cbs[i, "T.cal"] <- T.cal
+    cbs[i, "T.cal"] <- T.cal[i]
     cbs[i, "x.star"] <- length(ts.star)
-    cbs[i, "T.star"] <- T.star
+    cbs[i, "T.star"] <- T.star[i]
     cbs[i, "lambda"] <- lambda
   }
   out <- list(cbs=cbs)
