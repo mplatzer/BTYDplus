@@ -301,8 +301,8 @@ pcnbd.mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star=cal.cbs$T.s
 #' @export
 pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   
-  if (length(T.star)==1) T.star <- rep(T.star, n)
   if (length(T.cal)==1) T.cal <- rep(T.cal, n)
+  if (length(T.star)==1) T.star <- rep(T.star, n)
   
   # sample regularity parameter k for each customer
   if (all(c("t", "gamma") %in% names(params))) {
