@@ -136,6 +136,7 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
 #'   then grid search from 1 to 12 is performed; this however requires column
 #'   \code{litt} to be present in cal.cbs, which represents sum of logarithmic
 #'   interpurchase times during calibration period;
+#' @param trace print logging step every \code{trace} iteration
 #' @return list of estimated parameters
 #' @import BTYD
 #' @export
@@ -145,7 +146,7 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
 #'   University of Economics and Business Administration, Austria (2008). 
 #'   \url{https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships}
 #' @example demo/cbg-cnbd-k.r
-cbgcnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000, k = NULL) {
+cbgcnbd.EstimateParameters <- function(cal.cbs, par.start=c(1, 1, 1, 1), max.param.value=10000, k=NULL, trace=0) {
   
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "cbgcnbd.EstimateParameters")
@@ -159,9 +160,15 @@ cbgcnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.p
     params <- list()
     LL <- c()
     for (k in 1:12) {
-      params[[k]] <- cbgcnbd.EstimateParameters(cal.cbs, par.start, max.param.value, k=k)
+      params[[k]] <- tryCatch(cbgcnbd.EstimateParameters(cal.cbs, par.start, max.param.value, k=k, trace=trace),
+                              error = function(e) { e })
+      if (inherits(params[[k]], "error")) {
+        params[[k]] <- NULL
+        break # stop if parameters could not be estimated, e.g. if cbgcnbd.LL returns Inf
+      }
       LL[k] <- cbgcnbd.cbs.LL(params[[k]], cal.cbs)
-      if (k > 4 && LL[k] < LL[k-1] && LL[k-1] < LL[k-2]) break; # stop if LL gets worse for increasing k
+      if (k > 4 && LL[k] < LL[k-1] && LL[k-1] < LL[k-2]) 
+        break # stop if LL gets worse for increasing k
     }
     k <- which.max(LL)
     return(params[[k]])
@@ -172,11 +179,16 @@ cbgcnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.p
   if (!"litt" %in% colnames(cal.cbs))
     cal.cbs[, "litt"] <- 0 
   
+  count <- 0  
   cbgcnbd.eLL <- function(params, k, cal.cbs, max.param.value) {
     params <- exp(params)
     params[params > max.param.value] <- max.param.value
     params <- c(k, params)
-    return(-1 * cbgcnbd.cbs.LL(params, cal.cbs))
+    loglik <- cbgcnbd.cbs.LL(params, cal.cbs)
+    count <<- count + 1
+    if (trace>0 & count%%trace==0)
+      cat("iter", count, ":", sprintf("%12.2f", loglik), ":", sprintf("%10.6f", params), "\n")
+    return(-1 * loglik)
   }
   
   logparams <- log(par.start)
@@ -497,6 +509,9 @@ cbgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, return.elog=F) 
   alpha <- params[3]
   a <- params[4]
   b <- params[5]  
+
+  if (length(T.cal)==1) T.cal <- rep(T.cal, n)  
+  if (length(T.star)==1) T.star <- rep(T.star, n)  
   
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape=r, rate=alpha)
@@ -505,8 +520,8 @@ cbgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, return.elog=F) 
   ps <- rbeta(n, a, b)
   
   # sample intertransaction timings & churn
-  cbs <- data.frame()
-  elog <- data.frame(cust=numeric(0), t=numeric(0))
+  cbs_list <- list()
+  elog_list <- list()
   for (i in 1:n) {
     p <- ps[i]
     lambda <- lambdas[i]
@@ -514,24 +529,29 @@ cbgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, return.elog=F) 
     churn <- which.max(rbinom(min(10000, 10/p), 1, p)) - 1
     # sample transaction times
     times <- cumsum(c(0, rgamma(churn, shape=k, rate=lambda)))
-    if (return.elog) elog <- rbind(elog, data.frame(cust=i, t=times[times<(T.cal+T.star)]))
+    if (return.elog)
+      elog_list[[i]] <- data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])])
     # determine frequency, recency, etc.
-    ts.cal <- times[times<T.cal]
-    ts.star <- times[times>=T.cal & times<(T.cal+T.star)]
-    cbs[i, "x"] <- length(ts.cal)-1
-    cbs[i, "t.x"] <- max(ts.cal)
-    cbs[i, "T.cal"] <- T.cal
-    cbs[i, "litt"] <- sum(log(diff(ts.cal)))
-    cbs[i, "alive"] <- churn > cbs[i, "x"]
-    cbs[i, "T.star"] <- T.star
-    cbs[i, "x.star"] <- length(ts.star)
-    cbs[i, "p"] <- p
-    cbs[i, "lambda"] <- lambda
-    cbs[i, "churn"] <- churn
-    cbs[i, "k"] <- k
-    cbs[i, "x.max"] <- max(times)
+    ts.cal  <- times[times<T.cal[i]]
+    ts.star <- times[times>=T.cal[i] & times<(T.cal[i]+T.star[i])]
+    cbs_list[[i]] <- list(cust   = i,
+                          x      = length(ts.cal)-1,
+                          t.x    = max(ts.cal),
+                          litt   = sum(log(diff(ts.cal))),
+                          churn  = churn,
+                          alive  = churn > (length(ts.cal)-1),
+                          x.star = length(ts.star))
   }
+  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs$lambda <- lambdas
+  cbs$p      <- ps
+  cbs$k      <- k
+  cbs$T.cal  <- T.cal
+  cbs$T.star <- T.star
   out <- list(cbs=cbs)
-  if (return.elog) out$elog <- elog
+  if (return.elog) {
+    elog <- do.call(rbind.data.frame, elog_list)
+    out$elog <- elog
+  }
   return(out)
 }
