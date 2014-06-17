@@ -128,14 +128,14 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
 #'   \code{x}, for recency \code{t.x} and total time observed \code{T.cal}. Optionally a 
 #'   column \code{custs} can be provided, which represents number of customers with a
 #'   specific combination of frequency \code{x}, recency \code{t.x} and \code{T.cal}.
-#' @param par.start initial CBG/CNBD-k parameters - a vector with \code{r}, \code{alpha}, 
-#'   \code{a} and \code{b} in that order.
-#' @param max.param.value the upper bound on parameters
 #' @param k specified degree of regularity for Erlang-k distributed 
 #'   interpurchase times; needs to be integer-value; if this is not specified, 
 #'   then grid search from 1 to 12 is performed; this however requires column
 #'   \code{litt} to be present in cal.cbs, which represents sum of logarithmic
 #'   interpurchase times during calibration period;
+#' @param par.start initial CBG/CNBD-k parameters - a vector with \code{r}, \code{alpha}, 
+#'   \code{a} and \code{b} in that order.
+#' @param max.param.value the upper bound on parameters
 #' @param trace print logging step every \code{trace} iteration
 #' @return list of estimated parameters
 #' @import BTYD
@@ -146,7 +146,7 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
 #'   University of Economics and Business Administration, Austria (2008). 
 #'   \url{https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships}
 #' @example demo/cbg-cnbd-k.r
-cbgcnbd.EstimateParameters <- function(cal.cbs, par.start=c(1, 1, 1, 1), max.param.value=10000, k=NULL, trace=0) {
+cbgcnbd.EstimateParameters <- function(cal.cbs, k=NULL, par.start=c(1, 1, 1, 1), max.param.value=10000, trace=0) {
   
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "cbgcnbd.EstimateParameters")
@@ -548,6 +548,7 @@ cbgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, return.elog=F) 
   cbs$k      <- k
   cbs$T.cal  <- T.cal
   cbs$T.star <- T.star
+  rownames(cbs) <- NULL
   out <- list(cbs=cbs)
   if (return.elog) {
     elog <- do.call(rbind.data.frame, elog_list)

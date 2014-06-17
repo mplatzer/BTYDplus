@@ -363,7 +363,7 @@ pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   cbs$tau    <- taus
   cbs$T.cal  <- T.cal
   cbs$T.star <- T.star
-  row.names(data) <- NULL
+  rownames(cbs) <- NULL
   out <- list(cbs=cbs)
   if (return.elog) {
     elog <- do.call(rbind.data.frame, elog_list)

@@ -10,18 +10,25 @@
 #' @param par.start initial BG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and
 #'   \code{b} in that order.
 #' @param max.param.value the upper bound on parameters
+#' @param trace print logging step every \code{trace} iteration
 #' @return list of estimated parameters
 #' @import BTYD
 #' @export
 #' @references Fader, Peter S., Bruce GS Hardie, and Ka Lok Lee. "Counting Your Customers the Easy Way: An Alternative to the Pareto/NBD Model." Marketing Science 24.2 (2005): 275-284.
 #' @example demo/bg-nbd.r
-bgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000) {
+bgnbd.EstimateParameters <- function(cal.cbs, par.start=c(1, 1, 1, 1), max.param.value=10000, trace=0) {
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "bgnbd.EstimateParameters")
+  
+  count <- 0
   bgnbd.eLL <- function(params, cal.cbs, max.param.value) {
     params <- exp(params)
     params[params > max.param.value] <- max.param.value
-    return(-1 * bgnbd.cbs.LL(params, cal.cbs))
+    loglik <- bgnbd.cbs.LL(params, cal.cbs)
+    count <<- count + 1
+    if (trace>0 & count%%trace==0)
+      cat("iter", count, ":", sprintf("%12.2f", loglik), ":", sprintf("%10.6f", params), "\n")
+    return(-1 * loglik)
   }
   logparams <- log(par.start)
   results <- optim(logparams, bgnbd.eLL, cal.cbs = cal.cbs, 
@@ -266,6 +273,7 @@ bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   cbs$p      <- ps
   cbs$T.cal  <- T.cal
   cbs$T.star <- T.star
+  rownames(cbs) <- NULL
   out <- list(cbs=cbs)
   if (return.elog) {
     elog <- do.call(rbind.data.frame, elog_list)

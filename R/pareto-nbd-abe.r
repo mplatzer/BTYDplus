@@ -188,6 +188,10 @@ abe.mcmc.DrawParameters <- function(cal.cbs, mcmc = 20000, burnin = mcmc/2, thin
 
 
 abe.GenerateData <- function (n, T.cal, T.star, params, return.elog=F) {
+  
+  if (length(T.cal)==1) T.cal <- rep(T.cal, n)
+  if (length(T.star)==1) T.star <- rep(T.star, n)
+  
   # sample intertransaction timings parameter lambda for each customer
   thetas  <- exp(mvtnorm::rmvnorm(n, mean=params$beta, sigma=params$gamma))
   lambdas <- thetas[,1]
@@ -197,39 +201,45 @@ abe.GenerateData <- function (n, T.cal, T.star, params, return.elog=F) {
   taus <- rexp(n, rate=mus)
   
   # sample intertransaction timings & churn
-  cbs <- data.frame()
-  elog <- data.frame(cust=numeric(0), t=numeric(0))
+  cbs_list <- list()
+  elog_list <- list()
   for (i in 1:n) {
     lambda <- lambdas[i]
     mu <- mus[i]
     tau <- taus[i]
     # sample 'sufficiently' large amount of inter-transaction times
-    minT <- min(T.cal+T.star, tau)
-    draws <- max(10, minT * lambda)
-    itts <- rexp(draws * 2, rate=lambda)
-    if (sum(itts)<minT) itts <- c(itts, rexp(draws * 4, rate=lambda))
-    if (sum(itts)<minT) itts <- c(itts, rexp(draws * 8, rate=lambda))
+    minT <- min(T.cal[i]+T.star[i], tau)
+    nr_of_itt_draws <- max(10, minT * lambda)
+    itts <- rexp(nr_of_itt_draws * 2, rate=lambda)
+    if (sum(itts)<minT) itts <- c(itts, rexp(nr_of_itt_draws * 4, rate=lambda))
+    if (sum(itts)<minT) itts <- c(itts, rexp(nr_of_itt_draws * 800, rate=lambda))
     if (sum(itts)<minT)
       stop("not enough inter-transaction times sampled: ", sum(itts), " < ", tau)
     times <- cumsum(c(0, itts))
     times <- times[times<tau]
-    if (return.elog) elog <- rbind(elog, data.frame(cust=i, t=times[times<(T.cal+T.star)]))
+    if (return.elog)
+      elog_list[[i]] <- data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])])
     # determine frequency, recency, etc.
-    ts.cal <- times[times<T.cal]
-    ts.star <- times[times>=T.cal & times<(T.cal+T.star)]
-    cbs[i, "x"] <- length(ts.cal)-1
-    cbs[i, "t.x"] <- max(ts.cal)
-    cbs[i, "T.cal"] <- T.cal
-    cbs[i, "alive"] <- tau>T.cal
-    cbs[i, "x.star"] <- length(ts.star)
-    cbs[i, "lambda"] <- lambda
-    cbs[i, "mu"] <- mu
-    cbs[i, "tau"] <- tau
+    ts.cal   <- times[times<T.cal[i]]
+    ts.star  <- times[times>=T.cal[i] & times<(T.cal[i]+T.star[i])]
+    cbs_list[[i]] <- list(cust   = i,
+                          x      = length(ts.cal)-1,
+                          t.x    = max(ts.cal),
+                          litt   = ifelse(length(ts.cal)-1==0, 0, sum(log(itts[1:(length(ts.cal)-1)]))),
+                          alive  = tau>T.cal[i],
+                          x.star = length(ts.star))
   }
-  elog$date <- as.Date("2001/01/01") + elog$t
+  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs$lambda <- lambdas
+  cbs$mu     <- mus
+  cbs$tau    <- taus
+  cbs$T.cal  <- T.cal
+  cbs$T.star <- T.star
+  rownames(cbs) <- NULL
   out <- list(cbs=cbs)
   if (return.elog) {
-    out$elog <- transform(elog, date=as.Date("2001/01/01") + t)
+    elog <- do.call(rbind.data.frame, elog_list)
+    out$elog <- elog
   }
   return(out)
 }

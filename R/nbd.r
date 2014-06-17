@@ -162,23 +162,31 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   lambdas <- rgamma(n, shape=r, rate=alpha)
   
   # sample intertransaction timings, and generate CBS data frame
-  cbs <- data.frame()
+  cbs_list <- list()
+  elog_list <- list()
   for (i in 1:n) {
     lambda <- lambdas[i]
     # sample transaction times
     times <- cumsum(c(0, rexp(10*(T.cal[i]+T.star[i])*lambda, rate=lambda)))
-    if (return.elog) elog <- rbind(elog, data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])]))
+    if (return.elog) 
+      elog_list <- data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])])
     # determine frequency, recency, etc.
     ts.cal <- times[times<T.cal[i]]
     ts.star <- times[times>=T.cal[i] & times<(T.cal[i]+T.star[i])]
-    cbs[i, "x"] <- length(ts.cal) - 1
-    cbs[i, "t.x"] <- max(ts.cal)
-    cbs[i, "T.cal"] <- T.cal[i]
-    cbs[i, "x.star"] <- length(ts.star)
-    cbs[i, "T.star"] <- T.star[i]
-    cbs[i, "lambda"] <- lambda
+    cbs_list[[i]] <- list(cust   = i,
+                          x      = length(ts.cal)-1,
+                          t.x    = max(ts.cal),
+                          x.star = length(ts.star))
   }
+  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs$lambda <- lambdas
+  cbs$T.cal  <- T.cal
+  cbs$T.star <- T.star
+  rownames(cbs) <- NULL
   out <- list(cbs=cbs)
-  if (return.elog) out$elog <- elog
+  if (return.elog) {
+    elog <- do.call(rbind.data.frame, elog_list)
+    out$elog <- elog
+  }
   return(out)
 }
