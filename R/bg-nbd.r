@@ -240,8 +240,8 @@ bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
   ps <- rbeta(n, a, b)
   
   # sample intertransaction timings & churn
-  cbs <- data.frame()
-  elog <- data.frame(cust=numeric(0), t=numeric(0))
+  cbs_list <- list()
+  elog_list <- list()
   for (i in 1:n) {
     p <- ps[i]
     lambda <- lambdas[i]
@@ -249,21 +249,27 @@ bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
     churn <- which.max(rbinom(10/p, 1, p))
     # sample transaction times
     times <- cumsum(c(0, rexp(churn, rate=lambda)))
-    if (return.elog) elog <- rbind(elog, data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])]))
+    if (return.elog)
+      elog_list[[i]] <- data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])])    
     # determine frequency, recency, etc.
     ts.cal <- times[times<T.cal[i]]
     ts.star <- times[times>=T.cal[i] & times<(T.cal[i]+T.star[i])]
-    cbs[i, "x"] <- length(ts.cal)-1
-    cbs[i, "t.x"] <- max(ts.cal)
-    cbs[i, "T.cal"] <- T.cal[i]
-    cbs[i, "alive"] <- churn > cbs[i, "x"]
-    cbs[i, "x.star"] <- length(ts.star)
-    cbs[i, "p"] <- p
-    cbs[i, "lambda"] <- lambda
-    cbs[i, "churn"] <- churn
-    cbs[i, "T.star"] <- T.star[i]
+    cbs_list[[i]] <- list(cust   = i,
+                          x      = length(ts.cal)-1,
+                          t.x    = max(ts.cal),
+                          churn  = churn,
+                          alive  = churn > (length(ts.cal)-1),
+                          x.star = length(ts.star))
   }
+  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs$lambda <- lambdas
+  cbs$p      <- ps
+  cbs$T.cal  <- T.cal
+  cbs$T.star <- T.star
   out <- list(cbs=cbs)
-  if (return.elog) out$elog <- elog
+  if (return.elog) {
+    elog <- do.call(rbind.data.frame, elog_list)
+    out$elog <- elog
+  }
   return(out)
 }
