@@ -27,7 +27,7 @@ bgnbd.EstimateParameters <- function(cal.cbs, par.start=c(1, 1, 1, 1), max.param
     loglik <- bgnbd.cbs.LL(params, cal.cbs)
     count <<- count + 1
     if (trace>0 & count%%trace==0)
-      cat("iter", count, ":", sprintf("%12.2f", loglik), ":", sprintf("%10.6f", params), "\n")
+      cat("bgnbd.EstimateParameters - iter", count, ":", sprintf("%12.2f", loglik), ":", sprintf("%10.6f", params), "\n")
     return(-1 * loglik)
   }
   logparams <- log(par.start)
@@ -227,7 +227,7 @@ bgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #' @export
 #' @seealso \code{\link{bgnbd.EstimateParameters}}
 #' @example demo/bg-nbd.r
-bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
+bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
   # check model parameters
   dc.check.model.params(c("r", "alpha", "a", "b"), params,
                         "bgnbd.GenerateData")

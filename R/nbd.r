@@ -147,7 +147,7 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
 #' @seealso \code{\link{nbd.EstimateParameters}}
-nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
+nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
   # check model parameters
   dc.check.model.params(c("r", "alpha"), params,
                         "nbd.GenerateData")

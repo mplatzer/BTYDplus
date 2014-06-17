@@ -3,7 +3,7 @@
 \alias{cbgnbd.GenerateData}
 \title{Simulate data according to CBG/NBD model assumptions}
 \usage{
-cbgnbd.GenerateData(n, T.cal, T.star, params, return.elog = F)
+cbgnbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 }
 \description{
 Simulate data according to CBG/NBD model assumptions

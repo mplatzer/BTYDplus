@@ -21,15 +21,14 @@
 #' @export
 #' @seealso \code{\link{cbgcnbd.EstimateParameters}}
 #' @example demo/cbg-cnbd-k.r
-cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
+cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=FALSE) {
   if (!"cust" %in% names(elog)) 
     stop("Error in cbgcnbd.EstimateRegularity: elog must have a column labelled \"cust\"")
   if (!"date" %in% names(elog) & !"t" %in% names(elog)) 
     stop("Error in cbgcnbd.EstimateRegularity: elog must have a column labelled \"t\" or \"date\"")
   if (!"t" %in% names(elog)) elog$t <- as.numeric(elog$date)
   trans <- split(elog, elog$cust)
-  if (method=="wheat")
-  {
+  if (method=="wheat") {
     # Wheat, Rita D., and Donald G. Morrison. 
     #   "Estimating purchase regularity with two interpurchase times." 
     #   Journal of Marketing Research (1990): 87-93.
@@ -44,18 +43,18 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
     r <- (1-4*var(M)) / (8*var(M))
     if (plot) {
       op <- par(mar=c(1, 2, 1, 2))
-      plot(density(M), main="", sub="", xlab="", ylab="", lwd=2, frame=F, axes=F)
+      plot(density(M), main="", sub="", xlab="", ylab="", lwd=2, frame=FALSE, axes=FALSE)
       polygon(density(M), col="lightgray", border=1)
-      curve(dbeta(x, 1, 1), add=T, lty=2, lwd=2)
-      curve(dbeta(x, round(r), round(r)), add=T, lty=2, lwd=2)
+      fn1 <- function(x) dbeta(x, 1, 1)
+      fnr <- function(x) dbeta(x, round(r), round(r))
+      curve(fn1, add=TRUE, lty=2, lwd=2)
+      curve(fnr, add=TRUE, lty=2, lwd=2)
       par(op)
     }
     return(r)
-  } 
-  else 
-  {
-    if (method=="mle" | method=="mle-minka")
-    {
+    
+  } else {
+    if (method=="mle" | method=="mle-minka") {
       # Maximum Likelihood Estimator
       #  http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation
       # Approximation for MLE by Minka
@@ -75,9 +74,8 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
           return(k)
         }
       }))
-    }
-    else if (method=="mle-thom")
-    {
+      
+    } else if (method=="mle-thom") {
       # Approximation for ML estimator
       #   Thom (1968); see Dunn, Richard, Steven Reader, and Neil Wrigley. 
       #   "An investigation of the assumptions of the NBD model" Applied Statistics (1983): 249-259.
@@ -90,9 +88,8 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
           return(d)
         }
       }))
-    }
-    else if (method=="cv")
-    {
+      
+    } else if (method=="cv") {
       # Estimate regularity by analyzing coefficient of variation
       #   Wu, Couchen, and H-L. Chen. "A consumer purchasing model with learning and departure behaviour." 
       #   Journal of the Operational Research Society (2000): 583-591.
@@ -107,14 +104,16 @@ cbgcnbd.EstimateRegularity <- function(elog, method="wheat", plot=F) {
     }
     if (length(ks)==0)
       stop("No customers with 10 or more transactions.")
+    
     if (plot) {
       ymax <- median(ks)*3
-      boxplot(ks, horizontal=T, ylim=c(0, ymax), frame=F, axes=F)
+      boxplot(ks, horizontal=TRUE, ylim=c(0, ymax), frame=FALSE, axes=FALSE)
       axis(1, at=0:ymax)
       axis(3, at=0:ymax, labels=rep("", 1+ymax))
       abline(v=1:ymax, lty="dotted", col="lightgray")
-      boxplot(ks, horizontal=T, add=T, col="gray", frame=F, axes=F)
+      boxplot(ks, horizontal=TRUE, add=TRUE, col="gray", frame=FALSE, axes=FALSE)
     }
+    
     return(median(ks))
   }
 }
@@ -187,7 +186,7 @@ cbgcnbd.EstimateParameters <- function(cal.cbs, k=NULL, par.start=c(1, 1, 1, 1),
     loglik <- cbgcnbd.cbs.LL(params, cal.cbs)
     count <<- count + 1
     if (trace>0 & count%%trace==0)
-      cat("iter", count, ":", sprintf("%12.2f", loglik), ":", sprintf("%10.6f", params), "\n")
+      cat("cbgcnbd.EstimateParameters - iter", count, ":", sprintf("%12.2f", loglik), ":", sprintf("%10.6f", params), "\n")
     return(-1 * loglik)
   }
   
@@ -412,41 +411,6 @@ cbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
 }
 
 
-#' CBD/CNBD-k Unconditional Expected Transactions
-#' 
-#' Uses CBG/CNBD-k model parameters to return the number of transactions a 
-#' random customer is expected to make in a given time period.
-#' 
-#' @param params CBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
-#'   and \code{b} in that order.
-#' @param t length of time for which we are calculating the expected number of 
-#'   transactions.
-#' @return Number of transactions a customer is expected to make in a time 
-#'   period of length t. If any of the input parameters has a length greater 
-#'   than 1, this will be a vector of expected number of transactions.
-#' @export
-#' @seealso \code{\link{cbgcnbd.EstimateParameters}}
-cbgcnbd.UnconditionalExpectedTransactions <- function(params, t) {
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, 
-    "cbgcnbd.UnconditionalExpectedTransactions")
-  if (params[1] != floor(params[1]) | params[1] < 1)
-    stop("k must be integer being greater or equal to 1.")
-  if (params[1]>1)
-    message("Results for k>1 are approximative")
-  k <- params[1]
-  r <- params[2]
-  alpha <- params[3]
-  a <- params[4]
-  b <- params[5]
-  # for k>1 we simply scale rate parameter alpha accordingly to approximate results
-  alpha <- alpha * k
-  P1 <- ((a + b + x) / (a - 1))
-  P2 <- 1 - ((alpha+T.cal)/(alpha+T.cal+T.star))^(r+x) * hyperg_2F1(r+x, b+x+1, b+x+a, T.star/(alpha+T.cal+T.star))
-  P3 <- cbgcnbd.PAlive(params, x, t.x, T.cal)
-  return (P1 * P2 * P3)
-}
-
-
 #' CBD/CNBD-k Unconditional Probability Distribution of Transactions
 #' 
 #' Uses CBG/CNBD-k model parameters to return the probability distribution of
@@ -497,7 +461,7 @@ cbgcnbd.Px <- function(params, t, x) {
 #'   addition to the CBS summary
 #' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
-cbgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, return.elog=F) {
+cbgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, return.elog=FALSE) {
   # check model parameters
   dc.check.model.params(c("k", "r", "alpha", "a", "b"), params,
                         "cbgcnbd.GenerateData")

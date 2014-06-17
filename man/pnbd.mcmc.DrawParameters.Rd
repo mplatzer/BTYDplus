@@ -66,7 +66,7 @@ params <- list(t=3.15, gamma=1.35,  # regularity parameter k_i ~ Gamma(t, gamma)
                r=0.55, alpha=10.57, # purchase frequency lambda_i ~ Gamma(r, alpha)
                s=0.61, beta=11.74)  # dropout probability mu_i ~ Gamma(s, beta)
 
-data <- pcnbd.GenerateData(n, T.cal, T.star, params, return.elog=T)
+data <- pcnbd.GenerateData(n, T.cal, T.star, params, return.elog=TRUE)
 cbs <- data$cbs
 elog <- data$elog
 
@@ -76,7 +76,7 @@ plot(pnbd.draws$level_2)
 
 # estimate Pareto/CNBD MCMC
 pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=2500, burnin=500, chains=3, thin=10)
-plot(pcnbd.draws$level_2, density=F)
+plot(pcnbd.draws$level_2, density=FALSE)
 rbind("actual"=params, "estimated"=round(summary(pcnbd.draws$level_2)$quantiles[, "50\%"], 2))
 #           t    gamma r    alpha s    beta 
 # actual    3.15 1.35  0.55 10.57 0.61 11.74

@@ -3,7 +3,7 @@
 \alias{bgnbd.GenerateData}
 \title{Simulate data according to BG/NBD model assumptions}
 \usage{
-bgnbd.GenerateData(n, T.cal, T.star, params, return.elog = F)
+bgnbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 }
 \arguments{
 \item{n}{number of customers}

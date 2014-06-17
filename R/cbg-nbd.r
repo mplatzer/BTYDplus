@@ -47,7 +47,7 @@ cbgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 #' Simulate data according to CBG/NBD model assumptions
 #' 
 #' @seealso \code{\link{cbgcnbd.GenerateData}}
-cbgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
+cbgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
   if (length(params)==4) params <- c(k=1, params)
   return(cbgcnbd.GenerateData(n, T.cal, T.star, params, return.elog))
 }

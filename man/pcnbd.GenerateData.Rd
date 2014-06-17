@@ -3,7 +3,7 @@
 \alias{pcnbd.GenerateData}
 \title{Generate artificial data which follows Pareto/CNBD model assumptions}
 \usage{
-pcnbd.GenerateData(n, T.cal, T.star, params, return.elog = F)
+pcnbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 }
 \arguments{
 \item{n}{number of customers}

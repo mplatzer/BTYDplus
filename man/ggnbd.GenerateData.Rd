@@ -3,7 +3,7 @@
 \alias{ggnbd.GenerateData}
 \title{Simulate data according to Gamma/Gompertz/NBD model assumptions}
 \usage{
-ggnbd.GenerateData(n, T.cal, T.star, params, return.elog = F)
+ggnbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 }
 \arguments{
 \item{n}{number of customers}

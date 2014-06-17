@@ -43,7 +43,7 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
   val <- elog[date>T.cal & date<=T.tot,
               list(x.star=.N),
               keyby="cust"]
-  cbs <- merge(cbs, val, all.x=T, by="cust")
+  cbs <- merge(cbs, val, all.x=TRUE, by="cust")
   cbs[is.na(x.star), x.star := 0]
   # return same object type as was passed
   if (!is.dt) cbs <- data.frame(cbs)

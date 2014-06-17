@@ -299,7 +299,7 @@ pcnbd.mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star=cal.cbs$T.s
 #' 
 #' @return 2-elemnt list
 #' @export
-pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
+pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
   
   if (length(T.cal)==1) T.cal <- rep(T.cal, n)
   if (length(T.star)==1) T.star <- rep(T.star, n)
@@ -384,7 +384,7 @@ pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=F) {
 pcnbd.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax=NULL) {
   ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
   if (is.null(xmax)) xmax <- min(10, quantile(ks, 0.95)*1.5)
-  plot(density(ks), xlim=c(0, xmax), main="Distribution of Regularity Rate k", xlab="", ylab="", frame=F)
+  plot(density(ks), xlim=c(0, xmax), main="Distribution of Regularity Rate k", xlab="", ylab="", frame=FALSE)
   abline(v=1, lty=3)
   abline(v=mean(ks), col="red")
 }

@@ -3,7 +3,7 @@
 \alias{cbgcnbd.GenerateData}
 \title{Simulate data according to CBG/CNBD-k model assumptions}
 \usage{
-cbgcnbd.GenerateData(n, T.cal, T.star = T.cal, params, return.elog = F)
+cbgcnbd.GenerateData(n, T.cal, T.star = T.cal, params, return.elog = FALSE)
 }
 \arguments{
 \item{n}{number of customers}
