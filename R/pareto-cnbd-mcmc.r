@@ -195,9 +195,9 @@ pcnbd.mcmc.DrawParameters <-
   stopifnot(all(is.finite(cal.cbs$litt)))
   
   # run multiple chains - executed in parallel on Unix
-  cores <- ifelse(.Platform$OS.type=="windows", 1, max(chains, detectCores()))
-  if (cores>1) cat("running in parallel on", cores, "cores\n")
-  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores=cores)
+  ncores <- ifelse(.Platform$OS.type=="windows", 1, min(chains, detectCores()))
+  if (ncores>1) cat("running in parallel on", ncores, "cores\n")
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores=ncores)
   
   # merge chains into code::mcmc.list objects
   return(list(
