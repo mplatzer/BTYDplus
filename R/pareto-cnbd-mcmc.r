@@ -24,7 +24,7 @@
 #' @seealso \code{link{pcnbd.GenerateData}} \code{\link{elog2cbs}}
 pcnbd.mcmc.DrawParameters <-
   function(cal.cbs,
-           mcmc = 1500, burnin = 500, thin = 1, chains = 2,
+           mcmc = 1500, burnin = 500, thin = 50, chains = 2,
            param_init = NULL, trace = 100) {
   
   ## methods to sample heterogeneity parameters {r, alpha, s, beta, t, gamma} ##
@@ -182,7 +182,7 @@ pcnbd.mcmc.DrawParameters <-
   if (is.null(param_init)) {
     tryCatch({
       df <- cal.cbs[sample(nrow(cal.cbs), min(nrow(cal.cbs), 1000)),]
-      param_init <- c(1, 1, pnbd.EstimateParameters(df))
+      param_init <- c(1, 1, BTYD::pnbd.EstimateParameters(df))
       names(param_init) <- c("t", "gamma", "r", "alpha", "s", "beta")
       param_init <- as.list(param_init)
     }, error = function(e) param_init <- list(t=1, gamma=1, r=1, alpha=1, s=1, beta=1))
@@ -196,6 +196,7 @@ pcnbd.mcmc.DrawParameters <-
   
   # run multiple chains - executed in parallel on Unix
   cores <- ifelse(.Platform$OS.type=="windows", 1, max(chains, detectCores()))
+  if (cores>1) cat("running in parallel on", cores, "cores\n")
   draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores=cores)
   
   # merge chains into code::mcmc.list objects

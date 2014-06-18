@@ -43,7 +43,7 @@
 #' @references Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010. \url{http://gradworks.umi.com/34/02/3402149.html}
 pnbd.mcmc.DrawParameters <-
   function(cal.cbs,
-           mcmc = 1500, burnin = 500, thin = 1, chains = 2,
+           mcmc = 1500, burnin = 500, thin = 50, chains = 2,
            use_data_augmentation = TRUE, param_init = NULL, trace = 100) {
   
   ## methods to sample heterogeneity parameters {r, alpha, s, beta} ##
@@ -219,7 +219,8 @@ pnbd.mcmc.DrawParameters <-
   stopifnot(all(is.finite(cal.cbs$litt)))
   
   # run multiple chains - executed in parallel on Unix
-  cores <- ifelse(.Platform$OS.type=="windows", 1, max(chains, detectCores()))  
+  cores <- ifelse(.Platform$OS.type=="windows", 1, max(chains, detectCores()))
+  if (cores>1) cat("running in parallel on", cores, "cores\n")
   draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores=cores)
 
   # merge chains into code::mcmc.list objects

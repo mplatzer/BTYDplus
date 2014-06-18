@@ -1,5 +1,4 @@
 #include <Rcpp.h>
-#include <R_ext/Applic.h> // required to call Rdqags
 
 using namespace Rcpp;
 
@@ -296,21 +295,33 @@ NumericVector slice_sample_ma_liu(String what,
 
 // draw of individual-level posterior for Pareto/CNBD
 
-// see http://www.hep.by/gnu/r-patched/r-exts/R-exts_143.html
-//   for how to integrate within Rcpp
-typedef void integr_fn(double *x, int n, void *ex);
+double pcnbd_palive_integrand(double x, double params[6]) {
+  double tx = params[1];
+  double k = params[3];
+  double lambda = params[4];
+  double mu = params[5];
+  // call pgamma with lower.tail=FALSE and log.p=FALSE; note that 3rd parameter is scale and not rate;
+  return (::Rf_pgamma(x-tx, k, 1/(k*lambda), 0, 0) * exp(-mu*x));
+}
 
-void pcnbd_palive_integrand(double *x, int n, void *ex) {
-  double *params;
-  params = (double*)ex; // array of type 'double' and length 4
-  double tx = *(params+1);
-  double k = *(params+3);
-  double lambda = *(params+4);
-  double mu = *(params+5);
-  for(int i=0; i<n; i++) {
-    // call pgamma with lower.tail=FALSE and log.p=FALSE; note that 3rd parameter is scale and not rate;
-    x[i] = ::Rf_pgamma(x[i]-tx, k, 1/(k*lambda), 0, 0) * exp(-mu*x[i]);
-  }
+double simpson38(double (*fn)(double, double[6]), double a, double b, double fn_params[6]) {
+  // http://en.wikipedia.org/wiki/Simpson%27s_rule#Simpson.27s_3.2F8_rule_.28for_n_intervals.29
+  double n = 12.0;
+  double integral = (3.0/8.0) * ((b-a)/n) * 
+    (fn(a, fn_params) + 
+    3 * fn(a+(1/n)*(b-a), fn_params) + 
+    3 * fn(a+(2/n)*(b-a), fn_params) + 
+    2 * fn(a+(3/n)*(b-a), fn_params) + 
+    3 * fn(a+(4/n)*(b-a), fn_params) + 
+    3 * fn(a+(5/n)*(b-a), fn_params) + 
+    2 * fn(a+(6/n)*(b-a), fn_params) + 
+    3 * fn(a+(7/n)*(b-a), fn_params) + 
+    3 * fn(a+(8/n)*(b-a), fn_params) + 
+    2 * fn(a+(9/n)*(b-a), fn_params) +     
+    3 * fn(a+(10/n)*(b-a), fn_params) + 
+    3 * fn(a+(11/n)*(b-a), fn_params) + 
+    fn(b, fn_params));
+  return(integral);
 }
 
 // [[Rcpp::export]]
@@ -322,25 +333,11 @@ NumericVector pcnbd_palive(NumericVector x, NumericVector tx, NumericVector Tcal
     // calc numerator
     double one_minus_F = ::Rf_pgamma(Tcal[i]-tx[i], k[i], 1/(k[i]*lambda[i]), 0, 0);
     double numer = one_minus_F * exp(-mu[i]*Tcal[i]);
-    // calc denominator (by integrating from tx to Tcal)
-    double denom;
-    void *ex;
+    // calc denominator by integrating from tx to Tcal
+    // - we integrate numerically via Simpson3/8 rule (calling Rdqags crashed under Unix)
     double fn_params[6] = {x[i], tx[i], Tcal[i], k[i], lambda[i], mu[i]};
-    ex = &fn_params;
-    double epsabs = 0.0001;
-    double epsrel = 0.0001;
-    double abserr = 0.0;
-    int neval = 0;
-    int ier = 0;
-    int limit = 100; // = subdivisions parameter
-    int lenw = 4 * limit;
-    int last = 0;
-    int iwork = limit;
-    double work = 4.0 * limit;
-    Rdqags(pcnbd_palive_integrand, ex, &tx[i], &Tcal[i],
-           &epsabs, &epsrel, &denom, &abserr,
-           &neval, &ier, &limit, &lenw, &last, &iwork, &work); // result is return to denom variable
-    denom = numer + mu[i] * denom;
+    double integral = simpson38(pcnbd_palive_integrand, tx[i], Tcal[i], fn_params);
+    double denom = numer + mu[i] * integral;
     out[i] = (numer/denom);
   }
   return(out);
@@ -477,10 +474,11 @@ NumericVector pcnbd_slice_sample(String what,
   # unit-test P(alive) by comparing C++ result matches R results, matches Pareto/NBD result (k=1)
   x <- 0
   tx <- 7
-  Tcal <- 12 # FIXME: if Tcal=50 the integration fails on AWS; probably due to 'too low' integrand value;
+  Tcal <- 12
   k <- 1
   lambda <- 1.4
   mu <- 0.015
+
   # C++ implementation
   res1 <- pcnbd_palive(x, tx, Tcal, k, lambda, mu)
   # R implementation
@@ -491,6 +489,7 @@ NumericVector pcnbd_slice_sample(String what,
   la_mu <- lambda + mu
   res3 <- exp(-la_mu*Tcal) / (exp(-la_mu*Tcal) + (mu/la_mu)*(exp(-la_mu*tx)-exp(-la_mu*Tcal)))
 
-  stopifnot(round(res1, 4)==round(res2, 4))
-  stopifnot(k!=1 | round(res1, 4)==round(res3, 4))
+  ape <- function(a, e) abs(a-e)/a
+  stopifnot(ape(res1, res2) < 0.01)
+  stopifnot(k!=1 | ape(res1, res2) < 0.01)
 */
