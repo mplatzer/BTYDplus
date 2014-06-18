@@ -22,8 +22,8 @@ pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=1500, burnin=500, chains=2, t
 plot(pcnbd.draws$level_2, density=FALSE)
 rbind("actual"=params, "estimated"=round(summary(pcnbd.draws$level_2)$quantiles[, "50%"], 2))
 #           t   gamma r    alpha s   beta
-# actual    4.5  1.5   5    10    0.8  12  
-# estimated 3.63 1.19  4.78 9.52  0.71 9.32
+# actual    4.5  1.5  5    10    0.8  12  
+# estimated 3.7  1.2  4.85 9.72  0.71 9.2
 
 coda::gelman.diag(pcnbd.draws$level_2)
 # -> MCMC chains have not converged yet
@@ -56,8 +56,8 @@ bench <- function(cbs, models) {
 
 bench(cbs, c("pnbd.mcmc", "pcnbd.mcmc"))
 #            MAPE  RMSE  MSLE   BIAS
-# pnbd.mcmc  0.531 4.485 0.483 -0.268
-# pcnbd.mcmc 0.486 4.420 0.370 -0.007
+# pnbd.mcmc  0.532 4.485 0.477 -0.21
+# pcnbd.mcmc 0.488 4.437 0.379 -0.02
 
 # calculate P(active)
 cbs$pactive.pnbd.mcmc <- apply(pnbd.xstar, 2, function(x) mean(x>0))
@@ -67,4 +67,4 @@ cbs$pactive.pcnbd.mcmc <- apply(pcnbd.xstar, 2, function(x) mean(x>0))
 c("pnbd.mcmc"=mean((cbs$pactive.pnbd.mcmc-(cbs$x.star>0))^2),
   "pcnbd.mcmc"=mean((cbs$pactive.pcnbd.mcmc-(cbs$x.star>0))^2))
 #  pnbd.mcmc pcnbd.mcmc 
-# 0.04381472 0.03712778 
+# 0.04344944 0.03808333
