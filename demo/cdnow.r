@@ -69,15 +69,17 @@ cbs$palive.cbgcnbd <- cbgcnbd.PAlive(params=params.cbgcnbd, cbs$x, cbs$t.x, cbs$
 
 x <- readline("Compare Forecasting Accuracy (press Enter)")
 
-MAPE <- function(a, f) { return(sum(abs(a-f)/sum(a))) }
-RMSE <- function(a, f) { return(sqrt(mean((a-f)^2))) }
-MSLE <- function(a, f) { return(mean(((log(a+1) - log(f+1)))^2)) }
+MAPE <- function(a, f) sum(abs(a-f)/sum(a))
+RMSE <- function(a, f) sqrt(mean((a-f)^2))
+MSLE <- function(a, f) mean(((log(a+1) - log(f+1)))^2)
+BIAS <- function(a, f) sum(f)/sum(a)-1
 bench <- function(cbs, models) {
   acc <- t(sapply(models, function(model) c(MAPE(cbs$x.star, cbs[, model]),
                                             RMSE(cbs$x.star, cbs[, model]),
-                                            MSLE(cbs$x.star, cbs[, model]))))
-  colnames(acc) <- c("MAPE", "RMSE", "MSLE")
-  round(acc, 3)  
+                                            MSLE(cbs$x.star, cbs[, model]),
+                                            BIAS(cbs$x.star, cbs[, model]))))
+  colnames(acc) <- c("MAPE", "RMSE", "MSLE", "BIAS")
+  round(acc, 3)
 }
 
 bench(cbs, c("nbd", "pnbd", "ggnbd", "bgnbd", "cbgnbd", "cbgcnbd"))
@@ -86,7 +88,7 @@ bench(cbs, c("nbd", "pnbd", "ggnbd", "bgnbd", "cbgnbd", "cbgcnbd"))
 x <- readline("Estimate Pareto/NBD model via MCMC (press Enter)")
 
 set.seed(1)
-pnbd.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc=1000, burnin=1000, chains=2, thin=10)
+pnbd.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc=1500, burnin=1500, chains=4)
 
 summary(pnbd.draws$level_2)
 plot(pnbd.draws$level_2)
@@ -98,18 +100,13 @@ rbind("MCMC"=round(unlist(params.pnbd.mcmc), 3), "MLE"=round(params.pnbd, 3))
 
 x <- readline("Estimate Pareto/CNBD model via MCMC - this will take several minutes (press Enter)")
 
-# Note: For keeping the runtime of this demo short, we initialize the parameters with
-# the outcome of Pareto/NBD, and limit the MCMC to 500 iterations for both
-# chains. In fact, the chains should be run longer to ensure convergence, and
-# collect enough samples
+# Note: For keeping the runtime of this demo short, we limit the MCMC to 500 
+# iterations for both chains. In fact, the chains should be run longer to 
+# ensure convergence, and collect enough samples
 
-set.seed(2)
+set.seed(1)
 
-param_init <- params.pnbd.mcmc
-param_init$t <- 10
-param_init$gamma <- 10
-
-pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=500, burnin=100, chains=2, thin=10, param_init=param_init)
+pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=500, burnin=100, chains=2, thin=10)
 
 plot(pcnbd.draws$level_2, density=FALSE)
 plot(pcnbd.draws$level_2, trace=FALSE)
