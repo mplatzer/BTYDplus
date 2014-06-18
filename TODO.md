@@ -4,4 +4,3 @@ Pareto/CNBD:
 * implement pcnbd.DrawFutureTransactions in C++
 * make pcnbd.DrawFutureTransactions more flexible; number of draws should not depend on dimension of input
 * normalize time so that Tcal ~ 1 ?!
-* make it run on AWS (and parallelize)
