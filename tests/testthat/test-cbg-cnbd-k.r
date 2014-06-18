@@ -1,8 +1,8 @@
 context("mle")
 
 test_that("CBG/CNBD-k", {
-  
-  # generate artificial BG/NBD data 
+
+  # generate artificial CBG/CNBD-k data 
   set.seed(1)
   params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
   n <- 8000
