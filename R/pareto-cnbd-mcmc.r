@@ -10,7 +10,6 @@
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
 #' @param chains number of MCMC chains to be run
-#' @param use_data_augmentation determines MCMC method to be used
 #' @param param_init list of 2nd-level parameter start values
 #' @param trace print logging step every \code{trace} iteration
 #' @return 2-element list:
@@ -143,7 +142,7 @@ pcnbd.mcmc.DrawParameters <-
     ## run MCMC chain ##
     
     for (step in 1:(burnin+mcmc)) {
-      if (step%%trace==0) cat("chain:", chain_id, "step:", step, "of", (burnin+mcmc), "\n")      
+      if (step%%trace==0) cat("chain:", chain_id, "step:", step, "of", (burnin+mcmc), "\n")
       
       # store
       if ((step-burnin)>0 & (step-1-burnin)%%thin==0) {
@@ -201,7 +200,7 @@ pcnbd.mcmc.DrawParameters <-
   
   # merge chains into code::mcmc.list objects
   return(list(
-    level_1 = lapply(1:1:nrow(cal.cbs), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
+    level_1 = lapply(1:nrow(cal.cbs), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
     level_2 = mcmc.list(lapply(draws, function(draw) draw$level_2))))
 }
 
@@ -216,7 +215,6 @@ pcnbd.mcmc.PAlive <- function(cal.cbs, draws) {
   
   nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
   nr_of_cust <- length(draws$level_1)
-  parameters <- nvar(draws$level_2[[1]])
   if (nr_of_cust != nrow(cal.cbs))
     stop("mismatch between number of customers in parameters 'cal.cbs' and 'draws'")
   
@@ -386,6 +384,7 @@ pcnbd.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax=NULL) {
   ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
   if (is.null(xmax)) xmax <- min(10, quantile(ks, 0.95)*1.5)
   plot(density(ks), xlim=c(0, xmax), main="Distribution of Regularity Rate k", xlab="", ylab="", frame=FALSE)
+  #plot(density(apply(ks, 2, mean)), xlim=c(0, xmax), main="Distribution of Regularity Rate k", xlab="", ylab="", frame=FALSE)
   abline(v=1, lty=3)
-  abline(v=mean(ks), col="red")
+  abline(v=median(ks), col="red")
 }
