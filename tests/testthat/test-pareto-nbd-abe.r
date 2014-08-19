@@ -2,31 +2,34 @@ context("mle")
 
 test_that("Pareto/NBD Abe MCMC", {
   
-  # generate artificial Pareto/NBD Abe
+  # generate artificial Pareto/NBD Abe with 2 covariates
   set.seed(1)
   params <- list()
-  params$beta <- c(log(1.2), log(0.08))
-  params$gamma <- matrix(c(0.05, 0, 0, 0.2), ncol=2)
-  n <- 1000
+  params$beta <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow=T, ncol=2)
+  params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol=2)
+  n <- 5000
   cbs <- abe.GenerateData(n, T.cal=32, T.star=32, params)$cbs
   
   # estimate parameters
-  draws <- abe.mcmc.DrawParameters(cbs, mcmc=5000, burnin=5000, thin=100)
-  est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
+  draws <- abe.mcmc.DrawParameters(cbs, covariates=c("covariate_1", "covariate_2"))
   
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
+  expect_true(all(c("lambda", "mu", "z", "tau") %in% colnames(as.matrix(draws$level_1[[1]]))))
+  expect_true(all(c("log_lambda_intercept", "log_mu_intercept", "log_lambda_covariate_1", 
+                    "log_mu_covariate_1", "log_lambda_covariate_2", "log_mu_covariate_2", 
+                    "var_log_lambda", "cov_log_lambda_log_mu", "var_log_mu") %in% colnames(as.matrix(draws$level_2))))
   expect_equal(length(draws$level_1), n)
   expect_true(is.mcmc.list(draws$level_1[[1]]))
   expect_true(is.mcmc.list(draws$level_2))
   
-  # require less than 10% deviation in estimated parameters
-  ape <- function(act, est) abs(act-est)/act
-  expect_less_than(ape(params$beta[1], est$log_lambda), 0.10)
-  expect_less_than(ape(params$beta[2], est$log_mu), 0.10)
-  expect_less_than(ape(params$gamma[1,1], est$sigma_lambda_lambda), 0.50)
-  expect_less_than(abs(est$sigma_lambda_mu), 0.1)
-  ## There are difficulties to estimate heterogeneity in mu accurately
-  #expect_less_than(ape(params$gamma[2,2], est$sigma_mu_mu), 0.20) 
+  est <- round(summary(draws$level_2)$quantiles[, "50%"], 3)
+  # require less than 20% deviation in estimated location parameter beta
+  est.beta <- matrix(est[1:6], ncol=2, byrow=T)
+  expect_less_than(max(abs((est.beta - params$beta) / params$beta)), 0.20)
+  # variance parameter gamma is difficult to identify, particularly for mu; hence we relax our checks
+  expect_less_than((est["var_log_lambda"] - params$gamma[1,1]) / params$gamma[1,1], 0.30)
+  expect_less_than(abs(est["cov_log_lambda_log_mu"] - params$gamma[1,2]), 0.05)
+  #expect_less_than((est["var_log_mu"] - params$gamma[2,2]) / params$gamma[2,2], 0.30)
   
   # estimate future transactions & P(alive)
   xstar <- abe.mcmc.DrawFutureTransactions(cbs, draws, T.star=cbs$T.star)
@@ -34,10 +37,10 @@ test_that("Pareto/NBD Abe MCMC", {
   cbs$pactive <- apply(xstar, 2, function(x) mean(x>0))
   cbs$palive <- abe.mcmc.PAlive(cbs, draws)
   
-  # require less than 5% deviation
-  expect_less_than(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.05)
-  expect_less_than(ape(sum(cbs$palive), sum(cbs$alive)), 0.05)
-  expect_less_than(ape(sum(cbs$x.star>0), sum(cbs$pactive)), 0.05)
+  # require less than 10% deviation in aggregated future transactions
+  expect_less_than(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.10)
+  expect_less_than(ape(sum(cbs$palive), sum(cbs$alive)), 0.10)
+  expect_less_than(ape(sum(cbs$x.star>0), sum(cbs$pactive)), 0.10)
   
   expect_true(min(cbs$x.star)>=0)
   expect_true(all(cbs$x.star==round(cbs$x.star)))

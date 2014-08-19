@@ -1,33 +1,30 @@
 
-# load CDnow data
-data(cdnowSummary, package="BTYD")
-data <- as.data.frame(cdnowSummary$cbs)
+# Load CDNow event log
+data(cdnowElog, package="BTYD")
+elog <- data.frame(t(sapply(2:nrow(cdnowElog), function(i) strsplit(as.character(cdnowElog[i,]), split=",")[[1]])), stringsAsFactors=F)
+names(elog) <- c("cust", "sampleid", "date", "cds", "sales")
+elog$date <- as.Date(elog$date, "%Y%m%d")
+elog$sales <- as.numeric(elog$sales)
+
+# Transform to CBS (including extra column 'litt')
+cbs <- elog2cbs(elog, per="week", T.cal=as.Date("1997-09-30"))
+
+# Estimate with no covariates, i.e. model M1 in (Abe 2009)
+set.seed(1)
+draws_m1 <- abe.mcmc.DrawParameters(cbs, mcmc=5000, burnin=5000)
+plot(draws_m1$level_2, density=F)
+params.pnbd_abe.m1 <- round(summary(draws_m1$level_2)$quantiles[, c("2.5%", "50%", "97.5%")], 2)
+params.pnbd_abe.m1
+# -> Parameter Estimates match (Abe 2009)
+
+# Append dollar amount of first purchase; used as covariate in (Abe 2009)
+elog.dt <- data.table(elog)
+setkey(elog.dt, cust, date)
+cbs <- merge(cbs, elog.dt[, list(first=as.numeric(sales[1])*10^-3), by="cust"], by="cust")
 
 set.seed(1)
-# estimate parameters
-draws <- abe.mcmc.DrawParameters(data, burnin=5000, mcmc=5000, thin=100, chains=2)
-
-agg <- function(x) round(c(quantile(x, 0.025), "mean"=mean(x), quantile(x, 0.975)), 2)
-agg(as.matrix(draws$level_2)[, "log_lambda"])
-agg(as.matrix(draws$level_2)[, "log_mu"])
-agg((as.matrix(draws$level_2)[, "sigma_lambda_lambda"]))
-agg((as.matrix(draws$level_2)[, "sigma_mu_mu"]))
-agg((as.matrix(draws$level_2)[, "sigma_lambda_mu"]))
-# -> parameter estimates match results shown in Abe's paper
-
-xstar <- abe.mcmc.DrawFutureTransactions(data, draws, T.star=39)
-mcmc.palive    <- abe.mcmc.PAlive(data, draws)
-mcmc.est       <- colMeans(xstar)
-#mcmc.est       <- apply(xstar, 2, median)
-mcmc.est.pos   <- colMeans(xstar>0)
-
-cor(data$x.star, mcmc.est)
-# 0.62
-
-mse <- function(x1, x2) sqrt(mean((x1-x2)^2))
-mse(data$x.star, mcmc.est)
-# 1.61
-
-mae <- function(x1, x2) mean(abs(x1-x2))
-mae(data$x.star, mcmc.est)
-# 0.75
+draws_m2 <- abe.mcmc.DrawParameters(cbs, covariates=c("first"), mcmc=5000, burnin=5000)
+plot(draws_m2$level_2, density=F)
+params.pnbd_abe.m2 <- round(summary(draws_m2$level_2)$quantiles[, c("2.5%", "50%", "97.5%")], 4)
+params.pnbd_abe.m2
+# -> Parameter Estimates match (Abe 2009)

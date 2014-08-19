@@ -1,13 +1,12 @@
 
 #' HB Pareto/NBD variant as described in Abe (2009)
 #' 
-#' TODO: implement passing of covariates
-#'
 #' Returns 2-element list
 #'   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
 #'   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
 #'
 #' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}
+#' @param covariates list of column names containing customer-level covariates
 #' @param mcmc number of MCMC steps
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
@@ -24,15 +23,16 @@
 #' @seealso \code{link{abe.GenerateData}}
 abe.mcmc.DrawParameters <- 
   function(cal.cbs, 
+           covariates = c(),
            mcmc = 1500, burnin = 500, thin = 50, chains = 2,
            trace = 100) {
 
   ## methods to sample heterogeneity parameters {beta, gamma} ##
 
-  draw_level_2 <- function(covariates, level_1, hyper_prior) {
+  draw_level_2 <- function(covars, level_1, hyper_prior) {
     # standard multi-variate normal regression update
     draw <- bayesm::rmultireg(Y = log(t(level_1[c("lambda", "mu"),])),
-                              X = covariates,
+                              X = covars,
                               Bbar = hyper_prior$beta_0, A = hyper_prior$A_0, 
                               nu = hyper_prior$nu_00, V = hyper_prior$gamma_00)
     return(list(beta=t(draw$B), gamma=draw$Sigma))
@@ -62,11 +62,11 @@ abe.mcmc.DrawParameters <-
     z      <- level_1["z",]
     
     alive  <- z==1
-    y      <- numeric(nrow(data))
+    tau    <- numeric(nrow(data))
     
     # Case: still alive - left truncated exponential distribution -> [T.cal, Inf]
     if (any(alive)) {
-      y[alive]  <- Tcal[alive] + rexp(sum(alive), mu[alive])
+      tau[alive]  <- Tcal[alive] + rexp(sum(alive), mu[alive])
     }
     
     # Case: churned     - double truncated exponential distribution -> [tx, T.cal]
@@ -74,20 +74,20 @@ abe.mcmc.DrawParameters <-
       mu_lam_tx   <- pmin(700, mu_lam[!alive] * tx[!alive])
       mu_lam_Tcal <- pmin(700, mu_lam[!alive] * Tcal[!alive])
       rand        <- runif(n=sum(!alive))
-      y[!alive] <- -log( (1-rand)*exp(-mu_lam_tx) + rand*exp(-mu_lam_Tcal)) / mu_lam[!alive]
+      tau[!alive] <- -log( (1-rand)*exp(-mu_lam_tx) + rand*exp(-mu_lam_Tcal)) / mu_lam[!alive]
     }
-    return(y)
+    return(tau)
   }
   
-  draw_level_1 <- function(data, covariates, level_1, level_2) {
-    # sample (lambda, mu) given (z, y, beta, gamma)
+  draw_level_1 <- function(data, covars, level_1, level_2) {
+    # sample (lambda, mu) given (z, tau, beta, gamma)
     N      <- nrow(data)
     x      <- data[, "x"]
     tx     <- data[, "t.x"]
     Tcal   <- data[, "T.cal"]
     z      <- level_1["z", ]
-    y      <- level_1["y", ]
-    mvmean <- covariates[,] %*% t(level_2$beta)
+    tau    <- level_1["tau", ]
+    mvmean <- covars[,] %*% t(level_2$beta)
     gamma  <- level_2$gamma
     inv_gamma <- solve(gamma)
     
@@ -99,7 +99,7 @@ abe.mcmc.DrawParameters <-
       log_mu      <- log_theta[2,]
       diff_lambda <- log_lambda - mvmean[,1]
       diff_mu     <- log_mu     - mvmean[,2]
-      likel <- x*log_lambda + (1-z)*log_mu - (exp(log_lambda)+exp(log_mu))*(z*Tcal+(1-z)*y)
+      likel <- x*log_lambda + (1-z)*log_mu - (exp(log_lambda)+exp(log_mu))*(z*Tcal+(1-z)*tau)
       prior <- -0.5 * (diff_lambda^2*inv_gamma[1,1] + 2*diff_lambda*diff_mu*inv_gamma[1,2] + diff_mu^2*inv_gamma[2,2])
       post <- likel + prior
       post[log_mu>5] <- -Inf # cap !!
@@ -144,19 +144,14 @@ abe.mcmc.DrawParameters <-
     ## initialize arrays for storing draws ##
     nr_of_cust <- nrow(data)
     nr_of_draws <- (mcmc-1) %/% thin + 1
-  
-    # Setup Regressors (Covariates) for location of 1st-stage prior, i.e. beta = [log(lambda), log(mu)]
-    covariates <- matrix(1, nrow=nr_of_cust, ncol=1) # ncol=1 # we use a single intercept as regressor here
-    colnames(covariates) <- c("(Intercept)")
-    K <- ncol(covariates) # number of covariates
     
     level_1_draws <- array(NA_real_, dim=c(nr_of_draws, 4, nr_of_cust))
-    dimnames(level_1_draws)[[2]] <- c("lambda", "mu", "y", "z")
+    dimnames(level_1_draws)[[2]] <- c("lambda", "mu", "tau", "z")
     
     level_2_draws <- array(NA_real_, dim=c(nr_of_draws, 2*K + 3))
     nm <- c("log_lambda", "log_mu")
-    if (K>1) nm <- paste(rep(nm, times=K), rep(colnames(covariates), each=2))
-    dimnames(level_2_draws)[[2]] <- c(nm, "sigma_lambda_lambda", "sigma_lambda_mu", "sigma_mu_mu")
+    if (K>1) nm <- paste(rep(nm, times=K), rep(colnames(covars), each=2), sep="_")
+    dimnames(level_2_draws)[[2]] <- c(nm, "var_log_lambda", "cov_log_lambda_log_mu", "var_log_mu")
   
     ## initialize parameters ##
     
@@ -174,11 +169,11 @@ abe.mcmc.DrawParameters <-
       
       # draw individual-level parameters
       level_1["z", ] <- draw_z(data, level_1)
-      level_1["y", ] <- draw_y(data, level_1)
+      level_1["tau", ] <- draw_y(data, level_1)
       
-      level_2 <- draw_level_2(covariates, level_1, hyper_prior)
+      level_2 <- draw_level_2(covars, level_1, hyper_prior)
       
-      draw <- draw_level_1(data, covariates, level_1, level_2)
+      draw <- draw_level_1(data, covars, level_1, level_2)
       level_1["lambda", ] <- draw$lambda
       level_1["mu", ]     <- draw$mu
     
@@ -196,17 +191,24 @@ abe.mcmc.DrawParameters <-
       level_2 = mcmc(level_2_draws, start=burnin, thin=thin)))
   }
   
+  # check whether input data meets requirements
+  stopifnot(is.data.frame(cal.cbs))
+  stopifnot(all(c("x", "t.x", "T.cal") %in% names(cal.cbs)))
+  stopifnot(all(covariates %in% names(cal.cbs)))
+  
+  # Setup Regressors (Covariates) for location of 1st-stage prior, i.e. beta = [log(lambda), log(mu)]
+  cal.cbs[, "intercept"] <- 1
+  covariates <- c("intercept", covariates)
+  K <- length(covariates) # number of covars
+  covars <- as.matrix(cal.cbs[, covariates])
+  
   # set hyper priors
-  beta_0 <- matrix(NA_real_, nrow=K, ncol=2, dimnames=list(NULL, c("log_lambda", "log_mu")))
+  beta_0 <- matrix(0, nrow=K, ncol=2, dimnames=list(NULL, c("log_lambda", "log_mu")))
   A_0 <- diag(rep(.01, K), ncol=K, nrow=K) # diffuse precision matrix
   # set diffuse hyper-parameters for 2nd-stage prior of gamma_0; follows defaults from rmultireg example
   nu_00 <- 3 + K # 30
   gamma_00 <- nu_00 * diag(2)
   hyper_prior <- list(beta_0=beta_0, A_0=A_0, nu_00=nu_00, gamma_00=gamma_00)
-  
-  # check whether input data meets requirements
-  stopifnot(is.data.frame(cal.cbs))
-  stopifnot(all(c("x", "t.x", "T.cal") %in% names(cal.cbs)))
   
   # run multiple chains - executed in parallel on Unix
   ncores <- ifelse(.Platform$OS.type=="windows", 1, min(chains, detectCores()))
@@ -241,9 +243,15 @@ abe.GenerateData <- function (n, T.cal, T.star, params, return.elog=FALSE) {
   
   if (length(T.cal)==1) T.cal <- rep(T.cal, n)
   if (length(T.star)==1) T.star <- rep(T.star, n)
+  if (!is.matrix(params$beta)) params$beta <- matrix(params$beta, nrow=1, ncol=2)
+  
+  nr_covars <- nrow(params$beta)
+  covars <- matrix(c(rep(1, n), runif((nr_covars-1)*n, -1, 1)), nrow=n, ncol=nr_covars)
+  colnames(covars) <- paste("covariate", 0:(nr_covars-1), sep="_")
+  colnames(covars)[1] <- "intercept"
   
   # sample log-normal distributed parameters lambda/mu for each customer
-  thetas  <- exp(mvtnorm::rmvnorm(n, mean=params$beta, sigma=params$gamma))
+  thetas  <- exp((covars %*% params$beta) + mvtnorm::rmvnorm(n, mean=c(0,0), sigma=params$gamma))
   lambdas <- thetas[,1]
   mus     <- thetas[,2]
 
@@ -286,9 +294,11 @@ abe.GenerateData <- function (n, T.cal, T.star, params, return.elog=FALSE) {
   cbs$T.cal  <- T.cal
   cbs$T.star <- T.star
   rownames(cbs) <- NULL
+  cbs <- cbind(cbs, covars)
   out <- list(cbs=cbs)
   if (return.elog) {
     elog <- do.call(rbind.data.frame, elog_list)
+    elog <- cbind(elog, covars)
     out$elog <- elog
   }
   return(out)
@@ -338,7 +348,7 @@ abe.mcmc.DrawFutureTransactions <- function (cal.cbs, draws, T.star) {
     T.cal   <- cal.cbs[cust, "T.cal"]
     cust_draws <- as.matrix(draws$level_1[[cust]])
     alive   <- as.logical(cust_draws[, "z"])
-    ys      <- cust_draws[, "y"]
+    ys      <- cust_draws[, "tau"]
     lambdas <- cust_draws[, "lambda"]
     
     # Case: customer alive

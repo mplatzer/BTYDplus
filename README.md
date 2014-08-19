@@ -20,7 +20,7 @@ These R source files extend the functionality of the BTYD package by providing f
 
 * NBD - EHRENBERG, ASC. "The Pattern of Consumer Purchases." Quantitative techniques in marketing analysis: text and readings (1962): 355.
 
-* Gamma/Gompertz/NBD - Bemmaor, Albert C., and Nicolas Glady. "Modeling Purchasing Behavior with Sudden “Death”: A Flexible Customer Lifetime Model." Management Science 58.5 (2012): 1012-1021.
+* Gamma/Gompertz/NBD - Bemmaor, Albert C., and Nicolas Glady. "Modeling Purchasing Behavior with Sudden Death: A Flexible Customer Lifetime Model." Management Science 58.5 (2012): 1012-1021.
 
 * BG/NBD - Fader, Peter S., Bruce GS Hardie, and Ka Lok Lee. "Counting Your Customers the Easy Way: An Alternative to the Pareto/NBD Model." Marketing Science 24.2 (2005): 275-284.
 
@@ -29,5 +29,7 @@ These R source files extend the functionality of the BTYD package by providing f
 * CBG/CNBD-k - Platzer, Michael. "Stochastic models of noncontractual consumer relationships." Master of Science in Business Administration thesis, Vienna University of Economics and Business Administration, Austria (2008). https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships
 
 * Pareto/NBD MCMC - Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404 - Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010. http://gradworks.umi.com/34/02/3402149.html
+
+* Pareto/NBD HB variant - Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 
 * Pareto/CNBD MCMC
