@@ -132,6 +132,6 @@ Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD mod
 Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010. \url{http://gradworks.umi.com/34/02/3402149.html}
 }
 \seealso{
-\code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.DrawFutureTransactions}}
+\code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}}
 }
 

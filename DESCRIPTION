@@ -11,6 +11,6 @@ Description: Extends the functionality of BTYD package by providing methods for
     Abe's Pareto/NBD variant and Pareto/CNBD.
 License: GPL-3
 LinkingTo: Rcpp
-Depends: BTYD, coda, data.table, bayesm, parallel, mvtnorm
-Imports: Rcpp (>= 0.11.1)
+Imports: Rcpp (>= 0.11.1), BTYD, coda, data.table
+Suggests: bayesm, mvtnorm
 Roxygen: list(wrap = FALSE)

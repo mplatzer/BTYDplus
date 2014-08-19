@@ -38,7 +38,7 @@
 #' @import coda parallel
 #' @export
 #' @example demo/pareto-cnbd.r
-#' @seealso \code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.DrawFutureTransactions}}
+#' @seealso \code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}}
 #' @references Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
 #' @references Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010. \url{http://gradworks.umi.com/34/02/3402149.html}
 pnbd.mcmc.DrawParameters <-
