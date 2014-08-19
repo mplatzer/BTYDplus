@@ -3,7 +3,7 @@
 \alias{pnbd.mcmc.DrawParameters}
 \title{Hierarchical Bayes variant of Pareto/NBD}
 \usage{
-pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 1,
+pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 50,
   chains = 2, use_data_augmentation = TRUE, param_init = NULL,
   trace = 100)
 }
@@ -62,25 +62,25 @@ set.seed(1)
 n      <- 1000 # no. of customers
 T.cal  <- 32   # length of calibration period
 T.star <- 32   # length of hold-out period
-params <- list(t=3.15, gamma=1.35,  # regularity parameter k_i ~ Gamma(t, gamma)
-               r=0.55, alpha=10.57, # purchase frequency lambda_i ~ Gamma(r, alpha)
-               s=0.61, beta=11.74)  # dropout probability mu_i ~ Gamma(s, beta)
+params <- list(t=4.5, gamma=1.5, # regularity parameter k_i ~ Gamma(t, gamma)
+               r=5, alpha=10,    # purchase frequency lambda_i ~ Gamma(r, alpha)
+               s=0.8, beta=12)   # dropout probability mu_i ~ Gamma(s, beta)
 
 data <- pcnbd.GenerateData(n, T.cal, T.star, params, return.elog=TRUE)
 cbs <- data$cbs
 elog <- data$elog
 
 # estimate Pareto/NBD MCMC
-pnbd.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc=2500, burnin=500, chains=3, thin=10)
+pnbd.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc=1500, burnin=500, chains=2, thin=50)
 plot(pnbd.draws$level_2)
 
 # estimate Pareto/CNBD MCMC
-pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=2500, burnin=500, chains=3, thin=10)
+pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=1500, burnin=500, chains=2, thin=50)
 plot(pcnbd.draws$level_2, density=FALSE)
 rbind("actual"=params, "estimated"=round(summary(pcnbd.draws$level_2)$quantiles[, "50\%"], 2))
-#           t    gamma r    alpha s    beta 
-# actual    3.15 1.35  0.55 10.57 0.61 11.74
-# estimated 3.96 1.99  0.56 12.26 2.28 78.84
+#           t   gamma r    alpha s   beta
+# actual    4.5  1.5  5    10    0.8  12  
+# estimated 3.7  1.2  4.85 9.72  0.71 9.2
 
 coda::gelman.diag(pcnbd.draws$level_2)
 # -> MCMC chains have not converged yet
@@ -113,8 +113,8 @@ bench <- function(cbs, models) {
 
 bench(cbs, c("pnbd.mcmc", "pcnbd.mcmc"))
 #            MAPE  RMSE  MSLE   BIAS
-# pnbd.mcmc  0.977 1.072 0.170 -0.085
-# pcnbd.mcmc 0.890 1.064 0.143  0.068
+# pnbd.mcmc  0.532 4.485 0.477 -0.21
+# pcnbd.mcmc 0.488 4.437 0.379 -0.02
 
 # calculate P(active)
 cbs$pactive.pnbd.mcmc <- apply(pnbd.xstar, 2, function(x) mean(x>0))
@@ -123,8 +123,8 @@ cbs$pactive.pcnbd.mcmc <- apply(pcnbd.xstar, 2, function(x) mean(x>0))
 # Brier score
 c("pnbd.mcmc"=mean((cbs$pactive.pnbd.mcmc-(cbs$x.star>0))^2),
   "pcnbd.mcmc"=mean((cbs$pactive.pcnbd.mcmc-(cbs$x.star>0))^2))
-# pnbd.mcmc pcnbd.mcmc 
-# 0.1075209  0.1037862 
+#  pnbd.mcmc pcnbd.mcmc 
+# 0.04344944 0.03808333
 }
 \references{
 Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
