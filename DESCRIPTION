@@ -6,7 +6,7 @@ Date: 2014-05-15
 Author: Michael Platzer <michael.platzer@gmail.com>
 Maintainer: Michael Platzer <michael.platzer@gmail.com>
 Description: Extends the functionality of BTYD package by providing methods for
-    parameter estimation and scoring for NBD, G/G/NBD, BG/NBD, CBG/NBD and
+    parameter estimation and scoring for NBD, G/G/NBD, CBG/NBD and
     CBG/CNBD-k models, as well as MCMC samples for Pareto/NBD,
     Abe's Pareto/NBD variant and Pareto/CNBD.
 License: GPL-3

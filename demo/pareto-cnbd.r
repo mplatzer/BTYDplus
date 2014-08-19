@@ -1,7 +1,7 @@
 
 set.seed(1)
 
-# generate artificial BG/NBD data 
+# generate artificial Pareto/CNBD data 
 n      <- 1000 # no. of customers
 T.cal  <- 32   # length of calibration period
 T.star <- 32   # length of hold-out period

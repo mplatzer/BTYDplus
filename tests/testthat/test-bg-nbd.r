@@ -9,7 +9,7 @@ test_that("BG/NBD", {
   cbs <- bgnbd.GenerateData(n, runif(n, 12, 96), 32, params)$cbs
   
   # estimate parameters, and compare to true parameters
-  est <- bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal")])
+  est <- BTYD::bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal")])
   
   # require less than 5% deviation in estimated parameters
   ape <- function(act, est) abs(act-est)/act
@@ -19,8 +19,8 @@ test_that("BG/NBD", {
   expect_true(ape(params[4], est[4]) < 0.05)
   
   # estimate future transactions & P(alive) with true parameters
-  cbs$x.est <- bgnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-  cbs$palive <- bgnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
+  cbs$x.est <- BTYD::bgnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+  cbs$palive <- BTYD::bgnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
 
   # require less than 5% deviation
   expect_true(ape(sum(cbs$x.star), sum(cbs$x.est)) < 0.05)

@@ -22,8 +22,6 @@ These R source files extend the functionality of the BTYD package by providing f
 
 * Gamma/Gompertz/NBD (MLE) - Bemmaor, Albert C., and Nicolas Glady. "Modeling Purchasing Behavior with Sudden Death: A Flexible Customer Lifetime Model." Management Science 58.5 (2012): 1012-1021.
 
-* BG/NBD (MLE) - Fader, Peter S., Bruce GS Hardie, and Ka Lok Lee. "Counting Your Customers the Easy Way: An Alternative to the Pareto/NBD Model." Marketing Science 24.2 (2005): 275-284.
-
 * CBG/NBD (MLE) - Hoppe, Daniel, and Udo Wagner. "Customer base analysis: The case for a central variant of the Betageometric/NBD Model." Marketing Journal of Research and Management 3.2 (2007): 75-90.
 
 * CBG/CNBD-k (MLE) - Platzer, Michael. "Stochastic models of noncontractual consumer relationships." Master of Science in Business Administration thesis, Vienna University of Economics and Business Administration, Austria (2008). https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships

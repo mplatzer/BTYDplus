@@ -24,8 +24,8 @@ x <- readline("Estimate Models via MLE (press Enter)")
 #(params.ggnbd <- ggnbd.EstimateParameters(cbs, trace=10)) # would take several minutes
 (params.ggnbd <- c(r=0.552256, alpha=10.568448, b=0.000035, s=0.609494, beta=0.000417))
 
-# BG/NBD
-(params.bgnbd <- bgnbd.EstimateParameters(cbs))
+# BG/NBD (from BTYD package)
+(params.bgnbd <- BTYD::bgnbd.EstimateParameters(cbs))
 
 # CBG/NBD
 (params.cbgnbd <- cbgnbd.EstimateParameters(cbs))
@@ -62,7 +62,7 @@ x <- readline("Estimate P(alive) (press Enter)")
 cbs$palive.nbd <- 1
 cbs$palive.pnbd <- BTYD::pnbd.PAlive(params=params.pnbd, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$palive.ggnbd <- ggnbd.PAlive(params=params.ggnbd, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$palive.bgnbd <- bgnbd.PAlive(params=params.bgnbd, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$palive.bgnbd <- BTYD::bgnbd.PAlive(params=params.bgnbd, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$palive.cbgnbd <- cbgnbd.PAlive(params=params.cbgnbd, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$palive.cbgcnbd <- cbgcnbd.PAlive(params=params.cbgcnbd, cbs$x, cbs$t.x, cbs$T.cal)
 
