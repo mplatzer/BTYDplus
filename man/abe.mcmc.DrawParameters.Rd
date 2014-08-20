@@ -65,6 +65,9 @@ params.pnbd_abe.m2 <- round(summary(draws_m2$level_2)$quantiles[, c("2.5\%", "50
 params.pnbd_abe.m2
 # -> Parameter Estimates match (Abe 2009)
 }
+\references{
+Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
+}
 \seealso{
 \code{link{abe.GenerateData}} \code{\link{pcnbd.mcmc.PAlive}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}}
 }
