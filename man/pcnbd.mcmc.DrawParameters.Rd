@@ -106,6 +106,6 @@ c("pnbd.mcmc"=mean((cbs$pactive.pnbd.mcmc-(cbs$x.star>0))^2),
 # 0.04344944 0.03808333
 }
 \seealso{
-\code{link{pcnbd.GenerateData}} \code{\link{elog2cbs}}
+\code{link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.PAlive}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
 }
 

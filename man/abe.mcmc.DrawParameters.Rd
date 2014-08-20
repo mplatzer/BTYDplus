@@ -66,6 +66,6 @@ params.pnbd_abe.m2
 # -> Parameter Estimates match (Abe 2009)
 }
 \seealso{
-\code{link{abe.GenerateData}}
+\code{link{abe.GenerateData}} \code{\link{pcnbd.mcmc.PAlive}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}}
 }
 

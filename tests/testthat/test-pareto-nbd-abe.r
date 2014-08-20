@@ -32,12 +32,14 @@ test_that("Pareto/NBD Abe MCMC", {
   #expect_less_than((est["var_log_mu"] - params$gamma[2,2]) / params$gamma[2,2], 0.30)
   
   # estimate future transactions & P(alive)
-  xstar <- abe.mcmc.DrawFutureTransactions(cbs, draws, T.star=cbs$T.star)
+  xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, draws, T.star=cbs$T.star)
   cbs$x.est <- apply(xstar, 2, mean)
+  cbs$x.estx <- apply(xstarx, 2, mean)
   cbs$pactive <- apply(xstar, 2, function(x) mean(x>0))
-  cbs$palive <- abe.mcmc.PAlive(cbs, draws)
+  cbs$palive <- pcnbd.mcmc.PAlive(cbs, draws)
   
   # require less than 10% deviation in aggregated future transactions
+  ape <- function(act, est) abs(act-est)/act
   expect_less_than(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.10)
   expect_less_than(ape(sum(cbs$palive), sum(cbs$alive)), 0.10)
   expect_less_than(ape(sum(cbs$x.star>0), sum(cbs$pactive)), 0.10)

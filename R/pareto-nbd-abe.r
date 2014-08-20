@@ -20,7 +20,7 @@
 #' @import coda parallel bayesm
 #' @export
 #' @example demo/pareto-nbd-abe.r
-#' @seealso \code{link{abe.GenerateData}}
+#' @seealso \code{link{abe.GenerateData}} \code{\link{pcnbd.mcmc.PAlive}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}}
 abe.mcmc.DrawParameters <- 
   function(cal.cbs, 
            covariates = c(),
@@ -39,21 +39,23 @@ abe.mcmc.DrawParameters <-
   }
   
   ## methods to sample individual-level parameters ##
-    
+
   draw_z <- function(data, level_1) {
     tx     <- data[, "t.x"]
     Tcal   <- data[, "T.cal"]
     lambda <- level_1["lambda", ]
     mu     <- level_1["mu", ]
-    mu_lam <- mu + lambda    
-    prob   <- 1/(1+(mu/(mu_lam))*(exp((mu_lam)*(Tcal-tx))-1))
-    #prop   <- pmin(prob, 0.95) # impose upper limit; see Note (3)
+    
+    mu_lam <- mu + lambda
+    t_diff <- Tcal - tx
+    
+    prob   <- 1/(1+(mu/mu_lam)*(exp(mu_lam*t_diff)-1))
     z      <- as.numeric(runif(length(prob)) < prob)
     return(z)
   }
   
-  draw_y <- function(data, level_1) {
-    # sample from truncated exponential distribution  
+  draw_tau <- function(data, level_1) {
+    N      <- nrow(data)
     tx     <- data[, "t.x"]
     Tcal   <- data[, "T.cal"]
     lambda <- level_1["lambda",]
@@ -62,7 +64,7 @@ abe.mcmc.DrawParameters <-
     z      <- level_1["z",]
     
     alive  <- z==1
-    tau    <- numeric(nrow(data))
+    tau <- numeric(N)
     
     # Case: still alive - left truncated exponential distribution -> [T.cal, Inf]
     if (any(alive)) {
@@ -169,7 +171,7 @@ abe.mcmc.DrawParameters <-
       
       # draw individual-level parameters
       level_1["z", ] <- draw_z(data, level_1)
-      level_1["tau", ] <- draw_y(data, level_1)
+      level_1["tau", ] <- draw_tau(data, level_1)
       
       level_2 <- draw_level_2(covars, level_1, hyper_prior)
       
@@ -302,63 +304,4 @@ abe.GenerateData <- function (n, T.cal, T.star, params, return.elog=FALSE) {
     out$elog <- elog
   }
   return(out)
-}
-
-
-#' Calculates P(alive) based on MCMC draws
-#'
-#' @param cal.cbs data.frame with column \code{T.cal}
-#' @param draws MCMC draws returned by \code{\link{abe.mcmc.DrawParameters}}
-#' @return numeric vector of probabilities
-#' @export
-abe.mcmc.PAlive <- function (cal.cbs, draws) {
-  
-  nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
-  nr_of_cust <- length(draws$level_1)
-  if (nr_of_cust != nrow(cal.cbs))
-    stop("mismatch between number of customers in parameters 'cal.cbs' and 'draws'")
-  
-  p.alives <- sapply(1:nr_of_cust, function(i) mean(as.matrix(draws$level_1[[i]][, "z"])))
-  return(p.alives)
-}
-
-
-#' Samples number of future transactions based on drawn parameters
-#'
-#' @param cal.cbs data.frame with column \code{t.x} and \code{T.cal}
-#' @param draws MCMC draws returned by \code{\link{abe.mcmc.DrawParameters}}
-#' @param T.star length of period for which future transactions are counted
-#' @return 2-dim array [draw x cust] with sampled future transactions
-#' @export
-abe.mcmc.DrawFutureTransactions <- function (cal.cbs, draws, T.star) {
-  
-  nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
-  nr_of_cust <- length(draws$level_1)
-  parameters <- varnames(draws$level_1[[1]])
-  
-  if (nr_of_cust != nrow(cal.cbs))
-    stop("mismatch between number of customers in parameters 'cal.cbs' and 'draws'")
-  if (is.null(T.star))
-    stop("T.star is missing")
-  
-  x.stars <- array(NA_real_, dim=c(nr_of_draws, nr_of_cust))
-  if (length(T.star)==1) T.star <- rep(T.star, nr_of_cust)
-  
-  for (cust in 1:nrow(cal.cbs)) {
-    T.cal   <- cal.cbs[cust, "T.cal"]
-    cust_draws <- as.matrix(draws$level_1[[cust]])
-    alive   <- as.logical(cust_draws[, "z"])
-    ys      <- cust_draws[, "tau"]
-    lambdas <- cust_draws[, "lambda"]
-    
-    # Case: customer alive
-    if (any(alive)) {
-      x.stars[alive, cust] <- rpois(sum(alive), lambdas[alive] * pmin(ys[alive] - T.cal, T.star[cust]))
-    }
-    # Case: customer churned
-    if (any(!alive)) {
-      x.stars[!alive, cust] <- 0
-    }
-  }
-  return(x.stars)
 }
