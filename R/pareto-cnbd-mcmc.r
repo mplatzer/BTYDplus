@@ -20,7 +20,7 @@
 #' @import coda parallel
 #' @export
 #' @example demo/pareto-cnbd.r
-#' @seealso \code{link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.PAlive}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
+#' @seealso \code{link{pcnbd.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
 pcnbd.mcmc.DrawParameters <-
   function(cal.cbs,
            mcmc = 1500, burnin = 500, thin = 50, chains = 2,
@@ -204,82 +204,6 @@ pcnbd.mcmc.DrawParameters <-
   return(list(
     level_1 = lapply(1:nrow(cal.cbs), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
     level_2 = mcmc.list(lapply(draws, function(draw) draw$level_2))))
-}
-
-
-#' Calculates P(alive) based on MCMC draws
-#'
-#' @param cal.cbs data.frame with column \code{T.cal}
-#' @param draws MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}
-#' @return numeric vector of probabilities
-#' @export
-pcnbd.mcmc.PAlive <- function(cal.cbs, draws) {
-  
-  nr_of_cust <- length(draws$level_1)
-  if (nr_of_cust != nrow(cal.cbs))
-    stop("mismatch between number of customers in parameters 'cal.cbs' and 'draws'")
-  
-  p.alives <- sapply(1:nr_of_cust, function(i) mean(as.matrix(draws$level_1[[i]][, "z"])))
-  return(p.alives)
-}
-
-
-#' Samples number of future transactions based on drawn parameters
-#'
-#' @param cal.cbs data.frame with column \code{t.x} and \code{T.cal}
-#' @param draws MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}
-#' @param T.star length of period for which future transactions are counted
-#' @return 2-dim array [draw x cust] with sampled future transactions
-#' @export
-pcnbd.mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star=cal.cbs$T.star) {
-  
-  nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
-  nr_of_cust <- length(draws$level_1)
-  parameters <- varnames(draws$level_1[[1]])
-  
-  if (nr_of_cust != nrow(cal.cbs))
-    stop("mismatch between number of customers in parameters 'cal.cbs' and 'draws'")
-  if (is.null(T.star))
-    stop("T.star is missing")
-  
-  x.stars <- array(NA_real_, dim=c(nr_of_draws, nr_of_cust))
-  if (length(T.star)==1) T.star <- rep(T.star, nr_of_cust)
-  
-  draw_left_truncated_gamma <- function(lower, k, lambda) {
-    rand <- runif(1, pgamma(lower, k, k*lambda), 1)
-    qgamma(rand, k, k*lambda)
-  }
-  
-  for (cust in 1:nrow(cal.cbs)) {
-    Tcal    <- cal.cbs[cust, "T.cal"]
-    Tstar   <- T.star[cust]
-    tx      <- cal.cbs[cust, "t.x"]
-    taus    <- as.matrix(draws$level_1[[cust]][, "tau"])
-    ks      <- if ("k" %in% parameters) as.matrix(draws$level_1[[cust]][, "k"]) else rep(1, nr_of_draws)
-    lambdas <- as.matrix(draws$level_1[[cust]][, "lambda"])
-    alive   <- (taus>Tcal)
-    
-    # Case: customer alive
-    for (draw in which(alive)) {
-      # sample itt which is larger than (Tcal-tx)
-      itts <- draw_left_truncated_gamma(Tcal-tx, ks[draw], lambdas[draw])
-      # sample 'sufficiently' large amount of inter-transaction times
-      minT <- pmin(Tcal + Tstar - tx, taus[draw] - tx)
-      nr_of_itt_draws <- pmax(10, round(minT * lambdas[draw]))
-      itts <- c(itts, rgamma(nr_of_itt_draws * 2, shape=ks[draw], rate=ks[draw]*lambdas[draw]))
-      if (sum(itts)<minT) itts <- c(itts, rgamma(nr_of_itt_draws * 4, shape=ks[draw], rate=ks[draw]*lambdas[draw]))
-      if (sum(itts)<minT) itts <- c(itts, rgamma(nr_of_itt_draws * 800, shape=ks[draw], rate=ks[draw]*lambdas[draw]))
-      if (sum(itts)<minT)
-        stop("not enough inter-transaction times sampled! cust:", cust, " draw:", draw, " ", sum(itts), " < ", minT)
-      x.stars[draw, cust] <- sum(cumsum(itts)<minT)
-    }
-    
-    # Case: customer churned
-    if (any(!alive)) {
-      x.stars[!alive, cust] <- 0
-    }
-  }
-  return(x.stars)
 }
 
 

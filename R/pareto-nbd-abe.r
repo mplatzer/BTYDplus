@@ -20,7 +20,7 @@
 #' @import coda parallel bayesm
 #' @export
 #' @example demo/pareto-nbd-abe.r
-#' @seealso \code{link{abe.GenerateData}} \code{\link{pcnbd.mcmc.PAlive}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}}
+#' @seealso \code{link{abe.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}}
 #' @references Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 abe.mcmc.DrawParameters <- 
   function(cal.cbs, 

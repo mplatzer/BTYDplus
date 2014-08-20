@@ -34,8 +34,8 @@ round(effectiveSize(pcnbd.draws$level_2))
 # -> effective sample size are small for such a short chain
 
 # draw future transaction
-pnbd.xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star=cbs$T.star)
-pcnbd.xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, pcnbd.draws, T.star=cbs$T.star)
+pnbd.xstar <- mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star=cbs$T.star)
+pcnbd.xstar <- mcmc.DrawFutureTransactions(cbs, pcnbd.draws, T.star=cbs$T.star)
 
 # calculate mean over future transaction draws for each customer
 cbs$pnbd.mcmc <- apply(pnbd.xstar, 2, mean)
@@ -68,3 +68,7 @@ c("pnbd.mcmc"=mean((cbs$pactive.pnbd.mcmc-(cbs$x.star>0))^2),
   "pcnbd.mcmc"=mean((cbs$pactive.pcnbd.mcmc-(cbs$x.star>0))^2))
 #  pnbd.mcmc pcnbd.mcmc 
 # 0.04344944 0.03808333
+
+# calculate P(alive)
+cbs$palive.pnbd.mcmc <- mcmc.PAlive(cbs, pnbd.draws)
+cbs$palive.pcnbd.mcmc <- mcmc.PAlive(cbs, pcnbd.draws)

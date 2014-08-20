@@ -1,5 +1,6 @@
 
 # Load CDNow event log
+library(BTYD)
 data(cdnowElog, package="BTYD")
 elog <- data.frame(t(sapply(2:nrow(cdnowElog), function(i) strsplit(as.character(cdnowElog[i,]), split=",")[[1]])))
 names(elog) <- c("cust", "sampleid", "date", "cds", "sales")
@@ -38,9 +39,9 @@ x <- readline("Estimate Models via MLE (press Enter)")
 x <- readline("Compare Log-Likelihoods (press Enter)")
 
 rbind("NBD"=nbd.cbs.LL(params.nbd, cbs),
-      "Pareto/NBD"=pnbd.cbs.LL(params.pnbd, cbs),
+      "Pareto/NBD"=BTYD::pnbd.cbs.LL(params.pnbd, cbs),
       "GG/NBD"=ggnbd.cbs.LL(params.ggnbd, cbs),
-      "BG/NBD"=bgnbd.cbs.LL(params.bgnbd, cbs),
+      "BG/NBD"=BTYD::bgnbd.cbs.LL(params.bgnbd, cbs),
       "CBG/NBD"=cbgnbd.cbs.LL(params.cbgnbd, cbs),
       "CBG/CNBD-k"=cbgcnbd.cbs.LL(params.cbgcnbd, cbs))
 # -> CBG/NBD provides best fit according to LL
@@ -52,7 +53,7 @@ x <- readline("Estimate Transactions in Holdout period (press Enter)")
 cbs$nbd <- nbd.ConditionalExpectedTransactions(params.nbd, cbs$T.star, cbs$x, cbs$T.cal)
 cbs$pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$ggnbd <- ggnbd.ConditionalExpectedTransactions(params.ggnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$bgnbd <- bgnbd.ConditionalExpectedTransactions(params.bgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$bgnbd <- BTYD::bgnbd.ConditionalExpectedTransactions(params.bgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$cbgnbd <- cbgnbd.ConditionalExpectedTransactions(params.cbgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$cbgcnbd <- cbgcnbd.ConditionalExpectedTransactions(params.cbgcnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 
@@ -127,8 +128,8 @@ round(coda::effectiveSize(pcnbd.draws$level_2))
 x <- readline("Estimate Future Transactions & P(active) for MCMC models - this will take several minutes (press Enter)")
 
 # draw future transaction
-pnbd.xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star=cbs$T.star)
-pcnbd.xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, pcnbd.draws, T.star=cbs$T.star)
+pnbd.xstar <- mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star=cbs$T.star)
+pcnbd.xstar <- mcmc.DrawFutureTransactions(cbs, pcnbd.draws, T.star=cbs$T.star)
 
 # calculate mean over future transaction draws for each customer
 cbs$pnbd.mcmc <- apply(pnbd.xstar, 2, mean)
@@ -140,3 +141,7 @@ bench(cbs, c("pnbd", "pnbd.mcmc", "pcnbd.mcmc"))
 # calculate P(active)
 cbs$pactive.pnbd.mcmc <- apply(pnbd.xstar, 2, function(x) mean(x>0))
 cbs$pactive.pcnbd.mcmc <- apply(pcnbd.xstar, 2, function(x) mean(x>0))
+
+# calculate P(alive)
+cbs$palive.pnbd.mcmc <- mcmc.PAlive(cbs, pnbd.draws)
+cbs$palive.pcnbd.mcmc <- mcmc.PAlive(cbs, pcnbd.draws)

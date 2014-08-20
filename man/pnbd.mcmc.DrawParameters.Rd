@@ -89,8 +89,8 @@ round(effectiveSize(pcnbd.draws$level_2))
 # -> effective sample size are small for such a short chain
 
 # draw future transaction
-pnbd.xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star=cbs$T.star)
-pcnbd.xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, pcnbd.draws, T.star=cbs$T.star)
+pnbd.xstar <- mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star=cbs$T.star)
+pcnbd.xstar <- mcmc.DrawFutureTransactions(cbs, pcnbd.draws, T.star=cbs$T.star)
 
 # calculate mean over future transaction draws for each customer
 cbs$pnbd.mcmc <- apply(pnbd.xstar, 2, mean)
@@ -123,6 +123,10 @@ c("pnbd.mcmc"=mean((cbs$pactive.pnbd.mcmc-(cbs$x.star>0))^2),
   "pcnbd.mcmc"=mean((cbs$pactive.pcnbd.mcmc-(cbs$x.star>0))^2))
 #  pnbd.mcmc pcnbd.mcmc 
 # 0.04344944 0.03808333
+
+# calculate P(alive)
+cbs$palive.pnbd.mcmc <- mcmc.PAlive(cbs, pnbd.draws)
+cbs$palive.pcnbd.mcmc <- mcmc.PAlive(cbs, pcnbd.draws)
 }
 \references{
 Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
@@ -130,6 +134,6 @@ Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD mod
 Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 }
 \seealso{
-\code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}} \code{\link{pcnbd.mcmc.PAlive}}
+\code{\link{pcnbd.GenerateData}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{mcmc.PAlive}}
 }
 

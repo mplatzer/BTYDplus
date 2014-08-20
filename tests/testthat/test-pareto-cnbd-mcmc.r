@@ -27,10 +27,10 @@ test_that("Pareto/CNBD MCMC", {
   expect_less_than(ape(params$gamma, est$gamma), 0.10)
   
   # estimate future transactions & P(alive)
-  xstar <- pcnbd.mcmc.DrawFutureTransactions(cbs, draws, T.star=cbs$T.star)
+  xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star=cbs$T.star)
   cbs$x.est <- apply(xstar, 2, mean)
   cbs$pactive <- apply(xstar, 2, function(x) mean(x>0))
-  cbs$palive <- pcnbd.mcmc.PAlive(cbs, draws)
+  cbs$palive <- mcmc.PAlive(cbs, draws)
 
   # require less than 5% deviation
   expect_less_than(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.05)
