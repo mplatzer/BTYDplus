@@ -20,7 +20,7 @@
 #' @import coda parallel
 #' @export
 #' @example demo/pareto-cnbd.r
-#' @seealso \code{link{pcnbd.GenerateData}} \code{\link{elog2cbs}}
+#' @seealso \code{link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.PAlive}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
 pcnbd.mcmc.DrawParameters <-
   function(cal.cbs,
            mcmc = 1500, burnin = 500, thin = 50, chains = 2,
@@ -120,8 +120,8 @@ pcnbd.mcmc.DrawParameters <-
     nr_of_draws <- (mcmc-1) %/% thin + 1
     level_2_draws <- array(NA_real_, dim=c(nr_of_draws, 6))
     dimnames(level_2_draws)[[2]] <- c("t", "gamma", "r", "alpha", "s", "beta")
-    level_1_draws <- array(NA_real_, dim=c(nr_of_draws, 4, nr_of_cust))
-    dimnames(level_1_draws)[[2]] <- c("k", "lambda", "mu", "tau")
+    level_1_draws <- array(NA_real_, dim=c(nr_of_draws, 5, nr_of_cust))
+    dimnames(level_1_draws)[[2]] <- c("k", "lambda", "mu", "tau", "z")
     
     ## initialize parameters ##
     
@@ -137,6 +137,7 @@ pcnbd.mcmc.DrawParameters <-
     level_1["k",]      <- 1
     level_1["lambda",] <- mean(data$x) / mean(ifelse(data$t.x==0, data$T.cal, data$t.x))
     level_1["tau",]    <- data$t.x + 0.5/level_1["lambda",]
+    level_1["z",]      <- as.numeric(level_1["tau",] > data$T.cal)
     level_1["mu",]     <- 1/level_1["tau",]
     
     ## run MCMC chain ##
@@ -156,6 +157,7 @@ pcnbd.mcmc.DrawParameters <-
       level_1["lambda", ] <- draw_lambda(data, level_1, level_2)
       level_1["mu", ]     <- draw_mu(data, level_1, level_2)
       level_1["tau", ]    <- draw_tau(data, level_1, level_2)
+      level_1["z", ]      <- as.numeric(level_1["tau",] > data$T.cal)
       
       # draw heterogeneity parameters
       level_2[c("t", "gamma")] <- draw_gamma_params("k", level_1, level_2, hyper_prior)
@@ -213,12 +215,11 @@ pcnbd.mcmc.DrawParameters <-
 #' @export
 pcnbd.mcmc.PAlive <- function(cal.cbs, draws) {
   
-  nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
   nr_of_cust <- length(draws$level_1)
   if (nr_of_cust != nrow(cal.cbs))
     stop("mismatch between number of customers in parameters 'cal.cbs' and 'draws'")
   
-  p.alives <- sapply(1:nr_of_cust, function(i) mean(as.matrix(draws$level_1[[i]][, "tau"]) > cal.cbs$T.cal[i]))
+  p.alives <- sapply(1:nr_of_cust, function(i) mean(as.matrix(draws$level_1[[i]][, "z"])))
   return(p.alives)
 }
 
