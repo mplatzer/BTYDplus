@@ -4,12 +4,10 @@
 #' \code{pnbd.mcmc.DrawParameters} samples parameters via MCMC for a given CBS
 #' matrix
 #' 
-#' method 1) If \code{use_data_augmentation==TRUE} then implementation follows chapter
-#' 3.2 of Sandeep Conoor's dissertation
-#' \url{http://gradworks.umi.com/34/02/3402149.html}, i.e. parameter space is expanded
-#' with unobserved lifetime tau_i. Note, however, that  we follow the notation
-#' of original SMC paper with alpha and beta being the 'rate' parameters of the
-#' Gamma distributions, instead of 'scale' parameter.
+#' method 1) If \code{use_data_augmentation==TRUE} MCMC scheme takes advantage of 
+#' conjugate priors for drawing lambda and mu, by augmentating the parameter space 
+#' with unobserved lifetime 'tau' and activity status 'z'. See technical appendix 
+#' to (Abe 2009).
 #' 
 #' method 2) If \code{use_data_augmentation==FALSE} then implementation follows
 #' Shao-Hui Ma & Jin-Lan Liu paper 
@@ -38,9 +36,9 @@
 #' @import coda parallel
 #' @export
 #' @example demo/pareto-cnbd.r
-#' @seealso \code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}}
+#' @seealso \code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}} \code{\link{pcnbd.mcmc.PAlive}}
 #' @references Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
-#' @references Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010. \url{http://gradworks.umi.com/34/02/3402149.html}
+#' @references Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 pnbd.mcmc.DrawParameters <-
   function(cal.cbs,
            mcmc = 1500, burnin = 500, thin = 50, chains = 2,
@@ -63,7 +61,7 @@ pnbd.mcmc.DrawParameters <-
   
   ## methods to sample individual-level parameters (with data augmentation) ##  
   
-  draw_lambda_conoor <- function(data, level_1, level_2) {
+  draw_lambda <- function(data, level_1, level_2) {
     N      <- nrow(data)
     x      <- data[, "x"]
     T.cal  <- data[, "T.cal"]
@@ -78,15 +76,16 @@ pnbd.mcmc.DrawParameters <-
     return(lambda)
   }
   
-  draw_mu_conoor <- function(data, level_1, level_2) {
+  draw_mu <- function(data, level_1, level_2) {
     N      <- nrow(data)
+    T.cal  <- data[, "T.cal"]
     tau    <- level_1["tau", ]  
     s      <- level_2["s"]
     beta   <- level_2["beta"]
-    
+
     mu <- rgamma(n     = N, 
-                 shape = s + 1, 
-                 rate  = beta + tau)
+                 shape = s + ifelse(tau < T.cal, 1, 0), 
+                 rate  = beta + pmin(tau, T.cal))
     mu[mu==0 | log(mu) < -70] <- exp(-70) # avoid numeric overflow
     return(mu)
   }
@@ -150,8 +149,8 @@ pnbd.mcmc.DrawParameters <-
     nr_of_draws <- (mcmc-1) %/% thin + 1
     level_2_draws <- array(NA_real_, dim=c(nr_of_draws, 4))
     dimnames(level_2_draws)[[2]] <- c("r", "alpha", "s", "beta")
-    level_1_draws <- array(NA_real_, dim=c(nr_of_draws, 3, nr_of_cust))
-    dimnames(level_1_draws)[[2]] <- c("lambda", "mu", "tau")
+    level_1_draws <- array(NA_real_, dim=c(nr_of_draws, 4, nr_of_cust))
+    dimnames(level_1_draws)[[2]] <- c("lambda", "mu", "tau", "z")
     
     ## initialize parameters ##
     
@@ -164,7 +163,8 @@ pnbd.mcmc.DrawParameters <-
     level_1            <- level_1_draws[1,,]
     level_1["lambda",] <- mean(data$x) / mean(ifelse(data$t.x==0, data$T.cal, data$t.x))
     level_1["tau",]    <- data$t.x + 0.5/level_1["lambda",]
-    level_1["mu",]     <- 1/level_1["tau",]  
+    level_1["z",]      <- as.numeric(level_1["tau",] > data$T.cal)
+    level_1["mu",]     <- 1/level_1["tau",]
     
     ## run MCMC chain ##
     
@@ -179,11 +179,12 @@ pnbd.mcmc.DrawParameters <-
       }
       
       # draw individual-level parameters
-      draw_lambda <- if (use_data_augmentation) draw_lambda_conoor else draw_lambda_ma_liu
-      draw_mu     <- if (use_data_augmentation) draw_mu_conoor else draw_mu_ma_liu
+      draw_lambda <- if (use_data_augmentation) draw_lambda else draw_lambda_ma_liu
+      draw_mu     <- if (use_data_augmentation) draw_mu else draw_mu_ma_liu
       level_1["lambda", ] <- draw_lambda(data, level_1, level_2)
       level_1["mu", ]     <- draw_mu(data, level_1, level_2)
       level_1["tau", ]    <- draw_tau(data, level_1)
+      level_1["z", ]      <- as.numeric(level_1["tau",] > data$T.cal)
       
       # draw heterogeneity parameters
       level_2[c("r", "alpha")] <- draw_gamma_params("lambda", level_1, level_2, hyper_prior)

@@ -36,12 +36,10 @@ pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 50,
 matrix
 }
 \details{
-method 1) If \code{use_data_augmentation==TRUE} then implementation follows chapter
-3.2 of Sandeep Conoor's dissertation
-\url{http://gradworks.umi.com/34/02/3402149.html}, i.e. parameter space is expanded
-with unobserved lifetime tau_i. Note, however, that  we follow the notation
-of original SMC paper with alpha and beta being the 'rate' parameters of the
-Gamma distributions, instead of 'scale' parameter.
+method 1) If \code{use_data_augmentation==TRUE} MCMC scheme takes advantage of
+conjugate priors for drawing lambda and mu, by augmentating the parameter space
+with unobserved lifetime 'tau' and activity status 'z'. See technical appendix
+to (Abe 2009).
 
 method 2) If \code{use_data_augmentation==FALSE} then implementation follows
 Shao-Hui Ma & Jin-Lan Liu paper
@@ -129,9 +127,9 @@ c("pnbd.mcmc"=mean((cbs$pactive.pnbd.mcmc-(cbs$x.star>0))^2),
 \references{
 Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
 
-Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010. \url{http://gradworks.umi.com/34/02/3402149.html}
+Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 }
 \seealso{
-\code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}}
+\code{\link{pcnbd.GenerateData}} \code{\link{pcnbd.mcmc.DrawFutureTransactions}} \code{\link{pcnbd.mcmc.PAlive}}
 }
 

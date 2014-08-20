@@ -26,7 +26,7 @@ These R source files extend the functionality of the BTYD package by providing f
 
 * CBG/CNBD-k (MLE) - Platzer, Michael. "Stochastic models of noncontractual consumer relationships." Master of Science in Business Administration thesis, Vienna University of Economics and Business Administration, Austria (2008). https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships
 
-* Pareto/NBD (HB) - Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404 - Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010. http://gradworks.umi.com/34/02/3402149.html
+* Pareto/NBD (HB) - Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404 - Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 
 * Pareto/NBD variant (HB) - Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 
