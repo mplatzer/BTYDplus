@@ -49,7 +49,7 @@ pcnbd.mcmc.DrawParameters <-
   
   draw_k <- function(data, level_1, level_2) {
     pcnbd_slice_sample("k",
-                       x = data[,"x"], tx = data[,"t.x"], Tcal = data[,"T.cal"], litt = data[,"litt"], 
+                       x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt, 
                        k = level_1["k",], lambda = level_1["lambda",], mu = level_1["mu",], tau = level_1["tau",],
                        t = level_2["t"], gamma = level_2["gamma"],
                        r = level_2["r"], alpha = level_2["alpha"], 
@@ -58,7 +58,7 @@ pcnbd.mcmc.DrawParameters <-
   
   draw_lambda <- function(data, level_1, level_2) {
     pcnbd_slice_sample("lambda",
-                       x = data[,"x"], tx = data[,"t.x"], Tcal = data[,"T.cal"], litt = data[,"litt"], 
+                       x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt, 
                        k = level_1["k",], lambda = level_1["lambda",], mu = level_1["mu",], tau = level_1["tau",],
                        t = level_2["t"], gamma = level_2["gamma"],
                        r = level_2["r"], alpha = level_2["alpha"], 
@@ -80,9 +80,9 @@ pcnbd.mcmc.DrawParameters <-
   
   draw_tau <- function(data, level_1, level_2) {
     N      <- nrow(data)
-    x      <- data[, "x"]
-    tx     <- data[, "t.x"]
-    Tcal   <- data[, "T.cal"]
+    x      <- data$x
+    tx     <- data$t.x
+    Tcal   <- data$T.cal
     lambda <- level_1["lambda", ]
     k      <- level_1["k", ]
     mu     <- level_1["mu", ]
@@ -102,7 +102,7 @@ pcnbd.mcmc.DrawParameters <-
     # Case: churned     - distribution of min(t_(x+1), tau), truncated to [tx, Tcal]
     if (any(!alive)) {
       tau[!alive] <- pcnbd_slice_sample("tau",
-                                        x = data[!alive,"x"], tx = data[!alive,"t.x"], Tcal = data[!alive,"T.cal"], litt = data[!alive,"litt"],
+                                        x = data$x[!alive], tx = data$t.x[!alive], Tcal = data$T.cal[!alive], litt = data$litt[!alive],
                                         k = level_1["k",!alive], lambda = level_1["lambda",!alive], mu = level_1["mu",!alive], tau = level_1["tau",!alive],
                                         t = level_2["t"], gamma = level_2["gamma"],
                                         r = level_2["r"], alpha = level_2["alpha"], 

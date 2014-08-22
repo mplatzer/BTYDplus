@@ -63,8 +63,8 @@ pnbd.mcmc.DrawParameters <-
   
   draw_lambda <- function(data, level_1, level_2) {
     N      <- nrow(data)
-    x      <- data[, "x"]
-    T.cal  <- data[, "T.cal"]
+    x      <- data$x
+    T.cal  <- data$T.cal
     tau    <- level_1["tau", ]
     r      <- level_2["r"]
     alpha  <- level_2["alpha"]
@@ -72,13 +72,13 @@ pnbd.mcmc.DrawParameters <-
     lambda <- rgamma(n     = N,
                      shape = r + x,
                      rate  = alpha + pmin(tau, T.cal))
-    lambda[lambda==0 | log(lambda) < -70] <- exp(-70) # avoid numeric overflow
+    lambda[lambda==0 | log(lambda) < -10] <- exp(-10) # avoid numeric overflow
     return(lambda)
   }
   
   draw_mu <- function(data, level_1, level_2) {
     N      <- nrow(data)
-    T.cal  <- data[, "T.cal"]
+    T.cal  <- data$T.cal
     tau    <- level_1["tau", ]  
     s      <- level_2["s"]
     beta   <- level_2["beta"]
@@ -86,14 +86,14 @@ pnbd.mcmc.DrawParameters <-
     mu <- rgamma(n     = N, 
                  shape = s + ifelse(tau < T.cal, 1, 0), 
                  rate  = beta + pmin(tau, T.cal))
-    mu[mu==0 | log(mu) < -70] <- exp(-70) # avoid numeric overflow
+    mu[mu==0 | log(mu) < -10] <- exp(-10) # avoid numeric overflow
     return(mu)
   }
   
   draw_tau <- function(data, level_1) {
     N      <- nrow(data)
-    tx     <- data[, "t.x"]
-    T.cal  <- data[, "T.cal"]
+    tx     <- data$t.x
+    T.cal  <- data$T.cal
     lambda <- level_1["lambda", ]
     mu     <- level_1["mu", ]
     
@@ -127,7 +127,7 @@ pnbd.mcmc.DrawParameters <-
   
   draw_lambda_ma_liu <- function(data, level_1, level_2) {
     slice_sample_ma_liu("lambda", 
-                        x = data[,"x"], tx = data[,"t.x"], Tcal = data[,"T.cal"], 
+                        x = data$x, tx = data$t.x, Tcal = data$T.cal, 
                         lambda = level_1["lambda",], mu = level_1["mu",], 
                         r = level_2["r"], alpha = level_2["alpha"], 
                         s = level_2["s"], beta = level_2["beta"])
@@ -135,7 +135,7 @@ pnbd.mcmc.DrawParameters <-
   
   draw_mu_ma_liu <- function(data, level_1, level_2) {
     slice_sample_ma_liu("mu", 
-                        x = data[,"x"], tx = data[,"t.x"], Tcal = data[,"T.cal"], 
+                        x = data$x, tx = data$t.x, Tcal = data$T.cal, 
                         lambda = level_1["lambda",], mu = level_1["mu",], 
                         r = level_2["r"], alpha = level_2["alpha"], 
                         s = level_2["s"], beta = level_2["beta"])

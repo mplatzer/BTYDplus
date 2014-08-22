@@ -42,8 +42,8 @@ abe.mcmc.DrawParameters <-
   ## methods to sample individual-level parameters ##
 
   draw_z <- function(data, level_1) {
-    tx     <- data[, "t.x"]
-    Tcal   <- data[, "T.cal"]
+    tx     <- data$t.x
+    Tcal   <- data$T.cal
     lambda <- level_1["lambda", ]
     mu     <- level_1["mu", ]
     
@@ -57,8 +57,8 @@ abe.mcmc.DrawParameters <-
   
   draw_tau <- function(data, level_1) {
     N      <- nrow(data)
-    tx     <- data[, "t.x"]
-    Tcal   <- data[, "T.cal"]
+    tx     <- data$t.x
+    Tcal   <- data$T.cal
     lambda <- level_1["lambda",]
     mu     <- level_1["mu",]
     mu_lam <- mu + lambda
@@ -85,9 +85,9 @@ abe.mcmc.DrawParameters <-
   draw_level_1 <- function(data, covars, level_1, level_2) {
     # sample (lambda, mu) given (z, tau, beta, gamma)
     N      <- nrow(data)
-    x      <- data[, "x"]
-    tx     <- data[, "t.x"]
-    Tcal   <- data[, "T.cal"]
+    x      <- data$x
+    tx     <- data$t.x
+    Tcal   <- data$T.cal
     z      <- level_1["z", ]
     tau    <- level_1["tau", ]
     mvmean <- covars[,] %*% t(level_2$beta)
