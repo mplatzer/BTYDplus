@@ -1,4 +1,12 @@
 
+Changes in version x.x.x (to-be-released):
+
+    o   added mcmc.setBurnin method which cuts away (additional) initial burnin 
+ steps of MCMC chains
+
+    o   *.mcmc.DrawParameters now also accept data.tables as input
+
+
 Changes in version 0.3.1 (2014-08-20):
 
     o   deprecated `abe.mcmc.DrawFutureTransactions` and `pcnbd.mcmc.DrawFutureTransactions`
@@ -9,3 +17,4 @@ Changes in version 0.3.1 (2014-08-20):
 
     o   `*.mcmc.DrawParameters` now all consistenly return sampled `z` values
  in their output
+

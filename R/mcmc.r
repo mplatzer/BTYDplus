@@ -1,5 +1,4 @@
 
-
 #' Calculates P(alive) based on MCMC draws
 #'
 #' @param cal.cbs data.frame with column \code{T.cal}
@@ -73,4 +72,19 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star=cal.cbs$T.star) {
     }
   }
   return(x.stars)
+}
+
+
+#' (Re-)set burnin of MCMC chains.
+#'
+#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pcnbd.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
+#' @param burnin new start index
+#' @return 2-element list with MCMC draws
+#' @export
+mcmc.setBurnin <- function(draws, burnin) {
+  if (burnin < start(draws$level_2) | burnin > end(draws$level_2))
+    stop("specified burnin is out of bound: ", start(draws$level_2), " - ", end(draws$level_2))
+  draws$level_2 <- window(draws$level_2, start=burnin)
+  draws$level_1 <- lapply(draws$level_1, function(draw) window(draw, start=burnin))
+  return(draws)
 }
