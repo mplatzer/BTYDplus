@@ -84,8 +84,8 @@ pnbd.mcmc.DrawParameters <-
     beta   <- level_2["beta"]
 
     mu <- rgamma(n     = N, 
-                 shape = s + ifelse(tau < T.cal, 1, 0), 
-                 rate  = beta + pmin(tau, T.cal))
+                 shape = s + 1, 
+                 rate  = beta + tau)
     mu[mu==0 | log(mu) < -10] <- exp(-10) # avoid numeric overflow
     return(mu)
   }
