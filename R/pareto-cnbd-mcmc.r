@@ -186,7 +186,7 @@ pcnbd.mcmc.DrawParameters <-
       param_init <- c(1, 1, BTYD::pnbd.EstimateParameters(df))
       names(param_init) <- c("t", "gamma", "r", "alpha", "s", "beta")
       param_init <- as.list(param_init)
-    })
+    }, silent=TRUE)
     if (is.null(param_init)) param_init <- list(t=1, gamma=1, r=1, alpha=1, s=1, beta=1)
     cat("set param_init:", paste(round(unlist(param_init), 4), collapse=", "), "\n")
   }
