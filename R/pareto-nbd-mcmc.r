@@ -205,12 +205,13 @@ pnbd.mcmc.DrawParameters <-
   
   # set param_init (if not passed as argument)
   if (is.null(param_init)) {
-    tryCatch({
+    try({
       df <- cal.cbs[sample(nrow(cal.cbs), min(nrow(cal.cbs), 1000)),]
-      param_init <- pnbd.EstimateParameters(df)
+      param_init <- BTYD::pnbd.EstimateParameters(df)
       names(param_init) <- c("r", "alpha", "s", "beta")
       param_init <- as.list(param_init)
-    }, error = function(e) param_init <- list(r=1, alpha=1, s=1, beta=1))
+    }, silent=TRUE)
+    if (is.null(param_init)) param_init <- list(r=1, alpha=1, s=1, beta=1)
     cat("set param_init:", paste(round(unlist(param_init), 4), collapse=", "), "\n")
   }
   
