@@ -43,9 +43,9 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star=cal.cbs$T.star) {
   }
   
   for (cust in 1:nrow(cal.cbs)) {
-    Tcal    <- cal.cbs[cust, "T.cal"]
+    Tcal    <- cal.cbs$T.cal[cust]
     Tstar   <- T.star[cust]
-    tx      <- cal.cbs[cust, "t.x"]
+    tx      <- cal.cbs$t.x[cust]
     taus    <- as.matrix(draws$level_1[[cust]][, "tau"])
     ks      <- if ("k" %in% parameters) as.matrix(draws$level_1[[cust]][, "k"]) else rep(1, nr_of_draws)
     lambdas <- as.matrix(draws$level_1[[cust]][, "lambda"])
@@ -75,6 +75,16 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star=cal.cbs$T.star) {
 }
 
 
+#' Calculates P(active) based on drawn future transactions.
+#'
+#' @param xstar future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}
+#' @return vector with P(active) estimates for each customer
+#' @export
+mcmc.PActive <- function(xstar) {
+  return(apply(xstar, 2, function(x) mean(x>0)))
+}
+
+
 #' (Re-)set burnin of MCMC chains.
 #'
 #' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pcnbd.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
@@ -88,3 +98,33 @@ mcmc.setBurnin <- function(draws, burnin) {
   draws$level_1 <- lapply(draws$level_1, function(draw) window(draw, start=burnin))
   return(draws)
 }
+
+
+#' Draw diagnostic plot to inspect error in P(active).
+#'
+#' @param cbs data.frame with column \code{x} and \code{x.star}
+#' @param pactive vector of P(active)'s as returned by \code{\link{mcmc.PActive}}
+#' @return 2-element list with MCMC draws
+#' @export
+mcmc.plotPActiveDiagnostic <- function(cbs, pactive, title="Diagnostic Plot for P(active)") {
+  x.star <- cbs$x.star
+  nf <- layout(mat=matrix(c(1,2),2,1), heights=c(1,4), TRUE)
+  par(mar=c(0,4,3,1))
+  xhist <- hist(pactive, plot=F, breaks=seq(0,1,0.05))
+  barplot(xhist$counts, axes=F, main="", space=0, xlab="", ylab="")
+  title(title)
+  par(mar=c(4,4,0,2))
+  par(mgp=c(2.5,1,0))
+  cuts <- unique(quantile(c(0, pactive, 1), seq(0,1,0.1)))
+  spls.y <- sapply(split(x.star>0, cut(pactive, breaks=cuts, include.lowest=T)), mean)
+  spls.x <- sapply(split(pactive, cut(pactive, breaks=cuts, include.lowest=T)), mean)
+  plot(spls.x, spls.y, typ="b", xlim=c(0,1), ylim=c(0,1), frame=0, axes=F, xlab="Estimated P(active)", ylab="Actual Share of Actives")
+  axis(side=1, at=seq(0,1,0.1), pos=0, labels=paste(100*seq(0,1,0.1), "%"))
+  axis(side=2, at=seq(0,1,0.1), pos=0, labels=paste(100*seq(0,1,0.1), "%"), las=2)
+  abline(0,1)
+  abline(h=seq(0,1,0.1), col = "lightgray", lty = "dotted")
+  abline(v=seq(0,1,0.1),  col = "lightgray", lty = "dotted")
+  #abline(h=mean(x.star>0), col="red", lty=4)
+  points(mean(pactive[cbs$x==0]), mean(x.star[cbs$x==0]>0), col="red", pch="0")
+}
+
