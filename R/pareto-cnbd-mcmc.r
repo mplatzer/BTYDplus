@@ -304,10 +304,12 @@ pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
 #' 
 #' @param draws MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}
 #' @param xmax upper bound for x-scale
+#' @param fn optional function to summarize individual-level draws for k, e.g. 'mean'
 #'
 #' @export
-pcnbd.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax=NULL) {
+pcnbd.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax=NULL, fn=NULL) {
   ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
+  if (!is.null(fn)) ks <- apply(ks, 2, fn)
   if (is.null(xmax)) xmax <- min(10, quantile(ks, 0.95)*1.5)
   plot(density(ks), xlim=c(0, xmax), main="Distribution of Regularity Rate k", xlab="", ylab="", frame=FALSE)
   #plot(density(apply(ks, 2, mean)), xlim=c(0, xmax), main="Distribution of Regularity Rate k", xlab="", ylab="", frame=FALSE)

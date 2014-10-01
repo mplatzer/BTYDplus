@@ -3,12 +3,14 @@
 \alias{pcnbd.mcmc.plotRegularityRateHeterogeneity}
 \title{Pareto/CNBD Plot Regularity Rate Heterogeneity}
 \usage{
-pcnbd.mcmc.plotRegularityRateHeterogeneity(draws, xmax = NULL)
+pcnbd.mcmc.plotRegularityRateHeterogeneity(draws, xmax = NULL, fn = NULL)
 }
 \arguments{
 \item{draws}{MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}}
 
 \item{xmax}{upper bound for x-scale}
+
+\item{fn}{optional function to summarize individual-level draws for k, e.g. 'mean'}
 }
 \description{
 Plots and returns the estimated gamma distribution of k (customers' regularity in interpurchase times).
