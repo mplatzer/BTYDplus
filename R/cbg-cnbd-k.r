@@ -216,12 +216,12 @@ cbgcnbd.EstimateParameters <- function(cal.cbs, k=NULL, par.start=c(1, 1, 1, 1),
 cbgcnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, 
    "cbgcnbd.cbs.LL")
-  tryCatch(x <- cal.cbs[, "x"], error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
-  tryCatch(t.x <- cal.cbs[, "t.x"], error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
-  tryCatch(T.cal <- cal.cbs[, "T.cal"], error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
-  tryCatch(litt <- cal.cbs[, "litt"], error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a column for sum over logarithmic inter-transaction-times labelled \"litt\""))
+  tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
+  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  tryCatch(litt <- cal.cbs$litt, error = function(e) stop("Error in cbgcnbd.cbs.LL: cal.cbs must have a column for sum over logarithmic inter-transaction-times labelled \"litt\""))
   if ("custs" %in% colnames(cal.cbs)) {
-    custs <- cal.cbs[, "custs"]
+    custs <- cal.cbs$custs
   } else {
     custs <- rep(1, length(x))
   }

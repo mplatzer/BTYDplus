@@ -38,4 +38,7 @@ test_that("CBG/CNBD-k", {
   expect_true(all(cbs$x.star==round(cbs$x.star)))
   expect_true(all(cbs$palive>=0 & cbs$palive<=1))
   
+  # test estimating when cbs is data.table
+  est2 <- cbgcnbd.EstimateParameters(as.data.table(cbs))
+  expect_equal(est, est2)
 }

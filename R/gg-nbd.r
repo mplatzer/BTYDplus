@@ -60,11 +60,11 @@ ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min
 ggnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
                         "ggnbd.cbs.LL")  
-  tryCatch(x <- cal.cbs[, "x"], error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
-  tryCatch(t.x <- cal.cbs[, "t.x"], error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
-  tryCatch(T.cal <- cal.cbs[, "T.cal"], error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
+  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
   if ("custs" %in% colnames(cal.cbs)) {
-    custs <- cal.cbs[, "custs"]
+    custs <- cal.cbs$custs
   } else {
     custs <- rep(1, length(x))
   }
