@@ -1,13 +1,13 @@
 
-Changes in version x.x.x (to-be-released):
+Changes in version 0.3.2 (2014-10-07):
 
-    o   added mcmc.setBurnin method which cuts away (additional) initial burnin 
- steps of MCMC chains
+    o   added mcmc.setBurnin method which cuts away (additional) initial burnin steps of MCMC chains
 
     o   *.EstimateParameters and *.mcmc.DrawParameters now also accept data.tables as input
 
     o   pcnbd.mcmc.plotRegularityRateHeterogeneity: add option to plot point estimates
 
+    o   added mcmc.PActive and mcmc.plotPActiveDiagnostic
 
 Changes in version 0.3.1 (2014-08-20):
 

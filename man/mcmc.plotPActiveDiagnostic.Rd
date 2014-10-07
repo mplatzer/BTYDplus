@@ -3,13 +3,13 @@
 \alias{mcmc.plotPActiveDiagnostic}
 \title{Draw diagnostic plot to inspect error in P(active).}
 \usage{
-mcmc.plotPActiveDiagnostic(cbs, pactive,
+mcmc.plotPActiveDiagnostic(cbs, xstar,
   title = "Diagnostic Plot for P(active)")
 }
 \arguments{
 \item{cbs}{data.frame with column \code{x} and \code{x.star}}
 
-\item{pactive}{vector of P(active)'s as returned by \code{\link{mcmc.PActive}}}
+\item{xstar}{future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}}
 }
 \value{
 2-element list with MCMC draws

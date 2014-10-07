@@ -103,18 +103,19 @@ mcmc.setBurnin <- function(draws, burnin) {
 #' Draw diagnostic plot to inspect error in P(active).
 #'
 #' @param cbs data.frame with column \code{x} and \code{x.star}
-#' @param pactive vector of P(active)'s as returned by \code{\link{mcmc.PActive}}
+#' @param xstar future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}
 #' @return 2-element list with MCMC draws
 #' @export
-mcmc.plotPActiveDiagnostic <- function(cbs, pactive, title="Diagnostic Plot for P(active)") {
+mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title="Diagnostic Plot for P(active)") {
+  def.par <- par(no.readonly = TRUE)
+  pactive <- mcmc.PActive(xstar)
   x.star <- cbs$x.star
   nf <- layout(mat=matrix(c(1,2),2,1), heights=c(1,4), TRUE)
   par(mar=c(0,4,3,1))
   xhist <- hist(pactive, plot=F, breaks=seq(0,1,0.05))
   barplot(xhist$counts, axes=F, main="", space=0, xlab="", ylab="")
   title(title)
-  par(mar=c(4,4,0,2))
-  par(mgp=c(2.5,1,0))
+  par(mar=c(4,4,0,2), mgp=c(2.5,1,0))
   cuts <- unique(quantile(c(0, pactive, 1), seq(0,1,0.1)))
   spls.y <- sapply(split(x.star>0, cut(pactive, breaks=cuts, include.lowest=T)), mean)
   spls.x <- sapply(split(pactive, cut(pactive, breaks=cuts, include.lowest=T)), mean)
@@ -126,5 +127,6 @@ mcmc.plotPActiveDiagnostic <- function(cbs, pactive, title="Diagnostic Plot for 
   abline(v=seq(0,1,0.1),  col = "lightgray", lty = "dotted")
   #abline(h=mean(x.star>0), col="red", lty=4)
   points(mean(pactive[cbs$x==0]), mean(x.star[cbs$x==0]>0), col="red", pch="0")
+  par(def.par)
 }
 

@@ -22,14 +22,14 @@ test_that("Pareto/CNBD MCMC", {
   expect_less_than(ape(params$r, est$r), 0.10)
   expect_less_than(ape(params$alpha, est$alpha), 0.10)
   expect_less_than(ape(params$s, est$s), 0.10)
-  expect_less_than(ape(params$beta, est$beta), 0.10)
+  expect_less_than(ape(params$beta, est$beta), 0.12)
   expect_less_than(ape(params$t, est$t), 0.10)
   expect_less_than(ape(params$gamma, est$gamma), 0.10)
   
   # estimate future transactions & P(alive)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star=cbs$T.star)
   cbs$x.est <- apply(xstar, 2, mean)
-  cbs$pactive <- apply(xstar, 2, function(x) mean(x>0))
+  cbs$pactive <- mcmc.PActive(xstar)
   cbs$palive <- mcmc.PAlive(cbs, draws)
 
   # require less than 5% deviation
@@ -41,4 +41,10 @@ test_that("Pareto/CNBD MCMC", {
   expect_true(all(cbs$x.star==round(cbs$x.star)))
   expect_true(all(cbs$palive>=0 & cbs$palive<=1))
   
+  draws2 <- mcmc.setBurnin(draws, burnin=600)
+  expect_equal(start(draws2$level_2), 600)
+  expect_equal(start(draws2$level_1[[1]]), 600)
+  
+  mcmc.plotPActiveDiagnostic(cbs, xstar)
+  pcnbd.mcmc.plotRegularityRateHeterogeneity(draws)
 }
