@@ -233,7 +233,7 @@ pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
   if (all(c("t", "gamma") %in% names(params))) {
     # Case A: regularity parameter k is gamma-distributed across customers
     ks <- rgamma(n, shape=params$t, rate=params$gamma)
-    ks <- pmax(0.01, ks) # ensure that k is not too small, otherwise itt can be 0
+    ks <- pmax(0.1, ks) # ensure that k is not too small, otherwise itt can be 0
     
   } else if ("k" %in% params) {
     # Case B: regularity parameter k is fixed across customers
