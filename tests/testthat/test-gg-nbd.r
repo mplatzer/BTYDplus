@@ -22,7 +22,7 @@ test_that("Gamma/Gompertz/NBD", {
   cbs$x.est <- ggnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
   cbs$palive <- ggnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
   # require less than 5% deviation
-  #expect_true(ape(sum(cbs$x.star), sum(cbs$x.est)) < 0.05) # ERROR: ggnbd.ConditionalExpectedTransactions is far too high!?
+  expect_true(ape(sum(cbs$x.star), sum(cbs$x.est)) < 0.05) # ERROR: ggnbd.ConditionalExpectedTransactions is far too high!?
   expect_true(ape(sum(cbs$palive), sum(cbs$alive)) < 0.05)
 
   expect_true(min(cbs$x.star)>=0)
