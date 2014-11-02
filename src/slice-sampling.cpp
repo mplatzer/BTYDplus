@@ -361,9 +361,7 @@ double pcnbd_post_tau(NumericVector data, NumericVector params) {
 //  double s      = params[12];
 //  double beta   = params[13];  
   
-  double one_minus_F = ::Rf_pgamma(tau_, k, 1/(k*lambda), 0, 0);
-  double f = ::Rf_dgamma(tau_, k, 1/(k*lambda), 0);
-  return(-mu*tau_ + log(mu*one_minus_F + f));
+  return(-mu*tau_ + ::Rf_pgamma(tau_, k, 1/(k*lambda), 0, 1));
 }
 
 
@@ -429,22 +427,12 @@ NumericVector pcnbd_slice_sample(String what,
                               t, gamma, r, alpha, s, beta);
     //Rcpp::Rcout << i << " - " << x[i] << " - " << tx[i] << " - " << Tcal[i] << " - " << litt[i] << " - " << k[i] << " - " << lambda[i] << " - " << mu[i] << " - " << tau[i] << " - " << t << " - " << gamma << " - " << r << " - " << alpha << " - " << s << " - " << beta << " - " << std::endl;
     if (what == "k") {
-      out[i] = slice_sample_cpp(pcnbd_post_k, params, NumericVector::create(k[i]), 3, 3 * sqrt(t) / gamma, 1e-5, 1e+5)[0];
+      out[i] = slice_sample_cpp(pcnbd_post_k, params, NumericVector::create(k[i]), 3, 3 * sqrt(t) / gamma, 1e-1, 1e+3)[0];
     } else if (what == "lambda") {
-      out[i] = slice_sample_cpp(pcnbd_post_lambda, params, NumericVector::create(lambda[i]), 3, 3 * sqrt(r) / alpha, 1e-5, 1e+5)[0];
+      out[i] = slice_sample_cpp(pcnbd_post_lambda, params, NumericVector::create(lambda[i]), 3, 3 * sqrt(r) / alpha, 1e-30, 1e+5)[0];
     } else if (what == "tau") {
-      if (::Rf_pgamma(tx[i], k[i], 1/(k[i]*lambda[i]), 0, 1) < -100) {
-        // distribution is 'too flat' to sample properly, so we draw uniformly
-        out[i] = runif(1, tx[i], Tcal[i])[0];
-      } else {
-        double tau_init;
-        if (tau[i] > Tcal[i] || tau[i] < tx[i]) {
-          tau_init = tx[i] + (Tcal[i]-tx[i])/2;
-        } else {
-          tau_init = tau[i];
-        }
-        out[i] = slice_sample_cpp(pcnbd_post_tau, params, NumericVector::create(tau_init), 6, (Tcal[i]-tx[i])/2, tx[i], Tcal[i])[0];
-      }
+      double tau_init = std::min(Tcal[i]-tx[i], ::Rf_rgamma(k[i], 1/(k[i]*lambda[i]))) / 2;
+      out[i] = tx[i] + slice_sample_cpp(pcnbd_post_tau, params, NumericVector::create(tau_init), 6, (Tcal[i]-tx[i])/2, 0, Tcal[i]-tx[i])[0];
     }
   }
   return out;
@@ -468,16 +456,28 @@ NumericVector pcnbd_slice_sample(String what,
   draws2 <- -log( (1-rand)*exp(-(mu+lambda) * tx) + rand*exp(-(mu+lambda) * Tcal)) / (mu+lambda)
   err <- abs(mean(draws1)-mean(draws2))
   stopifnot(err<.1)
+
+  # compare results for k!=1 with random draws
+  k <- 4
+  lambda <- 0.0000001
+  mu <- 0.1
+  Tcal <- 52
+  tx <- 26
+  draws1 <- replicate(1e5, pcnbd_slice_sample("tau", x, tx, Tcal, 0, k, lambda, mu, 0, 0,0,0,0,0,0))
+  draws2 <- pmin(rexp(1e7, mu), rgamma(1e7, k, k*lambda))
+  draws2 <- draws2[draws2>tx & draws2<Tcal]
+  err <- abs(mean(draws1)-mean(draws2))
+  stopifnot(err<.1)
 */
 
 /*** R
   # unit-test P(alive) by comparing C++ result matches R results, matches Pareto/NBD result (k=1)
-  x <- 0
-  tx <- 7
-  Tcal <- 12
-  k <- 1
-  lambda <- 1.4
-  mu <- 0.015
+  x <- 1
+  tx <- 45
+  Tcal <- 52
+  k <- 3
+  lambda <- 0.0001
+  mu <- 0.1
 
   # C++ implementation
   res1 <- pcnbd_palive(x, tx, Tcal, k, lambda, mu)
@@ -488,8 +488,14 @@ NumericVector pcnbd_slice_sample(String what,
   # R implementation for k=1
   la_mu <- lambda + mu
   res3 <- exp(-la_mu*Tcal) / (exp(-la_mu*Tcal) + (mu/la_mu)*(exp(-la_mu*tx)-exp(-la_mu*Tcal)))
+  # determine P(alive) via sampling
+  itts <- rgamma(1e8, k, k*lambda)
+  taus <- rexp(1e8, mu)
+  res4 <- sum(itts>(Tcal-tx) & taus>Tcal) / (sum(itts>(Tcal-tx) & taus>Tcal) + sum(itts>(taus-tx) & taus<Tcal & taus>tx))
 
   ape <- function(a, e) abs(a-e)/a
   stopifnot(ape(res1, res2) < 0.01)
+  stopifnot(ape(res1, res4) < 0.01)
+  stopifnot(ape(res2, res4) < 0.01)
   stopifnot(k!=1 | ape(res1, res2) < 0.01)
 */

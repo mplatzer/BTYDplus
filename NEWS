@@ -1,6 +1,9 @@
 
 Changes in version 0.x.x:
 
+    o   important bug-fix for pcnbd.mcmc.DrawParameters - draw_tau slice-samples now from correct
+        log_posterior in churn case
+
     o   pcnbd.GenerateData has minimum level of 0.1 for generated k's in order to avoid itt's if 0
 
 Changes in version 0.3.2 (2014-10-07):

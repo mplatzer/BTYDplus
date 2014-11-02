@@ -23,7 +23,7 @@
 #' @seealso \code{link{pcnbd.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
 pcnbd.mcmc.DrawParameters <-
   function(cal.cbs,
-           mcmc = 1500, burnin = 500, thin = 50, chains = 2,
+           mcmc = 2500, burnin = 500, thin = 50, chains = 2,
            param_init = NULL, trace = 100) {
   
   ## methods to sample heterogeneity parameters {r, alpha, s, beta, t, gamma} ##
@@ -58,8 +58,10 @@ pcnbd.mcmc.DrawParameters <-
   
   draw_lambda <- function(data, level_1, level_2) {
     pcnbd_slice_sample("lambda",
-                       x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt, 
-                       k = level_1["k",], lambda = level_1["lambda",], mu = level_1["mu",], tau = level_1["tau",],
+                       x = data$x, tx = data$t.x, 
+                       Tcal = data$T.cal, litt = data$litt, 
+                       k = level_1["k",], lambda = level_1["lambda",], 
+                       mu = level_1["mu",], tau = level_1["tau",],
                        t = level_2["t"], gamma = level_2["gamma"],
                        r = level_2["r"], alpha = level_2["alpha"], 
                        s = level_2["s"], beta  = level_2["beta"])
@@ -71,10 +73,10 @@ pcnbd.mcmc.DrawParameters <-
     s      <- level_2["s"]
     beta   <- level_2["beta"]
     
-    mu <- rgamma(n     = N, 
+    mu <- rgamma(n     = N,
                  shape = s + 1, 
                  rate  = beta + tau)
-    mu[mu==0 | log(mu) < -10] <- exp(-10) # avoid numeric overflow
+    mu[mu==0 | log(mu) < -30] <- exp(-30) # avoid numeric overflow
     return(mu)
   }
   
@@ -99,11 +101,13 @@ pcnbd.mcmc.DrawParameters <-
       tau[alive]  <- Tcal[alive] + rexp(sum(alive), mu[alive])
     }
     
-    # Case: churned     - distribution of min(t_(x+1), tau), truncated to [tx, Tcal]
+    # Case: churned     - distribution of tau truncated to [tx, pmin(tx+1, Tcal)]
     if (any(!alive)) {
       tau[!alive] <- pcnbd_slice_sample("tau",
-                                        x = data$x[!alive], tx = data$t.x[!alive], Tcal = data$T.cal[!alive], litt = data$litt[!alive],
-                                        k = level_1["k",!alive], lambda = level_1["lambda",!alive], mu = level_1["mu",!alive], tau = level_1["tau",!alive],
+                                        x = data$x[!alive], tx = data$t.x[!alive], 
+                                        Tcal = data$T.cal[!alive], litt = data$litt[!alive],
+                                        k = level_1["k",!alive], lambda = level_1["lambda",!alive], 
+                                        mu = level_1["mu",!alive], tau = level_1["tau",!alive],
                                         t = level_2["t"], gamma = level_2["gamma"],
                                         r = level_2["r"], alpha = level_2["alpha"], 
                                         s = level_2["s"], beta  = level_2["beta"])
