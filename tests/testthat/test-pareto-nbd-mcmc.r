@@ -3,10 +3,9 @@ context("mle")
 test_that("Pareto/NBD MCMC", {
 
   # generate artificial Pareto/NBD data 
-  set.seed(1)
-  params <- list(k=1, r=5, alpha=10, s=0.8, beta=12)
-  n <- 2000
-  cbs <- pcnbd.GenerateData(n, runif(n, 12, 96), 32, params, TRUE)$cbs
+  params <- list(k=1, r=0.9, alpha=10, s=0.8, beta=12)
+  n <- 5000
+  cbs <- pcnbd.GenerateData(n, 52, 52, params, TRUE)$cbs
   
   # estimate parameters
   draws <- pnbd.mcmc.DrawParameters(cbs)
@@ -17,12 +16,12 @@ test_that("Pareto/NBD MCMC", {
   expect_true(is.mcmc.list(draws$level_1[[1]]))
   expect_true(is.mcmc.list(draws$level_2))
   
-  # require less than 10% deviation in estimated parameters
+  # require less than 20% deviation in estimated parameters
   ape <- function(act, est) abs(act-est)/act
-  expect_less_than(ape(params$r, est$r), 0.10)
-  expect_less_than(ape(params$alpha, est$alpha), 0.10)
-  expect_less_than(ape(params$s, est$s), 0.10)
-  expect_less_than(ape(params$beta, est$beta), 0.10)
+  expect_less_than(ape(params$r, est$r), 0.20)
+  expect_less_than(ape(params$alpha, est$alpha), 0.20)
+  expect_less_than(ape(params$s, est$s), 0.20)
+  expect_less_than(ape(params$beta, est$beta), 0.40) # beta hard to identify
   
   # estimate future transactions & P(alive)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star=cbs$T.star)
