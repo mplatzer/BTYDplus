@@ -3,9 +3,9 @@
 \alias{pnbd.mcmc.DrawParameters}
 \title{Hierarchical Bayes variant of Pareto/NBD}
 \usage{
-pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 50,
-  chains = 2, use_data_augmentation = TRUE, param_init = NULL,
-  trace = 100)
+pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
+  chains = 2, mc.cores = NULL, use_data_augmentation = TRUE,
+  param_init = NULL, trace = 100)
 }
 \arguments{
 \item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}}
@@ -17,6 +17,8 @@ pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 50,
 \item{thin}{only every thin-th MCMC step will be returned}
 
 \item{chains}{number of MCMC chains to be run}
+
+\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to min(chains, detectCores())}
 
 \item{use_data_augmentation}{determines MCMC method to be used}
 

@@ -1,6 +1,8 @@
 
 Changes in version 0.x.x:
 
+    o   added mc.cores parameter to MCMC methods to explicitely set number of parallel cores to be used
+
     o   important bug-fix for pcnbd.mcmc.DrawParameters - draw_tau slice-samples now from correct
         log_posterior in churn case
 

@@ -9,7 +9,6 @@ test_that("Pareto/CNBD MCMC", {
   
   # estimate parameters
   draws <- pcnbd.mcmc.DrawParameters(cbs)
-  plot(draws$level_2, dens=F)
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
   
   expect_true(all(c("level_1", "level_2") %in% names(draws)))

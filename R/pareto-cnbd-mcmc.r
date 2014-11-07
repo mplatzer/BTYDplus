@@ -10,6 +10,7 @@
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
 #' @param chains number of MCMC chains to be run
+#' @param mc.cores number of cores to use in parallel (Unix only); defaults to min(chains, detectCores())
 #' @param param_init list of 2nd-level parameter start values
 #' @param trace print logging step every \code{trace} iteration
 #' @return 2-element list:
@@ -23,7 +24,7 @@
 #' @seealso \code{link{pcnbd.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
 pcnbd.mcmc.DrawParameters <-
   function(cal.cbs,
-           mcmc = 2500, burnin = 500, thin = 50, chains = 2,
+           mcmc = 2500, burnin = 500, thin = 50, chains = 2, mc.cores = NULL,
            param_init = NULL, trace = 100) {
   
   ## methods to sample heterogeneity parameters {r, alpha, s, beta, t, gamma} ##
@@ -201,7 +202,8 @@ pcnbd.mcmc.DrawParameters <-
   stopifnot(all(is.finite(cal.cbs$litt)))
   
   # run multiple chains - executed in parallel on Unix
-  ncores <- ifelse(.Platform$OS.type=="windows", 1, min(chains, detectCores()))
+  ncores <- ifelse(!is.null(mc.cores), min(chains, mc.cores), 
+                   ifelse(.Platform$OS.type=="windows", 1, min(chains, detectCores())))  
   if (ncores>1) cat("running in parallel on", ncores, "cores\n")
   draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores=ncores)
   

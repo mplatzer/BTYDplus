@@ -3,8 +3,8 @@
 \alias{pcnbd.mcmc.DrawParameters}
 \title{Hierarchical Bayes implementation of Pareto/CNBD}
 \usage{
-pcnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 50,
-  chains = 2, param_init = NULL, trace = 100)
+pcnbd.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
+  chains = 2, mc.cores = NULL, param_init = NULL, trace = 100)
 }
 \arguments{
 \item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}, \code{litt}; e.g. output of \code{\link{elog2cbs}}}
@@ -16,6 +16,8 @@ pcnbd.mcmc.DrawParameters(cal.cbs, mcmc = 1500, burnin = 500, thin = 50,
 \item{thin}{only every thin-th MCMC step will be returned}
 
 \item{chains}{number of MCMC chains to be run}
+
+\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to min(chains, detectCores())}
 
 \item{param_init}{list of 2nd-level parameter start values}
 

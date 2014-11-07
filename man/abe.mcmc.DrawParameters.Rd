@@ -4,7 +4,7 @@
 \title{HB Pareto/NBD variant as described in Abe (2009)}
 \usage{
 abe.mcmc.DrawParameters(cal.cbs, covariates = c(), mcmc = 1500,
-  burnin = 500, thin = 50, chains = 2, trace = 100)
+  burnin = 500, thin = 50, chains = 2, mc.cores = NULL, trace = 100)
 }
 \arguments{
 \item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}}
@@ -18,6 +18,8 @@ abe.mcmc.DrawParameters(cal.cbs, covariates = c(), mcmc = 1500,
 \item{thin}{only every thin-th MCMC step will be returned}
 
 \item{chains}{number of MCMC chains to be run}
+
+\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to min(chains, detectCores())}
 
 \item{trace}{print logging step every \code{trace} iteration}
 }
