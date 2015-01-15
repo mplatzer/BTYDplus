@@ -17,11 +17,11 @@ slice_sample_ma_liu <- function(what, x, tx, Tcal, lambda, mu, r, alpha, s, beta
     .Call('BTYDplus_slice_sample_ma_liu', PACKAGE = 'BTYDplus', what, x, tx, Tcal, lambda, mu, r, alpha, s, beta)
 }
 
-pcnbd_palive <- function(x, tx, Tcal, k, lambda, mu) {
-    .Call('BTYDplus_pcnbd_palive', PACKAGE = 'BTYDplus', x, tx, Tcal, k, lambda, mu)
+pggg_palive <- function(x, tx, Tcal, k, lambda, mu) {
+    .Call('BTYDplus_pggg_palive', PACKAGE = 'BTYDplus', x, tx, Tcal, k, lambda, mu)
 }
 
-pcnbd_slice_sample <- function(what, x, tx, Tcal, litt, k, lambda, mu, tau, t, gamma, r, alpha, s, beta) {
-    .Call('BTYDplus_pcnbd_slice_sample', PACKAGE = 'BTYDplus', what, x, tx, Tcal, litt, k, lambda, mu, tau, t, gamma, r, alpha, s, beta)
+pggg_slice_sample <- function(what, x, tx, Tcal, litt, k, lambda, mu, tau, t, gamma, r, alpha, s, beta) {
+    .Call('BTYDplus_pggg_slice_sample', PACKAGE = 'BTYDplus', what, x, tx, Tcal, litt, k, lambda, mu, tau, t, gamma, r, alpha, s, beta)
 }
 

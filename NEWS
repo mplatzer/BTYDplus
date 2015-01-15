@@ -1,4 +1,8 @@
 
+Changes in version 0.4.0 (2015-01-15):
+
+    o   renamed model from Pareto/CNBD to Pareto/GGG - function prefixes changed from pcnbd to pggg accordingly
+
 Changes in version 0.3.3 (2015-01-15):
 
     o   added mc.cores parameter to MCMC methods to explicitely set number of parallel cores to be used

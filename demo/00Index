@@ -1,6 +1,6 @@
 nbd            Demonstration of NBD model
 gg-nbd         Demonstration of Gamma/Gompertz/NBD model
 cbg-cnbd-k     Demonstration of CBG/CNBD-k model
-pareto-cnbd    Demonstration of Pareto/NBD & Pareto/CNBD model
+pareto-ggg     Demonstration of Pareto/NBD & Pareto/GGG model
 pareto-nbd-abe Demonstration of Abe's Pareto/NBD variant
 cdnow          Demonstration of fitting various models to the CDNow data set

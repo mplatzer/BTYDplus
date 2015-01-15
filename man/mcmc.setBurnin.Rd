@@ -6,7 +6,7 @@
 mcmc.setBurnin(draws, burnin)
 }
 \arguments{
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pcnbd.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}}
 
 \item{burnin}{new start index}
 }

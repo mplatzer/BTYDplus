@@ -8,7 +8,7 @@ mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star)
 \arguments{
 \item{cal.cbs}{data.frame with column \code{t.x} and \code{T.cal}}
 
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pcnbd.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}}
 
 \item{T.star}{length of period for which future transactions are counted}
 }

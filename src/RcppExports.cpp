@@ -81,9 +81,9 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// pcnbd_palive
-NumericVector pcnbd_palive(NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector k, NumericVector lambda, NumericVector mu);
-RcppExport SEXP BTYDplus_pcnbd_palive(SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP muSEXP) {
+// pggg_palive
+NumericVector pggg_palive(NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector k, NumericVector lambda, NumericVector mu);
+RcppExport SEXP BTYDplus_pggg_palive(SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP muSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -94,16 +94,16 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< NumericVector >::type k(kSEXP );
         Rcpp::traits::input_parameter< NumericVector >::type lambda(lambdaSEXP );
         Rcpp::traits::input_parameter< NumericVector >::type mu(muSEXP );
-        NumericVector __result = pcnbd_palive(x, tx, Tcal, k, lambda, mu);
+        NumericVector __result = pggg_palive(x, tx, Tcal, k, lambda, mu);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
     return __sexp_result;
 END_RCPP
 }
-// pcnbd_slice_sample
-NumericVector pcnbd_slice_sample(String what, NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector litt, NumericVector k, NumericVector lambda, NumericVector mu, NumericVector tau, double t, double gamma, double r, double alpha, double s, double beta);
-RcppExport SEXP BTYDplus_pcnbd_slice_sample(SEXP whatSEXP, SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP littSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP tauSEXP, SEXP tSEXP, SEXP gammaSEXP, SEXP rSEXP, SEXP alphaSEXP, SEXP sSEXP, SEXP betaSEXP) {
+// pggg_slice_sample
+NumericVector pggg_slice_sample(String what, NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector litt, NumericVector k, NumericVector lambda, NumericVector mu, NumericVector tau, double t, double gamma, double r, double alpha, double s, double beta);
+RcppExport SEXP BTYDplus_pggg_slice_sample(SEXP whatSEXP, SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP littSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP tauSEXP, SEXP tSEXP, SEXP gammaSEXP, SEXP rSEXP, SEXP alphaSEXP, SEXP sSEXP, SEXP betaSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -123,7 +123,7 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP );
         Rcpp::traits::input_parameter< double >::type s(sSEXP );
         Rcpp::traits::input_parameter< double >::type beta(betaSEXP );
-        NumericVector __result = pcnbd_slice_sample(what, x, tx, Tcal, litt, k, lambda, mu, tau, t, gamma, r, alpha, s, beta);
+        NumericVector __result = pggg_slice_sample(what, x, tx, Tcal, litt, k, lambda, mu, tau, t, gamma, r, alpha, s, beta);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

@@ -1,14 +1,14 @@
 context("mle")
 
-test_that("Pareto/CNBD MCMC", {
+test_that("Pareto/GGG MCMC", {
 
-  # generate artificial Pareto/CNBD data 
+  # generate artificial Pareto/GGG data 
   params <- list(t=4.5, gamma=1.5, r=0.9, alpha=10, s=0.8, beta=12)
   n <- 5000
-  cbs <- pcnbd.GenerateData(n, 52, 52, params, TRUE)$cbs
+  cbs <- pggg.GenerateData(n, 52, 52, params, TRUE)$cbs
   
   # estimate parameters
-  draws <- pcnbd.mcmc.DrawParameters(cbs)
+  draws <- pggg.mcmc.DrawParameters(cbs)
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
   
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
@@ -20,7 +20,7 @@ test_that("Pareto/CNBD MCMC", {
   ape <- function(act, est) abs(act-est)/act
   expect_less_than(ape(params$r, est$r), 0.10)
   expect_less_than(ape(params$alpha, est$alpha), 0.10)
-  expect_less_than(ape(params$s, est$s), 0.10)
+  expect_less_than(ape(params$s, est$s), 0.20) # s hard to estimate
   expect_less_than(ape(params$beta, est$beta), 0.40) # beta hard to estimate
   expect_less_than(ape(params$t, est$t), 0.10)
   expect_less_than(ape(params$gamma, est$gamma), 0.10)
@@ -45,5 +45,5 @@ test_that("Pareto/CNBD MCMC", {
   expect_equal(start(draws2$level_1[[1]]), 600)
   
   mcmc.plotPActiveDiagnostic(cbs, xstar)
-  pcnbd.mcmc.plotRegularityRateHeterogeneity(draws)
+  pggg.mcmc.plotRegularityRateHeterogeneity(draws)
 }

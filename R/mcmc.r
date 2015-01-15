@@ -2,7 +2,7 @@
 #' Calculates P(alive) based on MCMC draws
 #'
 #' @param cal.cbs data.frame with column \code{T.cal}
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pcnbd.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
+#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
 #' @return numeric vector of probabilities
 #' @export
 mcmc.PAlive <- function(cal.cbs, draws) {
@@ -19,7 +19,7 @@ mcmc.PAlive <- function(cal.cbs, draws) {
 #' Samples number of future transactions based on drawn parameters
 #'
 #' @param cal.cbs data.frame with column \code{t.x} and \code{T.cal}
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pcnbd.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
+#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
 #' @param T.star length of period for which future transactions are counted
 #' @return 2-dim array [draw x cust] with sampled future transactions
 #' @export
@@ -87,7 +87,7 @@ mcmc.PActive <- function(xstar) {
 
 #' (Re-)set burnin of MCMC chains.
 #'
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pcnbd.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
+#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
 #' @param burnin new start index
 #' @return 2-element list with MCMC draws
 #' @export

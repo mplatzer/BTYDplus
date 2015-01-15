@@ -1,5 +1,5 @@
 
-#' Hierarchical Bayes implementation of Pareto/CNBD
+#' Hierarchical Bayes implementation of Pareto/GGG
 #'
 #' Returns 2-element list
 #'   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
@@ -20,9 +20,9 @@
 ##' }
 #' @import coda parallel
 #' @export
-#' @example demo/pareto-cnbd.r
-#' @seealso \code{link{pcnbd.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
-pcnbd.mcmc.DrawParameters <-
+#' @example demo/pareto-ggg.r
+#' @seealso \code{link{pggg.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
+pggg.mcmc.DrawParameters <-
   function(cal.cbs,
            mcmc = 2500, burnin = 500, thin = 50, chains = 2, mc.cores = NULL,
            param_init = NULL, trace = 100) {
@@ -49,7 +49,7 @@ pcnbd.mcmc.DrawParameters <-
   ## methods to sample individual-level parameters ##
   
   draw_k <- function(data, level_1, level_2) {
-    pcnbd_slice_sample("k",
+    pggg_slice_sample("k",
                        x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt, 
                        k = level_1["k",], lambda = level_1["lambda",], mu = level_1["mu",], tau = level_1["tau",],
                        t = level_2["t"], gamma = level_2["gamma"],
@@ -58,7 +58,7 @@ pcnbd.mcmc.DrawParameters <-
   }
   
   draw_lambda <- function(data, level_1, level_2) {
-    pcnbd_slice_sample("lambda",
+    pggg_slice_sample("lambda",
                        x = data$x, tx = data$t.x, 
                        Tcal = data$T.cal, litt = data$litt, 
                        k = level_1["k",], lambda = level_1["lambda",], 
@@ -91,7 +91,7 @@ pcnbd.mcmc.DrawParameters <-
     mu     <- level_1["mu", ]
     
     # sample z
-    p_alive <- pcnbd_palive(x, tx, Tcal, k, lambda, mu)
+    p_alive <- pggg_palive(x, tx, Tcal, k, lambda, mu)
     alive   <- p_alive > runif(n=N)
     
     # sample tau
@@ -104,7 +104,7 @@ pcnbd.mcmc.DrawParameters <-
     
     # Case: churned     - distribution of tau truncated to [tx, pmin(tx+1, Tcal)]
     if (any(!alive)) {
-      tau[!alive] <- pcnbd_slice_sample("tau",
+      tau[!alive] <- pggg_slice_sample("tau",
                                         x = data$x[!alive], tx = data$t.x[!alive], 
                                         Tcal = data$T.cal[!alive], litt = data$litt[!alive],
                                         k = level_1["k",!alive], lambda = level_1["lambda",!alive], 
@@ -214,7 +214,7 @@ pcnbd.mcmc.DrawParameters <-
 }
 
 
-#' Generate artificial data which follows Pareto/CNBD model assumptions
+#' Generate artificial data which follows Pareto/GGG model assumptions
 #'
 #' Returns 2-element list
 #' * cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star' 
@@ -230,7 +230,7 @@ pcnbd.mcmc.DrawParameters <-
 #' 
 #' @return 2-elemnt list
 #' @export
-pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
+pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
   
   if (length(T.cal)==1) T.cal <- rep(T.cal, n)
   if (length(T.star)==1) T.star <- rep(T.star, n)
@@ -304,16 +304,16 @@ pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
 }
 
 
-#' Pareto/CNBD Plot Regularity Rate Heterogeneity
+#' Pareto/GGG Plot Regularity Rate Heterogeneity
 #' 
 #' Plots and returns the estimated gamma distribution of k (customers' regularity in interpurchase times).
 #' 
-#' @param draws MCMC draws returned by \code{\link{pcnbd.mcmc.DrawParameters}}
+#' @param draws MCMC draws returned by \code{\link{pggg.mcmc.DrawParameters}}
 #' @param xmax upper bound for x-scale
 #' @param fn optional function to summarize individual-level draws for k, e.g. 'mean'
 #'
 #' @export
-pcnbd.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax=NULL, fn=NULL) {
+pggg.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax=NULL, fn=NULL) {
   ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
   if (!is.null(fn)) ks <- apply(ks, 2, fn)
   if (is.null(xmax)) xmax <- min(10, quantile(ks, 0.95)*1.5)

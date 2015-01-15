@@ -290,12 +290,12 @@ NumericVector slice_sample_ma_liu(String what,
 
 
 
-// ********* Pareto / CNBD **********
+// ********* Pareto / GGG **********
 
 
-// draw of individual-level posterior for Pareto/CNBD
+// draw of individual-level posterior for Pareto/GGG
 
-double pcnbd_palive_integrand(double x, double params[6]) {
+double pggg_palive_integrand(double x, double params[6]) {
   double tx = params[1];
   double k = params[3];
   double lambda = params[4];
@@ -325,7 +325,7 @@ double simpson38(double (*fn)(double, double[6]), double a, double b, double fn_
 }
 
 // [[Rcpp::export]]
-NumericVector pcnbd_palive(NumericVector x, NumericVector tx, NumericVector Tcal, 
+NumericVector pggg_palive(NumericVector x, NumericVector tx, NumericVector Tcal, 
                            NumericVector k, NumericVector lambda, NumericVector mu) {
   int N = x.size();
   NumericVector out(N);
@@ -336,7 +336,7 @@ NumericVector pcnbd_palive(NumericVector x, NumericVector tx, NumericVector Tcal
     // calc denominator by integrating from tx to Tcal
     // - we integrate numerically via Simpson3/8 rule (calling Rdqags crashed under Unix)
     double fn_params[6] = {x[i], tx[i], Tcal[i], k[i], lambda[i], mu[i]};
-    double integral = simpson38(pcnbd_palive_integrand, tx[i], Tcal[i], fn_params);
+    double integral = simpson38(pggg_palive_integrand, tx[i], Tcal[i], fn_params);
     double denom = numer + mu[i] * integral;
     out[i] = (numer/denom);
   }
@@ -344,7 +344,7 @@ NumericVector pcnbd_palive(NumericVector x, NumericVector tx, NumericVector Tcal
 }
 
 
-double pcnbd_post_tau(NumericVector data, NumericVector params) {
+double pggg_post_tau(NumericVector data, NumericVector params) {
   double tau_    = data[0];
 //  double x      = params[0];
 //  double tx     = params[1];
@@ -365,7 +365,7 @@ double pcnbd_post_tau(NumericVector data, NumericVector params) {
 }
 
 
-double pcnbd_post_k(NumericVector data, NumericVector params) {
+double pggg_post_k(NumericVector data, NumericVector params) {
   double k_     = data[0];
   double x      = params[0];
   double tx     = params[1];
@@ -388,7 +388,7 @@ double pcnbd_post_k(NumericVector data, NumericVector params) {
     log_one_minus_F;
 }
 
-double pcnbd_post_lambda(NumericVector data, NumericVector params) {
+double pggg_post_lambda(NumericVector data, NumericVector params) {
   double lambda_ = data[0];
   double x       = params[0];
   double tx      = params[1];
@@ -413,7 +413,7 @@ double pcnbd_post_lambda(NumericVector data, NumericVector params) {
 
 
 // [[Rcpp::export]]
-NumericVector pcnbd_slice_sample(String what, 
+NumericVector pggg_slice_sample(String what, 
                                   NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector litt,
                                   NumericVector k, NumericVector lambda, NumericVector mu, NumericVector tau,
                                   double t, double gamma, double r, double alpha, double s, double beta) {
@@ -427,19 +427,19 @@ NumericVector pcnbd_slice_sample(String what,
                               t, gamma, r, alpha, s, beta);
     //Rcpp::Rcout << i << " - " << x[i] << " - " << tx[i] << " - " << Tcal[i] << " - " << litt[i] << " - " << k[i] << " - " << lambda[i] << " - " << mu[i] << " - " << tau[i] << " - " << t << " - " << gamma << " - " << r << " - " << alpha << " - " << s << " - " << beta << " - " << std::endl;
     if (what == "k") {
-      out[i] = slice_sample_cpp(pcnbd_post_k, params, NumericVector::create(k[i]), 3, 3 * sqrt(t) / gamma, 1e-1, 1e+3)[0];
+      out[i] = slice_sample_cpp(pggg_post_k, params, NumericVector::create(k[i]), 3, 3 * sqrt(t) / gamma, 1e-1, 1e+3)[0];
     } else if (what == "lambda") {
-      out[i] = slice_sample_cpp(pcnbd_post_lambda, params, NumericVector::create(lambda[i]), 3, 3 * sqrt(r) / alpha, 1e-30, 1e+5)[0];
+      out[i] = slice_sample_cpp(pggg_post_lambda, params, NumericVector::create(lambda[i]), 3, 3 * sqrt(r) / alpha, 1e-30, 1e+5)[0];
     } else if (what == "tau") {
       double tau_init = std::min(Tcal[i]-tx[i], ::Rf_rgamma(k[i], 1/(k[i]*lambda[i]))) / 2;
-      out[i] = tx[i] + slice_sample_cpp(pcnbd_post_tau, params, NumericVector::create(tau_init), 6, (Tcal[i]-tx[i])/2, 0, Tcal[i]-tx[i])[0];
+      out[i] = tx[i] + slice_sample_cpp(pggg_post_tau, params, NumericVector::create(tau_init), 6, (Tcal[i]-tx[i])/2, 0, Tcal[i]-tx[i])[0];
     }
   }
   return out;
 }
 
 /*** R
-  # unit-test slice sampling of pcnbd_post_tau, by comparing results to pareto/nbd (k=1), 
+  # unit-test slice sampling of pggg_post_tau, by comparing results to pareto/nbd (k=1), 
   #   where we can draw directly via http://en.wikipedia.org/wiki/Inverse_transform_sampling
   x <- 0
   tx <- 8
@@ -449,7 +449,7 @@ NumericVector pcnbd_slice_sample(String what,
   lambda <- 1.2
   mu <- 0.01
   n <- 10^4
-  draws1 <- pcnbd_slice_sample("tau", rep(x, n), rep(tx, n), rep(Tcal, n), rep(litt, n), 
+  draws1 <- pggg_slice_sample("tau", rep(x, n), rep(tx, n), rep(Tcal, n), rep(litt, n), 
                                rep(k, n), rep(lambda, n), rep(mu, n), rep(0, n), 
                                1,1,1,1,1,1)
   rand <- runif(n)
@@ -463,7 +463,7 @@ NumericVector pcnbd_slice_sample(String what,
   mu <- 0.1
   Tcal <- 52
   tx <- 26
-  draws1 <- replicate(1e5, pcnbd_slice_sample("tau", x, tx, Tcal, 0, k, lambda, mu, 0, 0,0,0,0,0,0))
+  draws1 <- replicate(1e5, pggg_slice_sample("tau", x, tx, Tcal, 0, k, lambda, mu, 0, 0,0,0,0,0,0))
   draws2 <- pmin(rexp(1e7, mu), rgamma(1e7, k, k*lambda))
   draws2 <- draws2[draws2>tx & draws2<Tcal]
   err <- abs(mean(draws1)-mean(draws2))
@@ -480,7 +480,7 @@ NumericVector pcnbd_slice_sample(String what,
   mu <- 0.1
 
   # C++ implementation
-  res1 <- pcnbd_palive(x, tx, Tcal, k, lambda, mu)
+  res1 <- pggg_palive(x, tx, Tcal, k, lambda, mu)
   # R implementation
   ff <- function(y, tx, k, lambda, mu) (1-pgamma(y-tx, k, k*lambda)) * exp(-mu*y)
   res2 <- ff(Tcal, tx, k, lambda, mu) / (ff(Tcal, tx, k, lambda, mu) + 

@@ -99,7 +99,7 @@ rbind("MCMC"=round(unlist(params.pnbd.mcmc), 3), "MLE"=round(params.pnbd, 3))
 # -> Parameter Estimates between MLE and MCMC match closely
 
 
-x <- readline("Estimate Pareto/CNBD model via MCMC - this will take several minutes (press Enter)")
+x <- readline("Estimate Pareto/GGG model via MCMC - this will take several minutes (press Enter)")
 
 # Note: For keeping the runtime of this demo short, we limit the MCMC to 500 
 # iterations for both chains. In fact, the chains should be run longer to 
@@ -107,21 +107,21 @@ x <- readline("Estimate Pareto/CNBD model via MCMC - this will take several minu
 
 set.seed(1)
 
-pcnbd.draws <- pcnbd.mcmc.DrawParameters(cbs, mcmc=500, burnin=100, chains=2, thin=10)
+pggg.draws <- pggg.mcmc.DrawParameters(cbs, mcmc=500, burnin=100, chains=2, thin=10)
 
-plot(pcnbd.draws$level_2, density=FALSE)
-plot(pcnbd.draws$level_2, trace=FALSE)
+plot(pggg.draws$level_2, density=FALSE)
+plot(pggg.draws$level_2, trace=FALSE)
 
-coda::gelman.diag(pcnbd.draws$level_2)
+coda::gelman.diag(pggg.draws$level_2)
 # -> MCMC chains have not converged yet
 
-(summary(pcnbd.draws$level_2)$quantiles[, "50%"])
+(summary(pggg.draws$level_2)$quantiles[, "50%"])
 
-pcnbd.mcmc.plotRegularityRateHeterogeneity(pcnbd.draws)
+pggg.mcmc.plotRegularityRateHeterogeneity(pggg.draws)
 # -> very narrow distribution around k=1; 
 # CDNow customers purchases indeed seem to follow Poisson process
 
-round(coda::effectiveSize(pcnbd.draws$level_2))
+round(coda::effectiveSize(pggg.draws$level_2))
 # -> effective sample size are small for such a short chain
 
 
@@ -129,19 +129,19 @@ x <- readline("Estimate Future Transactions & P(active) for MCMC models - this w
 
 # draw future transaction
 pnbd.xstar <- mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star=cbs$T.star)
-pcnbd.xstar <- mcmc.DrawFutureTransactions(cbs, pcnbd.draws, T.star=cbs$T.star)
+pggg.xstar <- mcmc.DrawFutureTransactions(cbs, pggg.draws, T.star=cbs$T.star)
 
 # calculate mean over future transaction draws for each customer
 cbs$pnbd.mcmc <- apply(pnbd.xstar, 2, mean)
-cbs$pcnbd.mcmc <- apply(pcnbd.xstar, 2, mean)
+cbs$pggg.mcmc <- apply(pggg.xstar, 2, mean)
 
 # forecasting accuracy
-bench(cbs, c("pnbd", "pnbd.mcmc", "pcnbd.mcmc"))
+bench(cbs, c("pnbd", "pnbd.mcmc", "pggg.mcmc"))
 
 # calculate P(active)
 cbs$pactive.pnbd.mcmc <- apply(pnbd.xstar, 2, function(x) mean(x>0))
-cbs$pactive.pcnbd.mcmc <- apply(pcnbd.xstar, 2, function(x) mean(x>0))
+cbs$pactive.pggg.mcmc <- apply(pggg.xstar, 2, function(x) mean(x>0))
 
 # calculate P(alive)
 cbs$palive.pnbd.mcmc <- mcmc.PAlive(cbs, pnbd.draws)
-cbs$palive.pcnbd.mcmc <- mcmc.PAlive(cbs, pcnbd.draws)
+cbs$palive.pggg.mcmc <- mcmc.PAlive(cbs, pggg.draws)

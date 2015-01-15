@@ -36,8 +36,8 @@
 ##' }
 #' @import coda parallel
 #' @export
-#' @example demo/pareto-cnbd.r
-#' @seealso \code{\link{pcnbd.GenerateData}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{mcmc.PAlive}}
+#' @example demo/pareto-ggg.r
+#' @seealso \code{\link{pggg.GenerateData}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{mcmc.PAlive}}
 #' @references Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
 #' @references Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 pnbd.mcmc.DrawParameters <-
