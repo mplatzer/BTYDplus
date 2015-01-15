@@ -4,6 +4,9 @@ Changes in version 0.4.0 (2015-01-15):
     o   renamed model from Pareto/CNBD to Pareto/GGG - function prefixes changed from 
         pcnbd to pggg accordingly
 
+    o   cust-column is assigned as names to list of level_1 CODA-objects returned by 
+        MCMC drawParameter methods - this makes it easier to access these via customer ID
+
     o   renamed to cbgcnbd.EstimateRegularity() to estimateRegularity(), because the 
         method is not bound to CBG/CNBD-k model - added tests and demo
 

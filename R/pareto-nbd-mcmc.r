@@ -228,7 +228,9 @@ pnbd.mcmc.DrawParameters <-
   draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores=ncores)
 
   # merge chains into code::mcmc.list objects
-  return(list(
+  out <- list(
     level_1 = lapply(1:nrow(cal.cbs), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
-    level_2 = mcmc.list(lapply(draws, function(draw) draw$level_2))))
+    level_2 = mcmc.list(lapply(draws, function(draw) draw$level_2)))
+  if ('cust' %in% names(cal.cbs)) names(out$level_1) <- cal.cbs$cust
+  return(out)
 }
