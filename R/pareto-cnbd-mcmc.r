@@ -241,9 +241,9 @@ pcnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
     ks <- rgamma(n, shape=params$t, rate=params$gamma)
     ks <- pmax(0.1, ks) # ensure that k is not too small, otherwise itt can be 0
     
-  } else if ("k" %in% params) {
+  } else if ("k" %in% names(params)) {
     # Case B: regularity parameter k is fixed across customers
-    ks <- rep(param$k, n)
+    ks <- rep(params$k, n)
     
   } else {
     # Case C: k=1 is assumed, i.e. Pareto/NBD
