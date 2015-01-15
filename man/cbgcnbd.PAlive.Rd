@@ -44,7 +44,7 @@ cbs  <- data$cbs  # CBS summary - one record per customer
 elog <- data$elog # Event log - one row per event/purchase
 
 # estimate regularity from event log
-(k.est <- cbgcnbd.EstimateRegularity(elog))
+(k.est <- estimateRegularity(elog))
 # 2.784212; interpruchase-times indicate Erlang-3
 
 # estimate parameters, and compare to true parameters

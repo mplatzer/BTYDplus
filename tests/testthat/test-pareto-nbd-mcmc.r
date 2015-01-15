@@ -1,4 +1,4 @@
-context("mle")
+context("mcmc")
 
 test_that("Pareto/NBD MCMC", {
 

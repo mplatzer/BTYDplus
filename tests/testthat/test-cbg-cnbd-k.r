@@ -11,7 +11,7 @@ test_that("CBG/CNBD-k", {
   elog <- data$elog
   
   # estimate regularity & parameters
-  k.est <- cbgcnbd.EstimateRegularity(elog)
+  k.est <- estimateRegularity(elog)
   est <- cbgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
   est.fixed.k <- cbgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")], k=params[1])
 
