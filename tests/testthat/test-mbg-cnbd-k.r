@@ -1,19 +1,19 @@
 context("mle")
 
-test_that("CBG/CNBD-k", {
+test_that("MBG/CNBD-k", {
 
-  # generate artificial CBG/CNBD-k data 
+  # generate artificial MBG/CNBD-k data 
   set.seed(1)
   params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
   n <- 8000
-  data <- cbgcnbd.GenerateData(n, runif(n, 12, 96), 32, params, TRUE)
+  data <- mbgcnbd.GenerateData(n, runif(n, 12, 96), 32, params, TRUE)
   cbs <- data$cbs
   elog <- data$elog
   
   # estimate regularity & parameters
   k.est <- estimateRegularity(elog)
-  est <- cbgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
-  est.fixed.k <- cbgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")], k=params[1])
+  est <- mbgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
+  est.fixed.k <- mbgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")], k=params[1])
 
   expect_equal(params[1], est[1])
   expect_equal(est, est.fixed.k)
@@ -27,8 +27,8 @@ test_that("CBG/CNBD-k", {
   expect_true(ape(params[5], est[5]) < 0.10)
   
   # estimate future transactions & P(alive) with true parameters
-  cbs$x.est <- cbgcnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-  cbs$palive <- cbgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
+  cbs$x.est <- mbgcnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+  cbs$palive <- mbgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
 
   # require less than 5% deviation
   expect_true(ape(sum(cbs$x.star), sum(cbs$x.est)) < 0.05)
@@ -39,6 +39,6 @@ test_that("CBG/CNBD-k", {
   expect_true(all(cbs$palive>=0 & cbs$palive<=1))
   
   # test estimating when cbs is data.table
-  est2 <- cbgcnbd.EstimateParameters(as.data.table(cbs))
+  est2 <- mbgcnbd.EstimateParameters(as.data.table(cbs))
   expect_equal(est, est2)
-}
+})

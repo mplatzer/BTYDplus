@@ -26,5 +26,4 @@ test_that("estimateRegularity", {
   expect_true(ape(k, k.est.4)<0.05) 
   expect_true(ape(k, k.est.5)<0.05)
   
-  
-}
+})

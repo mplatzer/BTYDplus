@@ -1,3 +1,4 @@
+require(data.table)
 
 # Load CDNow event log
 data(cdnowElog, package="BTYD")

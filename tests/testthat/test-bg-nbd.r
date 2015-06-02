@@ -30,4 +30,4 @@ test_that("BG/NBD", {
   expect_true(all(cbs$x.star==round(cbs$x.star)))
   expect_true(all(cbs$palive>=0 & cbs$palive<=1))
   
-}
+})

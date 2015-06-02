@@ -104,6 +104,7 @@ mcmc.setBurnin <- function(draws, burnin) {
 #'
 #' @param cbs data.frame with column \code{x} and \code{x.star}
 #' @param xstar future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}
+#' @param title plot title
 #' @return 2-element list with MCMC draws
 #' @export
 mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title="Diagnostic Plot for P(active)") {

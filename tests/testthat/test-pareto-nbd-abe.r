@@ -34,7 +34,6 @@ test_that("Pareto/NBD Abe MCMC", {
   # estimate future transactions & P(alive)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star=cbs$T.star)
   cbs$x.est <- apply(xstar, 2, mean)
-  cbs$x.estx <- apply(xstarx, 2, mean)
   cbs$pactive <- apply(xstar, 2, function(x) mean(x>0))
   cbs$palive <- mcmc.PAlive(cbs, draws)
   
@@ -48,4 +47,4 @@ test_that("Pareto/NBD Abe MCMC", {
   expect_true(all(cbs$x.star==round(cbs$x.star)))
   expect_true(all(cbs$palive>=0 & cbs$palive<=1))
   
-}
+})

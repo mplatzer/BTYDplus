@@ -1,3 +1,4 @@
+require(data.table)
 
 # generate Erlang-3 with various lambdas
 nr_of_customers <- 100

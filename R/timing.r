@@ -17,9 +17,9 @@
 #' @param method 'wheat', 'mle', 'mle-minka', 'mle-thom', 'cv'
 #' @param plot if \code{TRUE} then distribution of estimated regularity will be plotted
 #' @return estimated real-valued regularity parameter; rounded to an integer,
-#'   this can be used as 'k' for estimating CBG/CNBD-k models
+#'   this can be used as 'k' for estimating MBG/CNBD-k models
 #' @export
-#' @seealso \code{\link{cbgcnbd.EstimateParameters}}
+#' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 #' @example demo/timing.r
 estimateRegularity <- function(elog, method="wheat", plot=FALSE) {
   if (!"cust" %in% names(elog)) 

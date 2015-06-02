@@ -28,12 +28,12 @@ x <- readline("Estimate Models via MLE (press Enter)")
 # BG/NBD (from BTYD package)
 (params.bgnbd <- BTYD::bgnbd.EstimateParameters(cbs))
 
-# CBG/NBD
-(params.cbgnbd <- cbgnbd.EstimateParameters(cbs))
+# MBG/NBD
+(params.mbgnbd <- mbgnbd.EstimateParameters(cbs))
 
-# CBG/CNBD-k
-(params.cbgcnbd <- cbgcnbd.EstimateParameters(cbs))
-# -> CBG/CNBD-k is identical to CBG/NBD, as no regularity is detected, hence k=1
+# MBG/CNBD-k
+(params.mbgcnbd <- mbgcnbd.EstimateParameters(cbs))
+# -> MBG/CNBD-k is identical to MBG/NBD, as no regularity is detected, hence k=1
 
 
 x <- readline("Compare Log-Likelihoods (press Enter)")
@@ -42,9 +42,9 @@ rbind("NBD"=nbd.cbs.LL(params.nbd, cbs),
       "Pareto/NBD"=BTYD::pnbd.cbs.LL(params.pnbd, cbs),
       "GG/NBD"=ggnbd.cbs.LL(params.ggnbd, cbs),
       "BG/NBD"=BTYD::bgnbd.cbs.LL(params.bgnbd, cbs),
-      "CBG/NBD"=cbgnbd.cbs.LL(params.cbgnbd, cbs),
-      "CBG/CNBD-k"=cbgcnbd.cbs.LL(params.cbgcnbd, cbs))
-# -> CBG/NBD provides best fit according to LL
+      "MBG/NBD"=mbgnbd.cbs.LL(params.mbgnbd, cbs),
+      "MBG/CNBD-k"=mbgcnbd.cbs.LL(params.mbgcnbd, cbs))
+# -> MBG/NBD provides best fit according to LL
 
 
 
@@ -54,8 +54,8 @@ cbs$nbd <- nbd.ConditionalExpectedTransactions(params.nbd, cbs$T.star, cbs$x, cb
 cbs$pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$ggnbd <- ggnbd.ConditionalExpectedTransactions(params.ggnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$bgnbd <- BTYD::bgnbd.ConditionalExpectedTransactions(params.bgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$cbgnbd <- cbgnbd.ConditionalExpectedTransactions(params.cbgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$cbgcnbd <- cbgcnbd.ConditionalExpectedTransactions(params.cbgcnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$mbgnbd <- mbgnbd.ConditionalExpectedTransactions(params.mbgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 
 
 x <- readline("Estimate P(alive) (press Enter)")
@@ -64,8 +64,8 @@ cbs$palive.nbd <- 1
 cbs$palive.pnbd <- BTYD::pnbd.PAlive(params=params.pnbd, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$palive.ggnbd <- ggnbd.PAlive(params=params.ggnbd, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$palive.bgnbd <- BTYD::bgnbd.PAlive(params=params.bgnbd, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$palive.cbgnbd <- cbgnbd.PAlive(params=params.cbgnbd, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$palive.cbgcnbd <- cbgcnbd.PAlive(params=params.cbgcnbd, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$palive.mbgnbd <- mbgnbd.PAlive(params=params.mbgnbd, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$palive.mbgcnbd <- mbgcnbd.PAlive(params=params.mbgcnbd, cbs$x, cbs$t.x, cbs$T.cal)
 
 
 x <- readline("Compare Forecasting Accuracy (press Enter)")
@@ -83,7 +83,7 @@ bench <- function(cbs, models) {
   round(acc, 3)
 }
 
-bench(cbs, c("nbd", "pnbd", "ggnbd", "bgnbd", "cbgnbd", "cbgcnbd"))
+bench(cbs, c("nbd", "pnbd", "ggnbd", "bgnbd", "mbgnbd", "mbgcnbd"))
 
 
 x <- readline("Estimate Pareto/NBD model via MCMC (press Enter)")

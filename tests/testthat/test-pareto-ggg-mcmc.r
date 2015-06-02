@@ -46,4 +46,5 @@ test_that("Pareto/GGG MCMC", {
   
   mcmc.plotPActiveDiagnostic(cbs, xstar)
   pggg.mcmc.plotRegularityRateHeterogeneity(draws)
-}
+
+})

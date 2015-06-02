@@ -38,4 +38,4 @@ test_that("Pareto/NBD MCMC", {
   expect_true(all(cbs$x.star==round(cbs$x.star)))
   expect_true(all(cbs$palive>=0 & cbs$palive<=1))
   
-}
+})
