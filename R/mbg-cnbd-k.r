@@ -284,7 +284,7 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
   # calculate probabilities for encountering 0 to k-1 censored events within T.cal-t.x
   probs <- matrix(NA_real_, ncol=k, nrow=length(x))
   for (j in 0:(k-1)) {
-    probs[, j+1] <- ((T.cal-t.x)^j / factorial(j)) * (gamma(r+x+j) / gamma(r+x)) * (alpha+1)^(r+x) / (alpha+1+T.cal-t.x)^(r+x+j)
+    probs[, j+1] <- ((T.cal-t.x)^j / factorial(j)) * (exp(lgamma(r+x+j) - lgamma(r+x))) * (alpha+1)^(r+x) / (alpha+1+T.cal-t.x)^(r+x+j)
   }
   probs <- probs / rowSums(probs)
   G <- function(v1, v2, v3, v4, a, t) 1 - (v4/(v4+t))^v1 * gsl::hyperg_2F1(v1, v2+1, v3+a, t/(v4+t))

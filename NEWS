@@ -1,4 +1,9 @@
 
+Changes in version x.x.x (TO-BE-RELEASED):
+
+    o   mbgcnbd.ConditionalExpectedTransactions can now handle customers with many 
+        (170+) transactions; thanks to Andrea Rumenjak for providing the patch;
+
 Changes in version 0.5.0 (2015-06-02):
 
     o   renamed model from CBG/CNBD to MBG/CNBD - function prefixes changed from 
