@@ -46,3 +46,58 @@ params.pnbd_abe.m2
 # var_log_lambda          1.0881  1.3238  1.5536
 # cov_log_lambda_log_mu  -0.2494  0.1835  0.6724
 # var_log_mu              1.0430  3.0687  5.2276
+
+
+
+
+## attempt to calculate marginal log-likelihood; it should be -1'381 according
+## to Table 3 in Abe (2009), but with below code we get -18'292 instead !?
+
+# log-likelihood function of multivariate normal; https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Likelihood_function
+ll_mvn <- function(obs, mean, sigma) {
+  x1 <- -0.5 * as.numeric(determinant(sigma, logarithm = T)$modulus)
+  x2 <- -0.5 * (obs-mean) %*% solve(sigma) %*% (obs-mean) 
+  x3 <- -0.5 * length(mean) * log(2*pi)
+  x1 + x2 + x3
+}
+
+# log-likelihood function of individual customer; equation (5) from Abe (2009)
+ll_ind <- function(x, t.x, T.cal, lambda, mu, tau, z) {
+  val <- (1-z)*log(mu) - (lambda+mu) * (z*T.cal + (1-z)*tau)
+  if (x > 0) val <- val + x*log(lambda) + (x-1)*log(t.x) - lgamma(x)
+  val
+}
+
+# convert level 1 and level 2 MCMC draws into matrix
+samples_1   <- lapply(draws_m1$level_1, function(m) as.matrix(m))
+samples_2   <- as.matrix(draws_m1$level_2)
+
+# calculate for each MCMC draw the log-likelihood across all customers
+no_of_cust  <- length(samples_1)
+no_of_draws <- nrow(samples_2)
+LL <- c()
+for (j in 1:no_of_draws) {
+  cat('calculate log-likelihood for ', j, '-th draw\n')
+  LL_j <- c()
+  for (i in 1:no_of_cust) {
+    cust     <- as.list(cbs[i,])            # the data for i-th customer
+    sample_1 <- as.list(samples_1[[i]][j,]) # j-th draw for i-th customer
+    sample_2 <- as.list(samples_2[j,])      # j-th draw of heterogeneity parameters
+    LL_j[i] <- ll_ind(x = cust$x, t.x = cust$t.x, T.cal = cust$T.cal,
+                      lambda = sample_1$lambda, mu = sample_1$mu, tau = sample_1$tau, z = sample_1$z) + 
+               ll_mvn(obs   = c(log(sample_1$lambda), log(sample_1$mu)),
+                      mean  = c(sample_2$log_lambda, sample_2$log_mu),
+                      sigma = matrix(c(sample_2$var_log_lambda, 
+                                       sample_2$cov_log_lambda_log_mu, 
+                                       sample_2$cov_log_lambda_log_mu, 
+                                       sample_2$var_log_mu), nrow=2))
+  }
+  # sum across customers to get total log-likelihood for the j-th draw
+  LL[j] <-  sum(LL_j)
+}
+
+# harmonic mean of likelihood; eq (14) from Newton & Raftery (1994) J.Royal Stat. Soc.
+mean(LL) - log(mean(exp(mean(LL) - LL)))
+# -18'292.42
+
+
