@@ -100,4 +100,6 @@ for (j in 1:no_of_draws) {
 mean(LL) - log(mean(exp(mean(LL) - LL)))
 # -18'292.42
 
-
+summary(LL)
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#  -18300  -18030  -17960  -17950  -17890  -17400 
