@@ -225,7 +225,7 @@ mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 }
 
 
-#' CBD/CNBD-k Conditional Expected Transactions
+#' MBG/CNBD-k Conditional Expected Transactions
 #' 
 #' Uses MBG/CNBD-k model parameters and a customer's past transaction behavior 
 #' to return the number of transactions they are expected to make in a given 
@@ -300,7 +300,7 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
 }
 
 
-#' CBD/CNBD-k Unconditional Probability Distribution of Transactions
+#' MBG/CNBD-k Unconditional Probability Distribution of Transactions
 #' 
 #' Uses MBG/CNBD-k model parameters to return the probability distribution of
 #' purchase frequencies for a random customer in a given time period, i.e.
