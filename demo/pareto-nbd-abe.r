@@ -17,48 +17,12 @@ plot(draws_m1$level_2, density=FALSE)
 params.pnbd_abe.m1 <- round(summary(draws_m1$level_2)$quantiles[, c("2.5%", "50%", "97.5%")], 2)
 params.pnbd_abe.m1
 # -> Parameter Estimates match (Abe 2009)
-
-
-# attempt to calculate marginal log-likelihood; it should be -1'381 according to Abe (2009), but is rather -12'952
-ll_mvn <- function(obs, mean, sigma) {
-  return(0)
-  x1 <- -0.5 * determinant(sigma, logarithm = T)$modulus
-  x2 <- -0.5 * (obs-mean) %*% solve(sigma) %*% (obs-mean) 
-  x3 <- -0.5 * log(2*pi)
-  x1 + x2 + x3
-}
-ll <- function(x, t.x, T.cal, lambda, mu, tau, z) {
-  val <- (1-z)*log(mu) - (lambda+mu) * (z*T.cal + (1-z)*tau)
-  if (x > 0) val <- val + x*log(lambda)# + (x-1)*log(t.x) - lgamma(x)
-  val
-}
-a <- matrix(NA, nrow=200, ncol=nrow(cbs))
-samples_2 <- as.matrix(draws_m1$level_2)
-samples_1 <- lapply(draws_m1$level_1, function(m) as.matrix(m))
-for (j in 1:200) {
-  cat(j, '\n')
-  for (i in 1:nrow(cbs)) {
-  cust <- as.list(cbs[i,])
-  sample_1 <- as.list(samples_1[[i]][j,])
-  sample_2 <- as.list(samples_2[j,])
-  a[j, i] <- ll(cust$x, cust$t.x, cust$T.cal, 
-               sample_1$lambda, sample_1$mu, sample_1$tau, sample_1$z) +
-             ll_mvn(obs = c(log(sample_1$lambda), log(sample_1$mu)), 
-                    mean = c(sample_2$log_lambda, sample_2$log_mu),
-                    sigma = matrix(c(sample_2$var_log_lambda, 
-                                   sample_2$cov_log_lambda_log_mu, 
-                                   sample_2$cov_log_lambda_log_mu, 
-                                   sample_2$var_log_mu), 
-                                  nrow=2))
-  }
-}
-dim(a)
-ls <- apply(a, 1, sum)
-1/(sum(1/ls)/200)
-# -12951.93
-mean(ls)
-# -12956.58
-
+#                        2.5%   50% 97.5%
+# log_lambda            -3.74 -3.57 -3.37
+# log_mu                -3.98 -3.74 -3.42
+# var_log_lambda         1.19  1.42  1.69
+# cov_log_lambda_log_mu -0.11  0.29  0.76
+# var_log_mu             1.35  2.66  5.17
 
 
 # Append dollar amount of first purchase; used as covariate in (Abe 2009)
@@ -71,4 +35,14 @@ draws_m2 <- abe.mcmc.DrawParameters(cbs, covariates=c("first"), mcmc=5000, burni
 plot(draws_m2$level_2, density=FALSE)
 params.pnbd_abe.m2 <- round(summary(draws_m2$level_2)$quantiles[, c("2.5%", "50%", "97.5%")], 4)
 params.pnbd_abe.m2
-# -> Parameter Estimates match (Abe 2009)
+# -> Parameter Estimates match Abe (2009); except for log_lambda_first and
+# log_mu_first; note however, that via simulation we can establish that the
+# implementation is able to re-identify the underlying parameters correctly
+#                           2.5%     50%   97.5%
+# log_lambda_intercept   -3.9623 -3.7172 -3.5192
+# log_mu_intercept       -4.0323 -3.6350 -3.2458
+# log_lambda_first        2.4690  6.1411  8.9629
+# log_mu_first          -11.0806  1.6959  7.9268
+# var_log_lambda          1.0881  1.3238  1.5536
+# cov_log_lambda_log_mu  -0.2494  0.1835  0.6724
+# var_log_mu              1.0430  3.0687  5.2276
