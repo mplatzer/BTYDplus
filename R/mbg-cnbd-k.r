@@ -241,6 +241,10 @@ mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   calibration period.
 #' @param T.cal length of calibration period, or a vector of calibration period 
 #'   lengths.
+#' @param method `exact` or `approx`; method `exact` computes `P(Y(s, s+t)=j)`
+#'   for sufficiently large j and sums over these; method `approx` is only
+#'   approximative and uses closed-form results from MBG/NBD and down-scales
+#'   them by factor k; the latter method is significantly faster;
 #' @return Number of transactions a customer is expected to make in a time 
 #'   period of length t, conditional on their past behavior. If any of the input
 #'   parameters has a length greater than 1, this will be a vector of expected 
@@ -249,7 +253,7 @@ mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' @export
 #' @example demo/mbg-cnbd-k.r
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
-mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
+mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal, method="exact") {
   max.length <- max(length(T.star), length(x), length(t.x),
     length(T.cal))
   if (max.length%%length(T.star))
@@ -283,21 +287,64 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
   b <- params[5]
   # calculate probabilities for encountering 0 to k-1 censored events within T.cal-t.x
   probs <- matrix(NA_real_, ncol=k, nrow=length(x))
-  for (j in 0:(k-1)) {
-    probs[, j+1] <- ((T.cal-t.x)^j / factorial(j)) * (exp(lgamma(r+x+j) - lgamma(r+x))) * (alpha+1)^(r+x) / (alpha+1+T.cal-t.x)^(r+x+j)
+  for (i in 0:(k-1)) {
+    probs[, i+1] <- ((T.cal-t.x)^i / factorial(i)) * (exp(lgamma(r+x+i) - lgamma(r+x))) * (alpha+1)^(r+x) / (alpha+1+T.cal-t.x)^(r+x+i)
   }
   probs <- probs / rowSums(probs)
-  G <- function(v1, v2, v3, v4, a, t) 1 - (v4/(v4+t))^v1 * gsl::hyperg_2F1(v1, v2+1, v3+a, t/(v4+t))
-  # P1 and P2 are weighted averages across scenarios of 0 to k-1 censored events within T.cal-t.x
-  P1 <- numeric(length(x))
-  P2 <- numeric(length(x))
-  for (j in 0:(k-1)) {
-    P1 <- P1 + probs[,j+1] * ((a + b + k*x+j) / (a - 1)) / k
-    P2 <- P2 + probs[,j+1] * G(r + k*x+j, b + k*x+j, b + k*x+j, alpha+T.cal, a, T.star)
+  # implementation of two methods for calculating conditional expected number of transactions
+  if (method=='approx') {
+    if (k>1) warning('method `approx` will result in approximative results for k>1')
+    # iterate over cases of encountering 0 to k-1 censored events within T.cal-t.x
+    e_x <- numeric(length(x))
+    for (i in 0:(k-1)) {
+      a_ <- a
+      b_ <- b+k*x+i
+      r_ <- r+k*x+i
+      alpha_ <- alpha+T.cal
+      e_x <- e_x + probs[,i+1] * (1/k) * ((a_+b_)/(a_-1)) * 
+        (1-(alpha_/(alpha_+T.star))^r_ * gsl::hyperg_2F1(r_, b_+1, a_+b_, T.star/(alpha_+T.star)))
+    }
+  } else if (method=='exact1') {
+    warning('this is not working :(')
+    nbd_pdf <- function(t, j, r, alpha) exp(j * log(t) - lfactorial(j) + r * log(alpha) + lgamma(r+j) - lgamma(r) - (r+j) * log(alpha+t))
+    nbd_cdf <- function(t, j, r, alpha) apply(sapply(0:j, function(j) nbd_pdf(t, j, r, alpha)), 1, sum)
+    max_x  <- min(500, round(max(cbs$T.star * cbs$x / cbs$T.cal))*2) #set max number of x for which we compute P(X(t)=x)
+    seq_x  <- 1:max_x
+    a_     <- a
+    b_     <- b+x
+    r_     <- r+x
+    alpha_ <- alpha+T.cal
+    e_x <- numeric(length(x))
+    for (j in seq_x) e_x <- e_x + j * (
+      nbd_pdf(cbs$T.star, j, r_, alpha_) * beta(a_, b_+j+1) / beta(a_, b_) + 
+      (1-nbd_cdf(cbs$T.star, j-1, r_, alpha_)) * beta(a_+1, b_+j) / beta(a_, b_)
+    )
+  } else if (method=='exact') {
+    warning('this is not working :(')
+    # sum over sufficiently large series of P(X(t)=x) terms
+    nbd_pdf <- function(t, j, r, alpha) exp(j * log(t) - lfactorial(j) + r * log(alpha) + lgamma(r+j) - lgamma(r) - (r+j) * log(alpha+t))
+    e_x <- numeric(length(x))
+    for (i in 0:(k-1)) {
+      max_x  <- min(500, round(max(cbs$T.star * cbs$x / cbs$T.cal))*2) #set max number of x for which we compute P(X(t)=x)
+      seq_x  <- matrix(1:max_x,     nrow = nrow(cbs), ncol = max_x, byrow = T)
+      a_     <- matrix(a,           nrow = nrow(cbs), ncol = max_x)
+      b_     <- matrix(b+k*x+i,     nrow = nrow(cbs), ncol = max_x)
+      r_     <- matrix(r+k*x+i,     nrow = nrow(cbs), ncol = max_x)
+      alpha_ <- matrix(alpha+T.cal, nrow = nrow(cbs), ncol = max_x)
+      seq_j  <- matrix(0:((max_x+1)*k-1), nrow=nrow(cbs), ncol=(max_x+1)*k, byrow=T)
+      mat_pdf <- nbd_pdf(cbs$T.star, seq_j, r_[,1], alpha_[,1])
+      mat_cdf <- t(apply(mat_pdf, 1, cumsum))
+      F1 <- exp(lbeta(a_, b_+seq_x+1) - lbeta(a_, b_))
+      T1 <- mat_pdf %*% matrix(c(rep(c(rep(1, k), rep(0, (max_x+1)*k)), max_x), rep(1, k)), nrow=(max_x+1)*k, ncol=max_x+1)[,-1]
+      F2 <- exp(lbeta(a_+1, b_+seq_x) - lbeta(a_, b_))
+      T2 <- (1-mat_cdf[, k*(1:max_x)])
+      e_x <- e_x + probs[,i+1] * rowSums(seq_x * (F1*T1 + F2*T2))
+    }
   }
-  P3 <- mbgcnbd.PAlive(params, x, t.x, T.cal)
-  return (P1 * P2 * P3)
+  p_alive <- mbgcnbd.PAlive(params, x, t.x, T.cal)
+  return(e_x * p_alive)    
 }
+
 
 
 #' MBG/CNBD-k Unconditional Probability Distribution of Transactions
