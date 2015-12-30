@@ -319,20 +319,32 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
       nbd_pdf(cbs$T.star, j, r_, alpha_) * beta(a_, b_+j+1) / beta(a_, b_) + 
       (1-nbd_cdf(cbs$T.star, j-1, r_, alpha_)) * beta(a_+1, b_+j) / beta(a_, b_)
     )
+  } else if (method=='exact-base') {
+    nbd_pdf <- function(t, j, r, alpha) exp(j * log(t) - lfactorial(j) + r * log(alpha) + lgamma(r+j) - lgamma(r) - (r+j) * log(alpha+t))
+    nbd_cdf <- function(t, j, r, alpha) sum(sapply(0:j, function(j) nbd_pdf(t, j, r, alpha)))
+    max_x  <- min(500, round(max(cbs$T.star * cbs$x / cbs$T.cal))*2) #set max number of x for which we compute P(X(t)=x)
+    seq_x  <- 1:max_x
+    e_x <- 0
+    for (j in seq_x) e_x <- e_x + j * (
+      nbd_pdf(T.star, j, r, alpha) * beta(a, b+j+1) / beta(a, b) + 
+      (1-nbd_cdf(T.star, j-1, r, alpha)) * beta(a+1, b+j) / beta(a, b)
+    )
+  } else if (method=='approx-base') {
+    (b/(a-1)) * (1-(alpha/(alpha+T.star))^r * gsl::hyperg_2F1(r, b+1, a+b, T.star/(alpha+T.star)))
   } else if (method=='exact') {
     warning('this is not working :(')
     # sum over sufficiently large series of P(X(t)=x) terms
     nbd_pdf <- function(t, j, r, alpha) exp(j * log(t) - lfactorial(j) + r * log(alpha) + lgamma(r+j) - lgamma(r) - (r+j) * log(alpha+t))
     e_x <- numeric(length(x))
     for (i in 0:(k-1)) {
-      max_x  <- min(500, round(max(cbs$T.star * cbs$x / cbs$T.cal))*2) #set max number of x for which we compute P(X(t)=x)
+      max_x  <- min(500, round(max(T.star * cbs$x / cbs$T.cal))*2) #set max number of x for which we compute P(X(t)=x)
       seq_x  <- matrix(1:max_x,     nrow = nrow(cbs), ncol = max_x, byrow = T)
       a_     <- matrix(a,           nrow = nrow(cbs), ncol = max_x)
       b_     <- matrix(b+k*x+i,     nrow = nrow(cbs), ncol = max_x)
       r_     <- matrix(r+k*x+i,     nrow = nrow(cbs), ncol = max_x)
       alpha_ <- matrix(alpha+T.cal, nrow = nrow(cbs), ncol = max_x)
       seq_j  <- matrix(0:((max_x+1)*k-1), nrow=nrow(cbs), ncol=(max_x+1)*k, byrow=T)
-      mat_pdf <- nbd_pdf(cbs$T.star, seq_j, r_[,1], alpha_[,1])
+      mat_pdf <- nbd_pdf(T.star, seq_j, r_[,1], alpha_[,1])
       mat_cdf <- t(apply(mat_pdf, 1, cumsum))
       F1 <- exp(lbeta(a_, b_+seq_x+1) - lbeta(a_, b_))
       T1 <- mat_pdf %*% matrix(c(rep(c(rep(1, k), rep(0, (max_x+1)*k)), max_x), rep(1, k)), nrow=(max_x+1)*k, ncol=max_x+1)[,-1]
