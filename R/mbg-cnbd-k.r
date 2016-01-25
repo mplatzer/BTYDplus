@@ -241,6 +241,7 @@ mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   calibration period.
 #' @param T.cal length of calibration period, or a vector of calibration period 
 #'   lengths.
+#' @param method `A`, `B` or `C`; currently three different approximation methods implemented
 #' @return Number of transactions a customer is expected to make in a time 
 #'   period of length t, conditional on their past behavior. If any of the input
 #'   parameters has a length greater than 1, this will be a vector of expected 
@@ -249,7 +250,7 @@ mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' @export
 #' @example demo/mbg-cnbd-k.r
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
-mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
+mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal, method='A') {
   max.length <- max(length(T.star), length(x), length(t.x),
     length(T.cal))
   if (max.length%%length(T.star))
@@ -281,22 +282,73 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
   alpha <- params[3]
   a <- params[4]
   b <- params[5]
-  # calculate probabilities for encountering 0 to k-1 censored events within T.cal-t.x
-  probs <- matrix(NA_real_, ncol=k, nrow=length(x))
-  for (j in 0:(k-1)) {
-    probs[, j+1] <- ((T.cal-t.x)^j / factorial(j)) * (exp(lgamma(r+x+j) - lgamma(r+x))) * (alpha+1)^(r+x) / (alpha+1+T.cal-t.x)^(r+x+j)
+  if (method=='A') {
+    # conditional parameter update
+    a_     <- rep(a, max.length)
+    b_     <- b + x
+    r_     <- r + x
+    alpha_ <- alpha * k + T.cal  # for k>1 we simply scale rate parameter alpha accordingly to approximate results
+    expected_x <- ((a_ + b_) / (a - 1)) * (1 - ((alpha_)/(alpha_+T.star))^(r_) * gsl::hyperg_2F1(r_, b_+1, a_+b_, T.star/(alpha_+T.star)))
+    p_alive    <- mbgcnbd.PAlive(params, x, t.x, T.cal)
+    return (expected_x * p_alive)
+  } else if (method=='B' || method=='C') {
+    # calculate probabilities for encountering 0 to k-1 censored Poisson events within T.cal-t.x (assuming customer is alive)
+    p_nbd <- function(j, t, r, alpha) exp(lgamma(r+j) - lgamma(r) + r*log(alpha) + j*log(t) - lfactorial(j) - (r+j)*log(alpha+t))
+    c_nbd <- function(j, t, r, alpha) {
+      val <- sapply(0:j, function(i) p_nbd(i, t, r, alpha))
+      if (!is.null(dim(val))) apply(val, 1, sum) else sum(val)
+    }
+    probs <- matrix(NA_real_, ncol=k, nrow=length(x))
+    for (i in 0:(k-1)) {
+      #probs[, i+1] <- p_nbd(i, T.cal-t.x, r + k * x, alpha + t.x)
+      probs[, i+1] <- p_nbd(i, T.cal-t.x, r + x, alpha + 1) # for some unknown reason this parameter update works much better?!
+    }
+    probs <- probs / rowSums(probs) # p.d.f is truncated to i in 0:(k-1)
+    # iterate over cases of encountering 0 to k-1 censored Poisson events within T.cal-t.x
+    expected_x <- matrix(NA_real_, nrow=length(x), ncol=k)
+    for (i in 0:(k-1)) {
+      # conditional parameter update
+      a_     <- rep(a, max.length)
+      b_     <- b + k*x + i
+      r_     <- r + k*x + i
+      alpha_ <- alpha + T.cal
+      if (method=='B') {
+        # calculate expected number of Poisson events, i.e. incl both censored and uncensored
+        expected_x[,i+1] <- ((a_+b_)/(a_-1)) * (1-(alpha_/(alpha_+T.star))^r_ * gsl::hyperg_2F1(r_, b_+1, a_+b_, T.star/(alpha_+T.star)))
+        # re-scale total no. of events to censored events, by assuming a Poisson process
+        if (k>1) {
+          rescale_expected <- function(lambda) {
+            xs <- seq(0, min(1000, qpois(0.99999, lambda))) #generate sufficiently large sequence
+            sum(floor((xs+i)/k) * dpois(xs, lambda)) #calculate expected value of censored events
+          }
+          expected_x[,i+1] <- sapply(expected_x[,i+1], rescale_expected)
+        }
+      } else if (method=='C') {
+        stop('not working')
+        # calculate conditional probabilities incl both censored and uncensored
+        # use P_BGNBD because no drop-out occurs at time T.cal
+        p_bg <- function(j, t, r, alpha, a, b) {
+          sapply(j, function(j) {
+            T1 <- (beta(a, b+j) / beta(a, b)) * p_nbd(j, t, r, alpha)
+            T2 <- (beta(a+1, b+j-1) / beta(a, b))
+            if (j>0) T2 <- T2 * (1-c_nbd(j-1, t, r, alpha))
+            T1 + T2
+          })
+        }
+        e_bg_k <- function(t, r, alpha, a, b) {
+          max_j <- 50
+          sapply(1:max.length, function(idx) {
+            #sum(floor(1:max_j/k) * BTYD::bgnbd.pmf(c(r[idx], alpha[idx], a[idx], b[idx]), t=t[idx], x=1:max_j)) # faster, but sometimes throws exceptions
+            sum(floor(1:max_j/k) * p_bg(1:max_j, t[idx], r[idx], alpha[idx], a[idx], b[idx]))
+          })
+        }
+        expected_x[,i+1] <- e_bg_k(T.star, r_, alpha_, a_, b_)
+      }
+    }
+    expected_x <- rowSums(expected_x * probs)
+    p_alive    <- mbgcnbd.PAlive(params, x, t.x, T.cal)
+    return (expected_x * p_alive)
   }
-  probs <- probs / rowSums(probs)
-  G <- function(v1, v2, v3, v4, a, t) 1 - (v4/(v4+t))^v1 * gsl::hyperg_2F1(v1, v2+1, v3+a, t/(v4+t))
-  # P1 and P2 are weighted averages across scenarios of 0 to k-1 censored events within T.cal-t.x
-  P1 <- numeric(length(x))
-  P2 <- numeric(length(x))
-  for (j in 0:(k-1)) {
-    P1 <- P1 + probs[,j+1] * ((a + b + k*x+j) / (a - 1)) / k
-    P2 <- P2 + probs[,j+1] * G(r + k*x+j, b + k*x+j, b + k*x+j, alpha+T.cal, a, T.star)
-  }
-  P3 <- mbgcnbd.PAlive(params, x, t.x, T.cal)
-  return (P1 * P2 * P3)
 }
 
 
