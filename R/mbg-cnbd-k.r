@@ -283,16 +283,21 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
   a <- params[4]
   b <- params[5]
   if (method=='A') {
-    # for k>1 we simply scale rate parameter alpha accordingly to approximate results
-    alpha <- alpha * k
-    P1 <- ((a + b + x) / (a - 1))
-    P2 <- 1 - ((alpha+T.cal)/(alpha+T.cal+T.star))^(r+x) * gsl::hyperg_2F1(r+x, b+x+1, b+x+a, T.star/(alpha+T.cal+T.star))
-    expected_x <- P1 * P2
+    # conditional parameter update
+    a_     <- rep(a, max.length)
+    b_     <- b + x
+    r_     <- r + x
+    alpha_ <- alpha * k + T.cal  # for k>1 we simply scale rate parameter alpha accordingly to approximate results
+    expected_x <- ((a_ + b_) / (a - 1)) * (1 - ((alpha_)/(alpha_+T.star))^(r_) * gsl::hyperg_2F1(r_, b_+1, a_+b_, T.star/(alpha_+T.star)))
     p_alive    <- mbgcnbd.PAlive(params, x, t.x, T.cal)
     return (expected_x * p_alive)
   } else if (method=='B' || method=='C') {
     # calculate probabilities for encountering 0 to k-1 censored Poisson events within T.cal-t.x (assuming customer is alive)
     p_nbd <- function(j, t, r, alpha) exp(lgamma(r+j) - lgamma(r) + r*log(alpha) + j*log(t) - lfactorial(j) - (r+j)*log(alpha+t))
+    c_nbd <- function(j, t, r, alpha) {
+      val <- sapply(0:j, function(i) p_nbd(i, t, r, alpha))
+      if (!is.null(dim(val))) apply(val, 1, sum) else sum(val)
+    }
     probs <- matrix(NA_real_, ncol=k, nrow=length(x))
     for (i in 0:(k-1)) {
       #probs[, i+1] <- p_nbd(i, T.cal-t.x, r + k * x, alpha + t.x)
@@ -319,6 +324,7 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
           expected_x[,i+1] <- sapply(expected_x[,i+1], rescale_expected)
         }
       } else if (method=='C') {
+        stop('not working')
         # calculate conditional probabilities incl both censored and uncensored
         # use P_BGNBD because no drop-out occurs at time T.cal
         p_bg <- function(j, t, r, alpha, a, b) {
