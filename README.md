@@ -24,6 +24,8 @@ These R source files extend the functionality of the BTYD package by providing f
 
 * MBG/NBD (MLE) - Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical validation and comparison of models for customer base analysis. International Journal of Research in Marketing 24(3) 201–209.
 
+* BG/CNBD-k (MLE) - Platzer, Michael, and Thomas Reutterer. forthcoming...
+
 * MBG/CNBD-k (MLE) - Platzer, Michael, and Thomas Reutterer. forthcoming...
 
 * Pareto/NBD (HB) - Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404 - Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553. - Conoor, Sandeep S. Customer-base analysis in noncontractual settings. Diss. NORTHWESTERN UNIVERSITY, 2010.

@@ -4,9 +4,9 @@ test_that("MBG/CNBD-k", {
 
   # generate artificial MBG/CNBD-k data 
   set.seed(1)
-  params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
   n <- 8000
-  data <- mbgcnbd.GenerateData(n, runif(n, 12, 96), 32, params, TRUE)
+  params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
+  data <- mbgcnbd.GenerateData(n=n, T.cal=runif(n, 12, 96), T.star=32, params=params, return.elog=TRUE)
   cbs <- data$cbs
   elog <- data$elog
   
@@ -37,8 +37,4 @@ test_that("MBG/CNBD-k", {
   expect_true(min(cbs$x.star)>=0)
   expect_true(all(cbs$x.star==round(cbs$x.star)))
   expect_true(all(cbs$palive>=0 & cbs$palive<=1))
-  
-  # test estimating when cbs is data.table
-  est2 <- mbgcnbd.EstimateParameters(as.data.table(cbs))
-  expect_equal(est, est2)
 })

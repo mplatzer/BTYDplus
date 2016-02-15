@@ -21,10 +21,7 @@
 #' @import BTYD
 #' @export
 #' @seealso \code{\link{elog2cbs}}
-#' @references Platzer, Michael. "Stochastic models of noncontractual consumer 
-#'   relationships." Master of Science in Business Administration thesis, Vienna
-#'   University of Economics and Business Administration, Austria (2008). 
-#'   \url{https://sites.google.com/site/michaelplatzer/stochastic-models-of-noncontractual-consumer-relationships}
+#' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @example demo/mbg-cnbd-k.r
 mbgcnbd.EstimateParameters <- function(cal.cbs, k=NULL, par.start=c(1, 1, 1, 1), max.param.value=10000, trace=0) {
   
@@ -250,53 +247,7 @@ mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' @example demo/mbg-cnbd-k.r
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
-  max.length <- max(length(T.star), length(x), length(t.x),
-    length(T.cal))
-  if (max.length%%length(T.star))
-    warning("Maximum vector length not a multiple of the length of T.star")
-  if (max.length%%length(x))
-    warning("Maximum vector length not a multiple of the length of x")
-  if (max.length%%length(t.x))
-    warning("Maximum vector length not a multiple of the length of t.x")
-  if (max.length%%length(T.cal))
-    warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params,
-    "mbgcnbd.ConditionalExpectedTransactions")
-  if (params[1] != floor(params[1]) | params[1] < 1)
-    stop("k must be integer being greater or equal to 1.")
-  if (any(T.star < 0) || !is.numeric(T.star))
-    stop("T.star must be numeric and may not contain negative numbers.")
-  if (any(x < 0) || !is.numeric(x))
-    stop("x must be numeric and may not contain negative numbers.")
-  if (any(t.x < 0) || !is.numeric(t.x))
-    stop("t.x must be numeric and may not contain negative numbers.")
-  if (any(T.cal < 0) || !is.numeric(T.cal))
-    stop("T.cal must be numeric and may not contain negative numbers.")
-  T.star <- rep(T.star, length.out = max.length)
-  x <- rep(x, length.out = max.length)
-  t.x <- rep(t.x, length.out = max.length)
-  T.cal <- rep(T.cal, length.out = max.length)
-  k <- params[1]
-  r <- params[2]
-  alpha <- params[3]
-  a <- params[4]
-  b <- params[5]
-  # calculate probabilities for encountering 0 to k-1 censored events within T.cal-t.x
-  probs <- matrix(NA_real_, ncol=k, nrow=length(x))
-  for (j in 0:(k-1)) {
-    probs[, j+1] <- ((T.cal-t.x)^j / factorial(j)) * (exp(lgamma(r+x+j) - lgamma(r+x))) * (alpha+1)^(r+x) / (alpha+1+T.cal-t.x)^(r+x+j)
-  }
-  probs <- probs / rowSums(probs)
-  G <- function(v1, v2, v3, v4, a, t) 1 - (v4/(v4+t))^v1 * gsl::hyperg_2F1(v1, v2+1, v3+a, t/(v4+t))
-  # P1 and P2 are weighted averages across scenarios of 0 to k-1 censored events within T.cal-t.x
-  P1 <- numeric(length(x))
-  P2 <- numeric(length(x))
-  for (j in 0:(k-1)) {
-    P1 <- P1 + probs[,j+1] * ((a + b + k*x+j) / (a - 1)) / k
-    P2 <- P2 + probs[,j+1] * G(r + k*x+j, b + k*x+j, b + k*x+j, alpha+T.cal, a, T.star)
-  }
-  P3 <- mbgcnbd.PAlive(params, x, t.x, T.cal)
-  return (P1 * P2 * P3)
+  bgcnbd.ConditionalExpectedTransactions(params=params, T.star=T.star, x=x, t.x=t.x, T.cal=T.cal)
 }
 
 
@@ -316,26 +267,7 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
 #' @export
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.Px <- function(params, t, x) {
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, 
-                        "mbgcnbd.Px")
-  if (params[1] != floor(params[1]) | params[1] < 1)
-    stop("k must be integer being greater or equal to 1.")  
-  
-  k <- params[1]
-  r <- params[2]
-  alpha <- params[3]
-  a <- params[4]
-  b <- params[5]
-  
-  nbd.Px <- function(params, t, x) {
-    return ((gamma(r+x)*alpha^r*t^x)/(factorial(x)*gamma(r)*(alpha+t)^(r+x)))
-  }
-
-  P1 <- (gamma(b+x+1) * gamma(a+b)) / (gamma(b) * gamma(a+b+x+1))
-  P2a <- sum(nbd.Px(params, t, (k*x):(k*x+k-1)))
-  P2b <- a/(b+x)
-  if (x>0) P2b <- P2b * (1-sum(nbd.Px(params, t, 0:(k*x-1))))
-  return (P1 * (P2a + P2b))
+  bgcnbd.Px(params=params, t=t, x=x, dropout_at_zero=TRUE)
 }
 
 
@@ -344,68 +276,12 @@ mbgcnbd.Px <- function(params, t, x) {
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params MBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} and \code{b}
+#' @param params BG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} and \code{b}
 #'   in that order.
 #' @param return.elog boolean - if \code{TRUE} then the event log is returned in 
 #'   addition to the CBS summary
 #' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
 mbgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, return.elog=FALSE) {
-  # check model parameters
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params,
-                        "mbgcnbd.GenerateData")
-  if (params[1] != floor(params[1]) | params[1] < 1)
-    stop("k must be integer being greater or equal to 1.")  
-  
-  k <- params[1]
-  r <- params[2]
-  alpha <- params[3]
-  a <- params[4]
-  b <- params[5]  
-
-  if (length(T.cal)==1) T.cal <- rep(T.cal, n)  
-  if (length(T.star)==1) T.star <- rep(T.star, n)  
-  
-  # sample intertransaction timings parameter lambda for each customer
-  lambdas <- rgamma(n, shape=r, rate=alpha)
-  
-  # sample churn-probability p for each customer
-  ps <- rbeta(n, a, b)
-  
-  # sample intertransaction timings & churn
-  cbs_list <- list()
-  elog_list <- list()
-  for (i in 1:n) {
-    p <- ps[i]
-    lambda <- lambdas[i]
-    # sample no. of transactions until churn
-    churn <- which.max(rbinom(min(10000, 10/p), 1, p)) - 1
-    # sample transaction times
-    times <- cumsum(c(0, rgamma(churn, shape=k, rate=lambda)))
-    if (return.elog)
-      elog_list[[i]] <- data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])])
-    # determine frequency, recency, etc.
-    ts.cal  <- times[times<T.cal[i]]
-    ts.star <- times[times>=T.cal[i] & times<(T.cal[i]+T.star[i])]
-    cbs_list[[i]] <- list(cust   = i,
-                          x      = length(ts.cal)-1,
-                          t.x    = max(ts.cal),
-                          litt   = sum(log(diff(ts.cal))),
-                          churn  = churn,
-                          alive  = churn > (length(ts.cal)-1),
-                          x.star = length(ts.star))
-  }
-  cbs <- do.call(rbind.data.frame, cbs_list)
-  cbs$lambda <- lambdas
-  cbs$p      <- ps
-  cbs$k      <- k
-  cbs$T.cal  <- T.cal
-  cbs$T.star <- T.star
-  rownames(cbs) <- NULL
-  out <- list(cbs=cbs)
-  if (return.elog) {
-    elog <- do.call(rbind.data.frame, elog_list)
-    out$elog <- elog
-  }
-  return(out)
+  bgcnbd.GenerateData(n=n, T.cal=T.cal, T.star=T.cal, params=params, return.elog=return.elog, dropout_at_zero=TRUE)
 }
