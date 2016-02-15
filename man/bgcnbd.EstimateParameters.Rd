@@ -58,7 +58,7 @@ elog <- data$elog # Event log - one row per event/purchase
 
 # estimate parameters, and compare to true parameters
 est  <- bgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
-est1 <- bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
+est1 <- BTYD::bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
 rbind("actual"=params, "bg/cnbd-k"=round(est, 2), "bg/nbd"=c(1, round(est1, 2)))
 #           k    r alpha    a    b
 # actual    3 0.85  1.45 0.79 2.42
@@ -68,7 +68,7 @@ rbind("actual"=params, "bg/cnbd-k"=round(est, 2), "bg/nbd"=c(1, round(est1, 2)))
 
 # estimate future transactions in holdout-period
 cbs$x.est  <- bgcnbd.ConditionalExpectedTransactions(est, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$x.est1 <- bgnbd.ConditionalExpectedTransactions(est1, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$x.est1 <- BTYD::bgnbd.ConditionalExpectedTransactions(est1, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 
 # compare forecast accuracy to bg/nbd and naive forecast
 rbind("bg/cnbd-k" = mean(abs(cbs$x.star-cbs$x.est)),
@@ -81,7 +81,7 @@ rbind("bg/cnbd-k" = mean(abs(cbs$x.star-cbs$x.est)),
 
 # estimate P(alive)
 cbs$palive  <- bgcnbd.PAlive(est, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$palive1 <- bgnbd.PAlive(est1, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$palive1 <- BTYD::bgnbd.PAlive(est1, cbs$x, cbs$t.x, cbs$T.cal)
 
 # compare to true (usually unobserved) alive status
 prop.table(table(cbs$palive>.5, cbs$alive))

@@ -34,6 +34,8 @@ to return the number of transactions they are expected to make in a given
 time period.
 }
 \seealso{
+\code{\link{bgcnbd.ConditionalExpectedTransactions}}
+
 \code{\link{mbgcnbd.EstimateParameters}}
 }
 

@@ -25,4 +25,9 @@ list with elements \code{cbs} and \code{elog} containing data.frames
 \description{
 Simulate data according to MBG/CNBD-k model assumptions
 }
+\seealso{
+\code{\link{bgcnbd.GenerateData}}
+
+\code{\link{mbgcnbd.EstimateParameters}}
+}
 

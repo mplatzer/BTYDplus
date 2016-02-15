@@ -1,6 +1,6 @@
 library(testthat)
+library(BTYD)
 library(BTYDplus)
-library(data.table)
 library(coda)
 
 test_package("BTYDplus")

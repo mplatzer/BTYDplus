@@ -194,7 +194,6 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
 #' @return Probability that the customer is still alive at the end of the 
 #'   calibration period.
 #' @export
-#' @example demo/bg-cnbd-k.r
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
   max.length <- max(length(x), length(t.x), length(T.cal))
@@ -261,7 +260,6 @@ bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
 #'   number of transactions.
 #' @import gsl
 #' @export
-#' @example demo/bg-cnbd-k.r
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal, dropout_at_zero = FALSE) {
   max.length <- max(length(T.star), length(x), length(t.x),
@@ -290,7 +288,6 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
   t.x    <- rep(t.x,   length.out = max.length)
   T.cal  <- rep(T.cal, length.out = max.length)
   T.star <- rep(T.star, length.out = max.length)
-  litt   <- rep(litt,  length.out = max.length)
   k      <- params[1]
   r      <- params[2]
   alpha  <- params[3]

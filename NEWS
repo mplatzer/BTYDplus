@@ -1,5 +1,9 @@
 
-Changes in version x.x.x (TO-BE-RELEASED):
+Changes in version 0.6.0 (2016-02-15):
+
+    o   added implementation of BG/CNBD-k model
+
+    o   (m)bgcnbd.ConditionalExpectedTransactions uses original approximation again
 
     o   mbgcnbd.ConditionalExpectedTransactions can now handle customers with many 
         (170+) transactions; thanks to Andrea Rumenjak for providing the patch;

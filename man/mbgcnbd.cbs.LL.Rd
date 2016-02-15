@@ -23,6 +23,8 @@ the total log-likelihood for the provided data.
 Calculate the log-likelihood of the MBG/CNBD-k model
 }
 \seealso{
+\code{\link{bgcnbd.cbs.LL}}
+
 \code{\link{mbgcnbd.EstimateParameters}}
 }
 

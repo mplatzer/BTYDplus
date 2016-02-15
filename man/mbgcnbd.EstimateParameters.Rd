@@ -38,5 +38,7 @@ Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 \seealso{
 \code{\link{elog2cbs}}
+
+\code{\link{bgcnbd.EstimateParameters}}
 }
 

@@ -21,6 +21,7 @@
 #' @import BTYD
 #' @export
 #' @seealso \code{\link{elog2cbs}}
+#' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 mbgcnbd.EstimateParameters <- function(cal.cbs, k=NULL, par.start=c(1, 1, 1, 1), max.param.value=10000, trace=0) {
   
@@ -89,7 +90,8 @@ mbgcnbd.EstimateParameters <- function(cal.cbs, k=NULL, par.start=c(1, 1, 1, 1),
 #'   of frequency \code{x} and \code{T.cal}.
 #' @return the total log-likelihood for the provided data.
 #' @export
-#' @seealso \code{\link{mbgcnbd.EstimateParameters}} 
+#' @seealso \code{\link{bgcnbd.cbs.LL}}
+#' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, 
    "mbgcnbd.cbs.LL")
@@ -116,6 +118,7 @@ mbgcnbd.cbs.LL <- function(params, cal.cbs) {
 #' @param litt sum of logarithmic interpurchase times
 #' @return a vector of log-likelihoods
 #' @export
+#' @seealso \code{\link{bgcnbd.LL}}
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.LL <- function(params, x, t.x, T.cal, litt) {
   max.length <- max(length(x), length(t.x), length(T.cal))
@@ -180,6 +183,7 @@ mbgcnbd.LL <- function(params, x, t.x, T.cal, litt) {
 #' @return Probability that the customer is still alive at the end of the 
 #'   calibration period.
 #' @export
+#' @seealso \code{\link{bgcnbd.PAlive}}
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
@@ -242,6 +246,7 @@ mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   number of transactions.
 #' @import gsl
 #' @export
+#' @seealso \code{\link{bgcnbd.ConditionalExpectedTransactions}}
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   bgcnbd.ConditionalExpectedTransactions(params=params, T.star=T.star, x=x, t.x=t.x, T.cal=T.cal)
@@ -262,9 +267,10 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
 #' @return P(X(t)=x|r,alpha,a,b). If any of the input parameters has a length
 #'   greater than 1, this will be a vector of expected number of transactions.
 #' @export
+#' @seealso \code{\link{bgcnbd.pmf}}
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
-mbgcnbd.Px <- function(params, t, x) {
-  bgcnbd.Px(params=params, t=t, x=x, dropout_at_zero=TRUE)
+mbgcnbd.pmf <- function(params, t, x) {
+  bgcnbd.pmf(params=params, t=t, x=x, dropout_at_zero=TRUE)
 }
 
 
@@ -279,6 +285,8 @@ mbgcnbd.Px <- function(params, t, x) {
 #'   addition to the CBS summary
 #' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
+#' @seealso \code{\link{bgcnbd.GenerateData}}
+#' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, return.elog=FALSE) {
   bgcnbd.GenerateData(n=n, T.cal=T.cal, T.star=T.cal, params=params, return.elog=return.elog, dropout_at_zero=TRUE)
 }

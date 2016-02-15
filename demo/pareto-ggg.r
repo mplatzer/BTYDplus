@@ -30,7 +30,7 @@ coda::gelman.diag(pggg.draws$level_2)
 
 pggg.mcmc.plotRegularityRateHeterogeneity(pggg.draws)
 
-round(effectiveSize(pggg.draws$level_2))
+round(coda::effectiveSize(pggg.draws$level_2))
 # -> effective sample size are small for such a short chain
 
 # draw future transaction

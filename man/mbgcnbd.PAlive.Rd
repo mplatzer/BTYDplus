@@ -29,6 +29,8 @@ to return the probability that they are still alive at the end of the
 calibration period.
 }
 \seealso{
+\code{\link{bgcnbd.PAlive}}
+
 \code{\link{mbgcnbd.EstimateParameters}}
 }
 

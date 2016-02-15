@@ -25,6 +25,8 @@ a vector of log-likelihoods
 Calculate the log-likelihood of the MBG/CNBD-k model
 }
 \seealso{
+\code{\link{bgcnbd.LL}}
+
 \code{\link{mbgcnbd.EstimateParameters}}
 }
 

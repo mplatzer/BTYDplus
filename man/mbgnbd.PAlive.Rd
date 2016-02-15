@@ -6,10 +6,39 @@
 \usage{
 mbgnbd.PAlive(params, x, t.x, T.cal)
 }
+\arguments{
+\item{params}{MBG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a}
+and \code{b} in that order.}
+
+\item{x}{number of repeat transactions in the calibration period T.cal, or a 
+vector of calibration period frequencies.}
+
+\item{t.x}{recency, i.e. length between first and last transaction during 
+calibration period.}
+
+\item{T.cal}{length of calibration period, or a vector of calibration period 
+lengths.}
+}
+\value{
+Probability that the customer is still alive at the end of the 
+  calibration period.
+}
 \description{
-MBG/NBD P(alive)
+Uses MBG/NBD model parameters and a customer's past transaction behavior 
+to return the probability that they are still alive at the end of the 
+calibration period.
+}
+\references{
+Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
+  validation and comparison of models for customer base analysis.
+  International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
+  Daniel, and Udo Wagner. "Customer base analysis: The case for a central
+  variant of the Betageometric/NBD Model." Marketing Journal of Research and
+  Management 3.2 (2007): 75-90.
 }
 \seealso{
-\code{\link{mbgcnbd.PAlive}}
+\code{\link{bgcnbd.PAlive}}
+
+\code{\link{mbgnbd.EstimateParameters}}
 }
 
