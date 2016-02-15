@@ -1,7 +1,7 @@
 timing         Demonstration of Estimating timing patterns
 nbd            Demonstration of NBD model
 gg-nbd         Demonstration of Gamma/Gompertz/NBD model
-mbg-cnbd-k     Demonstration of MBG/CNBD-k model
+bg-cnbd-k      Demonstration of BG/CNBD-k model
 pareto-ggg     Demonstration of Pareto/NBD & Pareto/GGG model
 pareto-nbd-abe Demonstration of Abe's Pareto/NBD variant
 cdnow          Demonstration of fitting various models to the CDNow data set

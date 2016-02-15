@@ -1,8 +1,7 @@
 
 #' Parameter Estimation for the BG/CNBD-k model
 #' 
-#' Estimates parameters for the BG/CNBD-k via Maximum Likelihood Estimation. If 
-#' \code{dropout_at_zero=TRUE}, then the MBG/CNBD-k is being estimated.
+#' Estimates parameters for the BG/CNBD-k via Maximum Likelihood Estimation.
 #' 
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
 #'   \code{x}, for recency \code{t.x} and total time observed \code{T.cal}.
@@ -18,8 +17,8 @@
 #'   \code{alpha}, \code{a} and \code{b} in that order.
 #' @param max.param.value the upper bound on parameters
 #' @param trace print logging step every \code{trace} iteration
-#' @param dropout_at_zero Boolean; distinguishes between BG (FALSE; default) and
-#'   MBG (TRUE) assumptions
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
 #' @return list of estimated parameters
 #' @import BTYD
 #' @export
@@ -36,7 +35,7 @@ bgcnbd.EstimateParameters <- function(cal.cbs,
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "bgcnbd.EstimateParameters")
   
-  # Either 'k' or \code{litt} need to be present
+  # Either \code{k} or \code{litt} need to be present
   if (is.null(k) & !"litt" %in% colnames(cal.cbs))
     stop("Either regularity parameter k need to be specified, or a column with logarithmic interpurchase times litt need to be present in cal.cbs")
   
@@ -89,15 +88,15 @@ bgcnbd.EstimateParameters <- function(cal.cbs,
 
 #' Calculate the log-likelihood of the BG/CNBD-k model
 #' 
-#' @param params BG/CNBD-k parameters - a vector with 'k', \code{r},
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r},
 #'   \code{alpha}, \code{a} and \code{b} in that order.
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
 #'   \code{x}, for recency \code{t.x}, for sum of logarithmic interpurchase
 #'   times \code{litt} and total time observed \code{T.cal}. Optionally a column
 #'   \code{custs} can be provided, which represents number of customers with a
 #'   specific combination of frequency \code{x} and \code{T.cal}.
-#' @param dropout_at_zero Boolean; distinguishes between BG (FALSE; default) and
-#'   MBG (TRUE) assumptions
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
 #' @return the total log-likelihood for the provided data.
 #' @export
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
@@ -119,14 +118,14 @@ bgcnbd.cbs.LL <- function(params, cal.cbs, dropout_at_zero = FALSE) {
 
 #' Calculate the log-likelihood of the BG/CNBD-k model
 #' 
-#' @param params BG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
 #'   and \code{b} in that order.
 #' @param x frequency, i.e. number of re-purchases
 #' @param t.x recency, i.e. time elapsed from first purchase to last purchase
 #' @param T.cal total time of observation period
 #' @param litt sum of logarithmic interpurchase times
-#' @param dropout_at_zero Boolean; distinguishes between BG (FALSE; default) and
-#'   MBG (TRUE) assumptions
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
 #' @return a vector of log-likelihoods
 #' @export
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
@@ -182,7 +181,7 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
 #' to return the probability that they are still alive at the end of the 
 #' calibration period.
 #' 
-#' @param params BG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
 #'   and \code{b} in that order.
 #' @param x number of repeat transactions in the calibration period T.cal, or a 
 #'   vector of calibration period frequencies.
@@ -190,8 +189,8 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
 #'   calibration period.
 #' @param T.cal length of calibration period, or a vector of calibration period 
 #'   lengths.
-#' @param dropout_at_zero Boolean; distinguishes between BG (FALSE; default) and
-#'   MBG (TRUE) assumptions
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
 #' @return Probability that the customer is still alive at the end of the 
 #'   calibration period.
 #' @export
@@ -244,7 +243,7 @@ bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
 #' to return the number of transactions they are expected to make in a given 
 #' time period.
 #' 
-#' @param params BG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
 #'   and \code{b} in that order.
 #' @param T.star length of time for which we are calculating the expected number
 #'   of transactions.
@@ -254,8 +253,8 @@ bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
 #'   calibration period.
 #' @param T.cal length of calibration period, or a vector of calibration period 
 #'   lengths.
-#' @param dropout_at_zero Boolean; distinguishes between BG (FALSE; default) and
-#'   MBG (TRUE) assumptions
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
 #' @return Number of transactions a customer is expected to make in a time 
 #'   period of length t, conditional on their past behavior. If any of the input
 #'   parameters has a length greater than 1, this will be a vector of expected 
@@ -312,13 +311,13 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 #' purchase frequencies for a random customer in a given time period, i.e.
 #' P(X(t)=x|r,alpha,a,b)
 #' 
-#' @param params BG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} and \code{b}
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
 #'   in that order.
 #' @param t length of time for which we are calculating the expected number of 
 #'   transactions.
 #' @param x number of transactions for which probability is calculated.
-#' @param dropout_at_zero Boolean; distinguishes between BG (FALSE; default) and
-#'   MBG (TRUE) assumptions
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
 #' @return P(X(t)=x|r,alpha,a,b). If any of the input parameters has a length
 #'   greater than 1, this will be a vector of expected number of transactions.
 #' @export
@@ -363,10 +362,10 @@ bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params BG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} and \code{b}
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
 #'   in that order.
-#' @param dropout_at_zero Boolean; distinguishes between BG (FALSE; default) and
-#'   MBG (TRUE) assumptions
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
 #' @param return.elog boolean - if \code{TRUE} then the event log is returned in 
 #'   addition to the CBS summary
 #' @return list with elements \code{cbs} and \code{elog} containing data.frames

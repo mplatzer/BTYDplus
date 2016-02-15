@@ -22,13 +22,12 @@
 #' @export
 #' @seealso \code{\link{elog2cbs}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
-#' @example demo/mbg-cnbd-k.r
 mbgcnbd.EstimateParameters <- function(cal.cbs, k=NULL, par.start=c(1, 1, 1, 1), max.param.value=10000, trace=0) {
   
   dc.check.model.params(c("r", "alpha", "a", "b"), par.start, 
     "mbgcnbd.EstimateParameters")
   
-  # Either 'k' or \code{litt} need to be present
+  # Either \code{k} or \code{litt} need to be present
   if (is.null(k) & !"litt" %in% colnames(cal.cbs))
     stop("Either regularity parameter k need to be specified, or a column with logarithmic interpurchase times litt need to be present in cal.cbs")
   
@@ -81,7 +80,7 @@ mbgcnbd.EstimateParameters <- function(cal.cbs, k=NULL, par.start=c(1, 1, 1, 1),
 
 #' Calculate the log-likelihood of the MBG/CNBD-k model
 #' 
-#' @param params MBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} 
+#' @param params MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} 
 #'   and \code{b} in that order.
 #' @param cal.cbs calibration period CBS. It must contain columns for frequency 
 #'   \code{x}, for recency \code{t.x}, for sum of logarithmic interpurchase times \code{litt}
@@ -109,7 +108,7 @@ mbgcnbd.cbs.LL <- function(params, cal.cbs) {
 
 #' Calculate the log-likelihood of the MBG/CNBD-k model
 #' 
-#' @param params MBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+#' @param params MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
 #'   and \code{b} in that order.
 #' @param x frequency, i.e. number of re-purchases
 #' @param t.x recency, i.e. time elapsed from first purchase to last purchase
@@ -170,7 +169,7 @@ mbgcnbd.LL <- function(params, x, t.x, T.cal, litt) {
 #' to return the probability that they are still alive at the end of the 
 #' calibration period.
 #' 
-#' @param params MBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+#' @param params MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
 #'   and \code{b} in that order.
 #' @param x number of repeat transactions in the calibration period T.cal, or a 
 #'   vector of calibration period frequencies.
@@ -181,7 +180,6 @@ mbgcnbd.LL <- function(params, x, t.x, T.cal, litt) {
 #' @return Probability that the customer is still alive at the end of the 
 #'   calibration period.
 #' @export
-#' @example demo/mbg-cnbd-k.r
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
   max.length <- max(length(x), length(t.x), length(T.cal))
@@ -228,7 +226,7 @@ mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' to return the number of transactions they are expected to make in a given 
 #' time period.
 #' 
-#' @param params MBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a}
+#' @param params MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
 #'   and \code{b} in that order.
 #' @param T.star length of time for which we are calculating the expected number
 #'   of transactions.
@@ -244,7 +242,6 @@ mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   number of transactions.
 #' @import gsl
 #' @export
-#' @example demo/mbg-cnbd-k.r
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   bgcnbd.ConditionalExpectedTransactions(params=params, T.star=T.star, x=x, t.x=t.x, T.cal=T.cal)
@@ -257,7 +254,7 @@ mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
 #' purchase frequencies for a random customer in a given time period, i.e.
 #' P(X(t)=x|r,alpha,a,b)
 #' 
-#' @param params MBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} and \code{b}
+#' @param params MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
 #'   in that order.
 #' @param t length of time for which we are calculating the expected number of 
 #'   transactions.
@@ -276,7 +273,7 @@ mbgcnbd.Px <- function(params, t, x) {
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params BG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} and \code{b}
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
 #'   in that order.
 #' @param return.elog boolean - if \code{TRUE} then the event log is returned in 
 #'   addition to the CBS summary
