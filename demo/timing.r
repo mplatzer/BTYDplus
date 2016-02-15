@@ -9,7 +9,7 @@ elog <- rbindlist(lapply(1:nr_of_customers, function(i) {
 }))
 
 # estimate regularity parameter k
-estimateRegularity(elog, plot=T, method='wheat')
-estimateRegularity(elog, plot=T, method='mle-minka')
-estimateRegularity(elog, plot=T, method='mle-thom')
-estimateRegularity(elog, plot=T, method='cv')
+estimateRegularity(elog, plot=TRUE, method='wheat')
+estimateRegularity(elog, plot=TRUE, method='mle-minka')
+estimateRegularity(elog, plot=TRUE, method='mle-thom')
+estimateRegularity(elog, plot=TRUE, method='cv')

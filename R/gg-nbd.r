@@ -140,7 +140,6 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
 #'   calibration period.
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
-#' @example demo/gg-nbd.r
 ggnbd.PAlive <- function(params, x, t.x, T.cal) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
                         "ggnbd.PAlive")
@@ -194,7 +193,6 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   number of transactions.
 #' @export
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
-#' @example demo/gg-nbd.r
 ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
                         "ggnbd.ConditionalExpectedTransactions")  
@@ -252,7 +250,6 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
-#' @example demo/gg-nbd.r
 ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
   # check model parameters
   dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params,

@@ -1,12 +1,12 @@
 Package: BTYDplus
 Type: Package
 Title: Extension of R Package BTYD
-Version: 0.5.0
-Date: 2015-06-02
+Version: 0.6.0
+Date: 2016-02-15
 Author: Michael Platzer <michael.platzer@gmail.com>
 Maintainer: Michael Platzer <michael.platzer@gmail.com>
 Description: Extends the functionality of BTYD package by providing methods for
-    parameter estimation and scoring for NBD, G/G/NBD, MBG/NBD and
+    parameter estimation and scoring for NBD, G/G/NBD, MBG/NBD, BG/CNBD-k and
     MBG/CNBD-k models, as well as MCMC samples for Pareto/NBD,
     Abe's Pareto/NBD variant and Pareto/GGG.
 License: GPL-3

@@ -2,14 +2,37 @@
 % Please edit documentation in R/mbg-nbd.r
 \name{mbgnbd.LL}
 \alias{mbgnbd.LL}
-\title{Calculates the log-likelihood of the MBG/NBD model}
+\title{Calculate the log-likelihood of the MBG/NBD model}
 \usage{
 mbgnbd.LL(params, x, t.x, T.cal)
 }
+\arguments{
+\item{params}{MBG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a}
+and \code{b} in that order.}
+
+\item{x}{frequency, i.e. number of re-purchases}
+
+\item{t.x}{recency, i.e. time elapsed from first purchase to last purchase}
+
+\item{T.cal}{total time of observation period}
+}
+\value{
+a vector of log-likelihoods
+}
 \description{
-Calculates the log-likelihood of the MBG/NBD model
+Calculate the log-likelihood of the MBG/NBD model
+}
+\references{
+Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
+  validation and comparison of models for customer base analysis.
+  International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
+  Daniel, and Udo Wagner. "Customer base analysis: The case for a central
+  variant of the Betageometric/NBD Model." Marketing Journal of Research and
+  Management 3.2 (2007): 75-90.
 }
 \seealso{
-\code{\link{mbgcnbd.LL}}
+\code{\link{bgcnbd.LL}}
+
+\code{\link{mbgnbd.EstimateParameters}}
 }
 

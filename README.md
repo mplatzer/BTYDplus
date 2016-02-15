@@ -22,7 +22,9 @@ These R source files extend the functionality of the BTYD package by providing f
 
 * Gamma/Gompertz/NBD (MLE) - Bemmaor, Albert C., and Nicolas Glady. "Modeling Purchasing Behavior with Sudden Death: A Flexible Customer Lifetime Model." Management Science 58.5 (2012): 1012-1021.
 
-* MBG/NBD (MLE) - Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical validation and comparison of models for customer base analysis. International Journal of Research in Marketing 24(3) 201–209.
+* MBG/NBD (MLE) - Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical validation and comparison of models for customer base analysis. International Journal of Research in Marketing 24(3) 201–209. - Hoppe, Daniel, and Udo Wagner. "Customer base analysis: The case for a central variant of the Betageometric/NBD Model." Marketing Journal of Research and Management 3.2 (2007): 75-90.
+
+* BG/CNBD-k (MLE) - Platzer, Michael, and Thomas Reutterer. forthcoming...
 
 * MBG/CNBD-k (MLE) - Platzer, Michael, and Thomas Reutterer. forthcoming...
 

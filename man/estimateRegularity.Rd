@@ -10,13 +10,13 @@ estimateRegularity(elog, method = "wheat", plot = FALSE)
 \item{elog}{data.frame with transaction logs; requires columns customer-id
 'cust' and transaction time \code{t} or 'date'}
 
-\item{method}{'wheat', 'mle', 'mle-minka', 'mle-thom', 'cv'}
+\item{method}{\code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom}, \code{cv}}
 
 \item{plot}{if \code{TRUE} then distribution of estimated regularity will be plotted}
 }
 \value{
 estimated real-valued regularity parameter; rounded to an integer,
-  this can be used as 'k' for estimating MBG/CNBD-k models
+  this can be used as \code{k} for estimating MBG/CNBD-k models
 }
 \description{
 Estimates degree of regularity of intertransaction timings of a customer cohort,
@@ -43,10 +43,10 @@ elog <- rbindlist(lapply(1:nr_of_customers, function(i) {
 }))
 
 # estimate regularity parameter k
-estimateRegularity(elog, plot=T, method='wheat')
-estimateRegularity(elog, plot=T, method='mle-minka')
-estimateRegularity(elog, plot=T, method='mle-thom')
-estimateRegularity(elog, plot=T, method='cv')
+estimateRegularity(elog, plot=TRUE, method='wheat')
+estimateRegularity(elog, plot=TRUE, method='mle-minka')
+estimateRegularity(elog, plot=TRUE, method='mle-thom')
+estimateRegularity(elog, plot=TRUE, method='cv')
 }
 \seealso{
 \code{\link{mbgcnbd.EstimateParameters}}

@@ -7,7 +7,7 @@
 mbgcnbd.cbs.LL(params, cal.cbs)
 }
 \arguments{
-\item{params}{MBG/CNBD-k parameters - a vector with 'k', \code{r}, \code{alpha}, \code{a} 
+\item{params}{MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} 
 and \code{b} in that order.}
 
 \item{cal.cbs}{calibration period CBS. It must contain columns for frequency 
@@ -23,6 +23,8 @@ the total log-likelihood for the provided data.
 Calculate the log-likelihood of the MBG/CNBD-k model
 }
 \seealso{
+\code{\link{bgcnbd.cbs.LL}}
+
 \code{\link{mbgcnbd.EstimateParameters}}
 }
 

@@ -14,10 +14,10 @@
 #' 
 #' @param elog data.frame with transaction logs; requires columns customer-id
 #'   'cust' and transaction time \code{t} or 'date'
-#' @param method 'wheat', 'mle', 'mle-minka', 'mle-thom', 'cv'
+#' @param method \code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom}, \code{cv}
 #' @param plot if \code{TRUE} then distribution of estimated regularity will be plotted
 #' @return estimated real-valued regularity parameter; rounded to an integer,
-#'   this can be used as 'k' for estimating MBG/CNBD-k models
+#'   this can be used as \code{k} for estimating MBG/CNBD-k models
 #' @export
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 #' @example demo/timing.r
