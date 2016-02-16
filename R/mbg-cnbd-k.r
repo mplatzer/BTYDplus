@@ -279,7 +279,7 @@ mbgcnbd.pmf <- function(params, t, x) {
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
+#' @param params MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
 #'   in that order.
 #' @param return.elog boolean - if \code{TRUE} then the event log is returned in 
 #'   addition to the CBS summary
@@ -289,4 +289,40 @@ mbgcnbd.pmf <- function(params, t, x) {
 #' @seealso \code{\link{mbgcnbd.EstimateParameters}}
 mbgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, return.elog=FALSE) {
   bgcnbd.GenerateData(n=n, T.cal=T.cal, T.star=T.cal, params=params, return.elog=return.elog, dropout_at_zero=TRUE)
+}
+
+
+#' MBG/CNBD-k Plot Frequency in Calibration Period
+#' 
+#' Plots a histogram and returns a matrix comparing the actual and expected
+#' number of customers who made a certain number of repeat transactions in the
+#' calibration period, binned according to calibration period frequencies.
+#' 
+#' @param params MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
+#'   in that order.
+#' @param cal.cbs calibration period CBS (customer by sufficient statistic). It
+#'   must contain columns for frequency ("x") and total time observed ("T.cal").
+#' @param censor integer used to censor the data.
+#' @param plotZero If FALSE, the histogram will exclude the zero bin.
+#' @param xlab descriptive label for the x axis.
+#' @param ylab descriptive label for the y axis.
+#' @param title title placed on the top-center of the plot.
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
+#' @return Calibration period repeat transaction frequency comparison matrix (actual vs. expected).
+#'
+#' @seealso \code{\link{bgcnbd.GenerateData}}
+#' @examples 
+#' set.seed(1)
+#' params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
+#' cal.cbs <- mbgcnbd.GenerateData(n=5000, 32, 0, params)$cbs
+#' mbgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = 7)
+mbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, 
+                                              censor = NULL, 
+                                              plotZero = TRUE, 
+                                              xlab = "Calibration period transactions",
+                                              ylab = "Customers", 
+                                              title = "Frequency of Repeat Transactions") {
+  bgcnbd.PlotFrequencyInCalibration(params=params, cal.cbs=cal.cbs, censor=censor, plotZero=plotZero,
+                                    xlab=xlab, ylab=ylab, title=title, dropout_at_zero = TRUE)
 }

@@ -1,4 +1,10 @@
 
+Changes in version 0.6.1 (2016-02-xx):
+
+    o   added implementation of (m)bgcnbd.PlotFrequencyInCalibration
+    
+    o   ...
+
 Changes in version 0.6.0 (2016-02-15):
 
     o   added implementation of BG/CNBD-k model

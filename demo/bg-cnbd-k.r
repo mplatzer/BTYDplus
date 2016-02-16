@@ -27,6 +27,12 @@ rbind("actual"=params, "bg/cnbd-k"=round(est, 2), "bg/nbd"=c(1, round(est1, 2)))
 # bg/nbd    1 0.91  6.02 0.59 2.21
 # -> underlying parameters are successfully identified via Maximum Likelihood Estimation
 
+# plot aggregate fit in calibration; and compare to BG/NBD fit
+op <- par(mfrow=c(1,2))
+nil <- bgcnbd.PlotFrequencyInCalibration(est, cbs, censor = 7)
+nil <- bgcnbd.PlotFrequencyInCalibration(c(1, est1), cbs, censor = 7)
+par(op)
+
 # estimate future transactions in holdout-period
 cbs$x.est  <- bgcnbd.ConditionalExpectedTransactions(est, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 cbs$x.est1 <- BTYD::bgnbd.ConditionalExpectedTransactions(est1, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)

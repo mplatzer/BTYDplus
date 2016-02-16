@@ -101,8 +101,7 @@ bgcnbd.EstimateParameters <- function(cal.cbs,
 #' @export
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 bgcnbd.cbs.LL <- function(params, cal.cbs, dropout_at_zero = FALSE) {
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, 
-   "bgcnbd.cbs.LL")
+  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.cbs.LL")
   tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
   tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
   tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
@@ -139,8 +138,7 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
     warning("Maximum vector length not a multiple of the length of T.cal")
   if (max.length%%length(litt)) 
     warning("Maximum vector length not a multiple of the length of litt")
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, 
-   "bgcnbd.LL")
+  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.LL")
   if (params[1] != floor(params[1]) | params[1] < 1)
     stop("k must be integer being greater or equal to 1.")
   if (any(x < 0) || !is.numeric(x)) 
@@ -203,8 +201,7 @@ bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
     warning("Maximum vector length not a multiple of the length of t.x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, 
-   "bgcnbd.PAlive")  
+  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PAlive")  
   if (params[1] != floor(params[1]) | params[1] < 1)
     stop("k must be integer being greater or equal to 1.")
   if (any(x < 0) || !is.numeric(x)) 
@@ -272,8 +269,7 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
     warning("Maximum vector length not a multiple of the length of t.x")
   if (max.length%%length(T.cal))
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params,
-    "bgcnbd.ConditionalExpectedTransactions")
+  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.ConditionalExpectedTransactions")
   if (params[1] != floor(params[1]) | params[1] < 1)
     stop("k must be integer being greater or equal to 1.")
   if (any(T.star < 0) || !is.numeric(T.star))
@@ -328,8 +324,7 @@ bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
     x <- rep(x, length.out = max.length)
     return (sapply(1:max.length, function(i) bgcnbd.pmf(params, t[i], x[i], dropout_at_zero)))
   }
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, 
-                        "bgcnbd.pmf")
+  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.pmf")
   if (params[1] != floor(params[1]) | params[1] < 1)
     stop("k must be integer being greater or equal to 1.")
   k      <- params[1]
@@ -339,7 +334,7 @@ bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
   b      <- params[5]
   
   nbd.pmf <- function(params, t, x) {
-    return ((gamma(r+x)*alpha^r*t^x)/(factorial(x)*gamma(r)*(alpha+t)^(r+x)))
+    return (exp(lgamma(r+x) + r*log(alpha) + x*log(t) - lfactorial(x) - lgamma(r) - (r+x)*log(alpha+t)))
   }
 
   P1 <- beta(a, b+x+ifelse(dropout_at_zero, 1, 0)) / beta(a, b)
@@ -369,9 +364,7 @@ bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
 #' @export
 bgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, 
                                 return.elog = FALSE, dropout_at_zero = FALSE) {
-  # check model parameters
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params,
-                        "bgcnbd.GenerateData")
+  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.GenerateData")
   if (params[1] != floor(params[1]) | params[1] < 1)
     stop("k must be integer being greater or equal to 1.")  
   
@@ -429,3 +422,90 @@ bgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params,
   }
   return(out)
 }
+
+
+#' BG/CNBD-k Plot Frequency in Calibration Period
+#' 
+#' Plots a histogram and returns a matrix comparing the actual and expected
+#' number of customers who made a certain number of repeat transactions in the
+#' calibration period, binned according to calibration period frequencies.
+#' 
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
+#'   in that order.
+#' @param cal.cbs calibration period CBS (customer by sufficient statistic). It
+#'   must contain columns for frequency ("x") and total time observed ("T.cal").
+#' @param censor integer used to censor the data.
+#' @param plotZero If FALSE, the histogram will exclude the zero bin.
+#' @param xlab descriptive label for the x axis.
+#' @param ylab descriptive label for the y axis.
+#' @param title title placed on the top-center of the plot.
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
+#' @return Calibration period repeat transaction frequency comparison matrix (actual vs. expected).
+#'
+#' @examples 
+#' set.seed(1)
+#' params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
+#' cal.cbs <- bgcnbd.GenerateData(n=5000, 32, 0, params)$cbs
+#' bgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = 7)
+bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, 
+                                              censor = NULL, 
+                                              plotZero = TRUE, 
+                                              xlab = "Calibration period transactions",
+                                              ylab = "Customers", 
+                                              title = "Frequency of Repeat Transactions",
+                                              dropout_at_zero = FALSE) {
+  tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in bgcnbd.PlotFrequencyInCalibration: cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in bgcnbd.PlotFrequencyInCalibration: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotFrequencyInCalibration")
+  if (is.null(censor) || censor > max(x)) censor <- max(x)
+  n.x    <- rep(0, max(x) + 1)
+  for (xx in unique(x)) {
+      n.x[xx + 1] <- sum(xx == x)
+  }
+  n.x.censor <- sum(n.x[(censor + 1):length(n.x)])
+  n.x.actual <- c(n.x[1:censor], n.x.censor)
+  T.value.counts <- table(T.cal)
+  T.values <- as.numeric(names(T.value.counts))
+  n.T.values <- length(T.values)
+  n.x.expected <- rep(0, length(n.x.actual))
+  n.x.expected.all <- rep(0, max(x) + 1)
+  for (xx in 0:max(x)) {
+    this.x.expected <- 0
+    for (T.idx in 1:n.T.values) {
+      t <- T.values[T.idx]
+      if (t == 0) 
+          next
+      n.T <- T.value.counts[T.idx]
+      prob.of.this.x.for.this.T <- bgcnbd.pmf(params, t, xx, dropout_at_zero=dropout_at_zero)
+      expected.given.x.and.T <- n.T * prob.of.this.x.for.this.T
+      this.x.expected <- this.x.expected + expected.given.x.and.T
+    }
+    n.x.expected.all[xx + 1] <- this.x.expected
+  }
+  n.x.expected[1:censor] <- n.x.expected.all[1:censor]
+  n.x.expected[censor + 1] <- sum(n.x.expected.all[(censor + 1):(max(x) + 1)])
+  col.names <- paste(rep("freq", length(censor + 1)), (0:censor), sep = ".")
+  col.names[censor + 1] <- paste(col.names[censor + 1], "+", sep = "")
+  censored.freq.comparison <- rbind(n.x.actual, n.x.expected)
+  colnames(censored.freq.comparison) <- col.names
+  cfc.plot <- censored.freq.comparison
+  if (plotZero == FALSE) {
+    cfc.plot <- cfc.plot[, -1]
+  }
+  n.ticks <- ncol(cfc.plot)
+  if (plotZero == TRUE) {
+    x.labels <- 0:(n.ticks - 1)
+    x.labels[n.ticks] <- paste(n.ticks - 1, "+", sep = "")
+  }
+  ylim <- c(0, ceiling(max(cfc.plot) * 1.1))
+  barplot(cfc.plot, names.arg = x.labels, beside = TRUE, ylim = ylim, 
+      main = title, xlab = xlab, ylab = ylab, col = 1:2)
+  model <- paste0(ifelse(dropout_at_zero, "MBG", "BG"), "/",
+                  ifelse(params[1]>1, paste0("CNBD-", params[1]), "NBD"))
+  legend("topright", legend = c("Actual", model), col = 1:2, 
+      lwd = 2)
+  return(censored.freq.comparison)
+}
+
+

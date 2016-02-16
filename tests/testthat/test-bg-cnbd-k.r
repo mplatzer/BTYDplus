@@ -18,6 +18,8 @@ test_that("BG/CNBD-k", {
                bgcnbd.ConditionalExpectedTransactions(c(1, params), 32, 1, 16, 32))
   expect_equal(bgnbd.pmf(params, 32, 0:2), 
                bgcnbd.pmf(c(1, params), 32, 0:2))
+  expect_equal(bgnbd.PlotFrequencyInCalibration(params, cbs, 7),
+               bgcnbd.PlotFrequencyInCalibration(c(1, params), cbs, 7))
 
   # generate artificial BG/CNBD-k data
   set.seed(1)
@@ -54,4 +56,5 @@ test_that("BG/CNBD-k", {
   expect_true(min(cbs$x.star)>=0)
   expect_true(all(cbs$x.star==round(cbs$x.star)))
   expect_true(all(cbs$palive>=0 & cbs$palive<=1))
+  
 })
