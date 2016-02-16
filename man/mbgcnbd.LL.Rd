@@ -4,29 +4,15 @@
 \alias{mbgcnbd.LL}
 \title{Calculate the log-likelihood of the MBG/CNBD-k model}
 \usage{
-mbgcnbd.LL(params, x, t.x, T.cal, litt)
+mbgcnbd.LL(...)
 }
 \arguments{
-\item{params}{MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
-and \code{b} in that order.}
-
-\item{x}{frequency, i.e. number of re-purchases}
-
-\item{t.x}{recency, i.e. time elapsed from first purchase to last purchase}
-
-\item{T.cal}{total time of observation period}
-
-\item{litt}{sum of logarithmic interpurchase times}
-}
-\value{
-a vector of log-likelihoods
+\item{...}{Arguments to be passed to bgcnbd.LL}
 }
 \description{
 Calculate the log-likelihood of the MBG/CNBD-k model
 }
 \seealso{
 \code{\link{bgcnbd.LL}}
-
-\code{\link{mbgcnbd.EstimateParameters}}
 }
 

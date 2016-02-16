@@ -4,30 +4,15 @@
 \alias{mbgcnbd.GenerateData}
 \title{Simulate data according to MBG/CNBD-k model assumptions}
 \usage{
-mbgcnbd.GenerateData(n, T.cal, T.star = T.cal, params, return.elog = FALSE)
+mbgcnbd.GenerateData(...)
 }
 \arguments{
-\item{n}{number of customers}
-
-\item{T.cal}{length of calibration period}
-
-\item{T.star}{length of holdout period}
-
-\item{params}{MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-in that order.}
-
-\item{return.elog}{boolean - if \code{TRUE} then the event log is returned in 
-addition to the CBS summary}
-}
-\value{
-list with elements \code{cbs} and \code{elog} containing data.frames
+\item{...}{Arguments to be passed to bgcnbd.GenerateData}
 }
 \description{
 Simulate data according to MBG/CNBD-k model assumptions
 }
 \seealso{
 \code{\link{bgcnbd.GenerateData}}
-
-\code{\link{mbgcnbd.EstimateParameters}}
 }
 

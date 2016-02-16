@@ -31,6 +31,9 @@ Uses BG/CNBD-k model parameters and a customer's past transaction behavior
 to return the probability that they are still alive at the end of the 
 calibration period.
 }
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
+}
 \seealso{
 \code{\link{bgcnbd.EstimateParameters}}
 }

@@ -4,29 +4,15 @@
 \alias{mbgcnbd.pmf}
 \title{MBG/CNBD-k Unconditional Probability Distribution of Transactions}
 \usage{
-mbgcnbd.pmf(params, t, x)
+mbgcnbd.pmf(...)
 }
 \arguments{
-\item{params}{MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-in that order.}
-
-\item{t}{length of time for which we are calculating the expected number of 
-transactions.}
-
-\item{x}{number of transactions for which probability is calculated.}
-}
-\value{
-P(X(t)=x|r,alpha,a,b). If any of the input parameters has a length
-  greater than 1, this will be a vector of expected number of transactions.
+\item{...}{Arguments to be passed to bgcnbd.pmf}
 }
 \description{
-Uses MBG/CNBD-k model parameters to return the probability distribution of
-purchase frequencies for a random customer in a given time period, i.e.
-P(X(t)=x|r,alpha,a,b)
+MBG/CNBD-k Unconditional Probability Distribution of Transactions
 }
 \seealso{
 \code{\link{bgcnbd.pmf}}
-
-\code{\link{mbgcnbd.EstimateParameters}}
 }
 

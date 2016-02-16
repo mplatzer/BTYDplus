@@ -4,33 +4,15 @@
 \alias{mbgcnbd.PAlive}
 \title{MBG/CNBD-k P(alive)}
 \usage{
-mbgcnbd.PAlive(params, x, t.x, T.cal)
+mbgcnbd.PAlive(...)
 }
 \arguments{
-\item{params}{MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
-and \code{b} in that order.}
-
-\item{x}{number of repeat transactions in the calibration period T.cal, or a 
-vector of calibration period frequencies.}
-
-\item{t.x}{recency, i.e. length between first and last transaction during 
-calibration period.}
-
-\item{T.cal}{length of calibration period, or a vector of calibration period 
-lengths.}
-}
-\value{
-Probability that the customer is still alive at the end of the 
-  calibration period.
+\item{...}{Arguments to be passed to bgcnbd.PAlive}
 }
 \description{
-Uses MBG/CNBD-k model parameters and a customer's past transaction behavior 
-to return the probability that they are still alive at the end of the 
-calibration period.
+MBG/CNBD-k P(alive)
 }
 \seealso{
 \code{\link{bgcnbd.PAlive}}
-
-\code{\link{mbgcnbd.EstimateParameters}}
 }
 

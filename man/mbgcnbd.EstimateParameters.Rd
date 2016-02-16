@@ -4,41 +4,15 @@
 \alias{mbgcnbd.EstimateParameters}
 \title{Parameter Estimation for the MBG/CNBD-k model}
 \usage{
-mbgcnbd.EstimateParameters(cal.cbs, k = NULL, par.start = c(1, 1, 1, 1),
-  max.param.value = 10000, trace = 0)
+mbgcnbd.EstimateParameters(...)
 }
 \arguments{
-\item{cal.cbs}{calibration period CBS. It must contain columns for frequency 
-\code{x}, for recency \code{t.x} and total time observed \code{T.cal}. Optionally a 
-column \code{custs} can be provided, which represents number of customers with a
-specific combination of frequency \code{x}, recency \code{t.x} and \code{T.cal}.}
-
-\item{k}{specified degree of regularity for Erlang-k distributed 
-interpurchase times; needs to be integer-value; if this is not specified, 
-then grid search from 1 to 12 is performed; this however requires column
-\code{litt} to be present in cal.cbs, which represents sum of logarithmic
-interpurchase times during calibration period;}
-
-\item{par.start}{initial MBG/CNBD-k parameters - a vector with \code{r}, \code{alpha}, 
-\code{a} and \code{b} in that order.}
-
-\item{max.param.value}{the upper bound on parameters}
-
-\item{trace}{print logging step every \code{trace} iteration}
-}
-\value{
-list of estimated parameters
+\item{...}{Arguments to be passed to bgcnbd.EstimateParameters}
 }
 \description{
-Estimates parameters for the MBG/CNBD-k model via Maximum Likelihood 
-Estimation.
-}
-\references{
-Platzer Michael, and Thomas Reutterer (forthcoming)
+Parameter Estimation for the MBG/CNBD-k model
 }
 \seealso{
-\code{\link{elog2cbs}}
-
 \code{\link{bgcnbd.EstimateParameters}}
 }
 

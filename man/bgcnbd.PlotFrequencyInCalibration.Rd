@@ -43,4 +43,10 @@ params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
 cal.cbs <- bgcnbd.GenerateData(n=5000, 32, 0, params)$cbs
 bgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = 7)
 }
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
+}
+\seealso{
+\code{\link{bgcnbd.EstimateParameters}}
+}
 

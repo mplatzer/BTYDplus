@@ -27,6 +27,9 @@ a vector of log-likelihoods
 \description{
 Calculate the log-likelihood of the BG/CNBD-k model
 }
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
+}
 \seealso{
 \code{\link{bgcnbd.EstimateParameters}}
 }

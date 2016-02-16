@@ -4,27 +4,15 @@
 \alias{mbgcnbd.cbs.LL}
 \title{Calculate the log-likelihood of the MBG/CNBD-k model}
 \usage{
-mbgcnbd.cbs.LL(params, cal.cbs)
+mbgcnbd.cbs.LL(...)
 }
 \arguments{
-\item{params}{MBG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} 
-and \code{b} in that order.}
-
-\item{cal.cbs}{calibration period CBS. It must contain columns for frequency 
-\code{x}, for recency \code{t.x}, for sum of logarithmic interpurchase times \code{litt}
-and total time observed \code{T.cal}. Optionally a column \code{custs} can be
-provided, which represents number of customers with a specific combination
-of frequency \code{x} and \code{T.cal}.}
-}
-\value{
-the total log-likelihood for the provided data.
+\item{...}{Arguments to be passed to bgcnbd.cbs.LL}
 }
 \description{
 Calculate the log-likelihood of the MBG/CNBD-k model
 }
 \seealso{
 \code{\link{bgcnbd.cbs.LL}}
-
-\code{\link{mbgcnbd.EstimateParameters}}
 }
 

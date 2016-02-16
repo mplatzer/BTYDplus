@@ -5,7 +5,9 @@ test_that("BG/CNBD-k", {
   # validate against BTYD implementation
   set.seed(1)
   params <- c(0.85, 1.45, 0.79, 2.42)
-  cbs <- bgnbd.GenerateData(n=20000, T.cal=32, T.star=32, params=params, return.elog=FALSE)$cbs
+  n <- 8000
+  data <- bgnbd.GenerateData(n=n, T.cal=32, T.star=32, params=params, return.elog=TRUE)
+  cbs <- data$cbs
   params.est.btyd      <- bgnbd.EstimateParameters(cbs)
   params.est.btyd_plus <- bgcnbd.EstimateParameters(cbs, k=1)[-1]
   expect_equal(round(params.est.btyd, 2), 
@@ -14,12 +16,21 @@ test_that("BG/CNBD-k", {
                bgcnbd.PAlive(c(1, params), 0, 0, 32))
   expect_equal(bgnbd.PAlive(params, 1, 16, 32),
                bgcnbd.PAlive(c(1, params), 1, 16, 32))
+  expect_equal(bgnbd.Expectation(params, 1:3),
+               bgcnbd.Expectation(c(1, params), 1:3))
   expect_equal(bgnbd.ConditionalExpectedTransactions(params, 32, 1, 16, 32),
                bgcnbd.ConditionalExpectedTransactions(c(1, params), 32, 1, 16, 32))
   expect_equal(bgnbd.pmf(params, 32, 0:2), 
                bgcnbd.pmf(c(1, params), 32, 0:2))
   expect_equal(bgnbd.PlotFrequencyInCalibration(params, cbs, 7),
                bgcnbd.PlotFrequencyInCalibration(c(1, params), cbs, 7))
+  elog <- as.data.table(data$elog)
+  inc.tracking <- elog[t>0, .N, keyby=ceiling(t)]$N
+  expect_equal(bgnbd.PlotTrackingInc(params, cbs$T.cal, 32+32, inc.tracking),
+               bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, 32+32, inc.tracking))
+  cu.tracking <- cumsum(inc.tracking)
+  expect_equal(bgnbd.PlotTrackingCum(params, cbs$T.cal, 32+32, cu.tracking),
+               bgcnbd.PlotTrackingCum(c(1, params), cbs$T.cal, 32+32, cu.tracking))
 
   # generate artificial BG/CNBD-k data
   set.seed(1)

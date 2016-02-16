@@ -29,4 +29,10 @@ list with elements \code{cbs} and \code{elog} containing data.frames
 \description{
 Simulate data according to BG/CNBD-k model assumptions
 }
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
+}
+\seealso{
+\code{\link{bgcnbd.EstimateParameters}}
+}
 
