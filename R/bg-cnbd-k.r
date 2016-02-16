@@ -618,6 +618,7 @@ bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.period
 #' @param ylab descriptive label for the y axis.
 #' @param xticklab vector containing a label for each tick mark on the x axis.
 #' @param title title placed on the top-center of the plot.
+#' @param ymax upper boundary for y axis.
 #' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
 #'   which set this parameter to TRUE
 #' @return Matrix containing actual and expected cumulative repeat transactions.
@@ -626,7 +627,7 @@ bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.period
 bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data, 
     xlab = "Week", ylab = "Cumulative Transactions", 
     xticklab = NULL, title = "Tracking Cumulative Transactions", 
-    dropout_at_zero = FALSE) {
+    ymax = NULL, dropout_at_zero = FALSE) {
   
   dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotTrackingCum")
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
@@ -639,8 +640,9 @@ bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data
   actual <- actual.cu.tracking.data
   expected <- bgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, length(actual), dropout_at_zero = dropout_at_zero)
   cu.tracking.comparison <- rbind(actual, expected)
-  ylim <- c(0, max(c(actual, expected)) * 1.05)
-  plot(actual, type = "l", xaxt = "n", xlab = xlab, ylab = ylab, col = 1, ylim = ylim, main = title)
+  if (is.null(ymax)) ymax <- max(c(actual, expected)) * 1.05
+  plot(actual, type = "l", xaxt = "n", xlab = xlab, ylab = ylab, 
+       col = 1, ylim = c(0, ymax), main = title)
   lines(expected, lty = 2, col = 2)
   if (is.null(xticklab) == FALSE) {
     if (ncol(cu.tracking.comparison) != length(xticklab)) {
@@ -677,6 +679,7 @@ bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data
 #' @param ylab descriptive label for the y axis.
 #' @param xticklab vector containing a label for each tick mark on the x axis.
 #' @param title title placed on the top-center of the plot.
+#' @param ymax upper boundary for y axis.
 #' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
 #'   which set this parameter to TRUE
 #' @return Matrix containing actual and expected incremental repeat transactions.
@@ -685,7 +688,7 @@ bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data
 bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data, 
     xlab = "Week", ylab = "Transactions",
     xticklab = NULL, title = "Tracking Weekly Transactions", 
-    dropout_at_zero = FALSE) {
+    ymax = NULL, dropout_at_zero = FALSE) {
   
   dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotTrackingInc")
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
@@ -698,8 +701,9 @@ bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.dat
   actual <- actual.inc.tracking.data
   expected <- BTYD::dc.CumulativeToIncremental(bgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, length(actual), dropout_at_zero=dropout_at_zero))
   
-  ylim <- c(0, max(c(actual, expected)) * 1.05)
-  plot(actual, type = "l", xaxt = "n", xlab = xlab, ylab = ylab, col = 1, ylim = ylim, main = title)
+  if (is.null(ymax)) ymax <- max(c(actual, expected)) * 1.05
+  plot(actual, type = "l", xaxt = "n", xlab = xlab, ylab = ylab, 
+       col = 1, ylim = c(0, ymax), main = title)
   lines(expected, lty = 2, col = 2)
   if (is.null(xticklab) == FALSE) {
     if (length(actual) != length(xticklab)) {

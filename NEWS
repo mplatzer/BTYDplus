@@ -1,9 +1,8 @@
 
-Changes in version 0.6.1 (2016-02-xx):
+Changes in version 0.x.x (2016-02-xx):
 
     o   added implementation of:
         (m)bgcnbd.Expectation
-        (m)bgcnbd.PlotFrequencyInCalibration,
         (m)bgcnbd.PlotFrequencyInCalibration,
         (m)bgcnbd.ExpectedCumulativeTransactions,
         (m)bgcnbd.PlotTrackingCum,

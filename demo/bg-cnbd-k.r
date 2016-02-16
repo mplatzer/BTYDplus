@@ -3,8 +3,8 @@ set.seed(1)
 
 # generate artificial BG/CNBD-k data 
 n      <- 8000 # no. of customers
-T.cal  <- 32   # length of calibration period
-T.star <- 32   # length of hold-out period
+T.cal  <- 28   # 4 weeks of calibration period
+T.star <- 42   # 6 weeks of hold-out period
 params <- c(k=3,                # regularity in interpurchase-times (Erlang-k)
             r=0.85, alpha=1.45, # purchase frequency lambda_i ~ Gamma(r, alpha)
             a=0.79, b=2.42)     # dropout probability p_i ~ Beta(a, b)
@@ -15,7 +15,7 @@ elog <- data$elog # Event log - one row per event/purchase
 
 # estimate regularity from event log
 (k.est <- estimateRegularity(elog))
-# 2.927712; interpurchase-times indicate Erlang-3
+# 3.006329; interpurchase-times indicate Erlang-3
 
 # estimate parameters, and compare to true parameters
 est  <- bgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
@@ -23,14 +23,22 @@ est1 <- BTYD::bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
 rbind("actual"=params, "bg/cnbd-k"=round(est, 2), "bg/nbd"=c(1, round(est1, 2)))
 #           k    r alpha    a    b
 # actual    3 0.85  1.45 0.79 2.42
-# bg/cnbd-k 3 0.85  1.48 0.77 2.35
-# bg/nbd    1 0.91  6.02 0.59 2.21
+# bg/cnbd-k 3 0.86  1.51 0.79 2.42
+# bg/nbd    1 0.93  6.34 0.59 2.32
 # -> underlying parameters are successfully identified via Maximum Likelihood Estimation
 
 # plot aggregate fit in calibration; and compare to BG/NBD fit
 op <- par(mfrow=c(1,2))
 nil <- bgcnbd.PlotFrequencyInCalibration(est, cbs, censor = 7)
 nil <- bgcnbd.PlotFrequencyInCalibration(c(1, est1), cbs, censor = 7)
+par(op)
+
+# plot incremental transactions;
+op <- par(mfrow=c(1,2))
+elog <- as.data.table(elog)
+inc.tracking <- elog[t>0, .N, keyby=ceiling(t/7)]$N
+inc <- bgcnbd.PlotTrackingInc(est, cbs$T.cal/7, (28+42), inc.tracking)
+nil <- bgcnbd.PlotTrackingInc(c(1, est1), cbs$T.cal/7, (28+42), inc.tracking, ymax = max(inc) * 1.05)
 par(op)
 
 # estimate future transactions in holdout-period
