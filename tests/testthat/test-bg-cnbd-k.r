@@ -10,7 +10,7 @@ test_that("BG/CNBD-k", {
   cbs  <- data$cbs
   params.est.btyd      <- bgnbd.EstimateParameters(cbs)
   params.est.btyd_plus <- bgcnbd.EstimateParameters(cbs, k=1)[-1]
-  expect_equal(round(params.est.btyd, 2), 
+  expect_equal(round(params.est.btyd, 2),
                unname(round(params.est.btyd_plus, 2)))
   expect_equal(bgnbd.PAlive(params, 0, 0, 32), 
                bgcnbd.PAlive(c(1, params), 0, 0, 32))

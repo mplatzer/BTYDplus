@@ -4,18 +4,20 @@
 \alias{bgcnbd.GenerateData}
 \title{Simulate data according to BG/CNBD-k model assumptions}
 \usage{
-bgcnbd.GenerateData(n, T.cal, T.star = T.cal, params, return.elog = FALSE,
+bgcnbd.GenerateData(n, T.cal, T.star = NULL, params, return.elog = FALSE,
   dropout_at_zero = FALSE)
 }
 \arguments{
 \item{n}{number of customers}
 
-\item{T.cal}{length of calibration period}
+\item{T.cal}{length of calibration period; if vector then it is assumed that
+customers have different "birth" dates, i.e. max(T.cal)-T.cal}
 
-\item{T.star}{length of holdout period}
+\item{T.star}{length(s) of holdout period(s); assumed to be same for all
+customers}
 
-\item{params}{BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-in that order.}
+\item{params}{BG/CNBD-k parameters - a vector with \code{k}, \code{r},
+\code{alpha}, \code{a} and \code{b} in that order.}
 
 \item{return.elog}{boolean - if \code{TRUE} then the event log is returned in 
 addition to the CBS summary}

@@ -6,7 +6,8 @@
 \usage{
 bgcnbd.PlotTrackingCum(params, T.cal, T.tot, actual.cu.tracking.data,
   xlab = "Week", ylab = "Cumulative Transactions", xticklab = NULL,
-  title = "Tracking Cumulative Transactions", dropout_at_zero = FALSE)
+  title = "Tracking Cumulative Transactions", ymax = NULL,
+  dropout_at_zero = FALSE)
 }
 \arguments{
 \item{params}{BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
@@ -29,6 +30,8 @@ period (both calibration and holdout periods).}
 \item{xticklab}{vector containing a label for each tick mark on the x axis.}
 
 \item{title}{title placed on the top-center of the plot.}
+
+\item{ymax}{upper boundary for y axis.}
 
 \item{dropout_at_zero}{Boolean; the mbg-methods are simple wrapper methods,
 which set this parameter to TRUE}

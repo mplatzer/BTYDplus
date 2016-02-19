@@ -6,7 +6,8 @@
 \usage{
 bgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data,
   xlab = "Week", ylab = "Transactions", xticklab = NULL,
-  title = "Tracking Weekly Transactions", dropout_at_zero = FALSE)
+  title = "Tracking Weekly Transactions", ymax = NULL,
+  dropout_at_zero = FALSE)
 }
 \arguments{
 \item{params}{BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
@@ -25,6 +26,8 @@ matrix).}
 \item{xticklab}{vector containing a label for each tick mark on the x axis.}
 
 \item{title}{title placed on the top-center of the plot.}
+
+\item{ymax}{upper boundary for y axis.}
 
 \item{dropout_at_zero}{Boolean; the mbg-methods are simple wrapper methods,
 which set this parameter to TRUE}
