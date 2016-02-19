@@ -1,8 +1,8 @@
 Package: BTYDplus
 Type: Package
 Title: Extension of R Package BTYD
-Version: 0.6.0
-Date: 2016-02-15
+Version: 0.6.3
+Date: 2016-02-19
 Author: Michael Platzer <michael.platzer@gmail.com>
 Maintainer: Michael Platzer <michael.platzer@gmail.com>
 Description: Extends the functionality of BTYD package by providing methods for
