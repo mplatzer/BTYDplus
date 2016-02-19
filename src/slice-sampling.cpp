@@ -438,6 +438,7 @@ NumericVector pggg_slice_sample(String what,
   return out;
 }
 
+
 /*** R
   # unit-test slice sampling of pggg_post_tau, by comparing results to pareto/nbd (k=1), 
   #   where we can draw directly via http://en.wikipedia.org/wiki/Inverse_transform_sampling
@@ -498,4 +499,68 @@ NumericVector pggg_slice_sample(String what,
   stopifnot(ape(res1, res4) < 0.01)
   stopifnot(ape(res2, res4) < 0.01)
   stopifnot(k!=1 | ape(res1, res2) < 0.01)
+*/
+
+
+// ********* BG/CNBD-k **********
+
+// [[Rcpp::export]]
+double bgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zero = false) {
+  if (params.size() != 5) ::Rf_error("params needs to be of size 5 with (k, r, alpha, a, b)");
+  int k        = params[0];
+  double r     = params[1];
+  double alpha = params[2];
+  double a     = params[3];
+  double b     = params[4];
+  double survivals = x - 1;
+  if (dropout_at_zero) survivals = survivals + 1;
+  double P1 = exp(lgamma(b+survivals+1)+lgamma(a+b)-lgamma(b)-lgamma(a+b+survivals+1));
+  double P2a = 0;
+  for (int i = k*x; i <= k*x+k-1; i++) {
+     // TODO: check whether we can vectorize this loop
+    P2a += exp(lgamma(r+i) + r*log(alpha) + i*log(t) - lgamma(i+1) - lgamma(r) - (r+i)*log(alpha+t));
+  }
+  double P2b;
+  if (dropout_at_zero==FALSE & x==0) {
+    P2b = 0;
+  } else {
+    P2b = a / (b+survivals);
+    if (x>0) {
+      double cmf = 0;
+      for (int i = 0; i <= k*x-1; i++) {
+        // TODO: check whether we can vectorize this loop
+        cmf += exp(lgamma(r+i) + r*log(alpha) + i*log(t) - lgamma(i+1) - lgamma(r) - (r+i)*log(alpha+t));
+      }
+      P2b = P2b * (1-cmf);
+    }
+  }
+  double res = P1 * (P2a + P2b);
+  return res;
+}
+
+// [[Rcpp::export]]
+double bgcnbd_exp_cpp(NumericVector params, double t, bool dropout_at_zero = false) {
+  double res = 0;
+  // heuristic: stop infinite sum at 99.9% quantile of NBD; but at least 100
+  int k        = params[0];
+  double r     = params[1];
+  double alpha = params[2];
+  int stop = k * R::qnbinom(0.9999, r, alpha/(alpha+t), TRUE, FALSE);
+  if (stop < 100) stop = 100;
+  //Rcpp::Rcout << " stop:" << stop << std::endl;
+  for (int i=1; i<stop; i++) {
+    res += i * bgcnbd_pmf_cpp(params, t, i, dropout_at_zero);
+  }
+  return res;
+}
+
+
+/*** R
+  params <- c(3, 0.5, 2, 0.3, 0.6)
+  stopifnot(round(bgcnbd_ll_cpp(params, c(3,4), c(12,12), c(14,14), c(3,3)), 5) == c( -10.42500,-12.22396))
+  stopifnot(round(bgcnbd_pmf_cpp(params, 10, 2), 5) == 0.05669)
+  stopifnot(round(bgcnbd_pmf_cpp(params, 10, 2, TRUE), 5) == 0.04548)
+  stopifnot(round(sum(sapply(0:1000, function(i) bgcnbd_pmf_cpp(params, 10, i))), 5) == 1)
+  stopifnot(round(sum(sapply(1:1000, function(i) i * bgcnbd_pmf_cpp(params, 10, i))), 5) ==
+            round(bgcnbd_exp_cpp(params, 10), 5))
 */

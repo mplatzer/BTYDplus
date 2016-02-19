@@ -181,6 +181,76 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
 }
 
 
+#' BG/CNBD-k Probability Mass Function
+#' 
+#' Uses BG/CNBD-k model parameters to return the probability distribution of
+#' purchase frequencies for a random customer in a given time period, i.e.
+#' P(X(t)=x|r,alpha,a,b)
+#' 
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
+#'   in that order.
+#' @param t length of time for which we are calculating the expected number of 
+#'   transactions.
+#' @param x number of transactions for which probability is calculated.
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
+#' @return P(X(t)=x|r,alpha,a,b). If any of the input parameters has a length
+#'   greater than 1, this will be a vector of expected number of transactions.
+#' @export
+#' @seealso \code{\link{bgcnbd.EstimateParameters}}
+#' @references Platzer Michael, and Thomas Reutterer (forthcoming)
+bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
+
+  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.pmf")
+  if (params[1] != floor(params[1]) | params[1] < 1)
+    stop("k must be integer being greater or equal to 1.")
+  if (length(t) > 1 & length(x) > 1 & length(t) != length(x))
+    stop("parameters t and x must be of same length")
+
+  max.length <- max(length(t), length(x))
+  t <- rep(t, length.out = max.length)
+  x <- rep(x, length.out = max.length)
+  res <- sapply(1:max.length, function(i) {
+    # call C++ implementation
+    bgcnbd_pmf_cpp(params, t[i], x[i], dropout_at_zero)
+  })
+  return(res)
+}
+
+
+#' BG/CNBD-k Expectation
+#' 
+#' Returns the number of repeat transactions that a randomly chosen customer
+#' (for whom we have no prior information) is expected to make in a given time
+#' period.
+#' 
+#' E(X(t) | k, r, alpha, a, b)
+#' 
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
+#'   in that order.
+#' @param t length of time for which we are calculating the expected number of repeat transactions.
+#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
+#'   which set this parameter to TRUE
+#' @return Number of repeat transactions a customer is expected to make in a time period of length t.
+#' @references Platzer Michael, and Thomas Reutterer (forthcoming)
+#' @seealso \code{\link{bgcnbd.EstimateParameters}}
+bgcnbd.Expectation <- function(params, t, dropout_at_zero = FALSE) {
+  
+  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.Expectation")
+  if (any(t < 0) || !is.numeric(t)) 
+    stop("t must be numeric and may not contain negative numbers.")
+  
+  # to save computation time, we collapse vector `t` on to its unique values
+  ts <- unique(t); names(ts) <- ts
+  ts_map <- sapply(ts, function(t) {
+    # call C++ implementation
+    bgcnbd_exp_cpp(params, t, dropout_at_zero)
+  })
+  res <- unname(ts_map[as.character(t)])
+  return(res)
+}
+
+
 #' BG/CNBD-k P(alive)
 #' 
 #' Uses BG/CNBD-k model parameters and a customer's past transaction behavior 
@@ -305,58 +375,6 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
   P2 <- G(r+x, k*alpha+T.cal, a, b+x-1+ifelse(dropout_at_zero, 1, 0))
   P3 <- bgcnbd.PAlive(params = params, x = x, t.x = t.x, T.cal = T.cal, dropout_at_zero = dropout_at_zero)
   return(P1 * P2 * P3)
-}
-
-
-#' BG/CNBD-k Probability Mass Function
-#' 
-#' Uses BG/CNBD-k model parameters to return the probability distribution of
-#' purchase frequencies for a random customer in a given time period, i.e.
-#' P(X(t)=x|r,alpha,a,b)
-#' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-#'   in that order.
-#' @param t length of time for which we are calculating the expected number of 
-#'   transactions.
-#' @param x number of transactions for which probability is calculated.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
-#' @return P(X(t)=x|r,alpha,a,b). If any of the input parameters has a length
-#'   greater than 1, this will be a vector of expected number of transactions.
-#' @export
-#' @seealso \code{\link{bgcnbd.EstimateParameters}}
-#' @references Platzer Michael, and Thomas Reutterer (forthcoming)
-bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
-  if (length(t)>1 & length(x)>1 & length(t)!=length(x)) {
-    stop("parameters t and x must be of same length")
-  } else if (length(t)>1 | length(x)>1) {
-    max.length <- max(length(t), length(x))
-    t <- rep(t, length.out = max.length)
-    x <- rep(x, length.out = max.length)
-    return(sapply(1:max.length, function(i) bgcnbd.pmf(params, t[i], x[i], dropout_at_zero)))
-  }
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.pmf")
-  if (params[1] != floor(params[1]) | params[1] < 1)
-    stop("k must be integer being greater or equal to 1.")
-  k      <- params[1]
-  r      <- params[2]
-  alpha  <- params[3]
-  a      <- params[4]
-  b      <- params[5]
-  
-  nbd.pmf <- function(params, t, x) {
-    return(exp(lgamma(r+x) + r*log(alpha) + x*log(t) - lfactorial(x) - lgamma(r) - (r+x)*log(alpha+t)))
-  }
-
-  P1 <- beta(a, b+x+ifelse(dropout_at_zero, 1, 0)) / beta(a, b)
-  P2a <- sum(nbd.pmf(params, t, (k*x):(k*x+k-1)))
-  if (dropout_at_zero==FALSE & x==0) {
-    P2b <- 0
-  } else {
-    P2b <- a/(b+x-1+ifelse(dropout_at_zero, 1, 0))
-    if (x>0) P2b <- P2b * (1-sum(nbd.pmf(params, t, 0:(k*x-1))))
-  }
-  return(P1 * (P2a + P2b))
 }
 
 
@@ -521,41 +539,6 @@ bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs,
   legend("topright", legend = c("Actual", model), col = 1:2, 
       lwd = 2)
   return(censored.freq.comparison)
-}
-
-
-#' BG/CNBD-k Expectation
-#' 
-#' Returns the number of repeat transactions that a randomly chosen customer
-#' (for whom we have no prior information) is expected to make in a given time
-#' period.
-#' 
-#' E(X(t) | k, r, alpha, a, b)
-#' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-#'   in that order.
-#' @param t length of time for which we are calculating the expected number of repeat transactions.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
-#' @return Number of repeat transactions a customer is expected to make in a time period of length t.
-#' @references Platzer Michael, and Thomas Reutterer (forthcoming)
-#' @seealso \code{\link{bgcnbd.EstimateParameters}}
-bgcnbd.Expectation <- function(params, t, dropout_at_zero = FALSE) {
-  if (any(t < 0) || !is.numeric(t)) 
-    stop("t must be numeric and may not contain negative numbers.")
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.Expectation")
-  k      <- params[1]
-  r      <- params[2]
-  alpha  <- params[3]
-  a      <- params[4]
-  b      <- params[5]
-  
-  if (k>1) cat("note: expected transactions can only be approximated for k>1\n")
-  G <- function(r, alpha, a, b) 1 - (alpha/(alpha+t))^r * gsl::hyperg_2F1(r, b+1, a+b, t/(alpha+t))
-  
-  P1 <- (a+b-1+ifelse(dropout_at_zero, 1, 0)) / (a-1)
-  P2 <- G(r, k*alpha, a, b-1+ifelse(dropout_at_zero, 1, 0))
-  return(P1 * P2)
 }
 
 

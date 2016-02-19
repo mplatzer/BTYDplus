@@ -106,3 +106,30 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// bgcnbd_pmf_cpp
+double bgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zero);
+RcppExport SEXP BTYDplus_bgcnbd_pmf_cpp(SEXP paramsSEXP, SEXP tSEXP, SEXP xSEXP, SEXP dropout_at_zeroSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type params(paramsSEXP);
+    Rcpp::traits::input_parameter< double >::type t(tSEXP);
+    Rcpp::traits::input_parameter< int >::type x(xSEXP);
+    Rcpp::traits::input_parameter< bool >::type dropout_at_zero(dropout_at_zeroSEXP);
+    __result = Rcpp::wrap(bgcnbd_pmf_cpp(params, t, x, dropout_at_zero));
+    return __result;
+END_RCPP
+}
+// bgcnbd_exp_cpp
+double bgcnbd_exp_cpp(NumericVector params, double t, bool dropout_at_zero);
+RcppExport SEXP BTYDplus_bgcnbd_exp_cpp(SEXP paramsSEXP, SEXP tSEXP, SEXP dropout_at_zeroSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type params(paramsSEXP);
+    Rcpp::traits::input_parameter< double >::type t(tSEXP);
+    Rcpp::traits::input_parameter< bool >::type dropout_at_zero(dropout_at_zeroSEXP);
+    __result = Rcpp::wrap(bgcnbd_exp_cpp(params, t, dropout_at_zero));
+    return __result;
+END_RCPP
+}

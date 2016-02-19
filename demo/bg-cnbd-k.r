@@ -15,7 +15,7 @@ elog <- data$elog # Event log - one row per event/purchase
 
 # estimate regularity from event log
 (k.est <- estimateRegularity(elog))
-# 3.006329; interpurchase-times indicate Erlang-3
+# 2.985917; interpurchase-times indicate Erlang-3
 
 # estimate parameters, and compare to true parameters
 est  <- bgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
@@ -23,8 +23,8 @@ est1 <- BTYD::bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
 rbind("actual"=params, "bg/cnbd-k"=round(est, 2), "bg/nbd"=c(1, round(est1, 2)))
 #           k    r alpha    a    b
 # actual    3 0.85  1.45 0.79 2.42
-# bg/cnbd-k 3 0.86  1.51 0.79 2.42
-# bg/nbd    1 0.93  6.34 0.59 2.32
+# bg/cnbd-k 3 0.85  1.47 0.76 2.33
+# bg/nbd    1 0.92  6.19 0.55 2.14
 # -> underlying parameters are successfully identified via Maximum Likelihood Estimation
 
 # plot aggregate fit in calibration; and compare to BG/NBD fit
@@ -35,7 +35,7 @@ par(op)
 
 # plot incremental transactions;
 op <- par(mfrow=c(1,2))
-elog <- as.data.table(elog)
+elog <- data.table::setDT(elog)
 inc.tracking <- elog[t>0, .N, keyby=ceiling(t/7)]$N
 inc <- bgcnbd.PlotTrackingInc(est, cbs$T.cal/7, (28+42), inc.tracking)
 nil <- bgcnbd.PlotTrackingInc(c(1, est1), cbs$T.cal/7, (28+42), inc.tracking, ymax = max(inc) * 1.05)
@@ -49,9 +49,9 @@ cbs$x.est1 <- BTYD::bgnbd.ConditionalExpectedTransactions(est1, cbs$T.star, cbs$
 rbind("bg/cnbd-k" = mean(abs(cbs$x.star-cbs$x.est)),
       "bg/nbd"    = mean(abs(cbs$x.star-cbs$x.est1)),
       "naive"     = mean(abs(cbs$x.star-cbs$x)))
-# bg/cnbd-k 1.056313
-# bg/nbd    1.212169
-# naive     2.018125
+# bg/cnbd-k 1.452800
+# bg/nbd    1.678846
+# naive     2.175875
 # -> BG/CNBD-k forecast better than BG/NBD and naive forecast
 
 # estimate P(alive)
@@ -60,16 +60,16 @@ cbs$palive1 <- BTYD::bgnbd.PAlive(est1, cbs$x, cbs$t.x, cbs$T.cal)
 
 # compare to true (usually unobserved) alive status
 prop.table(table(cbs$palive>.5, cbs$alive))
-#         FALSE    TRUE
-#   FALSE 0.36800 0.04475
-#   TRUE  0.08850 0.49875
-# -> 87% of customers are correctly classified
+#            FALSE     TRUE
+#   FALSE 0.338125 0.044125
+#   TRUE  0.095125 0.522625
+# -> 86% of customers are correctly classified
 
 # Brier score for P(alive)
 rbind("bg/cnbd-k" = sqrt(mean((cbs$palive-cbs$alive)^2)),
       "bg/nbd"    = sqrt(mean((cbs$palive1-cbs$alive)^2)))
-# bg/cnbd-k 0.3069095
-# bg/nbd    0.3310709
+# bg/cnbd-k 0.3163118
+# bg/nbd    0.3441937
 # -> P(alive) is more accurate for BG/CNBD-k than for BG/NBD when regularity
 # is present in the data
 

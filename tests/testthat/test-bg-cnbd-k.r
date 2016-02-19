@@ -27,10 +27,12 @@ test_that("BG/CNBD-k", {
   elog <- as.data.table(data$elog)
   inc.tracking <- elog[t>0, .N, keyby=ceiling(t)]$N
   expect_equal(bgnbd.PlotTrackingInc(params, cbs$T.cal, 32+32, inc.tracking),
-               bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, 32+32, inc.tracking))
+               bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, 32+32, inc.tracking),
+               tolerance = 1e-3)
   cu.tracking <- cumsum(inc.tracking)
   expect_equal(bgnbd.PlotTrackingCum(params, cbs$T.cal, 32+32, cu.tracking),
-               bgcnbd.PlotTrackingCum(c(1, params), cbs$T.cal, 32+32, cu.tracking))
+               bgcnbd.PlotTrackingCum(c(1, params), cbs$T.cal, 32+32, cu.tracking),
+               tolerance = 1e-3)
 
   # generate artificial BG/CNBD-k data
   set.seed(1)

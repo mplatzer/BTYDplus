@@ -25,3 +25,11 @@ pggg_slice_sample <- function(what, x, tx, Tcal, litt, k, lambda, mu, tau, t, ga
     .Call('BTYDplus_pggg_slice_sample', PACKAGE = 'BTYDplus', what, x, tx, Tcal, litt, k, lambda, mu, tau, t, gamma, r, alpha, s, beta)
 }
 
+bgcnbd_pmf_cpp <- function(params, t, x, dropout_at_zero = FALSE) {
+    .Call('BTYDplus_bgcnbd_pmf_cpp', PACKAGE = 'BTYDplus', params, t, x, dropout_at_zero)
+}
+
+bgcnbd_exp_cpp <- function(params, t, dropout_at_zero = FALSE) {
+    .Call('BTYDplus_bgcnbd_exp_cpp', PACKAGE = 'BTYDplus', params, t, dropout_at_zero)
+}
+
