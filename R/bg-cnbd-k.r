@@ -381,10 +381,12 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 #' Simulate data according to BG/CNBD-k model assumptions
 #' 
 #' @param n number of customers
-#' @param T.cal length of calibration period
-#' @param T.star length of holdout period
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-#'   in that order.
+#' @param T.cal length of calibration period; if vector then it is assumed that
+#'   customers have different "birth" dates, i.e. max(T.cal)-T.cal
+#' @param T.star length(s) of holdout period(s); assumed to be same for all
+#'   customers
+#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r},
+#'   \code{alpha}, \code{a} and \code{b} in that order.
 #' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
 #'   which set this parameter to TRUE
 #' @param return.elog boolean - if \code{TRUE} then the event log is returned in 
@@ -393,7 +395,7 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 #' @export
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
-bgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params, 
+bgcnbd.GenerateData <- function(n, T.cal, T.star=NULL, params, 
                                 return.elog = FALSE, dropout_at_zero = FALSE) {
   dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.GenerateData")
   if (params[1] != floor(params[1]) | params[1] < 1)
@@ -406,7 +408,6 @@ bgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params,
   b      <- params[5]
 
   if (length(T.cal)==1)  T.cal  <- rep(T.cal, n)  
-  if (length(T.star)==1) T.star <- rep(T.star, n)  
   
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape=r, rate=alpha)
@@ -425,26 +426,29 @@ bgcnbd.GenerateData <- function(n, T.cal, T.star=T.cal, params,
     churn <- ifelse(any(coins==1), min(which(coins==1)), 10000)
     if (dropout_at_zero) churn <- churn - 1
     # sample transaction times
-    times <- cumsum(c(0, rgamma(churn, shape=k, rate=lambda)))
+    times <- cumsum(c(max(T.cal)-T.cal[i], rgamma(churn, shape=k, rate=lambda)))
     if (return.elog)
-      elog_list[[i]] <- data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])])
+      elog_list[[i]] <- data.frame(cust=i, t=times[times<(max(T.cal)+max(T.star))])
     # determine frequency, recency, etc.
-    ts.cal  <- times[times<T.cal[i]]
-    ts.star <- times[times>=T.cal[i] & times<(T.cal[i]+T.star[i])]
+    ts.cal  <- times[times < max(T.cal)]
+    ts.star <- times[times >= max(T.cal) & times<(max(T.cal)+T.star[i])]
     cbs_list[[i]] <- list(cust   = i,
                           x      = length(ts.cal)-1,
-                          t.x    = max(ts.cal),
+                          t.x    = max(ts.cal) - (max(T.cal)-T.cal[i]),
                           litt   = sum(log(diff(ts.cal))),
                           churn  = churn,
-                          alive  = churn > (length(ts.cal)-1),
-                          x.star = length(ts.star))
+                          alive  = churn > (length(ts.cal)-1))
+    for (tstar in T.star) {
+      colname <- paste0('x.star', ifelse(length(T.star)>1, tstar, ''))
+      cbs_list[[i]][[colname]] <- length(times[times >= max(T.cal) & times<(max(T.cal)+tstar)])
+    }
   }
   cbs <- do.call(rbind.data.frame, cbs_list)
   cbs$lambda <- lambdas
   cbs$p      <- ps
   cbs$k      <- k
   cbs$T.cal  <- T.cal
-  cbs$T.star <- T.star
+  if (length(T.star)==1) cbs$T.star <- T.star
   rownames(cbs) <- NULL
   out <- list(cbs=cbs)
   if (return.elog) {
@@ -575,7 +579,7 @@ bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.period
     if (interval <= min(cust.birth.periods)) 
       return(0)
     sum(bgcnbd.Expectation(params = params, 
-                           t = interval - cust.birth.periods[cust.birth.periods <= interval], 
+                           t = interval - cust.birth.periods[cust.birth.periods < interval], 
                            dropout_at_zero = dropout_at_zero))
   })
   return(expected.transactions)

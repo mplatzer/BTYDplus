@@ -6,8 +6,8 @@ test_that("BG/CNBD-k", {
   set.seed(1)
   params <- c(0.85, 1.45, 0.79, 2.42)
   n <- 8000
-  data <- bgnbd.GenerateData(n=n, T.cal=32, T.star=32, params=params, return.elog=TRUE)
-  cbs <- data$cbs
+  data <- bgnbd.GenerateData(n=n, T.cal=round(runif(n, 4, 32)), T.star=32, params=params, return.elog=TRUE)
+  cbs  <- data$cbs
   params.est.btyd      <- bgnbd.EstimateParameters(cbs)
   params.est.btyd_plus <- bgcnbd.EstimateParameters(cbs, k=1)[-1]
   expect_equal(round(params.est.btyd, 2), 
@@ -25,9 +25,10 @@ test_that("BG/CNBD-k", {
   expect_equal(bgnbd.PlotFrequencyInCalibration(params, cbs, 7),
                bgcnbd.PlotFrequencyInCalibration(c(1, params), cbs, 7))
   elog <- as.data.table(data$elog)
-  inc.tracking <- elog[t>0, .N, keyby=ceiling(t)]$N
-  expect_equal(bgnbd.PlotTrackingInc(params, cbs$T.cal, 32+32, inc.tracking),
-               bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, 32+32, inc.tracking),
+  elog[, t0 := min(t), by=cust]
+  inc.tracking <- elog[t>t0, .N, keyby=ceiling(t)]$N
+  expect_equal(bgnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal)+32, inc.tracking),
+               bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, max(cbs$T.cal)+32, inc.tracking),
                tolerance = 1e-3)
   cu.tracking <- cumsum(inc.tracking)
   expect_equal(bgnbd.PlotTrackingCum(params, cbs$T.cal, 32+32, cu.tracking),
@@ -38,8 +39,8 @@ test_that("BG/CNBD-k", {
   set.seed(1)
   n <- 8000
   params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
-  data <- bgcnbd.GenerateData(n=n, T.cal=runif(n, 12, 96), T.star=32, params=params, return.elog=TRUE)
-  cbs <- data$cbs
+  data <- bgcnbd.GenerateData(n=n, T.cal=round(runif(n, 12, 96)), T.star=c(32, 64), params=params, return.elog=TRUE)
+  cbs  <- data$cbs
   elog <- data$elog
   
   # estimate regularity & parameters
@@ -59,15 +60,18 @@ test_that("BG/CNBD-k", {
   expect_true(ape(params[5], est[5]) < 0.10)
   
   # estimate future transactions & P(alive) with true parameters
-  cbs$x.est  <- bgcnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-  cbs$palive <- bgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
+  cbs$x.est32  <- bgcnbd.ConditionalExpectedTransactions(params, 32, cbs$x, cbs$t.x, cbs$T.cal)
+  cbs$x.est64  <- bgcnbd.ConditionalExpectedTransactions(params, 64, cbs$x, cbs$t.x, cbs$T.cal)
+  cbs$palive   <- bgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
 
   # require less than 5% deviation
-  expect_true(ape(sum(cbs$x.star), sum(cbs$x.est)) < 0.05)
+  expect_true(ape(sum(cbs$x.star32), sum(cbs$x.est32)) < 0.05)
+  expect_true(ape(sum(cbs$x.star64), sum(cbs$x.est64)) < 0.05)
   expect_true(ape(sum(cbs$palive), sum(cbs$alive)) < 0.05)
 
-  expect_true(min(cbs$x.star)>=0)
-  expect_true(all(cbs$x.star==round(cbs$x.star)))
+  # some basic sanity checks
+  expect_true(min(cbs$x.star32)>=0)
+  expect_true(all(cbs$x.star32==round(cbs$x.star32)))
   expect_true(all(cbs$palive>=0 & cbs$palive<=1))
   
 })

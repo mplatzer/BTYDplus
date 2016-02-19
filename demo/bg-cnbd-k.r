@@ -1,13 +1,13 @@
 
 set.seed(1)
 
-# generate artificial BG/CNBD-k data 
+# generate artificial BG/CNBD-3 data 
 n      <- 8000 # no. of customers
-T.cal  <- 28   # 4 weeks of calibration period
-T.star <- 42   # 6 weeks of hold-out period
-params <- c(k=3,                # regularity in interpurchase-times (Erlang-k)
-            r=0.85, alpha=1.45, # purchase frequency lambda_i ~ Gamma(r, alpha)
-            a=0.79, b=2.42)     # dropout probability p_i ~ Beta(a, b)
+T.cal  <- round(runif(n, 24, 32)) # 12-32 weeks of calibration period
+T.star <- 32                      # 32 weeks of hold-out period
+params <- c(k=3,                  # regularity in interpurchase-times (Erlang-k)
+            r=0.85, alpha=1.45,   # purchase frequency lambda_i ~ Gamma(r, alpha)
+            a=0.79, b=2.42)       # dropout probability p_i ~ Beta(a, b)
 
 data <- bgcnbd.GenerateData(n, T.cal, T.star, params, return.elog=TRUE)
 cbs  <- data$cbs  # CBS summary - one record per customer
@@ -15,7 +15,7 @@ elog <- data$elog # Event log - one row per event/purchase
 
 # estimate regularity from event log
 (k.est <- estimateRegularity(elog))
-# 2.985917; interpurchase-times indicate Erlang-3
+# 3.013213; interpurchase-times indicate Erlang-3
 
 # estimate parameters, and compare to true parameters
 est  <- bgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
@@ -23,8 +23,8 @@ est1 <- BTYD::bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
 rbind("actual"=params, "bg/cnbd-k"=round(est, 2), "bg/nbd"=c(1, round(est1, 2)))
 #           k    r alpha    a    b
 # actual    3 0.85  1.45 0.79 2.42
-# bg/cnbd-k 3 0.85  1.47 0.76 2.33
-# bg/nbd    1 0.92  6.19 0.55 2.14
+# bg/cnbd-k 3 0.85  1.48 0.80 2.45
+# bg/nbd    1 0.92  6.16 0.58 2.30
 # -> underlying parameters are successfully identified via Maximum Likelihood Estimation
 
 # plot aggregate fit in calibration; and compare to BG/NBD fit
@@ -36,9 +36,11 @@ par(op)
 # plot incremental transactions;
 op <- par(mfrow=c(1,2))
 elog <- data.table::setDT(elog)
-inc.tracking <- elog[t>0, .N, keyby=ceiling(t/7)]$N
-inc <- bgcnbd.PlotTrackingInc(est, cbs$T.cal/7, (28+42), inc.tracking)
-nil <- bgcnbd.PlotTrackingInc(c(1, est1), cbs$T.cal/7, (28+42), inc.tracking, ymax = max(inc) * 1.05)
+elog <- elog[, t0 := min(t), by=cust]
+inc.tracking <- elog[t>t0, .N, keyby=ceiling(t)]$N
+T.tot  <- max(T.cal+T.star)
+inc <- bgcnbd.PlotTrackingInc(est, cbs$T.cal, T.tot, inc.tracking)
+nil <- bgcnbd.PlotTrackingInc(c(1, est1), cbs$T.cal, T.tot, inc.tracking, ymax = max(inc) * 1.05)
 par(op)
 
 # estimate future transactions in holdout-period
@@ -49,9 +51,9 @@ cbs$x.est1 <- BTYD::bgnbd.ConditionalExpectedTransactions(est1, cbs$T.star, cbs$
 rbind("bg/cnbd-k" = mean(abs(cbs$x.star-cbs$x.est)),
       "bg/nbd"    = mean(abs(cbs$x.star-cbs$x.est1)),
       "naive"     = mean(abs(cbs$x.star-cbs$x)))
-# bg/cnbd-k 1.452800
-# bg/nbd    1.678846
-# naive     2.175875
+# bg/cnbd-k 1.148021
+# bg/nbd    1.327117
+# naive     1.943375
 # -> BG/CNBD-k forecast better than BG/NBD and naive forecast
 
 # estimate P(alive)
@@ -61,15 +63,15 @@ cbs$palive1 <- BTYD::bgnbd.PAlive(est1, cbs$x, cbs$t.x, cbs$T.cal)
 # compare to true (usually unobserved) alive status
 prop.table(table(cbs$palive>.5, cbs$alive))
 #            FALSE     TRUE
-#   FALSE 0.338125 0.044125
-#   TRUE  0.095125 0.522625
+#   FALSE 0.341000 0.049875
+#   TRUE  0.092000 0.517125
 # -> 86% of customers are correctly classified
 
 # Brier score for P(alive)
 rbind("bg/cnbd-k" = sqrt(mean((cbs$palive-cbs$alive)^2)),
       "bg/nbd"    = sqrt(mean((cbs$palive1-cbs$alive)^2)))
-# bg/cnbd-k 0.3163118
-# bg/nbd    0.3441937
+# bg/cnbd-k 0.3155395
+# bg/nbd    0.3445256
 # -> P(alive) is more accurate for BG/CNBD-k than for BG/NBD when regularity
 # is present in the data
 

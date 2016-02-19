@@ -1,4 +1,8 @@
 
+Changes in version 0.x.x (2016-xx-xx):
+
+    o   (m)bgcnbd.GenerateData can now handle multiple holdout period lengths, and differing calibration periods for each customer
+
 Changes in version 0.6.3 (2016-02-19):
 
     o   unconditional expectations for (M)BG/CNBD-k (`(m)bgcnbd.Expectation`) are now calculated `exact` by utilizing `(m)bgcnbd.pmf`

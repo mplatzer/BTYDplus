@@ -507,6 +507,7 @@ NumericVector pggg_slice_sample(String what,
 // [[Rcpp::export]]
 double bgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zero = false) {
   if (params.size() != 5) ::Rf_error("params needs to be of size 5 with (k, r, alpha, a, b)");
+  if (t == 0) return(0);
   int k        = params[0];
   double r     = params[1];
   double alpha = params[2];
