@@ -369,6 +369,7 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
   alpha  <- params[3]
   a      <- params[4]
   b      <- params[5]
+  if (round(a, 2)==1) a <- a + 0.01 # P1 not defined for a=1, so we add slight noise in such rare cases
   if (k>1) cat("note: conditional expected transactions can only be approximated for k>1\n")
   G <- function(r, alpha, a, b) 1 - (alpha/(alpha+T.star))^r * gsl::hyperg_2F1(r, b+1, a+b, T.star/(alpha+T.star))
   P1 <- (a+b+x-1+ifelse(dropout_at_zero, 1, 0)) / (a-1)
