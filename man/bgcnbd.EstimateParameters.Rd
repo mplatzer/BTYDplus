@@ -90,7 +90,7 @@ cbs$x.est1 <- BTYD::bgnbd.ConditionalExpectedTransactions(est1, cbs$T.star, cbs$
 rbind("bg/cnbd-k" = mean(abs(cbs$x.star-cbs$x.est)),
       "bg/nbd"    = mean(abs(cbs$x.star-cbs$x.est1)),
       "naive"     = mean(abs(cbs$x.star-cbs$x)))
-# bg/cnbd-k 1.148021
+# bg/cnbd-k 1.147540
 # bg/nbd    1.327117
 # naive     1.943375
 # -> BG/CNBD-k forecast better than BG/NBD and naive forecast
@@ -114,6 +114,11 @@ rbind("bg/cnbd-k" = sqrt(mean((cbs$palive-cbs$alive)^2)),
 # -> P(alive) is more accurate for BG/CNBD-k than for BG/NBD when regularity
 # is present in the data
 
+# Bias
+rbind("bg/cnbd-k" = 1 - sum(cbs$x.est) / sum(cbs$x.star),
+      "bg/nbd"    = 1 - sum(cbs$x.est1) / sum(cbs$x.star))
+# bg/cnbd-k  0.007556411
+# bg/nbd    -0.144271627
 
 # compare estimated with actual distributions in lambda & churn probability
 par(mfrow=c(2,1), mar=c(2,1,2,1))

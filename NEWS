@@ -1,7 +1,9 @@
 
-Changes in version 0.x.x (2016-xx-xx):
+Changes in version 0.6.4 (2016-02-23):
 
     o   (m)bgcnbd.GenerateData can now handle multiple holdout period lengths, and differing calibration periods for each customer
+
+    o   fixed bias in (m)bgcnbd.ConditionalExpectedTransactions by re-scaling via (m)bgcnbd.Expectation
 
 Changes in version 0.6.3 (2016-02-19):
 

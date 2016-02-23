@@ -371,11 +371,19 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
   b      <- params[5]
   if (round(a, 2)==1) a <- a + 0.01 # P1 not defined for a=1, so we add slight noise in such rare cases
   if (k>1) cat("note: conditional expected transactions can only be approximated for k>1\n")
+  # approximate via expression for conditional expected transactions for BG/NBD model, but adjust scale parameter by k
   G <- function(r, alpha, a, b) 1 - (alpha/(alpha+T.star))^r * gsl::hyperg_2F1(r, b+1, a+b, T.star/(alpha+T.star))
   P1 <- (a+b+x-1+ifelse(dropout_at_zero, 1, 0)) / (a-1)
   P2 <- G(r+x, k*alpha+T.cal, a, b+x-1+ifelse(dropout_at_zero, 1, 0))
   P3 <- bgcnbd.PAlive(params = params, x = x, t.x = t.x, T.cal = T.cal, dropout_at_zero = dropout_at_zero)
-  return(P1 * P2 * P3)
+  exp <- P1 * P2 * P3
+  # adjust bias BG/NBD-based approximation by scaling via the Unconditional Expectations (for wich we have exact expression)
+  if (k>1) {
+    sum.cal <- sum(bgcnbd.Expectation(params = params, t = T.cal,        dropout_at_zero = dropout_at_zero))
+    sum.tot <- sum(bgcnbd.Expectation(params = params, t = T.cal+T.star, dropout_at_zero = dropout_at_zero))
+    exp <- exp * (sum.tot-sum.cal) / sum(exp)
+  }
+  return(exp)
 }
 
 
