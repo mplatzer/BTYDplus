@@ -126,7 +126,6 @@ mbgnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   period of length t, conditional on their past behavior. If any of the input
 #'   parameters has a length greater than 1, this will be a vector of expected 
 #'   number of transactions.
-#' @import gsl
 #' @export
 #' @seealso \code{\link{bgcnbd.ConditionalExpectedTransactions}}
 #' @seealso \code{\link{mbgnbd.EstimateParameters}}
