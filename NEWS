@@ -1,4 +1,8 @@
 
+Changes in version 0.6.5 (2016-04-19):
+
+    o   (m)bgcnbd.ConditionalExpectedTransactions uses same h2f1 method as BTYD, rather than relying on GSL
+
 Changes in version 0.6.4 (2016-02-23):
 
     o   (m)bgcnbd.GenerateData can now handle multiple holdout period lengths, and differing calibration periods for each customer
