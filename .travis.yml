@@ -1,12 +1,12 @@
 language: r
 cache: packages
-sudo: required
-r_binary_packages:
-  - gsl
-  - mvtnorm
-  - bayesm
-  - coda
-  - Rcpp
+#sudo: required
+#r_binary_packages:
+#  - gsl
+#  - mvtnorm
+#  - bayesm
+#  - coda
+#  - Rcpp
 #r_packages:
 #  - BTYD
 #  - data.table
@@ -15,6 +15,6 @@ r_binary_packages:
 #after_success:
 #  - Rscript -e 'covr::codecov()'
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y libgsl0-dev
+#before_install:
+#  - sudo apt-get update -qq
+#  - sudo apt-get install -y libgsl0-dev

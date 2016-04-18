@@ -21,7 +21,5 @@ Imports:
     data.table,
     mvtnorm,
     bayesm
-Suggests:
-    gsl
 Roxygen: list(wrap = FALSE)
 RoxygenNote: 5.0.1
