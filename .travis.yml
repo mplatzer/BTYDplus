@@ -1,5 +1,6 @@
 language: r
 cache: packages
+sudo: required
 r_binary_packages:
   - gsl
   - mvtnorm
@@ -10,7 +11,6 @@ r_binary_packages:
 #  - BTYD
 #  - data.table
 #warnings_are_errors: true
-#sudo: required
 
 #after_success:
 #  - Rscript -e 'covr::codecov()'
