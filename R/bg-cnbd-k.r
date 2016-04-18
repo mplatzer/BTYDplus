@@ -487,6 +487,7 @@ bgcnbd.GenerateData <- function(n, T.cal, T.star=NULL, params,
 #'   which set this parameter to TRUE
 #' @return Calibration period repeat transaction frequency comparison matrix (actual vs. expected).
 #'
+#' @export
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples 
@@ -571,6 +572,7 @@ bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs,
 #'   which set this parameter to TRUE
 #' @return Vector of expected cumulative total repeat transactions by all customers.
 #' 
+#' @export
 #' @seealso \code{\link{bgnbd.ExpectedCumulativeTransactions}}
 bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final, 
                                                   dropout_at_zero = FALSE) {
@@ -618,7 +620,7 @@ bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.period
 #' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
 #'   which set this parameter to TRUE
 #' @return Matrix containing actual and expected cumulative repeat transactions.
-#' 
+#' @export
 #' @seealso \code{\link{bgnbd.PlotTrackingCum}}
 bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data, 
     xlab = "Week", ylab = "Cumulative Transactions", 
@@ -679,7 +681,7 @@ bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data
 #' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
 #'   which set this parameter to TRUE
 #' @return Matrix containing actual and expected incremental repeat transactions.
-#' 
+#' @export
 #' @seealso \code{\link{bgnbd.PlotTrackingInc}}
 bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data, 
     xlab = "Week", ylab = "Transactions",
