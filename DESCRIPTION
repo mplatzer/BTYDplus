@@ -15,9 +15,9 @@ Imports:
     Rcpp (>= 0.11.1),
     BTYD (>= 2.3),
     coda,
-    data.table
-Suggests:
+    data.table,
     mvtnorm,
-    bayesm
+    bayesm,
+    gsl
 Roxygen: list(wrap = FALSE)
 RoxygenNote: 5.0.1
