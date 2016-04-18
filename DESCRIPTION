@@ -9,8 +9,11 @@ Description: Extends the functionality of BTYD package by providing methods for
     parameter estimation and scoring for NBD, G/G/NBD, MBG/NBD, BG/CNBD-k and
     MBG/CNBD-k models, as well as MCMC samples for Pareto/NBD,
     Abe's Pareto/NBD variant and Pareto/GGG.
+URL: https://github.com/mplatzer/BTYDplus
+BugReports: https://github.com/mplatzer/BTYDplus/issues
 License: GPL-3
 LinkingTo: Rcpp
+Depends: R (>= 3.2.0)
 Imports:
     Rcpp (>= 0.11.1),
     BTYD (>= 2.3),
