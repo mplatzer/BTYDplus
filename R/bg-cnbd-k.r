@@ -334,10 +334,10 @@ bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
 #'   period of length t, conditional on their past behavior. If any of the input
 #'   parameters has a length greater than 1, this will be a vector of expected 
 #'   number of transactions.
-#' @import gsl
 #' @export
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
+#' @import gsl
 bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal, dropout_at_zero = FALSE) {
   max.length <- max(length(T.star), length(x), length(t.x),
     length(T.cal))
@@ -668,7 +668,7 @@ bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data
 #'   other words, the "T.cal" column from a customer-by-sufficient-statistic
 #'   matrix).
 #' @param T.tot end of holdout period. Must be a single value, not a vector.
-#' @param actual.cu.tracking.data vector containing the cumulative number of
+#' @param actual.inc.tracking.data vector containing the incremental number of
 #'   repeat transactions made by customers for each period in the total time
 #'   period (both calibration and holdout periods).
 #' @param xlab descriptive label for the x axis.

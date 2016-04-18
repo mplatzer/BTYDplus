@@ -19,6 +19,10 @@ matrix).}
 
 \item{T.tot}{end of holdout period. Must be a single value, not a vector.}
 
+\item{actual.inc.tracking.data}{vector containing the incremental number of
+repeat transactions made by customers for each period in the total time
+period (both calibration and holdout periods).}
+
 \item{xlab}{descriptive label for the x axis.}
 
 \item{ylab}{descriptive label for the y axis.}
@@ -31,10 +35,6 @@ matrix).}
 
 \item{dropout_at_zero}{Boolean; the mbg-methods are simple wrapper methods,
 which set this parameter to TRUE}
-
-\item{actual.cu.tracking.data}{vector containing the cumulative number of
-repeat transactions made by customers for each period in the total time
-period (both calibration and holdout periods).}
 }
 \value{
 Matrix containing actual and expected incremental repeat transactions.
