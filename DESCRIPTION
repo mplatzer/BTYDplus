@@ -20,7 +20,8 @@ Imports:
     coda,
     data.table,
     mvtnorm,
-    bayesm,
+    bayesm
+Suggests:
     gsl
 Roxygen: list(wrap = FALSE)
 RoxygenNote: 5.0.1
