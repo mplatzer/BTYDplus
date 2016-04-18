@@ -1,10 +1,10 @@
-BTYDplus
-========
+# BTYDplus
+
+[![Travis-CI Build Status](https://travis-ci.org/mplatzer/BTYDplus.svg?branch=master)](https://travis-ci.org/mplatzer/BTYDplus)
 
 Extension to R package BTYD.
 
-Installation
-------------
+## Installation
 
 ```
 devtools::install_github("mplatzer/BTYDplus", dependencies=TRUE)
@@ -13,8 +13,7 @@ demo(package="BTYDplus")
 demo("cdnow")
 ```
 
-BTYD Models
------------
+## BTYD Models
 
 These R source files extend the functionality of the BTYD package by providing functions for parameter estimation and scoring for NBD, G/G/NBD, BG/NBD, CBG/NBD and CBG/CNBD-k models.
 
