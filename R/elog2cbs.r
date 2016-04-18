@@ -19,28 +19,29 @@
 #' @export
 #' @import data.table
 elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elog$date)) {
+  cust <- first <- itt <- T.star <- x.star <- NULL # avoid checkUsage warnings
 
   is.dt <- is.data.table(elog)
   # convert to data.table for improved performance
-  if (!is.dt) elog <- data.table(elog)
+  elog_dt <- data.table(elog)
   # merge same dates
-  setkey(elog, cust, date)
-  elog <- unique(elog)
+  setkey(elog_dt, cust, date)
+  elog_dt <- unique(elog_dt)
   # determine time since first date for each customer
-  elog[, first := min(date), by="cust"]
-  elog[, t := as.numeric(difftime(date, first, units=per)), by="cust"]
+  elog_dt[, first := min(date), by="cust"]
+  elog_dt[, t := as.numeric(difftime(date, first, units=per)), by="cust"]
   # compute intertransaction times
-  elog[, itt := c(0, diff(t)), by="cust"]
+  elog_dt[, itt := c(0, diff(t)), by="cust"]
   # count events in calibration period
-  cbs <- elog[date<=T.cal,
-              list(x=.N-1, t.x=max(t), litt=sum(log(itt[itt>0]))),
-              by="cust,first"]
+  cbs <- elog_dt[date<=T.cal,
+                 list(x=.N-1, t.x=max(t), litt=sum(log(itt[itt>0]))),
+                 by="cust,first"]
   cbs[, T.cal := as.numeric(difftime(T.cal, first, units=per))]
   cbs[, T.star := as.numeric(difftime(T.tot, first, units=per)) - T.cal]
   cbs[, first := NULL]
   setkey(cbs, cust)
   # count events in validation period
-  val <- elog[date>T.cal & date<=T.tot,
+  val <- elog_dt[date>T.cal & date<=T.tot,
               list(x.star=.N),
               keyby="cust"]
   cbs <- merge(cbs, val, all.x=TRUE, by="cust")
