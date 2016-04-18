@@ -1,5 +1,16 @@
 language: r
 cache: packages
+r_binary_packages:
+  - gsl
+  - mvtnorm
+  - bayesm
+  - coda
+  - Rcpp
+#r_packages:
+#  - BTYD
+#  - data.table
 #warnings_are_errors: true
-#r_packages : gsl
 #sudo: required
+
+#after_success:
+#  - Rscript -e 'covr::codecov()'
