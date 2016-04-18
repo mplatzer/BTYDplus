@@ -1,12 +1,12 @@
 language: r
 cache: packages
-#sudo: required
-#r_binary_packages:
+sudo: required
+r_binary_packages:
+  - mvtnorm
+  - bayesm
+  - coda
+  - Rcpp
 #  - gsl
-#  - mvtnorm
-#  - bayesm
-#  - coda
-#  - Rcpp
 #r_packages:
 #  - BTYD
 #  - data.table
