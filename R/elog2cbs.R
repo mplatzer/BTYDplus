@@ -17,7 +17,6 @@
 #' @param T.tot end date of holdout period
 #' @return data.frame
 #' @export
-#' @import data.table
 elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elog$date)) {
     cust <- first <- itt <- T.star <- x.star <- NULL  # avoid checkUsage warnings
     

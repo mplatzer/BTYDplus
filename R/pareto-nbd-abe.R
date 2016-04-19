@@ -18,7 +18,6 @@
 ##'  \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
 ##'  \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
 ##' }
-#' @import coda parallel bayesm
 #' @export
 #' @example demo/pareto-nbd-abe.R
 #' @seealso \code{link{abe.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}}
@@ -245,7 +244,6 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burn
 #' 
 #' @return 2-elemnt list
 #' @export
-#' @import mvtnorm
 abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     
     if (length(T.cal) == 1) 

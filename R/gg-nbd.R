@@ -14,7 +14,6 @@
 #' @param max.param.value the upper bound on parameters
 #' @param trace print logging step every \code{trace} iteration
 #' @return list of estimated parameters
-#' @import BTYD
 #' @export
 #' @references Bemmaor, Albert C., and Nicolas Glady. 'Modeling Purchasing 
 #'   Behavior with Sudden 'Death': A Flexible Customer Lifetime Model.'

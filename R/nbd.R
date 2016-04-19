@@ -11,7 +11,6 @@
 #'   that order.
 #' @param max.param.value the upper bound on parameters
 #' @return list of estimated parameters
-#' @import BTYD
 #' @export
 #' @references EHRENBERG, ASC. 'The Pattern of Consumer Purchases.' Quantitative
 #'   techniques in marketing analysis: text and readings (1962): 355.

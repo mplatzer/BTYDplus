@@ -20,7 +20,6 @@
 #' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
 #'   which set this parameter to TRUE
 #' @return list of estimated parameters
-#' @import BTYD
 #' @export
 #' @seealso \code{\link{elog2cbs}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)

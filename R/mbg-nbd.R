@@ -12,7 +12,6 @@
 #'   \code{a} and \code{b} in that order.
 #' @param max.param.value the upper bound on parameters
 #' @return list of estimated parameters
-#' @import BTYD
 #' @export
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
