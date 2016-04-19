@@ -22,7 +22,8 @@ Imports:
     bayesm
 Suggests: 
     testthat,
-    gsl
+    gsl,
+    covr
 Roxygen: list(wrap = FALSE)
 RoxygenNote: 5.0.1
 LazyData: true

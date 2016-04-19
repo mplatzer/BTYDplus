@@ -16,7 +16,7 @@ r_packages:
   - BTYD
   - data.table
 
-#warnings_are_errors: true
+after_success:
+  - Rscript -e 'covr::codecov()'
 
-#after_success:
-#  - Rscript -e 'covr::codecov()'
+#warnings_are_errors: true
