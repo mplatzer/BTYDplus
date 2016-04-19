@@ -187,6 +187,7 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' @export
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
+    stop('This method is currently broken')
     dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.ConditionalExpectedTransactions")
     max.length <- max(length(T.star), length(x), length(t.x), length(T.cal))
     if (max.length%%length(T.star)) 
