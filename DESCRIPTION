@@ -1,7 +1,7 @@
 Package: BTYDplus
 Type: Package
 Title: Extension of R Package BTYD
-Version: 0.6.5
+Version: 0.7.0
 Date: 2016-04-19
 Authors@R: person("Michael", "Platzer", email = "michael.platzer@gmail.com", role = c("aut", "cre"))
 Description: Extends the functionality of BTYD package by providing methods for
