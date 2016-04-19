@@ -1,6 +1,8 @@
 
 Changes in version 0.7.0 (2016-04-19):
 
+    o   ggnbd.ConditionalExpectedTransactions disabled
+
     o   (m)bgcnbd.ConditionalExpectedTransactions uses same h2f1 method as BTYD, if GSL is not present
 
     o   added Travis-CI
