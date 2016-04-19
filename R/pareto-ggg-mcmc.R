@@ -19,7 +19,6 @@
 ##'  \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
 ##' }
 #' @export
-#' @example demo/pareto-ggg.R
 #' @seealso \code{link{pggg.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
 pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 50, chains = 2, mc.cores = NULL, 
     param_init = NULL, trace = 100) {

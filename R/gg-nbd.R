@@ -18,7 +18,6 @@
 #' @references Bemmaor, Albert C., and Nicolas Glady. 'Modeling Purchasing 
 #'   Behavior with Sudden 'Death': A Flexible Customer Lifetime Model.'
 #'   Management Science 58.5 (2012): 1012-1021.
-#' @example demo/gg-nbd.R
 ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 0.5, 1, 1), min.param.value = 1e-05, max.param.value = 10000, 
     trace = 0) {
     dc.check.model.params(c("r", "alpha", "b", "s", "beta"), par.start, "ggnbd.EstimateParameters")

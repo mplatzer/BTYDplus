@@ -35,7 +35,6 @@
 ##'  \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
 ##' }
 #' @export
-#' @example demo/pareto-ggg.R
 #' @seealso \code{\link{pggg.GenerateData}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{mcmc.PAlive}}
 #' @references Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD model and possible extensions.' Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
 #' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.

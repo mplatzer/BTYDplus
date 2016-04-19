@@ -19,7 +19,6 @@
 ##'  \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
 ##' }
 #' @export
-#' @example demo/pareto-nbd-abe.R
 #' @seealso \code{link{abe.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}}
 #' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
 abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burnin = 500, thin = 50, chains = 2, 
