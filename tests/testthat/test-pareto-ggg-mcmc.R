@@ -1,6 +1,8 @@
 context("mcmc")
 
 test_that("Pareto/GGG MCMC", {
+    skip_on_cran()
+    skip_on_travis()
     
     # generate artificial Pareto/GGG data
     params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 10, s = 0.8, beta = 12)
@@ -18,12 +20,12 @@ test_that("Pareto/GGG MCMC", {
     
     # require less than 10% deviation in estimated parameters
     ape <- function(act, est) abs(act - est)/act
-    expect_less_than(ape(params$r, est$r), 0.1)
-    expect_less_than(ape(params$alpha, est$alpha), 0.1)
-    expect_less_than(ape(params$s, est$s), 0.2)  # s hard to estimate
-    expect_less_than(ape(params$beta, est$beta), 0.4)  # beta hard to estimate
-    expect_less_than(ape(params$t, est$t), 0.1)
-    expect_less_than(ape(params$gamma, est$gamma), 0.1)
+    expect_lt(ape(params$r, est$r), 0.1)
+    expect_lt(ape(params$alpha, est$alpha), 0.1)
+    expect_lt(ape(params$s, est$s), 0.2)  # s hard to estimate
+    expect_lt(ape(params$beta, est$beta), 0.4)  # beta hard to estimate
+    expect_lt(ape(params$t, est$t), 0.1)
+    expect_lt(ape(params$gamma, est$gamma), 0.1)
     
     # estimate future transactions & P(alive)
     xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
@@ -32,9 +34,9 @@ test_that("Pareto/GGG MCMC", {
     cbs$palive <- mcmc.PAlive(cbs, draws)
     
     # require less than 5% deviation
-    expect_less_than(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.05)
-    expect_less_than(ape(sum(cbs$palive), sum(cbs$alive)), 0.05)
-    expect_less_than(ape(sum(cbs$x.star > 0), sum(cbs$pactive)), 0.05)
+    expect_lt(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.05)
+    expect_lt(ape(sum(cbs$palive), sum(cbs$alive)), 0.05)
+    expect_lt(ape(sum(cbs$x.star > 0), sum(cbs$pactive)), 0.05)
     
     expect_true(min(cbs$x.star) >= 0)
     expect_true(all(cbs$x.star == round(cbs$x.star)))
