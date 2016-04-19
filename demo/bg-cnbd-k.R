@@ -6,9 +6,8 @@ n <- 8000  # no. of customers
 T.cal <- round(runif(n, 24, 32))  # 12-32 weeks of calibration period
 T.star <- 32  # 32 weeks of hold-out period
 params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-# regularity in interpurchase-times (Erlang-k) 
-# purchase frequency lambda_i ~ Gamma(r, alpha) 
-# dropout probability p_i ~ Beta(a, b)
+# regularity in interpurchase-times (Erlang-k); purchase frequency lambda_i ~ Gamma(r, alpha) dropout;
+# probability p_i ~ Beta(a, b)
 
 data <- bgcnbd.GenerateData(n, T.cal, T.star, params, return.elog = TRUE)
 cbs <- data$cbs  # CBS summary - one record per customer

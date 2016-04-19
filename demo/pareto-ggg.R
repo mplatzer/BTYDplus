@@ -6,8 +6,8 @@ n <- 1000  # no. of customers
 T.cal <- 32  # length of calibration period
 T.star <- 32  # length of hold-out period
 params <- list(t = 4.5, gamma = 1.5, r = 5, alpha = 10, s = 0.8, beta = 12)
-# regularity parameter k_i ~ Gamma(t, gamma) purchase frequency lambda_i ~ Gamma(r, alpha) dropout probability
-# mu_i ~ Gamma(s, beta)
+# regularity parameter k_i ~ Gamma(t, gamma); purchase frequency lambda_i ~ Gamma(r, alpha); dropout
+# probability mu_i ~ Gamma(s, beta)
 
 data <- pggg.GenerateData(n, T.cal, T.star, params, return.elog = TRUE)
 cbs <- data$cbs
