@@ -14,7 +14,7 @@ bgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = NULL,
 in that order.}
 
 \item{cal.cbs}{calibration period CBS (customer by sufficient statistic). It
-must contain columns for frequency ("x") and total time observed ("T.cal").}
+must contain columns for frequency ('x') and total time observed ('T.cal').}
 
 \item{censor}{integer used to censor the data.}
 

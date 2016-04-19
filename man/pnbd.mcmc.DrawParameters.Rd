@@ -132,9 +132,9 @@ cbs$palive.pnbd.mcmc <- mcmc.PAlive(cbs, pnbd.draws)
 cbs$palive.pggg.mcmc <- mcmc.PAlive(cbs, pggg.draws)
 }
 \references{
-Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
+Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD model and possible extensions.' Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
 
-Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
+Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
 }
 \seealso{
 \code{\link{pggg.GenerateData}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{mcmc.PAlive}}

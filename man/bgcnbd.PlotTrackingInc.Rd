@@ -14,7 +14,7 @@ bgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data,
 in that order.}
 
 \item{T.cal}{a vector to represent customers' calibration period lengths (in
-other words, the "T.cal" column from a customer-by-sufficient-statistic
+other words, the 'T.cal' column from a customer-by-sufficient-statistic
 matrix).}
 
 \item{T.tot}{end of holdout period. Must be a single value, not a vector.}

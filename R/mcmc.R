@@ -135,5 +135,4 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
     # abline(h=mean(x.star>0), col='red', lty=4)
     points(mean(pactive[cbs$x == 0]), mean(x.star[cbs$x == 0] > 0), col = "red", pch = "0")
     par(def.par)
-}
- 
+} 
