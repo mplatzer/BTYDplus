@@ -1,12 +1,13 @@
 context("mle")
 
 test_that("MBG/CNBD-k", {
+  cat('test MBG/CNBD-k\n')
   
   # generate artificial MBG/CNBD-k data
   set.seed(1)
   n <- 8000
   params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-  data <- mbgcnbd.GenerateData(n = n, T.cal = runif(n, 12, 96), T.star = 32, params = params, return.elog = TRUE)
+  data <- mbgcnbd.GenerateData(n = n, T.cal = round(runif(n, 12, 96)/4)*4, T.star = 32, params = params, return.elog = TRUE)
   cbs <- data$cbs
   elog <- data$elog
   

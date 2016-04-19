@@ -1,6 +1,7 @@
 context("mle")
 
 test_that("BG/CNBD-k", {
+  cat('test BG/CNBD-k\n')
   
   # validate against BTYD implementation
   set.seed(1)
@@ -32,7 +33,7 @@ test_that("BG/CNBD-k", {
   set.seed(1)
   n <- 8000
   params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-  data <- bgcnbd.GenerateData(n = n, T.cal = round(runif(n, 12, 96)), T.star = c(32, 64), params = params, return.elog = TRUE)
+  data <- bgcnbd.GenerateData(n = n, T.cal = round(runif(n, 12, 96)/4)*4, T.star = c(32, 64), params = params, return.elog = TRUE)
   cbs <- data$cbs
   elog <- data$elog
   

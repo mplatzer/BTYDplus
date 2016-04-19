@@ -1,6 +1,7 @@
 context("mle")
 
 test_that("NBD", {
+  cat('test NBD\n')
   
   # generate artificial NBD data
   set.seed(1)

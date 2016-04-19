@@ -2,6 +2,7 @@ context("mle")
 
 test_that("Gamma/Gompertz/NBD", {
   skip("ggnbd.ConditionalExpectedTransactions is currently broken")
+  cat('test GG/NBD\n')
   
   # generate artificial Gamma/Gompertz/NBD data
   set.seed(1)

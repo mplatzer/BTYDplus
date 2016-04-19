@@ -1,6 +1,8 @@
 context("mcmc")
 
 test_that("Pareto/GGG MCMC", {
+  cat('test Pareto/GGG\n')
+  skip('not run as it takes too long')
   skip_on_cran()
   skip_on_travis()
   

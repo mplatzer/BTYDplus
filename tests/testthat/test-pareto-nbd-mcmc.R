@@ -1,6 +1,8 @@
 context("mcmc")
 
 test_that("Pareto/NBD MCMC", {
+  cat('test Pareto/NBD MCMC\n')
+  skip_on_cran()
   
   # generate artificial Pareto/NBD data
   set.seed(1)

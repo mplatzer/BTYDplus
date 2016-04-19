@@ -1,12 +1,13 @@
 context("mle")
 
 test_that("BG/NBD", {
+  cat('test BG/NBD\n')
   
   # generate artificial BG/NBD data
   set.seed(1)
   params <- c(r = 0.85, alpha = 4.45, a = 0.79, b = 2.42)
   n <- 8000
-  cbs <- bgnbd.GenerateData(n, runif(n, 12, 96), 32, params)$cbs
+  cbs <- bgnbd.GenerateData(n, round(runif(n, 12, 96)/4)*4, 32, params)$cbs
   
   # estimate parameters, and compare to true parameters
   est <- BTYD::bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal")])
