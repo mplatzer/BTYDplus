@@ -29,8 +29,8 @@ Simulate data according to MBG/NBD model assumptions
 Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
   validation and comparison of models for customer base analysis.
   International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
-  Daniel, and Udo Wagner. "Customer base analysis: The case for a central
-  variant of the Betageometric/NBD Model." Marketing Journal of Research and
+  Daniel, and Udo Wagner. 'Customer base analysis: The case for a central
+  variant of the Betageometric/NBD Model.' Marketing Journal of Research and
   Management 3.2 (2007): 75-90.
 }
 \seealso{

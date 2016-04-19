@@ -11,7 +11,7 @@ bgcnbd.GenerateData(n, T.cal, T.star = NULL, params, return.elog = FALSE,
 \item{n}{number of customers}
 
 \item{T.cal}{length of calibration period; if vector then it is assumed that
-customers have different "birth" dates, i.e. max(T.cal)-T.cal}
+customers have different 'birth' dates, i.e. max(T.cal)-T.cal}
 
 \item{T.star}{length(s) of holdout period(s); assumed to be same for all
 customers}

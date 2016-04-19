@@ -1,10 +1,9 @@
 Package: BTYDplus
 Type: Package
 Title: Extension of R Package BTYD
-Version: 0.6.5
+Version: 0.7.0
 Date: 2016-04-19
-Author: Michael Platzer <michael.platzer@gmail.com>
-Maintainer: Michael Platzer <michael.platzer@gmail.com>
+Authors@R: person("Michael", "Platzer", email = "michael.platzer@gmail.com", role = c("aut", "cre"))
 Description: Extends the functionality of BTYD package by providing methods for
     parameter estimation and scoring for NBD, G/G/NBD, MBG/NBD, BG/CNBD-k and
     MBG/CNBD-k models, as well as MCMC samples for Pareto/NBD,
@@ -15,11 +14,15 @@ License: GPL-3
 LinkingTo: Rcpp
 Depends: R (>= 3.2.0)
 Imports:
-    Rcpp (>= 0.11.1),
+    Rcpp,
     BTYD (>= 2.3),
     coda,
     data.table,
     mvtnorm,
     bayesm
+Suggests: 
+    testthat,
+    gsl
 Roxygen: list(wrap = FALSE)
 RoxygenNote: 5.0.1
+LazyData: true

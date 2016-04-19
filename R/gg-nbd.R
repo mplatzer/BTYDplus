@@ -14,31 +14,26 @@
 #' @param max.param.value the upper bound on parameters
 #' @param trace print logging step every \code{trace} iteration
 #' @return list of estimated parameters
-#' @import BTYD
 #' @export
-#' @references Bemmaor, Albert C., and Nicolas Glady. "Modeling Purchasing 
-#'   Behavior with Sudden 'Death': A Flexible Customer Lifetime Model."
+#' @references Bemmaor, Albert C., and Nicolas Glady. 'Modeling Purchasing 
+#'   Behavior with Sudden 'Death': A Flexible Customer Lifetime Model.'
 #'   Management Science 58.5 (2012): 1012-1021.
-#' @example demo/gg-nbd.r
-ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min.param.value=1e-5, max.param.value=1e+4, trace=0) {
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), par.start, 
-                        "ggnbd.EstimateParameters")
+ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 0.5, 1, 1), min.param.value = 1e-05, max.param.value = 10000, 
+  trace = 0) {
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), par.start, "ggnbd.EstimateParameters")
   count <- 0
   ggnbd.eLL <- function(params, cal.cbs) {
     params <- exp(params)
     loglik <- ggnbd.cbs.LL(params, cal.cbs)
     count <<- count + 1
-    if (trace>0 & count%%trace==0)
-      cat("ggnbd.EstimateParameters - iter", count, ":", sprintf("%12.2f", loglik), ":", sprintf("%10.6f", params), "\n")
+    if (trace > 0 & count%%trace == 0) 
+      cat("ggnbd.EstimateParameters - iter", count, ":", sprintf("%12.2f", loglik), ":", sprintf("%10.6f", 
+        params), "\n")
     return(-1 * loglik)
   }
   logparams <- log(par.start)
-  results <- optim(par = logparams, 
-                   fn = ggnbd.eLL, 
-                   cal.cbs = cal.cbs, 
-                   method = "L-BFGS-B",
-                   lower = log(min.param.value), 
-                   upper = log(max.param.value))
+  results <- optim(par = logparams, fn = ggnbd.eLL, cal.cbs = cal.cbs, method = "L-BFGS-B", lower = log(min.param.value), 
+    upper = log(max.param.value))
   estimated.params <- exp(results$par)
   names(estimated.params) <- c("r", "alpha", "b", "s", "beta")
   return(estimated.params)
@@ -58,8 +53,7 @@ ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, .5, 1, 1), min
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
 ggnbd.cbs.LL <- function(params, cal.cbs) {
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
-                        "ggnbd.cbs.LL")  
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.cbs.LL")
   tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
   tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
   tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
@@ -83,8 +77,7 @@ ggnbd.cbs.LL <- function(params, cal.cbs) {
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
 ggnbd.LL <- function(params, x, t.x, T.cal) {
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
-                        "ggnbd.LL")
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.LL")
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -109,12 +102,13 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
   
   intl <- numeric(0)
   for (i in 1:max.length) {
-    intl[i] <- integrate(function(y) (y+alpha)^-(r+x[i]) * (beta+exp(b*y)-1)^-(s+1) * exp(b*y), 
-                      lower=t.x[i], upper=T.cal[i])$value
+    intl[i] <- integrate(function(y) (y + alpha)^-(r + x[i]) * (beta + exp(b * y) - 1)^-(s + 1) * exp(b * y), 
+      lower = t.x[i], upper = T.cal[i])$value
   }
   
-  L1 <- lgamma(r+x) - lgamma(r) + r*(log(alpha)-log(alpha+T.cal)) - x*log(alpha+T.cal) + s*(log(beta)-log(beta-1+exp(b*T.cal)))
-  L2 <- lgamma(r+x) - lgamma(r) + log(b) + r*log(alpha) + log(s) + s*log(beta) + log(intl)
+  L1 <- lgamma(r + x) - lgamma(r) + r * (log(alpha) - log(alpha + T.cal)) - x * log(alpha + T.cal) + s * (log(beta) - 
+    log(beta - 1 + exp(b * T.cal)))
+  L2 <- lgamma(r + x) - lgamma(r) + log(b) + r * log(alpha) + log(s) + s * log(beta) + log(intl)
   
   llh <- log(exp(L1) + exp(L2))
   
@@ -141,8 +135,7 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
 ggnbd.PAlive <- function(params, x, t.x, T.cal) {
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
-                        "ggnbd.PAlive")
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.PAlive")
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -164,8 +157,8 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
   b <- params[3]
   s <- params[4]
   beta <- params[5]
-  P1 <- lgamma(r+x) - lgamma(r)
-  P2 <- r * log(alpha/(alpha+T.cal)) + x * log(1/(alpha+T.cal)) + s * log(beta/(beta-1+exp(b*T.cal)))
+  P1 <- lgamma(r + x) - lgamma(r)
+  P2 <- r * log(alpha/(alpha + T.cal)) + x * log(1/(alpha + T.cal)) + s * log(beta/(beta - 1 + exp(b * T.cal)))
   P3 <- ggnbd.LL(params, x, t.x, T.cal)
   return(exp(P1 + P2 - P3))
 }
@@ -194,10 +187,9 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' @export
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, 
-                        "ggnbd.ConditionalExpectedTransactions")  
-  max.length <- max(length(T.star), length(x), length(t.x), 
-    length(T.cal))
+  stop("This method is currently broken")
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.ConditionalExpectedTransactions")
+  max.length <- max(length(T.star), length(x), length(t.x), length(T.cal))
   if (max.length%%length(T.star)) 
     warning("Maximum vector length not a multiple of the length of T.star")
   if (max.length%%length(x)) 
@@ -224,17 +216,17 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
   s <- params[4]
   beta <- params[5]
   
-  P1 <- (r+x) / (alpha+T.cal)
-  beta.star <- beta + exp(b*T.cal) - 1
-  P2 <- (beta.star/(beta.star+exp(b*T.star)-1))^s * T.star
+  P1 <- (r + x)/(alpha + T.cal)
+  beta.star <- beta + exp(b * T.cal) - 1
+  P2 <- (beta.star/(beta.star + exp(b * T.star) - 1))^s * T.star
   P3a <- b * s * beta.star^s
   P3b <- numeric()
   for (i in 1:max.length) {
-    P3b[i] <- integrate(function(tau) tau * exp(b*tau) * (beta.star[i]+exp(b*tau)-1)^(-s-1),
-                        lower=0, upper=T.star[i])$value
+    P3b[i] <- integrate(function(tau) tau * exp(b * tau) * (beta.star[i] + exp(b * tau) - 1)^(-s - 1), lower = 0, 
+      upper = T.star[i])$value
   }
   PAlive <- ggnbd.PAlive(params, x, t.x, T.cal)
-  return(P1 * (P2+P3a*P3b) * PAlive)
+  return(P1 * (P2 + P3a * P3b) * PAlive)
 }
 
 
@@ -250,63 +242,62 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
-ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog=FALSE) {
+ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   # check model parameters
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params,
-                        "ggnbd.GenerateData")
+  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.GenerateData")
   r <- params[1]
   alpha <- params[2]
   b <- params[3]
   s <- params[4]
-  beta <- params[5]  
+  beta <- params[5]
   
-  if (length(T.cal)==1) T.cal <- rep(T.cal, n)
-  if (length(T.star)==1) T.star <- rep(T.star, n)
+  if (length(T.cal) == 1) 
+    T.cal <- rep(T.cal, n)
+  if (length(T.star) == 1) 
+    T.star <- rep(T.star, n)
   
   # sample intertransaction timings parameter lambda for each customer
-  lambdas <- rgamma(n, shape=r, rate=alpha)
+  lambdas <- rgamma(n, shape = r, rate = alpha)
   
-  # sample lifetimes for each customer  
-  taus <- (1/b)*log(1-beta+beta/(1-runif(n))^(1/s))
+  # sample lifetimes for each customer
+  taus <- (1/b) * log(1 - beta + beta/(1 - runif(n))^(1/s))
   
   # sample intertransaction timings & churn
   cbs_list <- list()
   elog_list <- list()
   for (i in 1:n) {
     lambda <- lambdas[i]
-    #eta <- etas[i]
+    # eta <- etas[i]
     tau <- taus[i]
     # sample 'sufficiently' large amount of inter-transaction times
-    minT <- min(T.cal[i]+T.star[i], tau)
+    minT <- min(T.cal[i] + T.star[i], tau)
     nr_of_itt_draws <- max(10, round(minT * lambda))
-    itts <- rexp(nr_of_itt_draws * 2, rate=lambda)
-    if (sum(itts)<minT) itts <- c(itts, rexp(nr_of_itt_draws * 4, rate=lambda))
-    if (sum(itts)<minT) itts <- c(itts, rexp(nr_of_itt_draws * 800, rate=lambda))
-    if (sum(itts)<minT)
+    itts <- rexp(nr_of_itt_draws * 2, rate = lambda)
+    if (sum(itts) < minT) 
+      itts <- c(itts, rexp(nr_of_itt_draws * 4, rate = lambda))
+    if (sum(itts) < minT) 
+      itts <- c(itts, rexp(nr_of_itt_draws * 800, rate = lambda))
+    if (sum(itts) < minT) 
       stop("not enough inter-transaction times sampled: ", sum(itts), " < ", minT)
     times <- cumsum(c(0, itts))
-    times <- times[times<tau]
+    times <- times[times < tau]
     if (return.elog) 
-      elog_list[[i]] <- data.frame(cust=i, t=times[times<(T.cal[i]+T.star[i])])
+      elog_list[[i]] <- data.frame(cust = i, t = times[times < (T.cal[i] + T.star[i])])
     # determine frequency, recency, etc.
-    ts.cal   <- times[times<T.cal[i]]
-    ts.star  <- times[times>=T.cal[i] & times<(T.cal[i]+T.star[i])]
-    cbs_list[[i]] <- list(cust   = i,
-                          x      = length(ts.cal)-1,
-                          t.x    = max(ts.cal),
-                          alive  = tau>T.cal[i],
-                          x.star = length(ts.star))
+    ts.cal <- times[times < T.cal[i]]
+    ts.star <- times[times >= T.cal[i] & times < (T.cal[i] + T.star[i])]
+    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), alive = tau > T.cal[i], x.star = length(ts.star))
   }
   cbs <- do.call(rbind.data.frame, cbs_list)
   cbs$lambda <- lambdas
-  cbs$tau    <- taus
-  cbs$T.cal  <- T.cal
+  cbs$tau <- taus
+  cbs$T.cal <- T.cal
   cbs$T.star <- T.star
   rownames(cbs) <- NULL
-  out <- list(cbs=cbs)
+  out <- list(cbs = cbs)
   if (return.elog) {
     elog <- do.call(rbind.data.frame, elog_list)
     out$elog <- elog
   }
   return(out)
-}
+} 

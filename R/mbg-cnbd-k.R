@@ -85,7 +85,7 @@ mbgcnbd.PlotFrequencyInCalibration <- function(...) {
 #' @seealso \code{\link{bgcnbd.Expectation}}
 #' @export
 mbgcnbd.Expectation <- function(...) {
-  bgcnbd.Expectation(..., dropout_at_zero = TRUE)  
+  bgcnbd.Expectation(..., dropout_at_zero = TRUE)
 }
 
 
@@ -116,4 +116,4 @@ mbgcnbd.PlotTrackingCum <- function(...) {
 #' @export
 mbgcnbd.PlotTrackingInc <- function(...) {
   bgcnbd.PlotTrackingInc(..., dropout_at_zero = TRUE)
-}
+} 

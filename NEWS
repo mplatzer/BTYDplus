@@ -1,7 +1,13 @@
 
-Changes in version 0.6.5 (2016-04-19):
+Changes in version 0.7.0 (2016-04-19):
 
-    o   (m)bgcnbd.ConditionalExpectedTransactions uses same h2f1 method as BTYD, rather than relying on GSL
+    o   ggnbd.ConditionalExpectedTransactions disabled
+
+    o   (m)bgcnbd.ConditionalExpectedTransactions uses same h2f1 method as BTYD, if GSL is not present
+
+    o   added Travis-CI
+    
+    o   formatted R code with `formatR::tidy_dir('R', indent=2)`
 
 Changes in version 0.6.4 (2016-02-23):
 
