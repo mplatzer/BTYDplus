@@ -38,8 +38,8 @@ x <- readline("Estimate Models via MLE (press Enter)")
 x <- readline("Compare Log-Likelihoods (press Enter)")
 
 rbind(NBD = nbd.cbs.LL(params.nbd, cbs), `Pareto/NBD` = BTYD::pnbd.cbs.LL(params.pnbd, cbs), `GG/NBD` = ggnbd.cbs.LL(params.ggnbd, 
-    cbs), `BG/NBD` = BTYD::bgnbd.cbs.LL(params.bgnbd, cbs), `MBG/NBD` = mbgnbd.cbs.LL(params.mbgnbd, cbs), `MBG/CNBD-k` = mbgcnbd.cbs.LL(params.mbgcnbd, 
-    cbs))
+  cbs), `BG/NBD` = BTYD::bgnbd.cbs.LL(params.bgnbd, cbs), `MBG/NBD` = mbgnbd.cbs.LL(params.mbgnbd, cbs), `MBG/CNBD-k` = mbgcnbd.cbs.LL(params.mbgcnbd, 
+  cbs))
 # -> MBG/NBD provides best fit according to LL
 
 
@@ -71,10 +71,10 @@ RMSE <- function(a, f) sqrt(mean((a - f)^2))
 MSLE <- function(a, f) mean(((log(a + 1) - log(f + 1)))^2)
 BIAS <- function(a, f) sum(f)/sum(a) - 1
 bench <- function(cbs, models) {
-    acc <- t(sapply(models, function(model) c(MAPE(cbs$x.star, cbs[, model]), RMSE(cbs$x.star, cbs[, model]), 
-        MSLE(cbs$x.star, cbs[, model]), BIAS(cbs$x.star, cbs[, model]))))
-    colnames(acc) <- c("MAPE", "RMSE", "MSLE", "BIAS")
-    round(acc, 3)
+  acc <- t(sapply(models, function(model) c(MAPE(cbs$x.star, cbs[, model]), RMSE(cbs$x.star, cbs[, model]), MSLE(cbs$x.star, 
+    cbs[, model]), BIAS(cbs$x.star, cbs[, model]))))
+  colnames(acc) <- c("MAPE", "RMSE", "MSLE", "BIAS")
+  round(acc, 3)
 }
 
 bench(cbs, c("nbd", "pnbd", "ggnbd", "bgnbd", "mbgnbd", "mbgcnbd"))

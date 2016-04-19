@@ -5,7 +5,7 @@
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @export
 mbgcnbd.EstimateParameters <- function(...) {
-    bgcnbd.EstimateParameters(..., dropout_at_zero = TRUE)
+  bgcnbd.EstimateParameters(..., dropout_at_zero = TRUE)
 }
 
 
@@ -15,7 +15,7 @@ mbgcnbd.EstimateParameters <- function(...) {
 #' @seealso \code{\link{bgcnbd.cbs.LL}}
 #' @export
 mbgcnbd.cbs.LL <- function(...) {
-    bgcnbd.cbs.LL(..., dropout_at_zero = TRUE)
+  bgcnbd.cbs.LL(..., dropout_at_zero = TRUE)
 }
 
 
@@ -25,7 +25,7 @@ mbgcnbd.cbs.LL <- function(...) {
 #' @seealso \code{\link{bgcnbd.LL}}
 #' @export
 mbgcnbd.LL <- function(...) {
-    bgcnbd.LL(..., dropout_at_zero = TRUE)
+  bgcnbd.LL(..., dropout_at_zero = TRUE)
 }
 
 
@@ -35,7 +35,7 @@ mbgcnbd.LL <- function(...) {
 #' @seealso \code{\link{bgcnbd.PAlive}}
 #' @export
 mbgcnbd.PAlive <- function(...) {
-    bgcnbd.PAlive(..., dropout_at_zero = TRUE)
+  bgcnbd.PAlive(..., dropout_at_zero = TRUE)
 }
 
 
@@ -45,7 +45,7 @@ mbgcnbd.PAlive <- function(...) {
 #' @seealso \code{\link{bgcnbd.ConditionalExpectedTransactions}}
 #' @export
 mbgcnbd.ConditionalExpectedTransactions <- function(...) {
-    bgcnbd.ConditionalExpectedTransactions(..., dropout_at_zero = TRUE)
+  bgcnbd.ConditionalExpectedTransactions(..., dropout_at_zero = TRUE)
 }
 
 
@@ -55,7 +55,7 @@ mbgcnbd.ConditionalExpectedTransactions <- function(...) {
 #' @seealso \code{\link{bgcnbd.pmf}}
 #' @export
 mbgcnbd.pmf <- function(...) {
-    bgcnbd.pmf(..., dropout_at_zero = TRUE)
+  bgcnbd.pmf(..., dropout_at_zero = TRUE)
 }
 
 
@@ -65,7 +65,7 @@ mbgcnbd.pmf <- function(...) {
 #' @seealso \code{\link{bgcnbd.GenerateData}}
 #' @export
 mbgcnbd.GenerateData <- function(...) {
-    bgcnbd.GenerateData(..., dropout_at_zero = TRUE)
+  bgcnbd.GenerateData(..., dropout_at_zero = TRUE)
 }
 
 
@@ -75,7 +75,7 @@ mbgcnbd.GenerateData <- function(...) {
 #' @seealso \code{\link{bgcnbd.PlotFrequencyInCalibration}}
 #' @export
 mbgcnbd.PlotFrequencyInCalibration <- function(...) {
-    bgcnbd.PlotFrequencyInCalibration(..., dropout_at_zero = TRUE)
+  bgcnbd.PlotFrequencyInCalibration(..., dropout_at_zero = TRUE)
 }
 
 
@@ -85,7 +85,7 @@ mbgcnbd.PlotFrequencyInCalibration <- function(...) {
 #' @seealso \code{\link{bgcnbd.Expectation}}
 #' @export
 mbgcnbd.Expectation <- function(...) {
-    bgcnbd.Expectation(..., dropout_at_zero = TRUE)
+  bgcnbd.Expectation(..., dropout_at_zero = TRUE)
 }
 
 
@@ -95,7 +95,7 @@ mbgcnbd.Expectation <- function(...) {
 #' @seealso \code{\link{bgcnbd.ExpectedCumulativeTransactions}}
 #' @export
 mbgcnbd.ExpectedCumulativeTransactions <- function(...) {
-    bgcnbd.ExpectedCumulativeTransactions(..., dropout_at_zero = TRUE)
+  bgcnbd.ExpectedCumulativeTransactions(..., dropout_at_zero = TRUE)
 }
 
 
@@ -105,7 +105,7 @@ mbgcnbd.ExpectedCumulativeTransactions <- function(...) {
 #' @seealso \code{\link{bgcnbd.PlotTrackingCum}}
 #' @export
 mbgcnbd.PlotTrackingCum <- function(...) {
-    bgcnbd.PlotTrackingCum(..., dropout_at_zero = TRUE)
+  bgcnbd.PlotTrackingCum(..., dropout_at_zero = TRUE)
 }
 
 
@@ -115,5 +115,5 @@ mbgcnbd.PlotTrackingCum <- function(...) {
 #' @seealso \code{\link{bgcnbd.PlotTrackingInc}}
 #' @export
 mbgcnbd.PlotTrackingInc <- function(...) {
-    bgcnbd.PlotTrackingInc(..., dropout_at_zero = TRUE)
+  bgcnbd.PlotTrackingInc(..., dropout_at_zero = TRUE)
 } 

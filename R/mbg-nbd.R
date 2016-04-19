@@ -21,8 +21,8 @@
 #'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
 #'   Management 3.2 (2007): 75-90.
 mbgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000) {
-    params <- mbgcnbd.EstimateParameters(cal.cbs, par.start, max.param.value, k = 1)
-    return(params[2:5])
+  params <- mbgcnbd.EstimateParameters(cal.cbs, par.start, max.param.value, k = 1)
+  return(params[2:5])
 }
 
 
@@ -46,9 +46,9 @@ mbgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.pa
 #'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
 #'   Management 3.2 (2007): 75-90.
 mbgnbd.cbs.LL <- function(params, cal.cbs) {
-    if (length(params) == 4) 
-        params <- c(k = 1, params)
-    return(mbgcnbd.cbs.LL(params, cal.cbs))
+  if (length(params) == 4) 
+    params <- c(k = 1, params)
+  return(mbgcnbd.cbs.LL(params, cal.cbs))
 }
 
 
@@ -70,9 +70,9 @@ mbgnbd.cbs.LL <- function(params, cal.cbs) {
 #'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
 #'   Management 3.2 (2007): 75-90.
 mbgnbd.LL <- function(params, x, t.x, T.cal) {
-    if (length(params) == 4) 
-        params <- c(k = 1, params)
-    return(mbgcnbd.LL(params, x, t.x, T.cal))
+  if (length(params) == 4) 
+    params <- c(k = 1, params)
+  return(mbgcnbd.LL(params, x, t.x, T.cal))
 }
 
 
@@ -102,9 +102,9 @@ mbgnbd.LL <- function(params, x, t.x, T.cal) {
 #'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
 #'   Management 3.2 (2007): 75-90.
 mbgnbd.PAlive <- function(params, x, t.x, T.cal) {
-    if (length(params) == 4) 
-        params <- c(k = 1, params)
-    return(mbgcnbd.PAlive(params, x, t.x, T.cal))
+  if (length(params) == 4) 
+    params <- c(k = 1, params)
+  return(mbgcnbd.PAlive(params, x, t.x, T.cal))
 }
 
 
@@ -138,9 +138,9 @@ mbgnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
 #'   Management 3.2 (2007): 75-90.
 mbgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
-    if (length(params) == 4) 
-        params <- c(k = 1, params)
-    return(mbgcnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal))
+  if (length(params) == 4) 
+    params <- c(k = 1, params)
+  return(mbgcnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal))
 }
 
 
@@ -167,9 +167,9 @@ mbgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 #'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
 #'   Management 3.2 (2007): 75-90.
 mbgnbd.pmf <- function(params, t, x) {
-    if (length(params) == 4) 
-        params <- c(k = 1, params)
-    mbgcnbd.pmf(params = params, t = t, x = x)
+  if (length(params) == 4) 
+    params <- c(k = 1, params)
+  mbgcnbd.pmf(params = params, t = t, x = x)
 }
 
 
@@ -192,7 +192,7 @@ mbgnbd.pmf <- function(params, t, x) {
 #'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
 #'   Management 3.2 (2007): 75-90.
 mbgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
-    if (length(params) == 4) 
-        params <- c(k = 1, params)
-    return(mbgcnbd.GenerateData(n = n, T.cal = T.cal, T.star = T.star, params = params, return.elog = return.elog))
+  if (length(params) == 4) 
+    params <- c(k = 1, params)
+  return(mbgcnbd.GenerateData(n = n, T.cal = T.cal, T.star = T.star, params = params, return.elog = return.elog))
 } 

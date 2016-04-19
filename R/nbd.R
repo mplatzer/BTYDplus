@@ -16,18 +16,18 @@
 #'   techniques in marketing analysis: text and readings (1962): 355.
 #' @example demo/nbd.R
 nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value = 10000) {
-    dc.check.model.params(c("r", "alpha"), par.start, "nbd.EstimateParameters")
-    nbd.eLL <- function(params, cal.cbs, max.param.value) {
-        params <- exp(params)
-        params[params > max.param.value] <- max.param.value
-        return(-1 * nbd.cbs.LL(params, cal.cbs))
-    }
-    logparams <- log(par.start)
-    results <- optim(logparams, nbd.eLL, cal.cbs = cal.cbs, max.param.value = max.param.value, method = "L-BFGS-B")
-    estimated.params <- exp(results$par)
-    estimated.params[estimated.params > max.param.value] <- max.param.value
-    names(estimated.params) <- c("r", "alpha")
-    return(estimated.params)
+  dc.check.model.params(c("r", "alpha"), par.start, "nbd.EstimateParameters")
+  nbd.eLL <- function(params, cal.cbs, max.param.value) {
+    params <- exp(params)
+    params[params > max.param.value] <- max.param.value
+    return(-1 * nbd.cbs.LL(params, cal.cbs))
+  }
+  logparams <- log(par.start)
+  results <- optim(logparams, nbd.eLL, cal.cbs = cal.cbs, max.param.value = max.param.value, method = "L-BFGS-B")
+  estimated.params <- exp(results$par)
+  estimated.params[estimated.params > max.param.value] <- max.param.value
+  names(estimated.params) <- c("r", "alpha")
+  return(estimated.params)
 }
 
 
@@ -44,15 +44,15 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
 #' @export
 #' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.cbs.LL <- function(params, cal.cbs) {
-    dc.check.model.params(c("r", "alpha"), params, "nbd.cbs.LL")
-    tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
-    tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
-    if ("custs" %in% colnames(cal.cbs)) {
-        custs <- cal.cbs$custs
-    } else {
-        custs <- rep(1, length(x))
-    }
-    return(sum(custs * nbd.LL(params, x, T.cal)))
+  dc.check.model.params(c("r", "alpha"), params, "nbd.cbs.LL")
+  tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  if ("custs" %in% colnames(cal.cbs)) {
+    custs <- cal.cbs$custs
+  } else {
+    custs <- rep(1, length(x))
+  }
+  return(sum(custs * nbd.LL(params, x, T.cal)))
 }
 
 
@@ -66,24 +66,24 @@ nbd.cbs.LL <- function(params, cal.cbs) {
 #' @export
 #' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.LL <- function(params, x, T.cal) {
-    max.length <- max(length(x), length(T.cal))
-    if (max.length%%length(x)) 
-        warning("Maximum vector length not a multiple of the length of x")
-    if (max.length%%length(T.cal)) 
-        warning("Maximum vector length not a multiple of the length of T.cal")
-    dc.check.model.params(c("r", "alpha"), params, "nbd.LL")
-    if (any(x < 0) || !is.numeric(x)) 
-        stop("x must be numeric and may not contain negative numbers.")
-    if (any(T.cal < 0) || !is.numeric(T.cal)) 
-        stop("T.cal must be numeric and may not contain negative numbers.")
-    x <- rep(x, length.out = max.length)
-    T.cal <- rep(T.cal, length.out = max.length)
-    r <- params[1]
-    alpha <- params[2]
-    P1 <- lgamma(r + x) + r * log(alpha)
-    P2 <- lgamma(r) + (r + x) * log(alpha + T.cal)
-    llh <- P1 - P2
-    return(llh)
+  max.length <- max(length(x), length(T.cal))
+  if (max.length%%length(x)) 
+    warning("Maximum vector length not a multiple of the length of x")
+  if (max.length%%length(T.cal)) 
+    warning("Maximum vector length not a multiple of the length of T.cal")
+  dc.check.model.params(c("r", "alpha"), params, "nbd.LL")
+  if (any(x < 0) || !is.numeric(x)) 
+    stop("x must be numeric and may not contain negative numbers.")
+  if (any(T.cal < 0) || !is.numeric(T.cal)) 
+    stop("T.cal must be numeric and may not contain negative numbers.")
+  x <- rep(x, length.out = max.length)
+  T.cal <- rep(T.cal, length.out = max.length)
+  r <- params[1]
+  alpha <- params[2]
+  P1 <- lgamma(r + x) + r * log(alpha)
+  P2 <- lgamma(r) + (r + x) * log(alpha + T.cal)
+  llh <- P1 - P2
+  return(llh)
 }
 
 
@@ -107,26 +107,26 @@ nbd.LL <- function(params, x, T.cal) {
 #' @export
 #' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
-    max.length <- max(length(T.star), length(x), length(T.cal))
-    if (max.length%%length(T.star)) 
-        warning("Maximum vector length not a multiple of the length of T.star")
-    if (max.length%%length(x)) 
-        warning("Maximum vector length not a multiple of the length of x")
-    if (max.length%%length(T.cal)) 
-        warning("Maximum vector length not a multiple of the length of T.cal")
-    dc.check.model.params(c("r", "alpha"), params, "nbd.ConditionalExpectedTransactions")
-    if (any(T.star < 0) || !is.numeric(T.star)) 
-        stop("T.star must be numeric and may not contain negative numbers.")
-    if (any(x < 0) || !is.numeric(x)) 
-        stop("x must be numeric and may not contain negative numbers.")
-    if (any(T.cal < 0) || !is.numeric(T.cal)) 
-        stop("T.cal must be numeric and may not contain negative numbers.")
-    T.star <- rep(T.star, length.out = max.length)
-    x <- rep(x, length.out = max.length)
-    T.cal <- rep(T.cal, length.out = max.length)
-    r <- params[1]
-    alpha <- params[2]
-    return(T.star * (r + x)/(alpha + T.cal))
+  max.length <- max(length(T.star), length(x), length(T.cal))
+  if (max.length%%length(T.star)) 
+    warning("Maximum vector length not a multiple of the length of T.star")
+  if (max.length%%length(x)) 
+    warning("Maximum vector length not a multiple of the length of x")
+  if (max.length%%length(T.cal)) 
+    warning("Maximum vector length not a multiple of the length of T.cal")
+  dc.check.model.params(c("r", "alpha"), params, "nbd.ConditionalExpectedTransactions")
+  if (any(T.star < 0) || !is.numeric(T.star)) 
+    stop("T.star must be numeric and may not contain negative numbers.")
+  if (any(x < 0) || !is.numeric(x)) 
+    stop("x must be numeric and may not contain negative numbers.")
+  if (any(T.cal < 0) || !is.numeric(T.cal)) 
+    stop("T.cal must be numeric and may not contain negative numbers.")
+  T.star <- rep(T.star, length.out = max.length)
+  x <- rep(x, length.out = max.length)
+  T.cal <- rep(T.cal, length.out = max.length)
+  r <- params[1]
+  alpha <- params[2]
+  return(T.star * (r + x)/(alpha + T.cal))
 }
 
 
@@ -142,43 +142,43 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' @export
 #' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
-    # check model parameters
-    dc.check.model.params(c("r", "alpha"), params, "nbd.GenerateData")
-    
-    r <- params[1]
-    alpha <- params[2]
-    
-    if (length(T.cal) == 1) 
-        T.cal <- rep(T.cal, n)
-    if (length(T.star) == 1) 
-        T.star <- rep(T.star, n)
-    
-    # sample intertransaction timings parameter lambda for each customer
-    lambdas <- rgamma(n, shape = r, rate = alpha)
-    
-    # sample intertransaction timings, and generate CBS data frame
-    cbs_list <- list()
-    elog_list <- list()
-    for (i in 1:n) {
-        lambda <- lambdas[i]
-        # sample transaction times
-        times <- cumsum(c(0, rexp(10 * (T.cal[i] + T.star[i]) * lambda, rate = lambda)))
-        if (return.elog) 
-            elog_list <- data.frame(cust = i, t = times[times < (T.cal[i] + T.star[i])])
-        # determine frequency, recency, etc.
-        ts.cal <- times[times < T.cal[i]]
-        ts.star <- times[times >= T.cal[i] & times < (T.cal[i] + T.star[i])]
-        cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), x.star = length(ts.star))
-    }
-    cbs <- do.call(rbind.data.frame, cbs_list)
-    cbs$lambda <- lambdas
-    cbs$T.cal <- T.cal
-    cbs$T.star <- T.star
-    rownames(cbs) <- NULL
-    out <- list(cbs = cbs)
-    if (return.elog) {
-        elog <- do.call(rbind.data.frame, elog_list)
-        out$elog <- elog
-    }
-    return(out)
+  # check model parameters
+  dc.check.model.params(c("r", "alpha"), params, "nbd.GenerateData")
+  
+  r <- params[1]
+  alpha <- params[2]
+  
+  if (length(T.cal) == 1) 
+    T.cal <- rep(T.cal, n)
+  if (length(T.star) == 1) 
+    T.star <- rep(T.star, n)
+  
+  # sample intertransaction timings parameter lambda for each customer
+  lambdas <- rgamma(n, shape = r, rate = alpha)
+  
+  # sample intertransaction timings, and generate CBS data frame
+  cbs_list <- list()
+  elog_list <- list()
+  for (i in 1:n) {
+    lambda <- lambdas[i]
+    # sample transaction times
+    times <- cumsum(c(0, rexp(10 * (T.cal[i] + T.star[i]) * lambda, rate = lambda)))
+    if (return.elog) 
+      elog_list <- data.frame(cust = i, t = times[times < (T.cal[i] + T.star[i])])
+    # determine frequency, recency, etc.
+    ts.cal <- times[times < T.cal[i]]
+    ts.star <- times[times >= T.cal[i] & times < (T.cal[i] + T.star[i])]
+    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), x.star = length(ts.star))
+  }
+  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs$lambda <- lambdas
+  cbs$T.cal <- T.cal
+  cbs$T.star <- T.star
+  rownames(cbs) <- NULL
+  out <- list(cbs = cbs)
+  if (return.elog) {
+    elog <- do.call(rbind.data.frame, elog_list)
+    out$elog <- elog
+  }
+  return(out)
 } 
