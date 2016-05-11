@@ -184,7 +184,6 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   period of length t, conditional on their past behavior. If any of the input
 #'   parameters has a length greater than 1, this will be a vector of expected 
 #'   number of transactions.
-#' @export
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   stop("This method is currently broken")
