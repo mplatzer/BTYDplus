@@ -522,7 +522,7 @@ double bgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zer
     P2a += exp(lgamma(r+i) + r*log(alpha) + i*log(t) - lgamma(i+1) - lgamma(r) - (r+i)*log(alpha+t));
   }
   double P2b;
-  if (dropout_at_zero==FALSE & x==0) {
+  if ((dropout_at_zero==FALSE) & (x==0)) {
     P2b = 0;
   } else {
     P2b = a / (b+survivals);
