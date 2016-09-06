@@ -1,4 +1,10 @@
 
+Changes in version 0.7.1 (2016-09-06):
+
+    o   `elog2cbs` now returns sum over sales for calibration and holdout period
+
+    o   enhanced CDNow demo with estimating of monetary component (i.e. CLV estimate)
+
 Changes in version 0.7.0 (2016-04-19):
 
     o   ggnbd.ConditionalExpectedTransactions disabled
