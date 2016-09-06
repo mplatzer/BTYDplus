@@ -7,6 +7,16 @@ names if these are present}
 \usage{
 dc.check.model.params.safe(printnames, params, func)
 }
+\arguments{
+\item{printnames}{Names to print parameter errors}
+
+\item{params}{model parameters}
+
+\item{func}{Function calling dc.check.model.params.safe}
+}
+\value{
+stops program if there is something wrong with the parameters
+}
 \description{
 Wrapper for BTYD::dc.check.model.params with additional check for parameter
 names if these are present
