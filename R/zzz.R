@@ -3,6 +3,8 @@
 #' @import data.table
 #' @import coda
 #' @import parallel
+#' @import stats
+#' @import graphics
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib BTYDplus
 #' 

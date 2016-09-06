@@ -16,7 +16,7 @@
 #'   techniques in marketing analysis: text and readings (1962): 355.
 #' @example demo/nbd.R
 nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value = 10000) {
-  dc.check.model.params(c("r", "alpha"), par.start, "nbd.EstimateParameters")
+  dc.check.model.params.safe(c("r", "alpha"), par.start, "nbd.EstimateParameters")
   nbd.eLL <- function(params, cal.cbs, max.param.value) {
     params <- exp(params)
     params[params > max.param.value] <- max.param.value
@@ -44,7 +44,7 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
 #' @export
 #' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.cbs.LL <- function(params, cal.cbs) {
-  dc.check.model.params(c("r", "alpha"), params, "nbd.cbs.LL")
+  dc.check.model.params.safe(c("r", "alpha"), params, "nbd.cbs.LL")
   tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
   tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
   if ("custs" %in% colnames(cal.cbs)) {
@@ -71,7 +71,7 @@ nbd.LL <- function(params, x, T.cal) {
     warning("Maximum vector length not a multiple of the length of x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("r", "alpha"), params, "nbd.LL")
+  dc.check.model.params.safe(c("r", "alpha"), params, "nbd.LL")
   if (any(x < 0) || !is.numeric(x)) 
     stop("x must be numeric and may not contain negative numbers.")
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
@@ -114,7 +114,7 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
     warning("Maximum vector length not a multiple of the length of x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("r", "alpha"), params, "nbd.ConditionalExpectedTransactions")
+  dc.check.model.params.safe(c("r", "alpha"), params, "nbd.ConditionalExpectedTransactions")
   if (any(T.star < 0) || !is.numeric(T.star)) 
     stop("T.star must be numeric and may not contain negative numbers.")
   if (any(x < 0) || !is.numeric(x)) 
@@ -143,7 +143,7 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' @seealso \code{\link{nbd.EstimateParameters}}
 nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   # check model parameters
-  dc.check.model.params(c("r", "alpha"), params, "nbd.GenerateData")
+  dc.check.model.params.safe(c("r", "alpha"), params, "nbd.GenerateData")
   
   r <- params[1]
   alpha <- params[2]

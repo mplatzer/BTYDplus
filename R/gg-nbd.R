@@ -20,7 +20,7 @@
 #'   Management Science 58.5 (2012): 1012-1021.
 ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 0.5, 1, 1), min.param.value = 1e-05, max.param.value = 10000, 
   trace = 0) {
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), par.start, "ggnbd.EstimateParameters")
+  dc.check.model.params.safe(c("r", "alpha", "b", "s", "beta"), par.start, "ggnbd.EstimateParameters")
   count <- 0
   ggnbd.eLL <- function(params, cal.cbs) {
     params <- exp(params)
@@ -53,7 +53,7 @@ ggnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 0.5, 1, 1), mi
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
 ggnbd.cbs.LL <- function(params, cal.cbs) {
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.cbs.LL")
+  dc.check.model.params.safe(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.cbs.LL")
   tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
   tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
   tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in ggnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
@@ -77,7 +77,7 @@ ggnbd.cbs.LL <- function(params, cal.cbs) {
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
 ggnbd.LL <- function(params, x, t.x, T.cal) {
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.LL")
+  dc.check.model.params.safe(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.LL")
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -135,7 +135,7 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 #' @export
 ggnbd.PAlive <- function(params, x, t.x, T.cal) {
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.PAlive")
+  dc.check.model.params.safe(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.PAlive")
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -187,7 +187,7 @@ ggnbd.PAlive <- function(params, x, t.x, T.cal) {
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   stop("This method is currently broken")
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.ConditionalExpectedTransactions")
+  dc.check.model.params.safe(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.ConditionalExpectedTransactions")
   max.length <- max(length(T.star), length(x), length(t.x), length(T.cal))
   if (max.length%%length(T.star)) 
     warning("Maximum vector length not a multiple of the length of T.star")
@@ -243,7 +243,7 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
 #' @seealso \code{\link{ggnbd.EstimateParameters}}
 ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   # check model parameters
-  dc.check.model.params(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.GenerateData")
+  dc.check.model.params.safe(c("r", "alpha", "b", "s", "beta"), params, "ggnbd.GenerateData")
   r <- params[1]
   alpha <- params[2]
   b <- params[3]

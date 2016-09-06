@@ -19,7 +19,9 @@ Imports:
     coda,
     data.table,
     mvtnorm,
-    bayesm
+    bayesm,
+    stats,
+    graphics
 Suggests: 
     testthat,
     gsl,
