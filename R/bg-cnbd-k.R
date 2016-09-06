@@ -584,7 +584,7 @@ bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = NULL, pl
 #' @export
 #' @seealso \code{\link{bgnbd.ExpectedCumulativeTransactions}}
 bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final, dropout_at_zero = FALSE) {
-  dc.check.model.params.safe(c("k", "r", "alpha", "s", "beta"), params, "bgcnbd.ExpectedCumulativeTransactions")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.ExpectedCumulativeTransactions")
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
   if (length(T.tot) > 1 || T.tot < 0 || !is.numeric(T.tot)) 
