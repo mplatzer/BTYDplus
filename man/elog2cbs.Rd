@@ -8,7 +8,7 @@ elog2cbs(elog, per = "week", T.cal = max(elog$date),
   T.tot = max(elog$date))
 }
 \arguments{
-\item{elog}{data.frame with columns 'cust' and 'date'}
+\item{elog}{data.frame with columns 'cust' and 'date'; optionally with column 'sales'}
 
 \item{per}{time unit, either 'week', 'day', 'hour', 'min', 'sec'}
 
@@ -26,8 +26,14 @@ Returns data.frame with
      t.x:    time between first and last event in calibration period
      litt:   sum of logarithmic intertransaction timings durint calibration period 
              this is a summary statistic for estimating regularity
+     sales:  sum of sales in calibration period
+     first:  date of first transaction in calibration period
      T.cal:  time between first event and end of calibration period
      T.star: length of holdout period
      x.star: nr of events within holdout period
+     sales.star: sum of sales within holdout period
+     
+Customers without any transaction during calibration period are being dropped from the result.
+Transactions with identical `cust` and `date` field are treated as a single transaction, with `sales` being summed up
 }
 

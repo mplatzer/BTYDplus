@@ -1,13 +1,17 @@
 
 # Load CDNow event log
 library(BTYD)
-data(cdnowElog, package = "BTYD")
-elog <- data.frame(t(sapply(2:nrow(cdnowElog), function(i) strsplit(as.character(cdnowElog[i, ]), split = ",")[[1]])))
+data(cdnowElog, package = "BTYD", envir = environment())
+elog <- data.frame(t(sapply(2:nrow(cdnowElog), 
+                            function(i) strsplit(as.character(cdnowElog[i, ]), split = ",")[[1]])),
+                   stringsAsFactors = FALSE)
 names(elog) <- c("cust", "sampleid", "date", "cds", "sales")
 elog$date <- as.Date(elog$date, "%Y%m%d")
+elog$sales <- as.numeric(elog$sales)
 
-# Transform to CBS (including extra column 'litt')
-cbs <- elog2cbs(elog, per = "week", T.cal = as.Date("1997-09-30"))
+# Transform to CBS (including extra summary statistic 'litt' for estimating regularity)
+cutoff <- as.Date("1997-09-30")
+cbs <- elog2cbs(elog, per = "week", T.cal = cutoff)
 
 nrow(cbs)
 head(cbs)
@@ -44,11 +48,11 @@ rbind(`NBD` = nbd.cbs.LL(params.nbd, cbs),
 
 x <- readline("Estimate Transactions in Holdout period (press Enter)")
 
-cbs$nbd <- nbd.ConditionalExpectedTransactions(params.nbd, cbs$T.star, cbs$x, cbs$T.cal)
-cbs$pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$bgnbd <- BTYD::bgnbd.ConditionalExpectedTransactions(params.bgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$mbgnbd <- mbgnbd.ConditionalExpectedTransactions(params.mbgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$xstar.nbd <- nbd.ConditionalExpectedTransactions(params.nbd, cbs$T.star, cbs$x, cbs$T.cal)
+cbs$xstar.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$xstar.bgnbd <- BTYD::bgnbd.ConditionalExpectedTransactions(params.bgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$xstar.mbgnbd <- mbgnbd.ConditionalExpectedTransactions(params.mbgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$xstar.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
 
 
 x <- readline("Estimate P(alive) (press Enter)")
@@ -62,18 +66,41 @@ cbs$palive.mbgcnbd <- mbgcnbd.PAlive(params = params.mbgcnbd, cbs$x, cbs$t.x, cb
 
 x <- readline("Compare Forecasting Accuracy (press Enter)")
 
-MAPE <- function(a, f) sum(abs(a - f)/sum(a))
+MAE <- function(a, f) mean(abs(a - f))
 RMSE <- function(a, f) sqrt(mean((a - f)^2))
 MSLE <- function(a, f) mean(((log(a + 1) - log(f + 1)))^2)
 BIAS <- function(a, f) sum(f)/sum(a) - 1
 bench <- function(cbs, models) {
-  acc <- t(sapply(models, function(model) c(MAPE(cbs$x.star, cbs[, model]), RMSE(cbs$x.star, cbs[, model]), MSLE(cbs$x.star, 
-    cbs[, model]), BIAS(cbs$x.star, cbs[, model]))))
-  colnames(acc) <- c("MAPE", "RMSE", "MSLE", "BIAS")
+  acc <- t(sapply(models, function(model) {
+    est <- cbs[[paste0('xstar.', model)]]
+    c(MAE(cbs$x.star, est),
+      RMSE(cbs$x.star, est), 
+      MSLE(cbs$x.star, est), 
+      BIAS(cbs$x.star, est))
+  }))
+  colnames(acc) <- c("MAE", "RMSE", "MSLE", "BIAS")
   round(acc, 3)
 }
 
 bench(cbs, c("nbd", "pnbd", "bgnbd", "mbgnbd", "mbgcnbd"))
+
+
+x <- readline("Calculate CLV (press Enter)")
+
+# calculate average spends per transaction
+cbs$sales.avg      <- cbs$sales / (cbs$x + 1)
+
+# Note: we substitute customers with 0 spend with minimum non-zero spend, as the estimation fails otherwise
+cbs$sales.avg[cbs$sales.avg == 0] <- min(cbs$sales.avg[cbs$sales.avg > 0])
+
+# Estimate expected average transaction value based on gamma-gamma spend model
+spend.params <- BTYD::spend.EstimateParameters(cbs$sales.avg, cbs$x + 1)
+cbs$sales.avg.est <- spend.expected.value(spend.params, cbs$sales.avg, cbs$x + 1)
+
+# Calculate CLV for Pareto/NBD
+cbs$sales.pnbd <- cbs$sales.avg.est * cbs$xstar.pnbd
+sprintf('Estimated Sales: %.1f, Actual Sales: %.1f',
+        sum(cbs$sales.pnbd), sum(cbs$sales.star))
 
 
 x <- readline("Estimate Pareto/NBD model via MCMC (press Enter)")
@@ -133,3 +160,4 @@ cbs$pactive.pggg.mcmc <- apply(pggg.xstar, 2, function(x) mean(x > 0))
 # calculate P(alive)
 cbs$palive.pnbd.mcmc <- mcmc.PAlive(cbs, pnbd.draws)
 cbs$palive.pggg.mcmc <- mcmc.PAlive(cbs, pggg.draws) 
+
