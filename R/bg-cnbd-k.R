@@ -27,7 +27,7 @@
 bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 3), max.param.value = 10000, trace = 0, 
   dropout_at_zero = FALSE) {
   
-  dc.check.model.params(c("r", "alpha", "a", "b"), par.start, "bgcnbd.EstimateParameters")
+  dc.check.model.params.safe(c("r", "alpha", "a", "b"), par.start, "bgcnbd.EstimateParameters")
   
   # either `k` or `litt` need to be present
   if (is.null(k) & !"litt" %in% colnames(cal.cbs)) 
@@ -99,7 +99,7 @@ bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 bgcnbd.cbs.LL <- function(params, cal.cbs, dropout_at_zero = FALSE) {
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.cbs.LL")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.cbs.LL")
   tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
   tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
   tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
@@ -137,7 +137,7 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
     warning("Maximum vector length not a multiple of the length of T.cal")
   if (max.length%%length(litt)) 
     warning("Maximum vector length not a multiple of the length of litt")
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.LL")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.LL")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   if (any(x < 0) || !is.numeric(x)) 
@@ -193,7 +193,7 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
   
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.pmf")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.pmf")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   if (length(t) > 1 & length(x) > 1 & length(t) != length(x)) 
@@ -228,7 +228,7 @@ bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 bgcnbd.Expectation <- function(params, t, dropout_at_zero = FALSE) {
   
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.Expectation")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.Expectation")
   if (any(t < 0) || !is.numeric(t)) 
     stop("t must be numeric and may not contain negative numbers.")
   
@@ -273,7 +273,7 @@ bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
     warning("Maximum vector length not a multiple of the length of t.x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PAlive")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PAlive")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   if (any(x < 0) || !is.numeric(x)) 
@@ -341,7 +341,7 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
     warning("Maximum vector length not a multiple of the length of t.x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.ConditionalExpectedTransactions")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.ConditionalExpectedTransactions")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   if (any(T.star < 0) || !is.numeric(T.star)) 
@@ -421,7 +421,7 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 bgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = FALSE, dropout_at_zero = FALSE) {
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.GenerateData")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.GenerateData")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   
@@ -513,7 +513,7 @@ bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = NULL, pl
   ylab = "Customers", title = "Frequency of Repeat Transactions", dropout_at_zero = FALSE) {
   tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in bgcnbd.PlotFrequencyInCalibration: cal.cbs must have a frequency column labelled \"x\""))
   tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in bgcnbd.PlotFrequencyInCalibration: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotFrequencyInCalibration")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotFrequencyInCalibration")
   if (is.null(censor) || censor > max(x)) 
     censor <- max(x)
   n.x <- rep(0, max(x) + 1)
@@ -584,7 +584,7 @@ bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = NULL, pl
 #' @export
 #' @seealso \code{\link{bgnbd.ExpectedCumulativeTransactions}}
 bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final, dropout_at_zero = FALSE) {
-  dc.check.model.params(c("k", "r", "alpha", "s", "beta"), params, "bgcnbd.ExpectedCumulativeTransactions")
+  dc.check.model.params.safe(c("k", "r", "alpha", "s", "beta"), params, "bgcnbd.ExpectedCumulativeTransactions")
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
   if (length(T.tot) > 1 || T.tot < 0 || !is.numeric(T.tot)) 
@@ -632,7 +632,7 @@ bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.period
 bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data, xlab = "Week", ylab = "Cumulative Transactions", 
   xticklab = NULL, title = "Tracking Cumulative Transactions", ymax = NULL, dropout_at_zero = FALSE) {
   
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotTrackingCum")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotTrackingCum")
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
   if (any(actual.cu.tracking.data < 0) || !is.numeric(actual.cu.tracking.data)) 
@@ -691,7 +691,7 @@ bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data
 bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data, xlab = "Week", ylab = "Transactions", 
   xticklab = NULL, title = "Tracking Weekly Transactions", ymax = NULL, dropout_at_zero = FALSE) {
   
-  dc.check.model.params(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotTrackingInc")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotTrackingInc")
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
   if (any(actual.inc.tracking.data < 0) || !is.numeric(actual.inc.tracking.data)) 
