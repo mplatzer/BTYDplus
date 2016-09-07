@@ -213,12 +213,9 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
 #' @seealso \code{\link{elog2cbs}} 
 #' @export
 cdnow.sample <- function() {
-  cds <- sales <- cdnowElog <- NULL  # suppress checkUsage warnings
-  data(cdnowElog, package = "BTYD", envir = environment())
-  elog <- data.table(t(sapply(1:nrow(cdnowElog), function(i) {
-    as.numeric(strsplit(as.character(cdnowElog[i, ]), split = ",")[[1]])
-  })))
-  setnames(elog, c("cust", "sampleid", "date", "cds", "sales"))
+  cds <- sales <- NULL  # suppress checkUsage warnings
+  elog <- fread(system.file("data/cdnowElog.csv", package = "BTYD"))
+  setnames(elog, "masterid", "cust")
   elog <- elog[, list(sales = sum(sales), cds = sum(cds)), by = "cust,date"]
   elog[, `:=`(date, as.Date(as.character(date), "%Y%m%d"))]
   cbs <- elog2cbs(elog, per = "week", T.cal = as.Date("1997-09-30"))

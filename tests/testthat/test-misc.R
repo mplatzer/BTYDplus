@@ -34,7 +34,7 @@ test_that("elog2cum", {
   
   data <- cdnow.sample()
   cum <- elog2cum(data$elog)
-  data(cdnowSummary, package="BTYD", envir = environment())
+  utils::data(cdnowSummary, package="BTYD", envir = environment())
   expect_equal(head(cum, 66), head(cdnowSummary$cu.tracking, 66))
   # Note: for some weird reason these match only for the first 66 weeks?!
   # Probably an issue in BTYD package
