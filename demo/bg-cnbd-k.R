@@ -18,7 +18,7 @@ cbs$palive <- bgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
 
 #' plot estimated incremental transactions
 inc <- elog2inc(elog)
-bgcnbd.PlotTrackingInc(params, cbs$T.cal, T.tot = 78, inc)
+nil <- bgcnbd.PlotTrackingInc(params, cbs$T.cal, T.tot = 78, inc)
 
 
 x <- readline("Estimate BG/CNBD-k for self generated data (press Enter)")
@@ -80,7 +80,7 @@ op <- par(mfrow = c(1, 2))
 inc <- elog2inc(elog, by = 1)
 T.tot <- max(cbs$T.cal + cbs$T.star)
 inc_k <- bgcnbd.PlotTrackingInc(params_k, cbs$T.cal, T.tot, inc)
-inc_1 <- BTYD::bgcnbd.PlotTrackingInc(params_1, cbs$T.cal, T.tot, inc)
+inc_1 <- BTYD::bgnbd.PlotTrackingInc(params_1, cbs$T.cal, T.tot, inc)
 par(op)
 
 

@@ -63,5 +63,5 @@ cbs$xstar.pggg <- apply(pggg.xstar, 2, mean)
 
 #' compare Mean Absolute Error
 mae <- function(a, f) mean(abs(a-f))
-cat('MAE Pareto/GGG:', mae(cbs$x.star, cbs$xstar.pggg), '\n') 
-cat('MAE Pareto/NBD:', mae(cbs$x.star, cbs$xstar.pnbd), '\n') 
+cat("MAE Pareto/GGG:", mae(cbs$x.star, cbs$xstar.pggg), "\n") 
+cat("MAE Pareto/NBD:", mae(cbs$x.star, cbs$xstar.pnbd), "\n") 

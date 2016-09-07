@@ -34,5 +34,5 @@ cbs$xstar.m1 <- apply(xstar.m1.draws, 2, mean)
 cbs$xstar.m2 <- apply(xstar.m2.draws, 2, mean)
 #' 3) compare mean absolute error at individual level
 mae <- function(a, f) mean(abs(a-f))
-cat('MAE Model 1:', mae(cbs$x.star, cbs$xstar.m1), '\n') 
-cat('MAE Model 2:', mae(cbs$x.star, cbs$xstar.m2), '\n') 
+cat("MAE Model 1:", mae(cbs$x.star, cbs$xstar.m1), "\n") 
+cat("MAE Model 2:", mae(cbs$x.star, cbs$xstar.m2), "\n") 

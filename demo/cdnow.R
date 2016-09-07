@@ -59,7 +59,7 @@ MSLE <- function(a, f) mean(((log(a + 1) - log(f + 1)))^2)
 BIAS <- function(a, f) sum(f)/sum(a) - 1
 bench <- function(cbs, models) {
   acc <- t(sapply(models, function(model) {
-    est <- cbs[[paste0('xstar.', model)]]
+    est <- cbs[[paste0("xstar.", model)]]
     c(MAE(cbs$x.star, est),
       RMSE(cbs$x.star, est), 
       MSLE(cbs$x.star, est), 
@@ -88,8 +88,8 @@ cbs$sales.avg.est <- BTYD::spend.expected.value(spend.params, cbs$sales.avg, cbs
 
 #' Calculate CLV for Pareto/NBD
 cbs$sales.pnbd <- cbs$sales.avg.est * cbs$xstar.pnbd
-cat('Estimated Sales:', round(sum(cbs$sales.pnbd), 1), '\n') 
-cat('Actual Sales:', round(sum(cbs$sales.star), 1), '\n') 
+cat("Estimated Sales:", round(sum(cbs$sales.pnbd), 1), "\n") 
+cat("Actual Sales:", round(sum(cbs$sales.star), 1), "\n") 
 
 
 x <- readline("Estimate Pareto/NBD (HB) model via MCMC (press Enter)")

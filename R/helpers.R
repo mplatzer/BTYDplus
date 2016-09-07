@@ -18,6 +18,7 @@
 #' @param plot if \code{TRUE} then distribution of estimated regularity will be plotted
 #' @return estimated real-valued regularity parameter; rounded to an integer,
 #'   this can be used as \code{k} for estimating MBG/CNBD-k models
+#' @references Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase regularity with two interpurchase times.'
 #' @export
 #' @examples
 #' # generate Erlang-3 with various lambdas

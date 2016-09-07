@@ -47,4 +47,7 @@ estimateRegularity(elog, plot = TRUE, method = 'mle-minka')
 estimateRegularity(elog, plot = TRUE, method = 'mle-thom')
 estimateRegularity(elog, plot = TRUE, method = 'cv') 
 }
+\references{
+Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase regularity with two interpurchase times.'
+}
 
