@@ -6,6 +6,7 @@
 #' @import stats
 #' @import graphics
 #' @importFrom Rcpp sourceCpp
+#' @importFrom utils data
 #' @useDynLib BTYDplus
 #' 
-NULL 
+NULL

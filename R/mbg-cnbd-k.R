@@ -116,4 +116,4 @@ mbgcnbd.PlotTrackingCum <- function(...) {
 #' @export
 mbgcnbd.PlotTrackingInc <- function(...) {
   bgcnbd.PlotTrackingInc(..., dropout_at_zero = TRUE)
-} 
+}

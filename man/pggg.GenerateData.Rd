@@ -27,4 +27,13 @@ Returns 2-element list
        needed information for parameter estimation
 * elog: data.frame with 'cust', \code{t}
 }
+\examples{
+params <- list(t = 4.5, gamma = 1.5, r = 5, alpha = 10, s = 0.8, beta = 12)
+data <- pggg.GenerateData(n = 1000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
+cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
+elog <- data$elog  # Event log - one row per event/purchase
+}
+\references{
+Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
+}
 

@@ -27,10 +27,15 @@ Uses BG/CNBD-k model parameters to return the probability distribution of
 purchase frequencies for a random customer in a given time period, i.e.
 P(X(t)=x|r,alpha,a,b)
 }
+\examples{
+cbs <- cdnow.sample()$cbs # load CDNow summary data
+params <- bgcnbd.EstimateParameters(cbs)
+bgcnbd.pmf(params, t = 52, x = 0:6)
+}
 \references{
 Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 \seealso{
-\code{\link{bgcnbd.EstimateParameters}}
+\code{\link{bgcnbd.Expectation}}
 }
 

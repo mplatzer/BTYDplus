@@ -37,6 +37,12 @@ Uses BG/CNBD-k model parameters and a customer's past transaction behavior
 to return the number of transactions they are expected to make in a given 
 time period.
 }
+\examples{
+cbs <- cdnow.sample()$cbs # load CDNow summary data
+params <- bgcnbd.EstimateParameters(cbs)
+xstar.est <- bgcnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+sum(xstar.est) # expected total number of transactions during holdout
+}
 \references{
 Platzer Michael, and Thomas Reutterer (forthcoming)
 }

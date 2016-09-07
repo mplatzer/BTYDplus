@@ -14,7 +14,9 @@
 #' @export
 #' @references EHRENBERG, ASC. 'The Pattern of Consumer Purchases.' Quantitative
 #'   techniques in marketing analysis: text and readings (1962): 355.
-#' @example demo/nbd.R
+#' @examples
+#' cbs <- cdnow.sample()$cbs
+#' nbd.EstimateParameters(cbs)
 nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value = 10000) {
   dc.check.model.params.safe(c("r", "alpha"), par.start, "nbd.EstimateParameters")
   nbd.eLL <- function(params, cal.cbs, max.param.value) {
@@ -42,7 +44,10 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
 #'   optional \code{custs}.
 #' @return the total log-likelihood for the provided data.
 #' @export
-#' @seealso \code{\link{nbd.EstimateParameters}}
+#' @examples
+#' cbs <- cdnow.sample()$cbs
+#' params <- nbd.EstimateParameters(cbs)
+#' nbd.cbs.LL(params, cbs)
 nbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.cbs.LL")
   tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
@@ -64,7 +69,7 @@ nbd.cbs.LL <- function(params, cal.cbs) {
 #' @param T.cal total time of observation period
 #' @return a vector of log-likelihoods
 #' @export
-#' @seealso \code{\link{nbd.EstimateParameters}}
+#' @seealso \code{\link{nbd.cbs.LL}}
 nbd.LL <- function(params, x, T.cal) {
   max.length <- max(length(x), length(T.cal))
   if (max.length%%length(x)) 
@@ -105,7 +110,11 @@ nbd.LL <- function(params, x, T.cal) {
 #'   parameters has a length greater than 1, this will be a vector of expected
 #'   number of transactions.
 #' @export
-#' @seealso \code{\link{nbd.EstimateParameters}}
+#' @examples
+#' cbs <- cdnow.sample()$cbs
+#' params <- nbd.EstimateParameters(cbs)
+#' xstar.est <- nbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$T.cal)
+#' sum(xstar.est) # expected total number of transactions during holdout
 nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
   max.length <- max(length(T.star), length(x), length(T.cal))
   if (max.length%%length(T.star)) 
@@ -140,7 +149,14 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #'   addition to the CBS summary
 #' @return list with elements \code{cbs} and \code{elog} containing data.frames
 #' @export
-#' @seealso \code{\link{nbd.EstimateParameters}}
+#' @examples
+#' n <- 1000  # no. of customers
+#' T.cal <- 32  # length of calibration period
+#' T.star <- 32  # length of hold-out period
+#' params <- c(r = 0.85, alpha = 4.45)  # purchase frequency lambda_i ~ Gamma(r, alpha)
+#' data <- nbd.GenerateData(n, T.cal, T.star, params)
+#' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
+#' elog <- data$elog  # Event log - one row per event/purchase
 nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   # check model parameters
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.GenerateData")
@@ -181,4 +197,4 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     out$elog <- elog
   }
   return(out)
-} 
+}

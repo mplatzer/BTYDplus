@@ -5,6 +5,8 @@
 #'   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
 #'   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
 #'
+#' See \code{demo('pareto-nbd-abe')} for how to use this model.
+#' 
 #' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}
 #' @param covariates list of column names containing customer-level covariates
 #' @param mcmc number of MCMC steps
@@ -243,6 +245,14 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burn
 #' 
 #' @return 2-elemnt list
 #' @export
+#' @examples 
+#' # generate artificial Pareto/NBD Abe with 2 covariates
+#' params <- list()
+#' params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
+#' params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
+#' data <- abe.GenerateData(n = 2000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
+#' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
+#' elog <- data$elog  # Event log - one row per event/purchase
 abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   
   if (length(T.cal) == 1) 
@@ -303,8 +313,7 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   out <- list(cbs = cbs)
   if (return.elog) {
     elog <- do.call(rbind.data.frame, elog_list)
-    elog <- cbind(elog, covars)
     out$elog <- elog
   }
   return(out)
-} 
+}

@@ -26,10 +26,15 @@ period.
 \details{
 E(X(t) | k, r, alpha, a, b)
 }
+\examples{
+cbs <- cdnow.sample()$cbs # load CDNow summary data
+params <- bgcnbd.EstimateParameters(cbs)
+bgcnbd.Expectation(params, t = 52)
+}
 \references{
 Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 \seealso{
-\code{\link{bgcnbd.EstimateParameters}}
+\code{\link{bgcnbd.pmf}}
 }
 

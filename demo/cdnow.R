@@ -1,21 +1,8 @@
 
-# Load CDNow event log
-library(BTYD)
-data(cdnowElog, package = "BTYD", envir = environment())
-elog <- data.frame(t(sapply(2:nrow(cdnowElog), 
-                            function(i) strsplit(as.character(cdnowElog[i, ]), split = ",")[[1]])),
-                   stringsAsFactors = FALSE)
-names(elog) <- c("cust", "sampleid", "date", "cds", "sales")
-elog$date <- as.Date(elog$date, "%Y%m%d")
-elog$sales <- as.numeric(elog$sales)
-
-# Transform to CBS (including extra summary statistic 'litt' for estimating regularity)
-cutoff <- as.Date("1997-09-30")
-cbs <- elog2cbs(elog, per = "week", T.cal = cutoff)
-
-nrow(cbs)
-head(cbs)
-
+#' load CDNow data
+cdnow <- cdnow.sample()
+elog  <- cdnow$elog
+cbs   <- cdnow$cbs
 
 x <- readline("Estimate Models via MLE (press Enter)")
 
@@ -72,7 +59,7 @@ MSLE <- function(a, f) mean(((log(a + 1) - log(f + 1)))^2)
 BIAS <- function(a, f) sum(f)/sum(a) - 1
 bench <- function(cbs, models) {
   acc <- t(sapply(models, function(model) {
-    est <- cbs[[paste0('xstar.', model)]]
+    est <- cbs[[paste0("xstar.", model)]]
     c(MAE(cbs$x.star, est),
       RMSE(cbs$x.star, est), 
       MSLE(cbs$x.star, est), 
@@ -83,81 +70,49 @@ bench <- function(cbs, models) {
 }
 
 bench(cbs, c("nbd", "pnbd", "bgnbd", "mbgnbd", "mbgcnbd"))
+#' Pareto/NBD and MBG/NBD provide best forecasts
 
 
 x <- readline("Calculate CLV (press Enter)")
 
-# calculate average spends per transaction
-cbs$sales.avg      <- cbs$sales / (cbs$x + 1)
+#' calculate average spends per transaction
+cbs$sales.avg <- cbs$sales / (cbs$x + 1)
 
-# Note: we substitute customers with 0 spend with minimum non-zero spend, as the estimation fails otherwise
+#' Note: in CDNow some customers have sales.avg = 0. We substitute the zeros
+#' with the minimum non-zero spend, as the estimation fails otherwise
 cbs$sales.avg[cbs$sales.avg == 0] <- min(cbs$sales.avg[cbs$sales.avg > 0])
 
-# Estimate expected average transaction value based on gamma-gamma spend model
+#' Estimate expected average transaction value based on gamma-gamma spend model
 spend.params <- BTYD::spend.EstimateParameters(cbs$sales.avg, cbs$x + 1)
-cbs$sales.avg.est <- spend.expected.value(spend.params, cbs$sales.avg, cbs$x + 1)
+cbs$sales.avg.est <- BTYD::spend.expected.value(spend.params, cbs$sales.avg, cbs$x + 1)
 
-# Calculate CLV for Pareto/NBD
+#' Calculate CLV for Pareto/NBD
 cbs$sales.pnbd <- cbs$sales.avg.est * cbs$xstar.pnbd
-sprintf('Estimated Sales: %.1f, Actual Sales: %.1f',
-        sum(cbs$sales.pnbd), sum(cbs$sales.star))
+cat("Estimated Sales:", round(sum(cbs$sales.pnbd), 1), "\n") 
+cat("Actual Sales:", round(sum(cbs$sales.star), 1), "\n") 
 
 
-x <- readline("Estimate Pareto/NBD model via MCMC (press Enter)")
+x <- readline("Estimate Pareto/NBD (HB) model via MCMC (press Enter)")
 
-set.seed(1)
-pnbd.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 1500, burnin = 1500, chains = 4)
+#' draw parameter estimates
+params.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 1500, burnin = 1500, chains = 4)
+params.mcmc <- as.list(summary(params.draws$level_2)$quantiles[, "50%"])
+rbind(`Pareto/NBD (MCMC)` = round(unlist(params.mcmc), 3), 
+      `Pareto/NBD (MLE)` = round(params.pnbd, 3))
+#' -> Parameter Estimates between MLE and MCMC match closely
 
-summary(pnbd.draws$level_2)
-plot(pnbd.draws$level_2)
+#' draw future transaction estimates
+xstar.draws <- mcmc.DrawFutureTransactions(cbs, params.draws)
+cbs$xstar.mcmc <- apply(xstar.draws, 2, mean)
 
-params.pnbd.mcmc <- as.list(summary(pnbd.draws$level_2)$quantiles[, "50%"])
-rbind(MCMC = round(unlist(params.pnbd.mcmc), 3), MLE = round(params.pnbd, 3))
-# -> Parameter Estimates between MLE and MCMC match closely
+#' estimate P(alive)
+cbs$palive.mcmc <- mcmc.PAlive(cbs, params.draws)
 
+#' estimate P(active)
+cbs$pactive.mcmc <- mcmc.PActive(xstar.draws)
 
-x <- readline("Estimate Pareto/GGG model via MCMC - this will take several minutes (press Enter)")
-
-# Note: For keeping the runtime of this demo short, we limit the MCMC to 500 iterations for both chains. In
-# fact, the chains should be run longer to ensure convergence, and collect enough samples
-
-set.seed(1)
-
-pggg.draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 500, burnin = 100, chains = 2, thin = 10)
-
-plot(pggg.draws$level_2, density = FALSE)
-plot(pggg.draws$level_2, trace = FALSE)
-
-coda::gelman.diag(pggg.draws$level_2)
-# -> MCMC chains have not converged yet
-
-(summary(pggg.draws$level_2)$quantiles[, "50%"])
-
-pggg.mcmc.plotRegularityRateHeterogeneity(pggg.draws)
-# -> very narrow distribution around k=1; CDNow customers purchases indeed seem to follow Poisson process
-
-round(coda::effectiveSize(pggg.draws$level_2))
-# -> effective sample size are small for such a short chain
+#' plot P(active) diagnostic plot
+mcmc.plotPActiveDiagnostic(cbs, xstar.draws)
 
 
-x <- readline("Estimate Future Transactions & P(active) for MCMC models - this will take several minutes (press Enter)")
-
-# draw future transaction
-pnbd.xstar <- mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star = cbs$T.star)
-pggg.xstar <- mcmc.DrawFutureTransactions(cbs, pggg.draws, T.star = cbs$T.star)
-
-# calculate mean over future transaction draws for each customer
-cbs$pnbd.mcmc <- apply(pnbd.xstar, 2, mean)
-cbs$pggg.mcmc <- apply(pggg.xstar, 2, mean)
-
-# forecasting accuracy
-bench(cbs, c("pnbd", "pnbd.mcmc", "pggg.mcmc"))
-
-# calculate P(active)
-cbs$pactive.pnbd.mcmc <- apply(pnbd.xstar, 2, function(x) mean(x > 0))
-cbs$pactive.pggg.mcmc <- apply(pggg.xstar, 2, function(x) mean(x > 0))
-
-# calculate P(alive)
-cbs$palive.pnbd.mcmc <- mcmc.PAlive(cbs, pnbd.draws)
-cbs$palive.pggg.mcmc <- mcmc.PAlive(cbs, pggg.draws) 
-
+x <- readline("For a demo of Pareto/GGG see `demo(\"pareto-ggg\")`")

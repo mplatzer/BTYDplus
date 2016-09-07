@@ -29,7 +29,10 @@ Uses NBD model parameters and a customer's past transaction behavior to
 return the number of transactions they are expected to make in a given time
 period.
 }
-\seealso{
-\code{\link{nbd.EstimateParameters}}
+\examples{
+cbs <- cdnow.sample()$cbs
+params <- nbd.EstimateParameters(cbs)
+xstar.est <- nbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$T.cal)
+sum(xstar.est) # expected total number of transactions during holdout
 }
 

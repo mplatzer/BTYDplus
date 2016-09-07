@@ -44,7 +44,14 @@ Plots the actual and expected cumulative total repeat transactions by all
 customers for the calibration and holdout periods, and returns this
 comparison in a matrix.
 }
+\examples{
+cdnow <- cdnow.sample()
+cbs <- cdnow$cbs
+cum <- elog2cum(cdnow$elog)
+params <- c(k=1, r=0.24, alpha=4.41, a=0.79, b=2.43) # params <- bgcnbd.EstimateParameters(cbs)
+bgcnbd.PlotTrackingCum(params, cbs$T.cal, T.tot = 78, cum)
+}
 \seealso{
-\code{\link{bgnbd.PlotTrackingCum}}
+\code{\link[BTYD]{bgnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
 }
 

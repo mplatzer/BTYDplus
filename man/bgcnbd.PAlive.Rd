@@ -31,6 +31,12 @@ Uses BG/CNBD-k model parameters and a customer's past transaction behavior
 to return the probability that they are still alive at the end of the 
 calibration period.
 }
+\examples{
+cbs <- cdnow.sample()$cbs # load CDNow summary data
+params <- bgcnbd.EstimateParameters(cbs)
+palive <- bgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
+mean(palive) # Estimated share of customers to be still alive
+}
 \references{
 Platzer Michael, and Thomas Reutterer (forthcoming)
 }

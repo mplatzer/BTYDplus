@@ -22,7 +22,9 @@ the total log-likelihood for the provided data.
 \description{
 Calculate the log-likelihood of the NBD model
 }
-\seealso{
-\code{\link{nbd.EstimateParameters}}
+\examples{
+cbs <- cdnow.sample()$cbs
+params <- nbd.EstimateParameters(cbs)
+nbd.cbs.LL(params, cbs)
 }
 

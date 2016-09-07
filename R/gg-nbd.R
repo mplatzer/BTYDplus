@@ -299,4 +299,4 @@ ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     out$elog <- elog
   }
   return(out)
-} 
+}

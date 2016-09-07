@@ -19,4 +19,9 @@ mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star)
 \description{
 Samples number of future transactions based on drawn parameters
 }
+\examples{
+cbs <- cdnow.sample()$cbs 
+param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
+}
 

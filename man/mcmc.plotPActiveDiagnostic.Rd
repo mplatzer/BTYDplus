@@ -20,4 +20,10 @@ mcmc.plotPActiveDiagnostic(cbs, xstar,
 \description{
 Draw diagnostic plot to inspect error in P(active).
 }
+\examples{
+cbs <- cdnow.sample()$cbs
+param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
+mcmc.plotPActiveDiagnostic(cbs, xstar.draws)
+}
 

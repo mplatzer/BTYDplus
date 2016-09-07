@@ -36,6 +36,12 @@ Returns 2-element list
   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
 }
+\details{
+See \code{demo('pareto-ggg')} for how to use this model.
+}
+\references{
+Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
+}
 \seealso{
 \code{link{pggg.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
 }

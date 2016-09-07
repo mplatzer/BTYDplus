@@ -195,4 +195,4 @@ mbgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   if (length(params) == 4) 
     params <- c(k = 1, params)
   return(mbgcnbd.GenerateData(n = n, T.cal = T.cal, T.star = T.star, params = params, return.elog = return.elog))
-} 
+}

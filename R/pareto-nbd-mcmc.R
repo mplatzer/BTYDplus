@@ -19,6 +19,8 @@
 #' MLE, which itself can be 10x slower than BG/NBD. Both methods exhibit highly
 #' autocorrelated draws of {r, alpha, s, beta} and hence need to be run long, to
 #' generate 'enough' draws
+#' 
+#' See \code{demo('pareto-ggg')} for how to use this model.
 #'
 #' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}
 #' @param mcmc number of MCMC steps
@@ -119,8 +121,8 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   ## methods to sample individual-level parameters (without data augmentation) ##
   
   draw_lambda_ma_liu <- function(data, level_1, level_2) {
-    slice_sample_ma_liu("lambda", x = data$x, tx = data$t.x, Tcal = data$T.cal, lambda = level_1["lambda", 
-      ], mu = level_1["mu", ], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
+    slice_sample_ma_liu("lambda", x = data$x, tx = data$t.x, Tcal = data$T.cal, lambda = level_1["lambda", ], 
+      mu = level_1["mu", ], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
   }
   
   draw_mu_ma_liu <- function(data, level_1, level_2) {
@@ -221,4 +223,4 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   if ("cust" %in% names(cal.cbs)) 
     names(out$level_1) <- cal.cbs$cust
   return(out)
-} 
+}

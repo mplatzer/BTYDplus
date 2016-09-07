@@ -5,6 +5,10 @@
 #' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
 #' @return numeric vector of probabilities
 #' @export
+#' @examples
+#' cbs <- cdnow.sample()$cbs
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' mcmc.PAlive(cbs, param.draws)
 mcmc.PAlive <- function(cal.cbs, draws) {
   
   nr_of_cust <- length(draws$level_1)
@@ -23,6 +27,10 @@ mcmc.PAlive <- function(cal.cbs, draws) {
 #' @param T.star length of period for which future transactions are counted
 #' @return 2-dim array [draw x cust] with sampled future transactions
 #' @export
+#' @examples
+#' cbs <- cdnow.sample()$cbs 
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star) {
   
   nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
@@ -85,6 +93,11 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star)
 #' @param xstar future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}
 #' @return vector with P(active) estimates for each customer
 #' @export
+#' @examples
+#' cbs <- cdnow.sample()$cbs
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
+#' mcmc.PActive(xstar.draws)
 mcmc.PActive <- function(xstar) {
   return(apply(xstar, 2, function(x) mean(x > 0)))
 }
@@ -96,6 +109,10 @@ mcmc.PActive <- function(xstar) {
 #' @param burnin new start index
 #' @return 2-element list with MCMC draws
 #' @export
+#' @examples
+#' cbs <- cdnow.sample()$cbs
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' param.draws.stable <- mcmc.setBurnin(param.draws, burnin = 200)
 mcmc.setBurnin <- function(draws, burnin) {
   if (burnin < start(draws$level_2) | burnin > end(draws$level_2)) 
     stop("specified burnin is out of bound: ", start(draws$level_2), " - ", end(draws$level_2))
@@ -112,6 +129,11 @@ mcmc.setBurnin <- function(draws, burnin) {
 #' @param title plot title
 #' @return 2-element list with MCMC draws
 #' @export
+#' @examples
+#' cbs <- cdnow.sample()$cbs
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
+#' mcmc.plotPActiveDiagnostic(cbs, xstar.draws)
 mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for P(active)") {
   def.par <- par(no.readonly = TRUE)
   pactive <- mcmc.PActive(xstar)
@@ -135,4 +157,4 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
   # abline(h=mean(x.star>0), col='red', lty=4)
   points(mean(pactive[cbs$x == 0]), mean(x.star[cbs$x == 0] > 0), col = "red", pch = "0")
   par(def.par)
-} 
+}

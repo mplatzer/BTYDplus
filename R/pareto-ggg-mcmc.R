@@ -5,6 +5,8 @@
 #'   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
 #'   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
 #'
+#' See \code{demo('pareto-ggg')} for how to use this model.
+#'
 #' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}, \code{litt}; e.g. output of \code{\link{elog2cbs}}
 #' @param mcmc number of MCMC steps
 #' @param burnin number of initial MCMC steps which are discarded
@@ -19,6 +21,7 @@
 ##'  \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
 ##' }
 #' @export
+#' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 #' @seealso \code{link{pggg.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
 pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 50, chains = 2, mc.cores = NULL, 
   param_init = NULL, trace = 100) {
@@ -196,6 +199,30 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 }
 
 
+#' Pareto/GGG Plot Regularity Rate Heterogeneity
+#' 
+#' Plots and returns the estimated gamma distribution of k (customers' regularity in interpurchase times).
+#' 
+#' @param draws MCMC draws returned by \code{\link{pggg.mcmc.DrawParameters}}
+#' @param xmax upper bound for x-scale
+#' @param fn optional function to summarize individual-level draws for k, e.g. 'mean'
+#'
+#' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
+#' @export
+pggg.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL) {
+  ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
+  if (!is.null(fn)) 
+    ks <- apply(ks, 2, fn)
+  if (is.null(xmax)) 
+    xmax <- min(10, quantile(ks, 0.95) * 1.5)
+  plot(density(ks), xlim = c(0, xmax), main = "Distribution of Regularity Rate k", xlab = "", ylab = "", frame = FALSE)
+  # plot(density(apply(ks, 2, mean)), xlim=c(0, xmax), main='Distribution of Regularity Rate k', xlab='', ylab='',
+  # frame=FALSE)
+  abline(v = 1, lty = 3)
+  abline(v = median(ks), col = "red")
+}
+
+
 #' Generate artificial data which follows Pareto/GGG model assumptions
 #'
 #' Returns 2-element list
@@ -211,7 +238,13 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #' @param return.elog if \code{TRUE} then the event-log is returned as well; decreases performance
 #' 
 #' @return 2-elemnt list
+#' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 #' @export
+#' @examples
+#' params <- list(t = 4.5, gamma = 1.5, r = 5, alpha = 10, s = 0.8, beta = 12)
+#' data <- pggg.GenerateData(n = 1000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
+#' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
+#' elog <- data$elog  # Event log - one row per event/purchase
 pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   
   if (length(T.cal) == 1) 
@@ -284,26 +317,3 @@ pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   }
   return(out)
 }
-
-
-#' Pareto/GGG Plot Regularity Rate Heterogeneity
-#' 
-#' Plots and returns the estimated gamma distribution of k (customers' regularity in interpurchase times).
-#' 
-#' @param draws MCMC draws returned by \code{\link{pggg.mcmc.DrawParameters}}
-#' @param xmax upper bound for x-scale
-#' @param fn optional function to summarize individual-level draws for k, e.g. 'mean'
-#'
-#' @export
-pggg.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL) {
-  ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
-  if (!is.null(fn)) 
-    ks <- apply(ks, 2, fn)
-  if (is.null(xmax)) 
-    xmax <- min(10, quantile(ks, 0.95) * 1.5)
-  plot(density(ks), xlim = c(0, xmax), main = "Distribution of Regularity Rate k", xlab = "", ylab = "", frame = FALSE)
-  # plot(density(apply(ks, 2, mean)), xlim=c(0, xmax), main='Distribution of Regularity Rate k', xlab='',
-  # ylab='', frame=FALSE)
-  abline(v = 1, lty = 3)
-  abline(v = median(ks), col = "red")
-} 
