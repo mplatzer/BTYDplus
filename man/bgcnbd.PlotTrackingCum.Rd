@@ -52,6 +52,6 @@ params <- bgcnbd.EstimateParameters(cbs)
 bgcnbd.PlotTrackingCum(params, cbs$T.cal, T.tot = 78, cum)
 }
 \seealso{
-\code{\link{BTYD::bgnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
+\code{\link[BTYD]{bgnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
 }
 

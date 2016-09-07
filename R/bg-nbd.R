@@ -12,4 +12,4 @@
 #' @export
 bgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   bgcnbd.GenerateData(n = n, T.cal = T.cal, T.star = T.star, params = c(k = 1, params), return.elog = return.elog)
-} 
+}

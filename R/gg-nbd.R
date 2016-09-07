@@ -102,12 +102,12 @@ ggnbd.LL <- function(params, x, t.x, T.cal) {
   
   intl <- numeric(0)
   for (i in 1:max.length) {
-    intl[i] <- integrate(function(y) (y + alpha)^-(r + x[i]) * (beta + exp(b * y) - 1)^-(s + 1) * exp(b * y), 
-      lower = t.x[i], upper = T.cal[i])$value
+    intl[i] <- integrate(function(y) (y + alpha)^-(r + x[i]) * (beta + exp(b * y) - 1)^-(s + 1) * exp(b * 
+      y), lower = t.x[i], upper = T.cal[i])$value
   }
   
-  L1 <- lgamma(r + x) - lgamma(r) + r * (log(alpha) - log(alpha + T.cal)) - x * log(alpha + T.cal) + s * (log(beta) - 
-    log(beta - 1 + exp(b * T.cal)))
+  L1 <- lgamma(r + x) - lgamma(r) + r * (log(alpha) - log(alpha + T.cal)) - x * log(alpha + T.cal) + s * 
+    (log(beta) - log(beta - 1 + exp(b * T.cal)))
   L2 <- lgamma(r + x) - lgamma(r) + log(b) + r * log(alpha) + log(s) + s * log(beta) + log(intl)
   
   llh <- log(exp(L1) + exp(L2))
@@ -221,8 +221,8 @@ ggnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal)
   P3a <- b * s * beta.star^s
   P3b <- numeric()
   for (i in 1:max.length) {
-    P3b[i] <- integrate(function(tau) tau * exp(b * tau) * (beta.star[i] + exp(b * tau) - 1)^(-s - 1), lower = 0, 
-      upper = T.star[i])$value
+    P3b[i] <- integrate(function(tau) tau * exp(b * tau) * (beta.star[i] + exp(b * tau) - 1)^(-s - 1), 
+      lower = 0, upper = T.star[i])$value
   }
   PAlive <- ggnbd.PAlive(params, x, t.x, T.cal)
   return(P1 * (P2 + P3a * P3b) * PAlive)
@@ -285,7 +285,8 @@ ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     # determine frequency, recency, etc.
     ts.cal <- times[times < T.cal[i]]
     ts.star <- times[times >= T.cal[i] & times < (T.cal[i] + T.star[i])]
-    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), alive = tau > T.cal[i], x.star = length(ts.star))
+    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), alive = tau > T.cal[i], 
+      x.star = length(ts.star))
   }
   cbs <- do.call(rbind.data.frame, cbs_list)
   cbs$lambda <- lambdas
@@ -299,4 +300,4 @@ ggnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     out$elog <- elog
   }
   return(out)
-} 
+}

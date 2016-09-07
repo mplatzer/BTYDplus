@@ -46,6 +46,6 @@ bgcnbd.PlotFrequencyInCalibration(params, cbs, censor = 7)
 Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 \seealso{
-\code{\link{BTYD::bgnbd.PlotFrequencyInCalibration}}
+\code{\link[BTYD]{bgnbd.PlotFrequencyInCalibration}}
 }
 

@@ -9,24 +9,22 @@ test_that("BG/CNBD-k", {
   n <- 8000
   data <- bgnbd.GenerateData(n = n, T.cal = round(runif(n, 4, 32)), T.star = 32, params = params, return.elog = TRUE)
   cbs <- data$cbs
-  params.est.btyd <- bgnbd.EstimateParameters(cbs)
+  params.est.btyd <- BTYD::bgnbd.EstimateParameters(cbs)
   params.est.btyd_plus <- bgcnbd.EstimateParameters(cbs, k = 1)[-1]
   expect_equal(round(params.est.btyd, 2), unname(round(params.est.btyd_plus, 2)))
-  expect_equal(bgnbd.PAlive(params, 0, 0, 32), bgcnbd.PAlive(c(1, params), 0, 0, 32))
-  expect_equal(bgnbd.PAlive(params, 1, 16, 32), bgcnbd.PAlive(c(1, params), 1, 16, 32))
-  expect_equal(bgnbd.Expectation(params, 1:3), bgcnbd.Expectation(c(1, params), 1:3))
-  expect_equal(bgnbd.ConditionalExpectedTransactions(params, 32, 1, 16, 32), bgcnbd.ConditionalExpectedTransactions(c(1, 
+  expect_equal(BTYD::bgnbd.PAlive(params, 0, 0, 32), bgcnbd.PAlive(c(1, params), 0, 0, 32))
+  expect_equal(BTYD::bgnbd.PAlive(params, 1, 16, 32), bgcnbd.PAlive(c(1, params), 1, 16, 32))
+  expect_equal(BTYD::bgnbd.Expectation(params, 1:3), bgcnbd.Expectation(c(1, params), 1:3))
+  expect_equal(BTYD::bgnbd.ConditionalExpectedTransactions(params, 32, 1, 16, 32), bgcnbd.ConditionalExpectedTransactions(c(1, 
     params), 32, 1, 16, 32))
-  expect_equal(bgnbd.pmf(params, 32, 0:2), bgcnbd.pmf(c(1, params), 32, 0:2))
-  expect_equal(bgnbd.PlotFrequencyInCalibration(params, cbs, 7), bgcnbd.PlotFrequencyInCalibration(c(1, params), 
+  expect_equal(BTYD::bgnbd.pmf(params, 32, 0:2), unname(bgcnbd.pmf(c(1, params), 32, 0:2)))
+  expect_equal(BTYD::bgnbd.PlotFrequencyInCalibration(params, cbs, 7), bgcnbd.PlotFrequencyInCalibration(c(1, params), 
     cbs, 7))
-  elog <- as.data.table(data$elog)
-  elog[, `:=`(t0, min(t)), by = cust]
-  inc.tracking <- elog[t > t0, .N, keyby = ceiling(t)]$N
-  expect_equal(bgnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking), bgcnbd.PlotTrackingInc(c(1, 
+  inc.tracking <- elog2inc(elog, by = 1)
+  expect_equal(BTYD::bgnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking), bgcnbd.PlotTrackingInc(c(1, 
     params), cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking), tolerance = 0.001)
   cu.tracking <- cumsum(inc.tracking)
-  expect_equal(bgnbd.PlotTrackingCum(params, cbs$T.cal, 32 + 32, cu.tracking), bgcnbd.PlotTrackingCum(c(1, params), 
+  expect_equal(BTYD::bgnbd.PlotTrackingCum(params, cbs$T.cal, 32 + 32, cu.tracking), bgcnbd.PlotTrackingCum(c(1, params), 
     cbs$T.cal, 32 + 32, cu.tracking), tolerance = 0.001)
   
   # generate artificial BG/CNBD-k data

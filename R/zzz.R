@@ -8,4 +8,4 @@
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib BTYDplus
 #' 
-NULL 
+NULL

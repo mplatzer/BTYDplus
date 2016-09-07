@@ -30,10 +30,10 @@
 #'     }))
 #'     
 #' # estimate regularity parameter k
-#' estimateRegularity(elog, plot = TRUE, method = "wheat")
-#' estimateRegularity(elog, plot = TRUE, method = "mle-minka")
-#' estimateRegularity(elog, plot = TRUE, method = "mle-thom")
-#' estimateRegularity(elog, plot = TRUE, method = "cv") 
+#' estimateRegularity(elog, plot = TRUE, method = 'wheat')
+#' estimateRegularity(elog, plot = TRUE, method = 'mle-minka')
+#' estimateRegularity(elog, plot = TRUE, method = 'mle-thom')
+#' estimateRegularity(elog, plot = TRUE, method = 'cv') 
 estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
   if (!"cust" %in% names(elog)) 
     stop("Error in estimateRegularity: elog must have a column labelled \"cust\"")
@@ -68,19 +68,20 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
     
   } else {
     if (method == "mle" | method == "mle-minka") {
-      # Maximum Likelihood Estimator http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation
-      # Approximation for MLE by Minka http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf
+      # Maximum Likelihood Estimator
+      # http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation Approximation for MLE by
+      # Minka http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf
       ks <- unlist(lapply(trans, function(df) {
         itt <- diff(sort(unique(df$t)))
         if (length(itt) >= 9) {
           s <- log(sum(itt)/length(itt)) - sum(log(itt))/length(itt)
           if (method == "mle") {
-            fn <- function(v) {
-              return((log(v) - digamma(v) - s)^2)
-            }
-            k <- optimize(fn, lower = 0.1, upper = 50)$min
+          fn <- function(v) {
+            return((log(v) - digamma(v) - s)^2)
+          }
+          k <- optimize(fn, lower = 0.1, upper = 50)$min
           } else if (method == "mle-minka") {
-            k <- (3 - s + sqrt((s - 3)^2 + 24 * s))/(12 * s)
+          k <- (3 - s + sqrt((s - 3)^2 + 24 * s))/(12 * s)
           }
           return(k)
         }
@@ -100,8 +101,9 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
       }))
       
     } else if (method == "cv") {
-      # Estimate regularity by analyzing coefficient of variation Wu, Couchen, and H-L. Chen. 'A consumer purchasing
-      # model with learning and departure behaviour.'  Journal of the Operational Research Society (2000): 583-591.
+      # Estimate regularity by analyzing coefficient of variation Wu, Couchen, and H-L. Chen. 'A consumer
+      # purchasing model with learning and departure behaviour.'  Journal of the Operational Research Society
+      # (2000): 583-591.
       ks <- unlist(lapply(trans, function(df) {
         itt <- diff(sort(unique(df$t)))
         if (length(itt) >= 9) {
@@ -125,7 +127,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
     
     return(median(ks))
   }
-} 
+}
 
 
 #' CDNow Sample Data
@@ -133,8 +135,8 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 #' This is a convenience wrapper for data('cdnowElog', package='BTYD'), with
 #' same-day transactions being merged together for each customer.
 #' 
-#' @references Fader, Peter S. and Bruce G.,S. Hardie, (2001), "Forecasting
-#'   Repeat Sales at CDNOW: A Case Study," Interfaces, 31 (May-June), Part 2 of
+#' @references Fader, Peter S. and Bruce G.,S. Hardie, (2001), 'Forecasting
+#'   Repeat Sales at CDNOW: A Case Study,' Interfaces, 31 (May-June), Part 2 of
 #'   2, S94-S107.
 #' @return list with two data.frames: `elog` for the event logs and `cbs` for
 #'   the customer by sufficient summary
@@ -142,15 +144,14 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 #' @export
 cdnow.sample <- function() {
   data(cdnowElog, package = "BTYD", envir = environment())
-  elog <- data.table(t(
-    sapply(1:nrow(cdnowElog), function(i) {
-      as.numeric(strsplit(as.character(cdnowElog[i, ]), split = ",")[[1]])}
-    )))
+  elog <- data.table(t(sapply(1:nrow(cdnowElog), function(i) {
+    as.numeric(strsplit(as.character(cdnowElog[i, ]), split = ",")[[1]])
+  })))
   setnames(elog, c("cust", "sampleid", "date", "cds", "sales"))
   elog <- elog[, list(sales = sum(sales), cds = sum(cds)), by = "cust,date"]
-  elog[, date := as.Date(as.character(date), "%Y%m%d")]
+  elog[, `:=`(date, as.Date(as.character(date), "%Y%m%d"))]
   cbs <- elog2cbs(elog, per = "week", T.cal = as.Date("1997-09-30"))
-  return(list(elog=as.data.frame(elog), cbs=as.data.frame(cbs)))
+  return(list(elog = as.data.frame(elog), cbs = as.data.frame(cbs)))
 }
 
 
@@ -164,20 +165,20 @@ cdnow.sample <- function() {
 #' @examples 
 #' elog <- cdnow.sample()$elog
 #' cum <- elog2cum(elog)
-#' plot(cum, typ="l")
+#' plot(cum, typ='l')
 elog2cum <- function(elog, by = 7) {
   stopifnot("cust" %in% names(elog))
   is.dt <- is.data.table(elog)
-  if (!is.dt) elog <- as.data.table(elog)
-  else elog <- copy(elog)
+  if (!is.dt) 
+    elog <- as.data.table(elog) else elog <- copy(elog)
   if (!"t" %in% names(elog)) {
     stopifnot("date" %in% names(elog))
     cohort_start <- min(as.numeric(elog$date))
-    elog[, t := as.numeric(date) - cohort_start]
+    elog[, `:=`(t, as.numeric(date) - cohort_start)]
   }
-  elog[, t0 := min(t), by = "cust"]
-  inc <- elog[t > t0, .N, keyby = .(t=ceiling(t))]$N
-  cum <- c(0, cumsum(inc)[seq(by, length(inc)-1, by = by)], sum(inc))
+  elog[, `:=`(t0, min(t)), by = "cust"]
+  inc <- elog[t > t0, .N, keyby = .(t = ceiling(t))]$N
+  cum <- c(0, cumsum(inc)[seq(by, length(inc) - 1, by = by)], sum(inc))
   return(cum)
 }
 
@@ -192,7 +193,7 @@ elog2cum <- function(elog, by = 7) {
 #' @examples
 #' elog <- cdnow.sample()$elog
 #' inc <- elog2inc(elog)
-#' plot(inc, typ="l")
+#' plot(inc, typ='l')
 elog2inc <- function(elog, by = 7) {
   cum <- elog2cum(elog = elog, by = by)
   return(diff(cum))
@@ -213,8 +214,8 @@ dc.check.model.params.safe <- function(printnames, params, func) {
   if (!is.null(names(params))) {
     idx <- names(params) != ""
     if (any(printnames[idx] != names(params)[idx])) {
-      stop("Error in ", func, ": Parameter names do not match - ", paste0(printnames, collapse = ","), " != ", paste0(names(params), 
-        collapse = ","), call. = FALSE)
+      stop("Error in ", func, ": Parameter names do not match - ", paste0(printnames, collapse = ","), 
+        " != ", paste0(names(params), collapse = ","), call. = FALSE)
     }
   }
 }

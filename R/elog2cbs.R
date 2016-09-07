@@ -36,7 +36,7 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
   setkey(elog_dt, cust, date)
   # check for `sales` column, and populate if missing
   if (!has.sales) {
-    elog_dt[, sales := 1.0]
+    elog_dt[, `:=`(sales, 1)]
   } else {
     stopifnot(is.numeric(elog_dt$sales))
   }
@@ -48,20 +48,13 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
   # compute intertransaction times
   elog_dt[, `:=`(itt, c(0, diff(t))), by = "cust"]
   # count events in calibration period
-  cbs <- elog_dt[date <= T.cal, 
-                 list(x = .N - 1, 
-                      t.x = max(t), 
-                      litt = sum(log(itt[itt > 0])),
-                      sales = sum(sales)),
-                 by = "cust,first"]
+  cbs <- elog_dt[date <= T.cal, list(x = .N - 1, t.x = max(t), litt = sum(log(itt[itt > 0])), sales = sum(sales)), 
+    by = "cust,first"]
   cbs[, `:=`(T.cal, as.numeric(difftime(T.cal, first, units = per)))]
   cbs[, `:=`(T.star, as.numeric(difftime(T.tot, first, units = per)) - T.cal)]
   setkey(cbs, cust)
   # count events in validation period
-  val <- elog_dt[date > T.cal & date <= T.tot, 
-                 list(x.star = .N,
-                      sales.star = sum(sales)), 
-                 keyby = "cust"]
+  val <- elog_dt[date > T.cal & date <= T.tot, list(x.star = .N, sales.star = sum(sales)), keyby = "cust"]
   cbs <- merge(cbs, val, all.x = TRUE, by = "cust")
   cbs[is.na(x.star), `:=`(x.star, 0)]
   cbs[is.na(sales.star), `:=`(sales.star, 0)]
@@ -74,4 +67,4 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
     cbs <- data.frame(cbs)
   }
   return(cbs)
-} 
+}

@@ -5,7 +5,7 @@
 #'   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
 #'   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
 #'
-#' See \code{demo("pareto-nbd-abe")} for how to use this model.
+#' See \code{demo('pareto-nbd-abe')} for how to use this model.
 #' 
 #' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}
 #' @param covariates list of column names containing customer-level covariates
@@ -98,10 +98,10 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burn
       log_mu <- log_theta[2, ]
       diff_lambda <- log_lambda - mvmean[, 1]
       diff_mu <- log_mu - mvmean[, 2]
-      likel <- x * log_lambda + (1 - z) * log_mu - (exp(log_lambda) + exp(log_mu)) * (z * Tcal + (1 - z) * 
-        tau)
-      prior <- -0.5 * (diff_lambda^2 * inv_gamma[1, 1] + 2 * diff_lambda * diff_mu * inv_gamma[1, 2] + diff_mu^2 * 
-        inv_gamma[2, 2])
+      likel <- x * log_lambda + (1 - z) * log_mu - (exp(log_lambda) + exp(log_mu)) * (z * Tcal + (1 - 
+        z) * tau)
+      prior <- -0.5 * (diff_lambda^2 * inv_gamma[1, 1] + 2 * diff_lambda * diff_mu * inv_gamma[1, 2] + 
+        diff_mu^2 * inv_gamma[2, 2])
       post <- likel + prior
       post[log_mu > 5] <- -Inf  # cap !!
       return(post)
@@ -248,7 +248,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burn
 #' @examples 
 #' # generate artificial Pareto/NBD Abe with 2 covariates
 #' params <- list()
-#' params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = T, ncol = 2)
+#' params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
 #' params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
 #' data <- abe.GenerateData(n = 5000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
@@ -313,8 +313,7 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   out <- list(cbs = cbs)
   if (return.elog) {
     elog <- do.call(rbind.data.frame, elog_list)
-    elog <- cbind(elog, covars)
     out$elog <- elog
   }
   return(out)
-} 
+}

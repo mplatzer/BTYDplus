@@ -30,7 +30,7 @@ Returns 2-element list
 \examples{
 # generate artificial Pareto/NBD Abe with 2 covariates
 params <- list()
-params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = T, ncol = 2)
+params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
 params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
 data <- abe.GenerateData(n = 5000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
 cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
