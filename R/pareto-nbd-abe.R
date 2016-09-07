@@ -98,10 +98,10 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burn
       log_mu <- log_theta[2, ]
       diff_lambda <- log_lambda - mvmean[, 1]
       diff_mu <- log_mu - mvmean[, 2]
-      likel <- x * log_lambda + (1 - z) * log_mu - (exp(log_lambda) + exp(log_mu)) * (z * Tcal + (1 - 
-        z) * tau)
-      prior <- -0.5 * (diff_lambda^2 * inv_gamma[1, 1] + 2 * diff_lambda * diff_mu * inv_gamma[1, 2] + 
-        diff_mu^2 * inv_gamma[2, 2])
+      likel <- x * log_lambda + (1 - z) * log_mu - (exp(log_lambda) + exp(log_mu)) * (z * Tcal + (1 - z) * 
+        tau)
+      prior <- -0.5 * (diff_lambda^2 * inv_gamma[1, 1] + 2 * diff_lambda * diff_mu * inv_gamma[1, 2] + diff_mu^2 * 
+        inv_gamma[2, 2])
       post <- likel + prior
       post[log_mu > 5] <- -Inf  # cap !!
       return(post)

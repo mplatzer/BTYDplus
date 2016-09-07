@@ -69,20 +69,19 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
     
   } else {
     if (method == "mle" | method == "mle-minka") {
-      # Maximum Likelihood Estimator
-      # http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation Approximation for MLE by
-      # Minka http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf
+      # Maximum Likelihood Estimator http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation
+      # Approximation for MLE by Minka http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf
       ks <- unlist(lapply(trans, function(df) {
         itt <- diff(sort(unique(df$t)))
         if (length(itt) >= 9) {
           s <- log(sum(itt)/length(itt)) - sum(log(itt))/length(itt)
           if (method == "mle") {
-            fn <- function(v) {
-              return((log(v) - digamma(v) - s)^2)
-            }
-            k <- optimize(fn, lower = 0.1, upper = 50)$min
+          fn <- function(v) {
+            return((log(v) - digamma(v) - s)^2)
+          }
+          k <- optimize(fn, lower = 0.1, upper = 50)$min
           } else if (method == "mle-minka") {
-            k <- (3 - s + sqrt((s - 3)^2 + 24 * s))/(12 * s)
+          k <- (3 - s + sqrt((s - 3)^2 + 24 * s))/(12 * s)
           }
           return(k)
         }
@@ -102,9 +101,8 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
       }))
       
     } else if (method == "cv") {
-      # Estimate regularity by analyzing coefficient of variation Wu, Couchen, and H-L. Chen. 'A consumer
-      # purchasing model with learning and departure behaviour.'  Journal of the Operational Research Society
-      # (2000): 583-591.
+      # Estimate regularity by analyzing coefficient of variation Wu, Couchen, and H-L. Chen. 'A consumer purchasing
+      # model with learning and departure behaviour.'  Journal of the Operational Research Society (2000): 583-591.
       ks <- unlist(lapply(trans, function(df) {
         itt <- diff(sort(unique(df$t)))
         if (length(itt) >= 9) {
@@ -181,7 +179,7 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
   elog_dt[, `:=`(itt, c(0, diff(t))), by = "cust"]
   # count events in calibration period
   cbs <- elog_dt[date <= T.cal, list(x = .N - 1, t.x = max(t), litt = sum(log(itt[itt > 0])), sales = sum(sales)), 
-                 by = "cust,first"]
+    by = "cust,first"]
   cbs[, `:=`(T.cal, as.numeric(difftime(T.cal, first, units = per)))]
   cbs[, `:=`(T.star, as.numeric(difftime(T.tot, first, units = per)) - T.cal)]
   setkey(cbs, cust)
@@ -288,8 +286,8 @@ dc.check.model.params.safe <- function(printnames, params, func) {
   if (!is.null(names(params))) {
     idx <- names(params) != ""
     if (any(printnames[idx] != names(params)[idx])) {
-      stop("Error in ", func, ": Parameter names do not match - ", paste0(printnames, collapse = ","), 
-        " != ", paste0(names(params), collapse = ","), call. = FALSE)
+      stop("Error in ", func, ": Parameter names do not match - ", paste0(printnames, collapse = ","), " != ", 
+        paste0(names(params), collapse = ","), call. = FALSE)
     }
   }
 }

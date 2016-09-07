@@ -121,13 +121,13 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   ## methods to sample individual-level parameters (without data augmentation) ##
   
   draw_lambda_ma_liu <- function(data, level_1, level_2) {
-    slice_sample_ma_liu("lambda", x = data$x, tx = data$t.x, Tcal = data$T.cal, lambda = level_1["lambda", 
-      ], mu = level_1["mu", ], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
+    slice_sample_ma_liu("lambda", x = data$x, tx = data$t.x, Tcal = data$T.cal, lambda = level_1["lambda", ], 
+      mu = level_1["mu", ], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
   }
   
   draw_mu_ma_liu <- function(data, level_1, level_2) {
-    slice_sample_ma_liu("mu", x = data$x, tx = data$t.x, Tcal = data$T.cal, lambda = level_1["lambda", 
-      ], mu = level_1["mu", ], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
+    slice_sample_ma_liu("mu", x = data$x, tx = data$t.x, Tcal = data$T.cal, lambda = level_1["lambda", ], mu = level_1["mu", 
+      ], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
   }
   
   run_single_chain <- function(chain_id = 1, data) {
@@ -189,8 +189,8 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   }
   
   # set hyper priors
-  hyper_prior <- list(r_1 = 0.001, r_2 = 0.001, alpha_1 = 0.001, alpha_2 = 0.001, s_1 = 0.001, s_2 = 0.001, 
-    beta_1 = 0.001, beta_2 = 0.001)
+  hyper_prior <- list(r_1 = 0.001, r_2 = 0.001, alpha_1 = 0.001, alpha_2 = 0.001, s_1 = 0.001, s_2 = 0.001, beta_1 = 0.001, 
+    beta_2 = 0.001)
   
   # set param_init (if not passed as argument)
   if (is.null(param_init)) {

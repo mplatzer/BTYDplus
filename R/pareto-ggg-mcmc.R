@@ -49,14 +49,14 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   
   draw_k <- function(data, level_1, level_2) {
     pggg_slice_sample("k", x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt, k = level_1["k", 
-      ], lambda = level_1["lambda", ], mu = level_1["mu", ], tau = level_1["tau", ], t = level_2["t"], 
-      gamma = level_2["gamma"], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
+      ], lambda = level_1["lambda", ], mu = level_1["mu", ], tau = level_1["tau", ], t = level_2["t"], gamma = level_2["gamma"], 
+      r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
   }
   
   draw_lambda <- function(data, level_1, level_2) {
     pggg_slice_sample("lambda", x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt, k = level_1["k", 
-      ], lambda = level_1["lambda", ], mu = level_1["mu", ], tau = level_1["tau", ], t = level_2["t"], 
-      gamma = level_2["gamma"], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
+      ], lambda = level_1["lambda", ], mu = level_1["mu", ], tau = level_1["tau", ], t = level_2["t"], gamma = level_2["gamma"], 
+      r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
   }
   
   draw_mu <- function(data, level_1, level_2) {
@@ -162,8 +162,8 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   }
   
   # set hyper priors
-  hyper_prior <- list(r_1 = 0.001, r_2 = 0.001, alpha_1 = 0.001, alpha_2 = 0.001, s_1 = 0.001, s_2 = 0.001, 
-    beta_1 = 0.001, beta_2 = 0.001, t_1 = 0.001, t_2 = 0.001, gamma_1 = 0.001, gamma_2 = 0.001)
+  hyper_prior <- list(r_1 = 0.001, r_2 = 0.001, alpha_1 = 0.001, alpha_2 = 0.001, s_1 = 0.001, s_2 = 0.001, beta_1 = 0.001, 
+    beta_2 = 0.001, t_1 = 0.001, t_2 = 0.001, gamma_1 = 0.001, gamma_2 = 0.001)
   
   # set param_init (if not passed as argument)
   if (is.null(param_init)) {
@@ -215,10 +215,9 @@ pggg.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = N
     ks <- apply(ks, 2, fn)
   if (is.null(xmax)) 
     xmax <- min(10, quantile(ks, 0.95) * 1.5)
-  plot(density(ks), xlim = c(0, xmax), main = "Distribution of Regularity Rate k", xlab = "", ylab = "", 
-    frame = FALSE)
-  # plot(density(apply(ks, 2, mean)), xlim=c(0, xmax), main='Distribution of Regularity Rate k', xlab='',
-  # ylab='', frame=FALSE)
+  plot(density(ks), xlim = c(0, xmax), main = "Distribution of Regularity Rate k", xlab = "", ylab = "", frame = FALSE)
+  # plot(density(apply(ks, 2, mean)), xlim=c(0, xmax), main='Distribution of Regularity Rate k', xlab='', ylab='',
+  # frame=FALSE)
   abline(v = 1, lty = 3)
   abline(v = median(ks), col = "red")
 }

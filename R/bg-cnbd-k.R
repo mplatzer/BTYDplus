@@ -26,8 +26,8 @@
 #' @examples
 #' cbs <- cdnow.sample()$cbs # load CDNow summary data
 #' params <- bgcnbd.EstimateParameters(cbs)
-bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 3), max.param.value = 10000, 
-  trace = 0, dropout_at_zero = FALSE) {
+bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 3), max.param.value = 10000, trace = 0, 
+  dropout_at_zero = FALSE) {
   
   dc.check.model.params.safe(c("r", "alpha", "a", "b"), par.start, "bgcnbd.EstimateParameters")
   
@@ -40,8 +40,8 @@ bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 
     params <- list()
     LL <- c()
     for (k in 1:12) {
-      params[[k]] <- tryCatch(bgcnbd.EstimateParameters(cal.cbs = cal.cbs, k = k, par.start = par.start, 
-        max.param.value = max.param.value, trace = trace, dropout_at_zero = dropout_at_zero), error = function(e) {
+      params[[k]] <- tryCatch(bgcnbd.EstimateParameters(cal.cbs = cal.cbs, k = k, par.start = par.start, max.param.value = max.param.value, 
+        trace = trace, dropout_at_zero = dropout_at_zero), error = function(e) {
         e
       })
       if (inherits(params[[k]], "error")) {
@@ -56,8 +56,8 @@ bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 
     return(params[[k]])
   }
   
-  # if `litt` is missing, we set it to zero, so that bgcnbd.cbs.LL does not complain; however this makes LL
-  # values for different k values not comparable
+  # if `litt` is missing, we set it to zero, so that bgcnbd.cbs.LL does not complain; however this makes LL values
+  # for different k values not comparable
   if (!"litt" %in% colnames(cal.cbs)) 
     cal.cbs[, "litt"] <- 0
   
@@ -411,15 +411,15 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
       return(y)
     }
   }
-  # approximate via expression for conditional expected transactions for BG/NBD model, but adjust scale
-  # parameter by k
+  # approximate via expression for conditional expected transactions for BG/NBD model, but adjust scale parameter
+  # by k
   G <- function(r, alpha, a, b) 1 - (alpha/(alpha + T.star))^r * h2f1(r, b + 1, a + b, T.star/(alpha + T.star))
   P1 <- (a + b + x - 1 + ifelse(dropout_at_zero, 1, 0))/(a - 1)
   P2 <- G(r + x, k * alpha + T.cal, a, b + x - 1 + ifelse(dropout_at_zero, 1, 0))
   P3 <- bgcnbd.PAlive(params = params, x = x, t.x = t.x, T.cal = T.cal, dropout_at_zero = dropout_at_zero)
   exp <- P1 * P2 * P3
-  # adjust bias BG/NBD-based approximation by scaling via the Unconditional Expectations (for wich we have
-  # exact expression)
+  # adjust bias BG/NBD-based approximation by scaling via the Unconditional Expectations (for wich we have exact
+  # expression)
   if (k > 1) {
     sum.cal <- sum(bgcnbd.Expectation(params = params, t = T.cal, dropout_at_zero = dropout_at_zero))
     sum.tot <- sum(bgcnbd.Expectation(params = params, t = T.cal + T.star, dropout_at_zero = dropout_at_zero))
@@ -658,8 +658,8 @@ bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.dat
     stop("T.cal must be a single numeric value and may not be negative.")
   
   actual <- actual.inc.tracking.data
-  expected <- BTYD::dc.CumulativeToIncremental(bgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, 
-    length(actual), dropout_at_zero = dropout_at_zero))
+  expected <- BTYD::dc.CumulativeToIncremental(bgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, length(actual), 
+    dropout_at_zero = dropout_at_zero))
   
   if (is.null(ymax)) 
     ymax <- max(c(actual, expected)) * 1.05
@@ -742,8 +742,8 @@ bgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = F
     # determine frequency, recency, etc.
     ts.cal <- times[times < max(T.cal)]
     ts.star <- times[times >= max(T.cal) & times < (max(T.cal) + T.star[i])]
-    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal) - (max(T.cal) - T.cal[i]), 
-      litt = sum(log(diff(ts.cal))), churn = churn, alive = churn > (length(ts.cal) - 1))
+    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal) - (max(T.cal) - T.cal[i]), litt = sum(log(diff(ts.cal))), 
+      churn = churn, alive = churn > (length(ts.cal) - 1))
     for (tstar in T.star) {
       colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
       cbs_list[[i]][[colname]] <- length(times[times >= max(T.cal) & times < (max(T.cal) + tstar)])
