@@ -13,8 +13,16 @@ Extension to R package BTYD.
 ```
 devtools::install_github("mplatzer/BTYDplus", dependencies=TRUE)
 library(BTYDplus)
+```
+
+## Demos
+
+```
 demo(package="BTYDplus")
-demo("cdnow")
+demo("cdnow")          # Demonstration of fitting various models to the CDNow data set
+demo("bg-cnbd-k")      # Demonstration of BG/CNBD-k model
+demo("pareto-nbd-abe") # Demonstration of Abe's Pareto/NBD variant
+demo("pareto-ggg")     # Demonstration of Pareto/NBD & Pareto/GGG model
 ```
 
 ## BTYD Models
@@ -35,4 +43,4 @@ These R source files extend the functionality of the BTYD package by providing f
 
 * Pareto/NBD variant (HB) - Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 
-* Pareto/GGG (HB) - Platzer, Michael, and Thomas Reutterer. forthcoming...
+* Pareto/GGG (HB) - Platzer, Michael, and Thomas Reutterer. "Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity." Marketing Science (2016).

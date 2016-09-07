@@ -44,7 +44,14 @@ Plots the actual and expected incremental total repeat transactions by all
 customers for the calibration and holdout periods, and returns this
 comparison in a matrix.
 }
+\examples{
+cdnow <- cdnow.sample()
+cbs <- cdnow$cbs
+inc <- elog2inc(cdnow$elog)
+params <- bgcnbd.EstimateParameters(cbs)
+bgcnbd.PlotTrackingInc(params, cbs$T.cal, T.tot = 78, inc)
+}
 \seealso{
-\code{\link{bgnbd.PlotTrackingInc}}
+\code{\link{BTYD::bgnbd.PlotTrackingInc}} \code{\link{bgcnbd.PlotTrackingCum}}
 }
 

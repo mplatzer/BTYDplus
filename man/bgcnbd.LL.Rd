@@ -31,6 +31,6 @@ Calculate the log-likelihood of the BG/CNBD-k model
 Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 \seealso{
-\code{\link{bgcnbd.EstimateParameters}}
+\code{\link{bgcnbd.cbs.LL}}
 }
 

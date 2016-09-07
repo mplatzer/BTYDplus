@@ -38,15 +38,14 @@ number of customers who made a certain number of repeat transactions in the
 calibration period, binned according to calibration period frequencies.
 }
 \examples{
-set.seed(1)
 params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
-cal.cbs <- bgcnbd.GenerateData(n=5000, 32, 0, params)$cbs
-bgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = 7)
+cbs <- bgcnbd.GenerateData(n=5000, 32, 0, params)$cbs
+bgcnbd.PlotFrequencyInCalibration(params, cbs, censor = 7)
 }
 \references{
 Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 \seealso{
-\code{\link{bgcnbd.EstimateParameters}}
+\code{\link{BTYD::bgnbd.PlotFrequencyInCalibration}}
 }
 

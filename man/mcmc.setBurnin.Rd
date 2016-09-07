@@ -17,4 +17,9 @@ mcmc.setBurnin(draws, burnin)
 \description{
 (Re-)set burnin of MCMC chains.
 }
+\examples{
+cbs <- cdnow.sample()$cbs
+param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
+param.draws.stable <- mcmc.setBurnin(param.draws, burnin = 1000)
+}
 

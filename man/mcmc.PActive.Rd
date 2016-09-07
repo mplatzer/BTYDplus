@@ -15,4 +15,10 @@ vector with P(active) estimates for each customer
 \description{
 Calculates P(active) based on drawn future transactions.
 }
+\examples{
+cbs <- cdnow.sample()$cbs
+param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
+xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
+mcmc.PActive(xstar.draws)
+}
 

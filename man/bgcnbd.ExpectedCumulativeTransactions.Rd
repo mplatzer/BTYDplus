@@ -30,6 +30,6 @@ Calculates the expected cumulative total repeat transactions by all customers
 for the calibration and holdout periods.
 }
 \seealso{
-\code{\link{bgnbd.ExpectedCumulativeTransactions}}
+\code{\link{BTYD::bgnbd.ExpectedCumulativeTransactions}}
 }
 

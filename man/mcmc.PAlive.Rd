@@ -17,4 +17,9 @@ numeric vector of probabilities
 \description{
 Calculates P(alive) based on MCMC draws
 }
+\examples{
+cbs <- cdnow.sample()$cbs
+param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
+mcmc.PAlive(cbs, param.draws)
+}
 

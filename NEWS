@@ -1,4 +1,10 @@
 
+Changes in version 0.x.x (2016-xx-xx):
+
+    o   added new methods: `elog2inc`, `elog2cum`, `cdnow.sample`
+    
+    o   improved documentation and demos
+
 Changes in version 0.7.1 (2016-09-06):
 
     o   `elog2cbs` now returns sum over sales for calibration and holdout period

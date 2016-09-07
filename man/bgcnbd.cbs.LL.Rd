@@ -25,6 +25,11 @@ the total log-likelihood for the provided data.
 \description{
 Calculate the log-likelihood of the BG/CNBD-k model
 }
+\examples{
+cbs <- cdnow.sample()$cbs # load CDNow summary data
+params <- bgcnbd.EstimateParameters(cbs)
+bgcnbd.cbs.LL(params, cbs)
+}
 \references{
 Platzer Michael, and Thomas Reutterer (forthcoming)
 }

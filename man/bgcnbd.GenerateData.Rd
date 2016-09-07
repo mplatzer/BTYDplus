@@ -31,6 +31,12 @@ list with elements \code{cbs} and \code{elog} containing data.frames
 \description{
 Simulate data according to BG/CNBD-k model assumptions
 }
+\examples{
+params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
+data <- bgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32, params, return.elog = TRUE)
+cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
+elog <- data$elog  # Event log - one row per event/purchase
+}
 \references{
 Platzer Michael, and Thomas Reutterer (forthcoming)
 }

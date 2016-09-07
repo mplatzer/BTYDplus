@@ -16,4 +16,7 @@ pggg.mcmc.plotRegularityRateHeterogeneity(draws, xmax = NULL, fn = NULL)
 \description{
 Plots and returns the estimated gamma distribution of k (customers' regularity in interpurchase times).
 }
+\references{
+Platzer, Michael, and Thomas Reutterer. "Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity." Marketing Science (2016).
+}
 

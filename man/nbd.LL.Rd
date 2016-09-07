@@ -21,6 +21,6 @@ a vector of log-likelihoods
 Calculate the log-likelihood of the NBD model
 }
 \seealso{
-\code{\link{nbd.EstimateParameters}}
+\code{\link{nbd.cbs.LL}}
 }
 
