@@ -148,6 +148,7 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' @param return.elog boolean - if \code{TRUE} then the event log is returned in
 #'   addition to the CBS summary
 #' @return list with elements \code{cbs} and \code{elog} containing data.frames
+#' @export
 #' @examples
 #' n <- 1000  # no. of customers
 #' T.cal <- 32  # length of calibration period

@@ -48,7 +48,7 @@ comparison in a matrix.
 cdnow <- cdnow.sample()
 cbs <- cdnow$cbs
 inc <- elog2inc(cdnow$elog)
-params <- bgcnbd.EstimateParameters(cbs)
+params <- c(k=1, r=0.24, alpha=4.41, a=0.79, b=2.43) # params <- bgcnbd.EstimateParameters(cbs)
 bgcnbd.PlotTrackingInc(params, cbs$T.cal, T.tot = 78, inc)
 }
 \seealso{

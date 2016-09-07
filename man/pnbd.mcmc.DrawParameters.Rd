@@ -54,6 +54,8 @@ Estimating parameters via Pareto/NBD MCMC can be 10x slower than Pareto/NBD
 MLE, which itself can be 10x slower than BG/NBD. Both methods exhibit highly
 autocorrelated draws of {r, alpha, s, beta} and hence need to be run long, to
 generate 'enough' draws
+
+See \code{demo('pareto-ggg')} for how to use this model.
 }
 \references{
 Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD model and possible extensions.' Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}

@@ -19,6 +19,8 @@
 #' MLE, which itself can be 10x slower than BG/NBD. Both methods exhibit highly
 #' autocorrelated draws of {r, alpha, s, beta} and hence need to be run long, to
 #' generate 'enough' draws
+#' 
+#' See \code{demo('pareto-ggg')} for how to use this model.
 #'
 #' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}
 #' @param mcmc number of MCMC steps

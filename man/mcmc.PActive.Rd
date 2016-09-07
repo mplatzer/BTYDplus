@@ -17,7 +17,7 @@ Calculates P(active) based on drawn future transactions.
 }
 \examples{
 cbs <- cdnow.sample()$cbs
-param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
+param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
 xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 mcmc.PActive(xstar.draws)
 }

@@ -34,6 +34,6 @@ cbs <- data$cbs  # customer by sufficient summary statistic - one row per custom
 elog <- data$elog  # Event log - one row per event/purchase
 }
 \references{
-Platzer, Michael, and Thomas Reutterer. "Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity." Marketing Science (2016).
+Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 }
 

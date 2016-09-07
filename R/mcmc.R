@@ -7,7 +7,7 @@
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
 #' mcmc.PAlive(cbs, param.draws)
 mcmc.PAlive <- function(cal.cbs, draws) {
   
@@ -29,7 +29,7 @@ mcmc.PAlive <- function(cal.cbs, draws) {
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs 
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
 #' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star) {
   
@@ -95,7 +95,7 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star)
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
 #' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 #' mcmc.PActive(xstar.draws)
 mcmc.PActive <- function(xstar) {
@@ -111,8 +111,8 @@ mcmc.PActive <- function(xstar) {
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
-#' param.draws.stable <- mcmc.setBurnin(param.draws, burnin = 1000)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' param.draws.stable <- mcmc.setBurnin(param.draws, burnin = 200)
 mcmc.setBurnin <- function(draws, burnin) {
   if (burnin < start(draws$level_2) | burnin > end(draws$level_2)) 
     stop("specified burnin is out of bound: ", start(draws$level_2), " - ", end(draws$level_2))
@@ -131,7 +131,7 @@ mcmc.setBurnin <- function(draws, burnin) {
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
 #' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 #' mcmc.plotPActiveDiagnostic(cbs, xstar.draws)
 mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for P(active)") {

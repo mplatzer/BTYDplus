@@ -8,7 +8,8 @@ test_that("BG/CNBD-k", {
   params <- c(0.85, 1.45, 0.79, 2.42)
   n <- 8000
   data <- bgnbd.GenerateData(n = n, T.cal = round(runif(n, 4, 32)), T.star = 32, params = params, return.elog = TRUE)
-  cbs <- data$cbs
+  cbs  <- data$cbs
+  elog <- data$elog
   params.est.btyd <- BTYD::bgnbd.EstimateParameters(cbs)
   params.est.btyd_plus <- bgcnbd.EstimateParameters(cbs, k = 1)[-1]
   expect_equal(round(params.est.btyd, 2), unname(round(params.est.btyd_plus, 2)))

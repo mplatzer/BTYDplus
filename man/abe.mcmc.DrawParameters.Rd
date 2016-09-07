@@ -37,7 +37,7 @@ Returns 2-element list
   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
 }
 \details{
-See \code{demo("pareto-nbd-abe")} for how to use this model.
+See \code{demo('pareto-nbd-abe')} for how to use this model.
 }
 \references{
 Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.

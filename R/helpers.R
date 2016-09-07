@@ -76,12 +76,12 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
         if (length(itt) >= 9) {
           s <- log(sum(itt)/length(itt)) - sum(log(itt))/length(itt)
           if (method == "mle") {
-          fn <- function(v) {
-            return((log(v) - digamma(v) - s)^2)
-          }
-          k <- optimize(fn, lower = 0.1, upper = 50)$min
+            fn <- function(v) {
+              return((log(v) - digamma(v) - s)^2)
+            }
+            k <- optimize(fn, lower = 0.1, upper = 50)$min
           } else if (method == "mle-minka") {
-          k <- (3 - s + sqrt((s - 3)^2 + 24 * s))/(12 * s)
+            k <- (3 - s + sqrt((s - 3)^2 + 24 * s))/(12 * s)
           }
           return(k)
         }
@@ -130,6 +130,77 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 }
 
 
+#' Faster implementation of BTYD::dc.ElogToCbsCbt that also returns summary statistic for estimating regularity
+#'
+#' Returns data.frame with
+#'      cust:   customer id (unique key)
+#'      x:      nr of recurring events in calibration period
+#'      t.x:    time between first and last event in calibration period
+#'      litt:   sum of logarithmic intertransaction timings durint calibration period 
+#'              this is a summary statistic for estimating regularity
+#'      sales:  sum of sales in calibration period
+#'      first:  date of first transaction in calibration period
+#'      T.cal:  time between first event and end of calibration period
+#'      T.star: length of holdout period
+#'      x.star: nr of events within holdout period
+#'      sales.star: sum of sales within holdout period
+#'      
+#' Customers without any transaction during calibration period are being dropped from the result.
+#' Transactions with identical `cust` and `date` field are treated as a single transaction, with `sales` being summed up
+#'
+#' @param elog data.frame with columns 'cust' and 'date'; optionally with column 'sales'
+#' @param per time unit, either 'week', 'day', 'hour', 'min', 'sec'
+#' @param T.cal end date of calibration period
+#' @param T.tot end date of holdout period
+#' @return data.frame
+#' @export
+elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elog$date)) {
+  cust <- first <- itt <- T.star <- x.star <- sales <- sales.star <- NULL  # suppress checkUsage warnings
+  stopifnot(inherits(elog, "data.frame"))
+  stopifnot(all(c("cust", "date") %in% names(elog)))
+  stopifnot(any(c("Date", "POSIXt") %in% class(elog$date)))
+  
+  is.dt <- is.data.table(elog)
+  has.sales <- "sales" %in% names(elog)
+  # convert to data.table for improved performance
+  elog_dt <- data.table(elog)
+  setkey(elog_dt, cust, date)
+  # check for `sales` column, and populate if missing
+  if (!has.sales) {
+    elog_dt[, `:=`(sales, 1)]
+  } else {
+    stopifnot(is.numeric(elog_dt$sales))
+  }
+  # merge transactions with same dates
+  elog_dt <- elog_dt[, list(sales = sum(sales)), by = "cust,date"]
+  # determine time since first date for each customer
+  elog_dt[, `:=`(first, min(date)), by = "cust"]
+  elog_dt[, `:=`(t, as.numeric(difftime(date, first, units = per))), by = "cust"]
+  # compute intertransaction times
+  elog_dt[, `:=`(itt, c(0, diff(t))), by = "cust"]
+  # count events in calibration period
+  cbs <- elog_dt[date <= T.cal, list(x = .N - 1, t.x = max(t), litt = sum(log(itt[itt > 0])), sales = sum(sales)), 
+                 by = "cust,first"]
+  cbs[, `:=`(T.cal, as.numeric(difftime(T.cal, first, units = per)))]
+  cbs[, `:=`(T.star, as.numeric(difftime(T.tot, first, units = per)) - T.cal)]
+  setkey(cbs, cust)
+  # count events in validation period
+  val <- elog_dt[date > T.cal & date <= T.tot, list(x.star = .N, sales.star = sum(sales)), keyby = "cust"]
+  cbs <- merge(cbs, val, all.x = TRUE, by = "cust")
+  cbs[is.na(x.star), `:=`(x.star, 0)]
+  cbs[is.na(sales.star), `:=`(sales.star, 0)]
+  setcolorder(cbs, c("cust", "x", "t.x", "litt", "sales", "first", "T.cal", "T.star", "x.star", "sales.star"))
+  # return same object type as was passed
+  if (!has.sales) {
+    elog_dt[, `:=`(sales, NULL)]
+  }
+  if (!is.dt) {
+    cbs <- data.frame(cbs)
+  }
+  return(cbs)
+}
+
+
 #' CDNow Sample Data
 #' 
 #' This is a convenience wrapper for data('cdnowElog', package='BTYD'), with
@@ -143,6 +214,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 #' @seealso \code{\link{elog2cbs}} 
 #' @export
 cdnow.sample <- function() {
+  cds <- sales <- cdnowElog <- NULL  # suppress checkUsage warnings
   data(cdnowElog, package = "BTYD", envir = environment())
   elog <- data.table(t(sapply(1:nrow(cdnowElog), function(i) {
     as.numeric(strsplit(as.character(cdnowElog[i, ]), split = ",")[[1]])
@@ -167,6 +239,7 @@ cdnow.sample <- function() {
 #' cum <- elog2cum(elog)
 #' plot(cum, typ='l')
 elog2cum <- function(elog, by = 7) {
+  t0 <- sales <- NULL  # suppress checkUsage warnings
   stopifnot("cust" %in% names(elog))
   is.dt <- is.data.table(elog)
   if (!is.dt) 
@@ -177,7 +250,7 @@ elog2cum <- function(elog, by = 7) {
     elog[, `:=`(t, as.numeric(date) - cohort_start)]
   }
   elog[, `:=`(t0, min(t)), by = "cust"]
-  inc <- elog[t > t0, .N, keyby = .(t = ceiling(t))]$N
+  inc <- elog[t > t0, .N, keyby = list(t = ceiling(t))]$N
   cum <- c(0, cumsum(inc)[seq(by, length(inc) - 1, by = by)], sum(inc))
   return(cum)
 }

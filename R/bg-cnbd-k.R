@@ -579,7 +579,7 @@ bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.period
 #' cdnow <- cdnow.sample()
 #' cbs <- cdnow$cbs
 #' cum <- elog2cum(cdnow$elog)
-#' params <- bgcnbd.EstimateParameters(cbs)
+#' params <- c(k=1, r=0.24, alpha=4.41, a=0.79, b=2.43) # params <- bgcnbd.EstimateParameters(cbs)
 #' bgcnbd.PlotTrackingCum(params, cbs$T.cal, T.tot = 78, cum)
 bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data, xlab = "Week", ylab = "Cumulative Transactions", 
   xticklab = NULL, title = "Tracking Cumulative Transactions", ymax = NULL, dropout_at_zero = FALSE) {
@@ -644,7 +644,7 @@ bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data
 #' cdnow <- cdnow.sample()
 #' cbs <- cdnow$cbs
 #' inc <- elog2inc(cdnow$elog)
-#' params <- bgcnbd.EstimateParameters(cbs)
+#' params <- c(k=1, r=0.24, alpha=4.41, a=0.79, b=2.43) # params <- bgcnbd.EstimateParameters(cbs)
 #' bgcnbd.PlotTrackingInc(params, cbs$T.cal, T.tot = 78, inc)
 bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data, xlab = "Week", ylab = "Transactions", 
   xticklab = NULL, title = "Tracking Weekly Transactions", ymax = NULL, dropout_at_zero = FALSE) {

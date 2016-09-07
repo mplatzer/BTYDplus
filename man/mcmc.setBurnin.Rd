@@ -19,7 +19,7 @@ mcmc.setBurnin(draws, burnin)
 }
 \examples{
 cbs <- cdnow.sample()$cbs
-param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 3000, burnin = 0, chains = 4)
-param.draws.stable <- mcmc.setBurnin(param.draws, burnin = 1000)
+param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+param.draws.stable <- mcmc.setBurnin(param.draws, burnin = 200)
 }
 
