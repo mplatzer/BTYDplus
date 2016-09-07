@@ -2,7 +2,31 @@ context("mcmc")
 
 test_that("Pareto/GGG MCMC", {
   cat('test Pareto/GGG\n')
-  skip('not run as it takes too long')
+  
+  # generate artificial Pareto/GGG data
+  params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 10, s = 0.8, beta = 12)
+  n <- 100
+  cbs <- pggg.GenerateData(n, 52, 52, params, TRUE)$cbs
+  
+  # estimate parameters
+  draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 100, burnin = 20, thin = 10, chains = 2)
+  expect_true(all(c("level_1", "level_2") %in% names(draws)))
+  expect_equal(length(draws$level_1), n)
+  expect_true(is.mcmc.list(draws$level_1[[1]]))
+  expect_true(is.mcmc.list(draws$level_2))
+  
+  # estimate future transactions
+  xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
+  
+  # test setBurnin
+  draws2 <- mcmc.setBurnin(draws, burnin = 40)
+  expect_equal(start(draws2$level_2), 40)
+  expect_equal(start(draws2$level_1[[1]]), 40)
+  
+  mcmc.plotPActiveDiagnostic(cbs, xstar)
+  pggg.mcmc.plotRegularityRateHeterogeneity(draws)
+  
+  skip('not run as it takes too long; run this manually')
   skip_on_cran()
   skip_on_travis()
   
@@ -14,11 +38,6 @@ test_that("Pareto/GGG MCMC", {
   # estimate parameters
   draws <- pggg.mcmc.DrawParameters(cbs)
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
-  
-  expect_true(all(c("level_1", "level_2") %in% names(draws)))
-  expect_equal(length(draws$level_1), n)
-  expect_true(is.mcmc.list(draws$level_1[[1]]))
-  expect_true(is.mcmc.list(draws$level_2))
   
   # require less than 10% deviation in estimated parameters
   ape <- function(act, est) abs(act - est)/act
@@ -43,12 +62,5 @@ test_that("Pareto/GGG MCMC", {
   expect_true(min(cbs$x.star) >= 0)
   expect_true(all(cbs$x.star == round(cbs$x.star)))
   expect_true(all(cbs$palive >= 0 & cbs$palive <= 1))
-  
-  draws2 <- mcmc.setBurnin(draws, burnin = 600)
-  expect_equal(start(draws2$level_2), 600)
-  expect_equal(start(draws2$level_1[[1]]), 600)
-  
-  mcmc.plotPActiveDiagnostic(cbs, xstar)
-  pggg.mcmc.plotRegularityRateHeterogeneity(draws)
   
 }) 
