@@ -4,7 +4,8 @@
 \alias{mcmc.DrawFutureTransactions}
 \title{Samples number of future transactions based on drawn parameters}
 \usage{
-mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star)
+mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star,
+  size = NULL)
 }
 \arguments{
 \item{cal.cbs}{data.frame with column \code{t.x} and \code{T.cal}}
@@ -12,6 +13,8 @@ mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star)
 \item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}}
 
 \item{T.star}{length of period for which future transactions are counted}
+
+\item{size}{number of samples to draw; defaults to the same number of parameter draws that are passed to `draws`}
 }
 \value{
 2-dim array [draw x cust] with sampled future transactions
