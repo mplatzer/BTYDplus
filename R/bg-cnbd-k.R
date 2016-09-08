@@ -248,6 +248,14 @@ bgcnbd.Expectation <- function(params, t, dropout_at_zero = FALSE) {
   if (any(t < 0) || !is.numeric(t)) 
     stop("t must be numeric and may not contain negative numbers.")
   
+  # estimate computation time, and warn if it will take too long
+  if (uniqueN(t) > 100) {
+    estimated_time <- system.time(bgcnbd.Expectation(params, max(t), dropout_at_zero))["elapsed"]
+    if (uniqueN(t) * estimated_time > 60) {
+      cat("note: computation will take long for many unique time values (`t`, `T.cal`, `T.star`,...) - consider rounding!")
+    }
+  }
+  
   # to save computation time, we collapse vector `t` on to its unique values
   ts <- unique(t)
   names(ts) <- ts
@@ -423,7 +431,8 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
   if (k > 1) {
     sum.cal <- sum(bgcnbd.Expectation(params = params, t = T.cal, dropout_at_zero = dropout_at_zero))
     sum.tot <- sum(bgcnbd.Expectation(params = params, t = T.cal + T.star, dropout_at_zero = dropout_at_zero))
-    exp <- exp * (sum.tot - sum.cal)/sum(exp)
+    bias.corr <- (sum.tot - sum.cal)/sum(exp)
+    exp <- exp * bias.corr
   }
   return(exp)
 }
