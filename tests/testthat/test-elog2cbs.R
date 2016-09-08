@@ -41,4 +41,12 @@ test_that("elog2cbs", {
   cbs <- elog2cbs(elog_s, T.cal = T.cal, T.tot = T.tot)
   expect_equal(elog_s[first <= T.cal & date <= T.cal, sum(sales)], sum(cbs$sales))
   expect_equal(elog_s[first <= T.cal & date <= T.tot, sum(sales)], sum(cbs$sales) + sum(cbs$sales.star))
+  
+  # check that T.cal and T.tot also accept characters
+  cbs <- elog2cbs(elog_s, T.cal = as.character(T.cal), T.tot = as.character(T.tot))
+  
+  # check for errors
+  expect_error(elog2cbs(), "elog")
+  expect_error(elog2cbs(data.frame(cust = 1:3)), "cust")
+  expect_error(elog2cbs(data.frame(date = Sys.Date())) , "date")
 })

@@ -156,8 +156,8 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elog$date)) {
   cust <- first <- itt <- T.star <- x.star <- sales <- sales.star <- NULL  # suppress checkUsage warnings
   stopifnot(inherits(elog, "data.frame"))
-  stopifnot(all(c("cust", "date") %in% names(elog)))
-  stopifnot(any(c("Date", "POSIXt") %in% class(elog$date)))
+  if (!all(c("cust", "date") %in% names(elog))) stop("`elog` must have fields `cust` and `date`")
+  if (!any(c("Date", "POSIXt") %in% class(elog$date))) stop("`date` field must be of class `Date` or `POSIXt`")
   
   is.dt <- is.data.table(elog)
   has.sales <- "sales" %in% names(elog)
