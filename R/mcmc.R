@@ -25,15 +25,22 @@ mcmc.PAlive <- function(cal.cbs, draws) {
 #' @param cal.cbs data.frame with column \code{t.x} and \code{T.cal}
 #' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}
 #' @param T.star length of period for which future transactions are counted
+#' @param size number of samples to draw; defaults to the same number of parameter draws that are passed to `draws`
 #' @return 2-dim array [draw x cust] with sampled future transactions
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs 
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
 #' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
-mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star) {
+mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star, size = NULL) {
   
-  nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
+  if (is.null(size)) {
+    nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
+  } else {
+    stopifnot(is.numeric(size))
+    nr_of_draws <- as.integer(size)
+  }
+  stopifnot(size >= 1)
   nr_of_cust <- length(draws$level_1)
   parameters <- varnames(draws$level_1[[1]])
   
@@ -55,10 +62,20 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star)
     Tcal <- cal.cbs$T.cal[cust]
     Tstar <- T.star[cust]
     tx <- cal.cbs$t.x[cust]
-    taus <- as.matrix(draws$level_1[[cust]][, "tau"])
-    ks <- if ("k" %in% parameters) 
-      as.matrix(draws$level_1[[cust]][, "k"]) else rep(1, nr_of_draws)
-    lambdas <- as.matrix(draws$level_1[[cust]][, "lambda"])
+    taus <- drop(as.matrix(draws$level_1[[cust]][, "tau"]))
+    if ("k" %in% parameters) {
+      ks <- drop(as.matrix(draws$level_1[[cust]][, "k"]))
+    } else {
+      ks <- rep(1, length(taus))
+    }
+    lambdas <- drop(as.matrix(draws$level_1[[cust]][, "lambda"]))
+    stopifnot(length(taus) == length(ks) && length(taus) == length(lambdas))
+    if (!is.null(size)) {
+      idx <- sample(length(taus), size = size, replace = TRUE)
+      taus <- taus[idx]
+      ks <- ks[idx]
+      lambdas <- lambdas[idx]
+    }
     alive <- (taus > Tcal)
     
     # Case: customer alive

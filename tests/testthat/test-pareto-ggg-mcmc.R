@@ -18,12 +18,7 @@ test_that("Pareto/GGG MCMC", {
   # estimate future transactions
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
   
-  # test setBurnin
-  draws2 <- mcmc.setBurnin(draws, burnin = 40)
-  expect_equal(start(draws2$level_2), 40)
-  expect_equal(start(draws2$level_1[[1]]), 40)
-  
-  mcmc.plotPActiveDiagnostic(cbs, xstar)
+  # plot regularity rate
   pggg.mcmc.plotRegularityRateHeterogeneity(draws)
   
   skip('not run as it takes too long; run this manually')
@@ -48,7 +43,7 @@ test_that("Pareto/GGG MCMC", {
   expect_lt(ape(params$t, est$t), 0.1)
   expect_lt(ape(params$gamma, est$gamma), 0.1)
   
-  # estimate future transactions & P(alive)
+  # estimate future transactions & P(alive) & P(active)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
   cbs$x.est <- apply(xstar, 2, mean)
   cbs$pactive <- mcmc.PActive(xstar)
