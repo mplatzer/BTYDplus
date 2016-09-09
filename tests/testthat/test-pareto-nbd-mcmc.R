@@ -30,7 +30,7 @@ test_that("Pareto/NBD MCMC", {
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
   cbs$x.est <- apply(xstar, 2, mean)
   cbs$pactive <- apply(xstar, 2, function(x) mean(x > 0))
-  cbs$palive <- mcmc.PAlive(cbs, draws)
+  cbs$palive <- mcmc.PAlive(draws)
   
   # require less than 5% deviation
   expect_lt(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.05)

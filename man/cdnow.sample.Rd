@@ -4,15 +4,26 @@
 \alias{cdnow.sample}
 \title{CDNow Sample Data}
 \usage{
-cdnow.sample()
+cdnow.sample(T.cal = "1997-09-30", T.tot = "1998-06-30")
+}
+\arguments{
+\item{T.cal}{final date of calibration period}
+
+\item{T.tot}{final date of holdout period}
 }
 \value{
-list with two data.frames: `elog` for the event logs and `cbs` for
-  the customer by sufficient summary
+list with two data.frames
+\item{elog}{event log, with fields \code{cust}, \code{date}, \code{sales} and \code{cds}}
+\item{cbs}{customer-level summary statistic generated with \code{\link{elog2cbs}}}
 }
 \description{
-This is a convenience wrapper for data('cdnowElog', package='BTYD'), with
-same-day transactions being merged together for each customer.
+This is a convenience wrapper for \code{data('cdnowElog', package='BTYD')},
+with same-day transactions being merged together for each customer.
+}
+\examples{
+cdnow <- cdnow.sample()
+head(cdnow$cbs)
+head(cdnow$elog)
 }
 \references{
 Fader, Peter S. and Bruce G.,S. Hardie, (2001), 'Forecasting

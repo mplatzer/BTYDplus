@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{elog2cbs}
 \alias{elog2cbs}
-\title{Faster implementation of BTYD::dc.ElogToCbsCbt that also returns summary statistic for estimating regularity}
+\title{Convernt Event Log to customer-level summary statistic.}
 \usage{
 elog2cbs(elog, per = "week", T.cal = max(elog$date),
   T.tot = max(elog$date))
@@ -17,23 +17,29 @@ elog2cbs(elog, per = "week", T.cal = max(elog$date),
 \item{T.tot}{end date of holdout period}
 }
 \value{
-data.frame
+data.frame with fields
+ \item{\code{cust}}{customer id (unique key)}
+ \item{\code{x}}{number of recurring events in calibration period}
+ \item{\code{t.x}}{time between first and last event in calibration period}
+ \item{\code{litt}}{sum of logarithmic intertransaction timings durint calibration period}
+ \item{\code{sales}}{sum of sales in calibration period}
+ \item{\code{first}}{date of first transaction in calibration period}
+ \item{\code{T.cal}}{time between first event and end of calibration period}
+ \item{\code{T.star}}{length of holdout period}
+ \item{\code{x.star}}{number of events within holdout period}
+ \item{\code{sales.star}}{sum of sales within holdout period}
 }
 \description{
-Returns data.frame with
-     cust:   customer id (unique key)
-     x:      nr of recurring events in calibration period
-     t.x:    time between first and last event in calibration period
-     litt:   sum of logarithmic intertransaction timings durint calibration period 
-             this is a summary statistic for estimating regularity
-     sales:  sum of sales in calibration period
-     first:  date of first transaction in calibration period
-     T.cal:  time between first event and end of calibration period
-     T.star: length of holdout period
-     x.star: nr of events within holdout period
-     sales.star: sum of sales within holdout period
-     
-Customers without any transaction during calibration period are being dropped from the result.
-Transactions with identical `cust` and `date` field are treated as a single transaction, with `sales` being summed up
+Takes the event log of a customer cohort, and returns a sufficient summary statistic for applying common BTYD models.
+}
+\details{
+Note: compared to \code{\link[BTYD]{dc.ElogToCbsCbt}} this also adds a summary statistic for estimating regularity.
+
+Customers without any transaction during calibration period are being dropped from the result. Transactions with identical \code{cust} and \code{date} field are treated as a single transaction, with `sales` being summed up
+}
+\examples{
+elog <- cdnow.sample()$elog
+cbs <- elog2cbs(elog, T.cal = "1998-01-01", T.tot = "1998-03-31")
+head(cbs)
 }
 

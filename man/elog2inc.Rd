@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{elog2inc}
 \alias{elog2inc}
-\title{Convert Event Log to (weekly) incremental number of repeat transactions}
+\title{Aggregate Event Log to incremental number of repeat transactions}
 \usage{
 elog2inc(elog, by = 7)
 }
@@ -15,12 +15,12 @@ elog2inc(elog, by = 7)
 numeric vector
 }
 \description{
-Convert Event Log to (weekly) incremental number of repeat transactions
+Aggregate Event Log to incremental number of repeat transactions
 }
 \examples{
 elog <- cdnow.sample()$elog
 inc <- elog2inc(elog)
-plot(inc, typ='l')
+plot(inc, typ="l")
 }
 \seealso{
 \code{\link{elog2cum}}

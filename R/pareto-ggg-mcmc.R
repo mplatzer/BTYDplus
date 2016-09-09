@@ -1,28 +1,40 @@
 
-#' Hierarchical Bayes implementation of Pareto/GGG
+#' Hierarchical Bayes implementation of Pareto/GGG - Parameter Draws
 #'
-#' Returns 2-element list
-#'   level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
-#'   level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
+#' Returns draws from the posterior distributions of the Pareto/NBD (HB)
+#' parameters, on cohort as well as on customer level.
 #'
-#' See \code{demo('pareto-ggg')} for how to use this model.
+#' See \code{demo('pareto-ggg')} for how to apply this model.
 #'
 #' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}, \code{litt}; e.g. output of \code{\link{elog2cbs}}
 #' @param mcmc number of MCMC steps
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
 #' @param chains number of MCMC chains to be run
-#' @param mc.cores number of cores to use in parallel (Unix only); defaults to min(chains, detectCores())
+#' @param mc.cores number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}
 #' @param param_init list of 2nd-level parameter start values
 #' @param trace print logging step every \code{trace} iteration
 #' @return 2-element list:
 ##' \itemize{
-##'  \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
-##'  \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
+##'  \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+##'  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}, \code{t}, \code{gamma}}
 ##' }
 #' @export
 #' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
-#' @seealso \code{link{pggg.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
+#' @seealso \code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{elog2cbs} }
+#' @examples 
+#' cbs <- cdnow.sample()$cbs
+#' param.draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 20, burnin = 10, thin = 2, chains = 1) # we use short MCMC runs here only for demo purposes
+#' 
+#' # cohort-level parameter draws
+#' as.matrix(param.draws$level_2)
+#' # customer-level parameter draws for customer with ID '4'
+#' as.matrix(param.draws$level_1[["4"]])
+#' 
+#' # estimate future transactions
+#' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws, cbs$T.star)
+#' xstar.est <- apply(xstar.draws, 2, mean)
+#' head(xstar.est)
 pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 50, chains = 2, mc.cores = NULL, 
   param_init = NULL, trace = 100) {
   
@@ -209,7 +221,7 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #'
 #' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 #' @export
-pggg.mcmc.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL) {
+pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL) {
   ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
   if (!is.null(fn)) 
     ks <- apply(ks, 2, fn)

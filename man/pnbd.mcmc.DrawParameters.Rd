@@ -2,14 +2,14 @@
 % Please edit documentation in R/pareto-nbd-mcmc.R
 \name{pnbd.mcmc.DrawParameters}
 \alias{pnbd.mcmc.DrawParameters}
-\title{Hierarchical Bayes variant of Pareto/NBD}
+\title{Hierarchical Bayes variant of Pareto/NBD - Parameter Draws}
 \usage{
 pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
   chains = 2, mc.cores = NULL, use_data_augmentation = TRUE,
   param_init = NULL, trace = 100)
 }
 \arguments{
-\item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}}
+\item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}; e.g. output of \code{\link{elog2cbs}}}
 
 \item{mcmc}{number of MCMC steps}
 
@@ -19,7 +19,7 @@ pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
 
 \item{chains}{number of MCMC chains to be run}
 
-\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to min(chains, detectCores())}
+\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}}
 
 \item{use_data_augmentation}{determines MCMC method to be used}
 
@@ -30,15 +30,17 @@ pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
 \value{
 2-element list:
 \itemize{
- \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
- \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
+ \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+ \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}}
 }
 }
 \description{
-\code{pnbd.mcmc.DrawParameters} samples parameters via MCMC for a given CBS
-matrix
+Returns draws from the posterior distributions of the Pareto/NBD (HB)
+parameters, on cohort as well as on customer level.
 }
 \details{
+See \code{demo('pareto-ggg')} for how to apply this model.
+
 method 1) If \code{use_data_augmentation==TRUE} MCMC scheme takes advantage of 
 conjugate priors for drawing lambda and mu, by augmentating the parameter space 
 with unobserved lifetime 'tau' and activity status 'z'. See technical appendix 
@@ -54,8 +56,20 @@ Estimating parameters via Pareto/NBD MCMC can be 10x slower than Pareto/NBD
 MLE, which itself can be 10x slower than BG/NBD. Both methods exhibit highly
 autocorrelated draws of {r, alpha, s, beta} and hence need to be run long, to
 generate 'enough' draws
+}
+\examples{
+cbs <- cdnow.sample()$cbs
+param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
 
-See \code{demo('pareto-ggg')} for how to use this model.
+# cohort-level parameter draws
+as.matrix(param.draws$level_2)
+# customer-level parameter draws for customer with ID '4'
+as.matrix(param.draws$level_1[["4"]])
+
+# estimate future transactions
+xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws, cbs$T.star)
+xstar.est <- apply(xstar.draws, 2, mean)
+head(xstar.est)
 }
 \references{
 Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD model and possible extensions.' Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
@@ -63,6 +77,6 @@ Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD mod
 Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
 }
 \seealso{
-\code{\link{pggg.GenerateData}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{mcmc.PAlive}}
+\code{\link{pggg.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }
 }
 

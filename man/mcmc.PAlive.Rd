@@ -2,24 +2,22 @@
 % Please edit documentation in R/mcmc.R
 \name{mcmc.PAlive}
 \alias{mcmc.PAlive}
-\title{Calculates P(alive) based on MCMC draws}
+\title{Calculates P(alive) based on MCMC parameter draws}
 \usage{
-mcmc.PAlive(cal.cbs, draws)
+mcmc.PAlive(draws)
 }
 \arguments{
-\item{cal.cbs}{data.frame with column \code{T.cal}}
-
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC parameter draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
 }
 \value{
-numeric vector of probabilities
+numeric vector with the customers' probabilities of being still alive at end of calibration period
 }
 \description{
-Calculates P(alive) based on MCMC draws
+Calculates P(alive) based on MCMC parameter draws
 }
 \examples{
 cbs <- cdnow.sample()$cbs
 param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
-mcmc.PAlive(cbs, param.draws)
+mcmc.PAlive(param.draws)
 }
 

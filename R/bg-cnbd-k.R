@@ -528,7 +528,7 @@ bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = NULL, pl
 #' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
 #'   in that order.
 #' @param T.cal a vector to represent customers' calibration period lengths (in
-#'   other words, the 'T.cal' column from a customer-by-sufficient-statistic
+#'   other words, the \code{T.cal} column from a customer-by-sufficient-statistic
 #'   matrix).
 #' @param T.tot end of holdout period. Must be a single value, not a vector.
 #' @param n.periods.final number of time periods in the calibration and holdout periods.
@@ -538,6 +538,13 @@ bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = NULL, pl
 #' 
 #' @export
 #' @seealso \code{\link[BTYD]{bgnbd.ExpectedCumulativeTransactions}}
+#' @examples 
+#' cbs <- cdnow.sample()$cbs
+#' params <- c(1, 0.243, 4.414, 0.793, 2.426)
+#' # Returns a vector containing cumulative repeat transactions for 546 days.
+#' # All parameters are in weeks; the calibration period lasted 39 weeks
+#' # and the holdout period another 39.
+#' bgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
 bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final, dropout_at_zero = FALSE) {
   dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.ExpectedCumulativeTransactions")
   if (any(T.cal < 0) || !is.numeric(T.cal)) 

@@ -1,6 +1,10 @@
 
 Changes in version 0.x.x (2016-xx-xx):
 
+    o   added `mcmc.pmf`
+
+    o   dropped `cal.cbs` argument from `mcmc.PAlive` (breaks API)
+
     o   allow flexible sample size in `mcmc.DrawFutureTransactions`
     
     o   removed GammaGompertz/NBD due to broken `ggnbd.ConditionalExpectedTransactions`

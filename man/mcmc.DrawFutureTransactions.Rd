@@ -2,7 +2,7 @@
 % Please edit documentation in R/mcmc.R
 \name{mcmc.DrawFutureTransactions}
 \alias{mcmc.DrawFutureTransactions}
-\title{Samples number of future transactions based on drawn parameters}
+\title{Samples number of future transactions based on MCMC parameter draws}
 \usage{
 mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star,
   size = NULL)
@@ -10,21 +10,30 @@ mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star,
 \arguments{
 \item{cal.cbs}{data.frame with column \code{t.x} and \code{T.cal}}
 
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}}, \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
+\code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
 
 \item{T.star}{length of period for which future transactions are counted}
 
-\item{size}{number of samples to draw; defaults to the same number of parameter draws that are passed to `draws`}
+\item{size}{number of samples to draw; defaults to the same number of
+parameter draws that are passed to \code{draws}}
 }
 \value{
-2-dim array [draw x cust] with sampled future transactions
+2-dim matrix [draw x cust] with sampled future transactions
 }
 \description{
-Samples number of future transactions based on drawn parameters
+For each customer and each provided MCMC parameter draw this method will
+sample the number of transactions during the holdout period \code{T.star}. If
+argument \code{size} is provided then it returns a flexible number of draws,
+whereas for each customer and each draw it will first make a draw from the
+parameter draws.
 }
 \examples{
 cbs <- cdnow.sample()$cbs 
 param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
 xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
+cbs$xstar.est <- apply(xstar.draws, 2, mean)
+cbs$pactive <- mcmc.PActive(xstar.draws)
+head(cbs)
 }
 

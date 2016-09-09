@@ -26,7 +26,8 @@ test_that("cdnow.sample", {
   expect_is(data$elog, "data.frame")
   expect_equal(names(data$elog), c("cust", "date", "sales", "cds"))
   expect_equal(names(data$cbs), c("cust", "x", "t.x", "litt", "sales", "first", "T.cal", "T.star", "x.star", "sales.star"))
-  
+  expect_equal(nrow(data$cbs), 2357)
+  expect_equal(min(data$cbs$T.cal), 27)
 })  
 
 

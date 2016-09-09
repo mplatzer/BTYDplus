@@ -19,7 +19,7 @@ test_that("Pareto/GGG MCMC", {
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
   
   # plot regularity rate
-  pggg.mcmc.plotRegularityRateHeterogeneity(draws)
+  pggg.plotRegularityRateHeterogeneity(draws)
   
   skip('not run as it takes too long; run this manually')
   skip_on_cran()
@@ -47,7 +47,7 @@ test_that("Pareto/GGG MCMC", {
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
   cbs$x.est <- apply(xstar, 2, mean)
   cbs$pactive <- mcmc.PActive(xstar)
-  cbs$palive <- mcmc.PAlive(cbs, draws)
+  cbs$palive <- mcmc.PAlive(draws)
   
   # require less than 5% deviation
   expect_lt(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.05)

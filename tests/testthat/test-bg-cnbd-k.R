@@ -30,6 +30,9 @@ test_that("BG/CNBD-k", {
   expect_equal(BTYD::bgnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking), 
                bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking), 
                tolerance = 0.001)
+  expect_equal(BTYD::bgnbd.ExpectedCumulativeTransactions(params, 11, 39, 12),
+               bgcnbd.ExpectedCumulativeTransactions(c(1, params), 11, 39, 12),
+               tolerance = 0.001)
   cu.tracking <- cumsum(inc.tracking)
   expect_equal(BTYD::bgnbd.PlotTrackingCum(params, cbs$T.cal, 32 + 32, cu.tracking), 
                bgcnbd.PlotTrackingCum(c(1, params), cbs$T.cal, 32 + 32, cu.tracking), 
