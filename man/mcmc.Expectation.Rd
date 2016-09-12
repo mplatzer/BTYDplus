@@ -26,7 +26,8 @@ E(X(t))
 }
 \examples{
 cbs <- cdnow.sample()$cbs # load CDNow summary data
-param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 mcmc.Expectation(param.draws, t = c(26, 52))
 }
 \seealso{

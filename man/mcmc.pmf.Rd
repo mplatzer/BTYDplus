@@ -15,7 +15,7 @@ transactions. May also be a vector.}
 
 \item{x}{number of transactions for which probability is calculated. May also be a vector.}
 
-\item{sample_size}{Size used for sampling the distribution.}
+\item{sample_size}{Sample size for estimating the probability distribution.}
 }
 \value{
 P(X(t)=x). If either \code{t} or \code{x} is a
@@ -32,7 +32,8 @@ result varies from one call to another.
 }
 \examples{
 cbs <- cdnow.sample()$cbs # load CDNow summary data
-param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 mcmc.pmf(param.draws, t = 52, x = 0:6)
 mcmc.pmf(param.draws, t = c(26, 52), x = 0:6)
 }

@@ -197,7 +197,7 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
 #' @param t length of time for which we are calculating the expected number of 
 #'   transactions. May also be a vector.
 #' @param x number of transactions for which probability is calculated. May also be a vector.
-#' @param sample_size Size used for sampling the distribution.
+#' @param sample_size Sample size for estimating the probability distribution.
 #' @return P(X(t)=x). If either \code{t} or \code{x} is a
 #'   vector, then the output will be a vector as well. If both are vectors, the
 #'   output will be a matrix.
@@ -205,7 +205,8 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
 #' @seealso \code{\link{bgcnbd.pmf}} \code{\link[BTYD]{pnbd.pmf}}
 #' @examples
 #' cbs <- cdnow.sample()$cbs # load CDNow summary data
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 #' mcmc.pmf(param.draws, t = 52, x = 0:6)
 #' mcmc.pmf(param.draws, t = c(26, 52), x = 0:6)
 mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
@@ -251,7 +252,8 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
 #' @seealso \code{\link{bgcnbd.Expectation}} \code{\link{mcmc.pmf}}
 #' @examples
 #' cbs <- cdnow.sample()$cbs # load CDNow summary data
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 #' mcmc.Expectation(param.draws, t = c(26, 52))
 mcmc.Expectation <- function(draws, t) {
   unique_ts <- unique(t)
@@ -278,7 +280,8 @@ mcmc.Expectation <- function(draws, t) {
 #' @seealso \code{\link{bgcnbd.ExpectedCumulativeTransactions}}
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 #' # Returns a vector containing cumulative repeat transactions for 546 days.
 #' # All parameters are in weeks; the calibration period lasted 39 weeks
 #' # and the holdout period another 39.
@@ -357,7 +360,8 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 #' cdnow <- cdnow.sample()
 #' cbs <- cdnow$cbs
 #' cum <- elog2cum(cdnow$elog)
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 #' mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 78, cum)
 mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data, 
                                  xlab = "Week", ylab = "Cumulative Transactions", 
@@ -400,7 +404,8 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 #' cdnow <- cdnow.sample()
 #' cbs <-  cdnow$cbs
 #' inc <- elog2inc(cdnow$elog)
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 #' mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 78, inc)
 mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data, 
                                  xlab = "Week", ylab = "Transactions", 
@@ -422,7 +427,8 @@ mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data,
 #' number of customers who made a certain number of repeat transactions in the
 #' calibration period, binned according to calibration period frequencies.
 #' 
-#' The method \code{\link{mcmc.pmf}} is called to calculate the expected numbers based on the corresponding model.
+#' The method \code{\link{mcmc.pmf}} is called to calculate the expected numbers
+#' based on the corresponding model.
 #' 
 #' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
 #'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
@@ -432,18 +438,24 @@ mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data,
 #' @param xlab descriptive label for the x axis.
 #' @param ylab descriptive label for the y axis.
 #' @param title title placed on the top-center of the plot.
-#' @return Calibration period repeat transaction frequency comparison matrix (actual vs. expected).
-#'
+#' @param sample_size Sample size for estimating the probability distribution.
+#'   See \code{\link{mcmc.pmf}}.
+#' @return Calibration period repeat transaction frequency comparison matrix
+#'   (actual vs. expected).
+#'   
 #' @export
 #' @seealso \code{\link[BTYD]{bgnbd.PlotFrequencyInCalibration}} \code{\link{mcmc.pmf}}
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
-#' mcmc.PlotFrequencyInCalibration(param.draws, cbs)
+#' # for demo purposes we use short MCMC runs and small sample size
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' mcmc.PlotFrequencyInCalibration(param.draws, cbs, sample_size = 100)
 mcmc.PlotFrequencyInCalibration <- function(draws, cal.cbs, censor = 7, 
                                             xlab = "Calibration period transactions", 
                                             ylab = "Customers",
-                                            title = "Frequency of Repeat Transactions") {
+                                            title = "Frequency of Repeat Transactions", 
+                                            sample_size = 1000) {
 
   # actual
   x_act <- cal.cbs$x
@@ -453,7 +465,7 @@ mcmc.PlotFrequencyInCalibration <- function(draws, cal.cbs, censor = 7,
   # expected
   x_est <- sapply(unique(cal.cbs$T.cal), function(tcal) {
     n <- sum(cal.cbs$T.cal == tcal)
-    prop <- mcmc.pmf(draws, t = tcal, x=0:(censor-1))
+    prop <- mcmc.pmf(draws, t = tcal, x=0:(censor-1), sample_size = sample_size)
     prop <- c(prop, 1-sum(prop))
     prop * (n / nrow(cal.cbs))
   })

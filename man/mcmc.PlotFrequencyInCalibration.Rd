@@ -6,7 +6,7 @@
 \usage{
 mcmc.PlotFrequencyInCalibration(draws, cal.cbs, censor = 7,
   xlab = "Calibration period transactions", ylab = "Customers",
-  title = "Frequency of Repeat Transactions")
+  title = "Frequency of Repeat Transactions", sample_size = 1000)
 }
 \arguments{
 \item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
@@ -22,9 +22,13 @@ must contain columns for frequency ('x') and total time observed ('T.cal').}
 \item{ylab}{descriptive label for the y axis.}
 
 \item{title}{title placed on the top-center of the plot.}
+
+\item{sample_size}{Sample size for estimating the probability distribution.
+See \code{\link{mcmc.pmf}}.}
 }
 \value{
-Calibration period repeat transaction frequency comparison matrix (actual vs. expected).
+Calibration period repeat transaction frequency comparison matrix
+  (actual vs. expected).
 }
 \description{
 Plots a histogram and returns a matrix comparing the actual and expected
@@ -32,12 +36,15 @@ number of customers who made a certain number of repeat transactions in the
 calibration period, binned according to calibration period frequencies.
 }
 \details{
-The method \code{\link{mcmc.pmf}} is called to calculate the expected numbers based on the corresponding model.
+The method \code{\link{mcmc.pmf}} is called to calculate the expected numbers
+based on the corresponding model.
 }
 \examples{
 cbs <- cdnow.sample()$cbs
-param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
-mcmc.PlotFrequencyInCalibration(param.draws, cbs)
+# for demo purposes we use short MCMC runs and small sample size
+param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+  mcmc = 200, burnin = 100, thin = 20, chains = 1)
+mcmc.PlotFrequencyInCalibration(param.draws, cbs, sample_size = 100)
 }
 \seealso{
 \code{\link[BTYD]{bgnbd.PlotFrequencyInCalibration}} \code{\link{mcmc.pmf}}
