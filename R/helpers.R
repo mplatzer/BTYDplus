@@ -152,7 +152,7 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
   if (!any(c("Date", "POSIXt") %in% class(elog$date))) stop("`date` field must be of class `Date` or `POSIXt`")
   if (is.character(T.cal)) T.cal <- as.Date(T.cal)
   if (is.character(T.tot)) T.tot <- as.Date(T.tot)
-  stopifnot(T.tot > T.cal)
+  stopifnot(T.tot >= T.cal)
   
   is.dt <- is.data.table(elog)
   has.sales <- "sales" %in% names(elog)
