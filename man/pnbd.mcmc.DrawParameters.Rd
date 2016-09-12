@@ -77,6 +77,6 @@ Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD mod
 Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
 }
 \seealso{
-\code{\link{pggg.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }
+\code{\link{pnbd.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }
 }
 

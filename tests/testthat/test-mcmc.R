@@ -8,8 +8,8 @@ test_that("MCMC Helpers", {
   chains <- 2
 
   # generate small Pareto/NBD cohort
-  pnbd.params <- list(k = 1, r = 0.9, alpha = 10, s = 0.8, beta = 12)
-  pnbd.cbs <- pggg.GenerateData(n = 100, 28, 28, pnbd.params, FALSE)$cbs
+  pnbd.params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
+  pnbd.cbs <- pnbd.GenerateData(n = 100, 28, 28, pnbd.params, FALSE)$cbs
   pnbd.draws <- pnbd.mcmc.DrawParameters(pnbd.cbs, mcmc, burnin, thin, chains, mc.cores = 1)
   
   # generate small Pareto/Abe cohort
@@ -76,8 +76,8 @@ test_that("MCMC Helpers", {
 
   # test against P/NBD simulation
   set.seed(1)
-  pnbd.params <- list(k = 1, r = 0.9, alpha = 10, s = 0.8, beta = 12)
-  pnbd.sim <- pggg.GenerateData(n = 1000, 28, 28, pnbd.params, return.elog = TRUE)
+  pnbd.params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
+  pnbd.sim <- pnbd.GenerateData(n = 1000, 28, 28, pnbd.params, return.elog = TRUE)
   pnbd.elog <- pnbd.sim$elog
   pnbd.cbs <- pnbd.sim$cbs
   pnbd.draws <- pnbd.mcmc.DrawParameters(pnbd.cbs, mc.cores = 1)

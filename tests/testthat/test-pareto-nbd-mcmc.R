@@ -6,9 +6,9 @@ test_that("Pareto/NBD MCMC", {
   
   # generate artificial Pareto/NBD data
   set.seed(1)
-  params <- list(k = 1, r = 0.9, alpha = 10, s = 0.8, beta = 12)
+  params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
   n <- 5000
-  cbs <- pggg.GenerateData(n, 52, 52, params, TRUE)$cbs
+  cbs <- pnbd.GenerateData(n, 52, 52, params, TRUE)$cbs
   
   # estimate parameters
   draws <- pnbd.mcmc.DrawParameters(cbs, mc.cores = 1)

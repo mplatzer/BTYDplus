@@ -37,7 +37,7 @@
 ##'  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}}
 ##' }
 #' @export
-#' @seealso \code{\link{pggg.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }
+#' @seealso \code{\link{pnbd.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }
 #' @references Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD model and possible extensions.' Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
 #' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
 #' @examples 
@@ -236,4 +236,31 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   if ("cust" %in% names(cal.cbs)) 
     names(out$level_1) <- cal.cbs$cust
   return(out)
+}
+
+
+#' Generate artificial data which follows Pareto/NBD model assumptions
+#'
+#' Returns 2-element list
+#' * cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star' 
+#'        this is the summary statistics data.frame which contains all 
+#'        needed information for parameter estimation
+#' * elog: data.frame with 'cust', \code{t}
+#'
+#' @param n number of customers
+#' @param T.cal length of calibration period
+#' @param T.star length of holdout period
+#' @param params list of parameters: {r, alpha, s, beta}
+#' @param return.elog if \code{TRUE} then the event-log is returned as well; decreases performance
+#' 
+#' @return 2-elemnt list
+#' @export
+#' @examples
+#' params <- list(r = 5, alpha = 10, s = 0.8, beta = 12)
+#' data <- pnbd.GenerateData(n = 1000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
+#' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
+#' elog <- data$elog  # Event log - one row per event/purchase
+pnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
+  params$k <- 1
+  pggg.GenerateData(n, T.cal, T.star, params, return.elog)
 }
