@@ -24,7 +24,8 @@
 #' @seealso \code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{elog2cbs} }
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
-#' param.draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 20, burnin = 10, thin = 2, chains = 1) # we use short MCMC runs here only for demo purposes
+#' param.draws <- pggg.mcmc.DrawParameters(cbs, 
+#'   mcmc = 20, burnin = 10, thin = 2, chains = 1) # short MCMC runs for demo purposes
 #' 
 #' # cohort-level parameter draws
 #' as.matrix(param.draws$level_2)

@@ -59,7 +59,8 @@ generate 'enough' draws
 }
 \examples{
 cbs <- cdnow.sample()$cbs
-param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 
 # cohort-level parameter draws
 as.matrix(param.draws$level_2)

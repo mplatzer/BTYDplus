@@ -25,7 +25,8 @@
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
 #' cbs$sales.avg <- cbs$sales / (cbs$x + 1)
-#' param.draws <- abe.mcmc.DrawParameters(cbs, c("sales.avg", "sales"), mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' param.draws <- abe.mcmc.DrawParameters(cbs, c("sales.avg", "sales"), 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 #' 
 #' # cohort-level parameter draws
 #' as.matrix(param.draws$level_2)

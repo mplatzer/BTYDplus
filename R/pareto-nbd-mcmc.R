@@ -42,7 +42,8 @@
 #' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 #' 
 #' # cohort-level parameter draws
 #' as.matrix(param.draws$level_2)

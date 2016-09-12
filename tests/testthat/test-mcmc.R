@@ -95,6 +95,6 @@ test_that("MCMC Helpers", {
   expect_equal(mat[1, ], mat[2, ], tolerance = 0.1)
   
   expect_equal(mcmc.PlotFrequencyInCalibration(pnbd.draws, pnbd.cbs),
-               BTYD::pnbd.PlotFrequencyInCalibration(unlist(pnbd.params)[-1], pnbd.cbs, censor = 7),
+               BTYD::pnbd.PlotFrequencyInCalibration(unlist(pnbd.params), pnbd.cbs, censor = 7),
                tolerance = 0.1)
 })
