@@ -19,8 +19,9 @@ transactions.}
 which set this parameter to TRUE}
 }
 \value{
-P(X(t)=x|r,alpha,a,b). If any of the input parameters has a length
-  greater than 1, this will be a vector of expected number of transactions.
+P(X(t)=x|r,alpha,a,b). If either \code{t} or \code{x} is a
+  vector, then the output will be a vector as well. If both are vectors, the
+  output will be a matrix.
 }
 \description{
 Uses BG/CNBD-k model parameters to return the probability distribution of
@@ -30,6 +31,7 @@ P(X(t)=x|r,alpha,a,b)
 \examples{
 cbs <- cdnow.sample()$cbs # load CDNow summary data
 params <- bgcnbd.EstimateParameters(cbs)
+bgcnbd.pmf(params, t = c(26, 52), x = 0:6)
 bgcnbd.pmf(params, t = 52, x = 0:6)
 }
 \references{

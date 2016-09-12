@@ -4,7 +4,7 @@
 \alias{mcmc.pmf}
 \title{Probability Mass Function for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)}
 \usage{
-mcmc.pmf(draws, t, x, size = 1000)
+mcmc.pmf(draws, t, x, sample_size = 10000)
 }
 \arguments{
 \item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
@@ -15,7 +15,7 @@ transactions. May also be a vector.}
 
 \item{x}{number of transactions for which probability is calculated. May also be a vector.}
 
-\item{method}{'mean' or 'sample'}
+\item{sample_size}{Size used for sampling the distribution.}
 }
 \value{
 P(X(t)=x). If either \code{t} or \code{x} is a
@@ -23,8 +23,12 @@ P(X(t)=x). If either \code{t} or \code{x} is a
   output will be a matrix.
 }
 \description{
-Uses model parameter draws to return the probability distribution of purchase
-frequencies for a random customer in a given time period, i.e. P(X(t)=x)
+Return the probability distribution of purchase frequencies for a random customer in a given time period, i.e. P(X(t)=x)
+}
+\details{
+This is estimated by generating \code{sample_size} number of random customers
+that follow the provided parameter draws. Due to this sampling, the return
+result varies from one call to another.
 }
 \examples{
 cbs <- cdnow.sample()$cbs # load CDNow summary data

@@ -292,3 +292,44 @@ dc.check.model.params.safe <- function(printnames, params, func) {
     }
   }
 }
+
+
+#' Generic Method for Tracking Plots
+#' 
+#' @param actual actual
+#' @param expected expected
+#' @param T.cal T.cal
+#' @param model model
+#' @param xlab xlab
+#' @param ylab ylab
+#' @param title title
+#' @param xticklab xticklab
+#' @param ymax ymax
+#' @return Matrix
+#' @seealso \code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.PlotTrackingInc}} \code{\link{bgcnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
+dc.PlotTracking <- function(actual, expected, T.cal = NULL, model = "Model",
+                            xlab = "", ylab = "", title = "", 
+                            xticklab = NULL, ymax = NULL) {
+
+  stopifnot(is.numeric(actual))
+  stopifnot(is.numeric(expected))
+  stopifnot(all(actual >= 0))
+  stopifnot(all(expected >= 0))
+  stopifnot(length(actual) == length(expected))
+  
+  if (is.null(ymax)) ymax <- max(c(actual, expected)) * 1.1
+  plot(actual, type = "l", xaxt = "n", xlab = xlab, ylab = ylab, col = 1, ylim = c(0, ymax), main = title)
+  lines(expected, lty = 2, col = 2)
+  if (is.null(xticklab)) {
+    axis(1, at = 1:length(actual), labels = 1:length(actual))
+  } else {
+    if (length(actual) != length(xticklab)) {
+      stop("Plot error, xticklab does not have the correct size")
+    }
+    axis(1, at = 1:length(actual), labels = xticklab)
+  }
+  if (!is.null(T.cal)) abline(v = max(T.cal), lty = 2)
+  leg.y <- ifelse(which.max(expected) == length(expected), max(c(actual, expected)) * 0.4, max(c(actual, expected)))
+  legend(x = length(actual), y = leg.y, legend = c("Actual", model), col = 1:2, lty = 1:2, lwd = 1, xjust = 1)
+  return(rbind(actual, expected))
+}

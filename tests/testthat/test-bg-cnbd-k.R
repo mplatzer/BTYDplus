@@ -25,10 +25,10 @@ test_that("BG/CNBD-k", {
   expect_equal(unname(BTYD::bgnbd.pmf(params, 32, 0:2)), 
                unname(bgcnbd.pmf(c(1, params), 32, 0:2)))
   expect_equal(BTYD::bgnbd.PlotFrequencyInCalibration(params, cbs, 7), 
-               bgcnbd.PlotFrequencyInCalibration(c(1, params), cbs, 7))
+               bgcnbd.PlotFrequencyInCalibration(c(1, params), cbs, 7), tolerance = 0.001)
   inc.tracking <- elog2inc(elog, by = 1)
-  expect_equal(BTYD::bgnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking), 
-               bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking), 
+  expect_equal(BTYD::bgnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
+               bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
                tolerance = 0.001)
   expect_equal(BTYD::bgnbd.ExpectedCumulativeTransactions(params, 11, 39, 12),
                bgcnbd.ExpectedCumulativeTransactions(c(1, params), 11, 39, 12),
@@ -76,5 +76,11 @@ test_that("BG/CNBD-k", {
   expect_true(min(cbs$x.star32) >= 0)
   expect_true(all(cbs$x.star32 == round(cbs$x.star32)))
   expect_true(all(cbs$palive >= 0 & cbs$palive <= 1))
+  
+  # test bgcnbd.pmf
+  expect_equal(dim(bgcnbd.pmf(params, c(28, 56), 0:9)), c(10, 2))
+  expect_equal(length(bgcnbd.pmf(params, 56, 0:9)), 10)
+  expect_equal(length(bgcnbd.pmf(params, 56, 0)), 1)
+  expect_equal(sum(bgcnbd.pmf(params, 2, 0:100)), 1)
   
 }) 

@@ -186,14 +186,18 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
 
 #' Probability Mass Function for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)
 #' 
-#' Uses model parameter draws to return the probability distribution of purchase
-#' frequencies for a random customer in a given time period, i.e. P(X(t)=x)
+#' Return the probability distribution of purchase frequencies for a random customer in a given time period, i.e. P(X(t)=x)
+#' 
+#' This is estimated by generating \code{sample_size} number of random customers
+#' that follow the provided parameter draws. Due to this sampling, the return
+#' result varies from one call to another.
 #' 
 #' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
 #'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
 #' @param t length of time for which we are calculating the expected number of 
 #'   transactions. May also be a vector.
 #' @param x number of transactions for which probability is calculated. May also be a vector.
+#' @param sample_size Size used for sampling the distribution.
 #' @return P(X(t)=x). If either \code{t} or \code{x} is a
 #'   vector, then the output will be a vector as well. If both are vectors, the
 #'   output will be a matrix.
@@ -204,11 +208,11 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
 #' mcmc.pmf(param.draws, t = 52, x = 0:6)
 #' mcmc.pmf(param.draws, t = c(26, 52), x = 0:6)
-mcmc.pmf <- function(draws, t, x) {
+mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
   cohort_draws <- as.matrix(draws$level_2)
   nr_of_draws <- nrow(cohort_draws)
   # use posterior mean
-  draw_idx_cnt <- table(sample(nr_of_draws, size = 1000, replace = TRUE))
+  draw_idx_cnt <- table(sample(nr_of_draws, size = sample_size, replace = TRUE))
   model <- ifelse(all(c("r", "alpha") %in% colnames(cohort_draws)), "pggg", "abe")
   pmf <- sapply(t, function(t) {
     xs <- do.call(c, lapply(names(draw_idx_cnt), function(idx) {
@@ -224,7 +228,7 @@ mcmc.pmf <- function(draws, t, x) {
         abe.GenerateData(n = n, T.cal = t, T.star = 0, params = params)$cbs$x
       }
     }))
-    sapply(x, function(x) sum(xs==x)) / size
+    sapply(x, function(x) sum(xs==x)) / sample_size
   })
   drop(pmf)
 }
@@ -270,7 +274,6 @@ mcmc.Expectation <- function(draws, t) {
 #' @param T.tot end of holdout period. Must be a single value, not a vector.
 #' @param n.periods.final number of time periods in the calibration and holdout periods.
 #' @return Vector of expected cumulative total repeat transactions by all customers.
-#' 
 #' @export
 #' @seealso \code{\link{bgcnbd.ExpectedCumulativeTransactions}}
 #' @examples 
@@ -279,7 +282,7 @@ mcmc.Expectation <- function(draws, t) {
 #' # Returns a vector containing cumulative repeat transactions for 546 days.
 #' # All parameters are in weeks; the calibration period lasted 39 weeks
 #' # and the holdout period another 39.
-#' mcmc.ExpectedCumulativeTransactions(draws, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
+#' mcmc.ExpectedCumulativeTransactions(param.draws, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
 mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.final) {
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
@@ -307,6 +310,7 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
     }
     setDT(elog)
     elog$cust <- paste0(elog$cust, "_", i)
+    elog <- elog[t > 0] # drop initial transaction
     elog
   }))
   setkey(elog, t)
@@ -325,12 +329,143 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
   return(expected.transactions)
 }
 
-mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data, xlab = "Week", ylab = "Cumulative Transactions", 
-                                   xticklab = NULL, title = "Tracking Cumulative Transactions", ymax = NULL, dropout_at_zero = FALSE) {
-  return(NULL)
+
+#' Tracking Cumulative Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)
+#' 
+#' Plots the actual and expected cumulative total repeat transactions by all
+#' customers for the calibration and holdout periods, and returns this
+#' comparison in a matrix.
+#' 
+#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
+#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
+#' @param T.cal a vector to represent customers' calibration period lengths (in
+#'   other words, the \code{T.cal} column from a customer-by-sufficient-statistic
+#'   matrix). Considering rounding in order to speed up calculations.
+#' @param T.tot end of holdout period. Must be a single value, not a vector.
+#' @param actual.cu.tracking.data vector containing the cumulative number of
+#'   repeat transactions made by customers for each period in the total time
+#'   period (both calibration and holdout periods).
+#' @param xlab descriptive label for the x axis.
+#' @param ylab descriptive label for the y axis.
+#' @param xticklab vector containing a label for each tick mark on the x axis.
+#' @param title title placed on the top-center of the plot.
+#' @param ymax upper boundary for y axis.
+#' @return Matrix containing actual and expected cumulative repeat transactions.
+#' @export
+#' @seealso \code{\link{mcmc.PlotTrackingInc}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2cum}} \code{\link[BTYD]{bgnbd.PlotTrackingCum}} 
+#' @examples
+#' cdnow <- cdnow.sample()
+#' cbs <- cdnow$cbs
+#' cum <- elog2cum(cdnow$elog)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 78, cum)
+mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data, 
+                                 xlab = "Week", ylab = "Cumulative Transactions", 
+                                 xticklab = NULL, title = "Tracking Cumulative Transactions", 
+                                 ymax = NULL) {
+
+  actual <- actual.cu.tracking.data
+  expected <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual))
+  
+  dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
+                  xlab = xlab, ylab = ylab, title = title, 
+                  xticklab = xticklab, ymax = ymax)
 }
 
-mcmc.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = NULL, plotZero = TRUE, xlab = "Calibration period transactions", 
-                                            ylab = "Customers", title = "Frequency of Repeat Transactions") {
-  return(NULL)
+
+#' Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)
+#' 
+#' Plots the actual and expected incremental total repeat transactions by all
+#' customers for the calibration and holdout periods, and returns this
+#' comparison in a matrix.
+#' 
+#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
+#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
+#' @param T.cal a vector to represent customers' calibration period lengths (in
+#'   other words, the \code{T.cal} column from a customer-by-sufficient-statistic
+#'   matrix). Considering rounding in order to speed up calculations.
+#' @param T.tot end of holdout period. Must be a single value, not a vector.
+#' @param actual.inc.tracking.data vector containing the incremental number of
+#'   repeat transactions made by customers for each period in the total time
+#'   period (both calibration and holdout periods).
+#' @param xlab descriptive label for the x axis.
+#' @param ylab descriptive label for the y axis.
+#' @param xticklab vector containing a label for each tick mark on the x axis.
+#' @param title title placed on the top-center of the plot.
+#' @param ymax upper boundary for y axis.
+#' @return Matrix containing actual and expected incremental repeat transactions.
+#' @export
+#' @seealso \code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}} \code{\link[BTYD]{bgnbd.PlotTrackingCum}} 
+#' @examples
+#' cdnow <- cdnow.sample()
+#' cbs <-  cdnow$cbs
+#' inc <- elog2inc(cdnow$elog)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 78, inc)
+mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data, 
+                                 xlab = "Week", ylab = "Transactions", 
+                                 xticklab = NULL, title = "Tracking Weekly Transactions", 
+                                 ymax = NULL) {
+  
+  actual <- actual.inc.tracking.data
+  expected <- BTYD::dc.CumulativeToIncremental(mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual)))
+  
+  dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
+                  xlab = xlab, ylab = ylab, title = title, 
+                  xticklab = xticklab, ymax = ymax)
+}
+
+
+#' Frequency in Calibration Period for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)
+#' 
+#' Plots a histogram and returns a matrix comparing the actual and expected
+#' number of customers who made a certain number of repeat transactions in the
+#' calibration period, binned according to calibration period frequencies.
+#' 
+#' The method \code{\link{mcmc.pmf}} is called to calculate the expected numbers based on the corresponding model.
+#' 
+#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
+#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
+#' @param cal.cbs calibration period CBS (customer by sufficient statistic). It
+#'   must contain columns for frequency ('x') and total time observed ('T.cal').
+#' @param censor integer used to censor the data.
+#' @param xlab descriptive label for the x axis.
+#' @param ylab descriptive label for the y axis.
+#' @param title title placed on the top-center of the plot.
+#' @return Calibration period repeat transaction frequency comparison matrix (actual vs. expected).
+#'
+#' @export
+#' @seealso \code{\link[BTYD]{bgnbd.PlotFrequencyInCalibration}} \code{\link{mcmc.pmf}}
+#' @examples 
+#' cbs <- cdnow.sample()$cbs
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1) # we use short MCMC runs here only for demo purposes
+#' mcmc.PlotFrequencyInCalibration(param.draws, cbs)
+mcmc.PlotFrequencyInCalibration <- function(draws, cal.cbs, censor = 7, 
+                                            xlab = "Calibration period transactions", 
+                                            ylab = "Customers",
+                                            title = "Frequency of Repeat Transactions") {
+
+  # actual
+  x_act <- cal.cbs$x
+  x_act[x_act > censor] <- censor
+  x_act <- table(x_act)
+  
+  # expected
+  x_est <- sapply(unique(cal.cbs$T.cal), function(tcal) {
+    n <- sum(cal.cbs$T.cal == tcal)
+    prop <- mcmc.pmf(draws, t = tcal, x=0:(censor-1))
+    prop <- c(prop, 1-sum(prop))
+    prop * (n / nrow(cal.cbs))
+  })
+  x_est <- apply(x_est, 1, sum) * nrow(cal.cbs)
+  
+  mat <- matrix(c(x_act, x_est), nrow = 2, ncol = censor + 1, byrow = TRUE)
+  rownames(mat) <- c("n.x.actual", "n.x.expected")
+  colnames(mat) <- c(0:(censor-1), paste0(censor, "+"))
+  
+  barplot(mat, beside = TRUE, col = 1:2, main = title, xlab = xlab, ylab = ylab, ylim = c(0, max(x_act) * 1.1))
+  legend("topright", legend = c("Actual", "Model"), col = 1:2, lty = 1:2, lwd = 1, xjust = 1)
+  
+  colnames(mat) <- paste0("freq.", colnames(mat))
+  mat  
 }

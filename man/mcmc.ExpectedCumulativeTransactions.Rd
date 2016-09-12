@@ -31,7 +31,7 @@ param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20
 # Returns a vector containing cumulative repeat transactions for 546 days.
 # All parameters are in weeks; the calibration period lasted 39 weeks
 # and the holdout period another 39.
-mcmc.ExpectedCumulativeTransactions(draws, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
+mcmc.ExpectedCumulativeTransactions(param.draws, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
 }
 \seealso{
 \code{\link{bgcnbd.ExpectedCumulativeTransactions}}

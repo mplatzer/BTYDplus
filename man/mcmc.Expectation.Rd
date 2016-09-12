@@ -4,7 +4,7 @@
 \alias{mcmc.Expectation}
 \title{Unconditional Expectation for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)}
 \usage{
-mcmc.Expectation(draws, t, size = 1000)
+mcmc.Expectation(draws, t)
 }
 \arguments{
 \item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
