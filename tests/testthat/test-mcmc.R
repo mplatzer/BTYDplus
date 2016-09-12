@@ -75,6 +75,7 @@ test_that("MCMC Helpers", {
   expect_equal(length(mcmc.Expectation(abe.draws, 56)), 1)
 
   # test against P/NBD simulation
+  skip_on_cran()
   set.seed(1)
   pnbd.params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
   pnbd.sim <- pnbd.GenerateData(n = 1000, 28, 28, pnbd.params, return.elog = TRUE)
