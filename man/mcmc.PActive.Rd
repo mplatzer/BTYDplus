@@ -10,15 +10,16 @@ mcmc.PActive(xstar)
 \item{xstar}{future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}}
 }
 \value{
-vector with P(active) estimates for each customer
+numeric vector with the customers' probabilities of being active during the holdout period
 }
 \description{
 Calculates P(active) based on drawn future transactions.
 }
 \examples{
-cbs <- cdnow.sample()$cbs
+cbs <- cdnow.sample()$cbs 
 param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
 xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
-mcmc.PActive(xstar.draws)
+cbs$pactive <- mcmc.PActive(xstar.draws)
+head(cbs)
 }
 

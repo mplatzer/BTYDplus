@@ -29,7 +29,7 @@ cbs$xstar.pggg <- apply(xstar.pggg.draws, 2, mean)
 cbs$pactive <- apply(xstar.pggg.draws, 2, function(x) mean(x > 0))
 
 #' calculate P(alive)
-cbs$palive <- mcmc.PAlive(cbs, pggg.draws)
+cbs$palive <- mcmc.PAlive(pggg.draws)
 
 
 x <- readline("Estimate Pareto/GGG and Pareto/NBD (HB) for self generated data (press Enter)")
@@ -48,7 +48,7 @@ rbind(actual = params,
       `Pareto/NBD` = c(t=NA, gamma=NA, round(summary(pnbd.draws$level_2)$quantiles[, "50%"], 2)))
 
 #' plot estimated distribution of regularity rate `k`
-pggg.mcmc.plotRegularityRateHeterogeneity(pggg.draws)
+pggg.plotRegularityRateHeterogeneity(pggg.draws)
 
 #' calculate effective sample size for MCMC chain
 round(coda::effectiveSize(pggg.draws$level_2))

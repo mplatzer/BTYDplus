@@ -7,47 +7,37 @@
 estimateRegularity(elog, method = "wheat", plot = FALSE)
 }
 \arguments{
-\item{elog}{data.frame with transaction logs; requires columns customer-id
-'cust' and transaction time \code{t} or 'date'}
+\item{elog}{event log; \code{data.frame} with columns \code{cust} and transaction time \code{t} or \code{date}}
 
-\item{method}{\code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom}, \code{cv}}
+\item{method}{\code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom} or \code{cv}}
 
 \item{plot}{if \code{TRUE} then distribution of estimated regularity will be plotted}
 }
 \value{
-estimated real-valued regularity parameter; rounded to an integer,
-  this can be used as \code{k} for estimating MBG/CNBD-k models
+estimated real-valued regularity parameter
 }
 \description{
-Estimates degree of regularity of intertransaction timings of a customer cohort,
-}
-\details{
-This is done
- - by either assuming same regularity across all customers; this then only 
-     require three transactions per customer
-     method: wheat
- - or by estimating regularity for each customer seperately (as the shape
-     parameter of a fitted gamma distribution), and then return the 
-     median across estimates; this requires min. 10 transactions per customer
-     methods: mle, mle-minka, mle-thom, cv
+Estimates degree of regularity of intertransaction timings of a customer
+cohort. This is done by 1) assuming same regularity across all customers 
+(\code{method = "wheat"}), or 2) by estimating regularity for each customer 
+seperately, as the shape parameter of a fitted gamma distribution, and then 
+return the median across estimates; this requires sufficient (>=10) 
+transactions per customer
 }
 \examples{
-# generate Erlang-3 with various lambdas
-n <- 100
-k <- 3
-x <- 20
-elog <- do.call(rbind, lapply(1:n, function(i) {
-  lambda <- exp(rnorm(1))
-    data.frame(cust = i, t = cumsum(rgamma(x, k, k * lambda)))
-    }))
-    
-# estimate regularity parameter k
+elog <- cdnow.sample()$elog[, c("cust", "date")]
 estimateRegularity(elog, plot = TRUE, method = 'wheat')
 estimateRegularity(elog, plot = TRUE, method = 'mle-minka')
 estimateRegularity(elog, plot = TRUE, method = 'mle-thom')
-estimateRegularity(elog, plot = TRUE, method = 'cv') 
+estimateRegularity(elog, plot = TRUE, method = 'cv')
 }
 \references{
 Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase regularity with two interpurchase times.'
+
+Dunn, Richard, Steven Reader, and Neil Wrigley. 'An investigation of the assumptions of the NBD model' Applied Statistics (1983): 249-259.
+
+Wu, Couchen, and H-L. Chen. 'A consumer purchasing model with learning and departure behaviour.'  Journal of the Operational Research Society (2000): 583-591.
+
+\url{http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf}
 }
 

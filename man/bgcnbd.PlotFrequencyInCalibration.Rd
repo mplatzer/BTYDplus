@@ -4,10 +4,9 @@
 \alias{bgcnbd.PlotFrequencyInCalibration}
 \title{BG/CNBD-k Plot Frequency in Calibration Period}
 \usage{
-bgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = NULL,
-  plotZero = TRUE, xlab = "Calibration period transactions",
-  ylab = "Customers", title = "Frequency of Repeat Transactions",
-  dropout_at_zero = FALSE)
+bgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = 7,
+  xlab = "Calibration period transactions", ylab = "Customers",
+  title = "Frequency of Repeat Transactions", dropout_at_zero = FALSE)
 }
 \arguments{
 \item{params}{BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
@@ -17,8 +16,6 @@ in that order.}
 must contain columns for frequency ('x') and total time observed ('T.cal').}
 
 \item{censor}{integer used to censor the data.}
-
-\item{plotZero}{If FALSE, the histogram will exclude the zero bin.}
 
 \item{xlab}{descriptive label for the x axis.}
 
@@ -38,9 +35,9 @@ number of customers who made a certain number of repeat transactions in the
 calibration period, binned according to calibration period frequencies.
 }
 \examples{
-params <- c(k=3, r=0.85, alpha=1.45, a=0.79, b=2.42)
-cbs <- bgcnbd.GenerateData(n=5000, 32, 0, params)$cbs
-bgcnbd.PlotFrequencyInCalibration(params, cbs, censor = 7)
+cbs <- cdnow.sample()$cbs
+params <- bgcnbd.EstimateParameters(cbs)
+bgcnbd.PlotFrequencyInCalibration(params, cbs)
 }
 \references{
 Platzer Michael, and Thomas Reutterer (forthcoming)

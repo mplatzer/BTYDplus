@@ -1,5 +1,13 @@
 
-Changes in version 0.x.x (2016-xx-xx):
+Changes in version 0.8.0 (2016-09-12):
+
+    o   added `pnbd.GenerateData`
+    
+    o   added `mcmc.pmf`, `mcmc.Expectation`, `mcmc.mcmc.ExpectedCumulativeTransactions`, `mcmc.PlotTrackingCum`, `mcmc.PlotTrackingInc`, `mcmc.PlotFrequencyInCalibration`
+    
+    o   adapted `bgcnbd.pmf` to return matrix in case that both `t` and `x` are vectors
+
+    o   dropped unnecessary `cal.cbs` argument from `mcmc.PAlive`
 
     o   allow flexible sample size in `mcmc.DrawFutureTransactions`
     

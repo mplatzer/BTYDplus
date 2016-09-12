@@ -106,7 +106,7 @@ xstar.draws <- mcmc.DrawFutureTransactions(cbs, params.draws)
 cbs$xstar.mcmc <- apply(xstar.draws, 2, mean)
 
 #' estimate P(alive)
-cbs$palive.mcmc <- mcmc.PAlive(cbs, params.draws)
+cbs$palive.mcmc <- mcmc.PAlive(params.draws)
 
 #' estimate P(active)
 cbs$pactive.mcmc <- mcmc.PActive(xstar.draws)

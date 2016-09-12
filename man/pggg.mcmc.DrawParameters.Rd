@@ -2,7 +2,7 @@
 % Please edit documentation in R/pareto-ggg-mcmc.R
 \name{pggg.mcmc.DrawParameters}
 \alias{pggg.mcmc.DrawParameters}
-\title{Hierarchical Bayes implementation of Pareto/GGG}
+\title{Hierarchical Bayes implementation of Pareto/GGG - Parameter Draws}
 \usage{
 pggg.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
   chains = 2, mc.cores = NULL, param_init = NULL, trace = 100)
@@ -18,7 +18,7 @@ pggg.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
 
 \item{chains}{number of MCMC chains to be run}
 
-\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to min(chains, detectCores())}
+\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}}
 
 \item{param_init}{list of 2nd-level parameter start values}
 
@@ -27,22 +27,36 @@ pggg.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
 \value{
 2-element list:
 \itemize{
- \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
- \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
+ \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+ \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}, \code{t}, \code{gamma}}
 }
 }
 \description{
-Returns 2-element list
-  level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
-  level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
+Returns draws from the posterior distributions of the Pareto/NBD (HB)
+parameters, on cohort as well as on customer level.
 }
 \details{
-See \code{demo('pareto-ggg')} for how to use this model.
+See \code{demo('pareto-ggg')} for how to apply this model.
+}
+\examples{
+cbs <- cdnow.sample()$cbs
+param.draws <- pggg.mcmc.DrawParameters(cbs, 
+  mcmc = 20, burnin = 10, thin = 2, chains = 1) # short MCMC runs for demo purposes
+
+# cohort-level parameter draws
+as.matrix(param.draws$level_2)
+# customer-level parameter draws for customer with ID '4'
+as.matrix(param.draws$level_1[["4"]])
+
+# estimate future transactions
+xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws, cbs$T.star)
+xstar.est <- apply(xstar.draws, 2, mean)
+head(xstar.est)
 }
 \references{
 Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 }
 \seealso{
-\code{link{pggg.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{elog2cbs}}
+\code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{elog2cbs} }
 }
 

@@ -14,9 +14,6 @@ mcmc.plotPActiveDiagnostic(cbs, xstar,
 
 \item{title}{plot title}
 }
-\value{
-2-element list with MCMC draws
-}
 \description{
 Draw diagnostic plot to inspect error in P(active).
 }

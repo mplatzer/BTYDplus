@@ -6,9 +6,9 @@ test_that("Pareto/NBD MCMC", {
   
   # generate artificial Pareto/NBD data
   set.seed(1)
-  params <- list(k = 1, r = 0.9, alpha = 10, s = 0.8, beta = 12)
+  params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
   n <- 5000
-  cbs <- pggg.GenerateData(n, 52, 52, params, TRUE)$cbs
+  cbs <- pnbd.GenerateData(n, 52, 52, params, TRUE)$cbs
   
   # estimate parameters
   draws <- pnbd.mcmc.DrawParameters(cbs, mc.cores = 1)
@@ -30,7 +30,7 @@ test_that("Pareto/NBD MCMC", {
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
   cbs$x.est <- apply(xstar, 2, mean)
   cbs$pactive <- apply(xstar, 2, function(x) mean(x > 0))
-  cbs$palive <- mcmc.PAlive(cbs, draws)
+  cbs$palive <- mcmc.PAlive(draws)
   
   # require less than 5% deviation
   expect_lt(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.05)

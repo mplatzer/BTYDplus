@@ -1,8 +1,10 @@
 
-#' Hierarchical Bayes variant of Pareto/NBD
+#' Hierarchical Bayes variant of Pareto/NBD - Parameter Draws
 #'
-#' \code{pnbd.mcmc.DrawParameters} samples parameters via MCMC for a given CBS
-#' matrix
+#' Returns draws from the posterior distributions of the Pareto/NBD (HB)
+#' parameters, on cohort as well as on customer level.
+#' 
+#' See \code{demo('pareto-ggg')} for how to apply this model.
 #' 
 #' method 1) If \code{use_data_augmentation==TRUE} MCMC scheme takes advantage of 
 #' conjugate priors for drawing lambda and mu, by augmentating the parameter space 
@@ -19,27 +21,39 @@
 #' MLE, which itself can be 10x slower than BG/NBD. Both methods exhibit highly
 #' autocorrelated draws of {r, alpha, s, beta} and hence need to be run long, to
 #' generate 'enough' draws
-#' 
-#' See \code{demo('pareto-ggg')} for how to use this model.
 #'
-#' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}
+#' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}; e.g. output of \code{\link{elog2cbs}}
 #' @param mcmc number of MCMC steps
 #' @param burnin number of initial MCMC steps which are discarded
 #' @param thin only every thin-th MCMC step will be returned
 #' @param chains number of MCMC chains to be run
-#' @param mc.cores number of cores to use in parallel (Unix only); defaults to min(chains, detectCores())
+#' @param mc.cores number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}
 #' @param use_data_augmentation determines MCMC method to be used
 #' @param param_init list of 2nd-level parameter start values
 #' @param trace print logging step every \code{trace} iteration
 #' @return 2-element list:
 ##' \itemize{
-##'  \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
-##'  \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
+##'  \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+##'  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}}
 ##' }
 #' @export
-#' @seealso \code{\link{pggg.GenerateData}} \code{\link{mcmc.DrawFutureTransactions}} \code{\link{mcmc.PAlive}}
+#' @seealso \code{\link{pnbd.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }
 #' @references Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD model and possible extensions.' Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
 #' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
+#' @examples 
+#' cbs <- cdnow.sample()$cbs
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+#' 
+#' # cohort-level parameter draws
+#' as.matrix(param.draws$level_2)
+#' # customer-level parameter draws for customer with ID '4'
+#' as.matrix(param.draws$level_1[["4"]])
+#' 
+#' # estimate future transactions
+#' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws, cbs$T.star)
+#' xstar.est <- apply(xstar.draws, 2, mean)
+#' head(xstar.est)
 pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 50, chains = 2, mc.cores = NULL, 
   use_data_augmentation = TRUE, param_init = NULL, trace = 100) {
   
@@ -223,4 +237,31 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   if ("cust" %in% names(cal.cbs)) 
     names(out$level_1) <- cal.cbs$cust
   return(out)
+}
+
+
+#' Generate artificial data which follows Pareto/NBD model assumptions
+#'
+#' Returns 2-element list
+#' * cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star' 
+#'        this is the summary statistics data.frame which contains all 
+#'        needed information for parameter estimation
+#' * elog: data.frame with 'cust', \code{t}
+#'
+#' @param n number of customers
+#' @param T.cal length of calibration period
+#' @param T.star length of holdout period
+#' @param params list of parameters: {r, alpha, s, beta}
+#' @param return.elog if \code{TRUE} then the event-log is returned as well; decreases performance
+#' 
+#' @return 2-elemnt list
+#' @export
+#' @examples
+#' params <- list(r = 5, alpha = 10, s = 0.8, beta = 12)
+#' data <- pnbd.GenerateData(n = 1000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
+#' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
+#' elog <- data$elog  # Event log - one row per event/purchase
+pnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
+  params$k <- 1
+  pggg.GenerateData(n, T.cal, T.star, params, return.elog)
 }

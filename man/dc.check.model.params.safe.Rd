@@ -2,8 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{dc.check.model.params.safe}
 \alias{dc.check.model.params.safe}
-\title{Wrapper for BTYD::dc.check.model.params with additional check for parameter
-names if these are present}
+\title{Check Model Parameters}
 \usage{
 dc.check.model.params.safe(printnames, params, func)
 }
@@ -12,13 +11,13 @@ dc.check.model.params.safe(printnames, params, func)
 
 \item{params}{model parameters}
 
-\item{func}{Function calling dc.check.model.params.safe}
+\item{func}{Function calling \code{dc.check.model.params.safe}}
 }
 \value{
 stops program if there is something wrong with the parameters
 }
 \description{
-Wrapper for BTYD::dc.check.model.params with additional check for parameter
-names if these are present
+Wrapper for \code{BTYD::dc.check.model.params} with additional check for
+parameter names if these are present
 }
 

@@ -2,13 +2,13 @@
 % Please edit documentation in R/pareto-nbd-abe.R
 \name{abe.mcmc.DrawParameters}
 \alias{abe.mcmc.DrawParameters}
-\title{HB Pareto/NBD variant as described in Abe (2009)}
+\title{HB Pareto/NBD variant as described in Abe (2009) - Parameter Draws}
 \usage{
 abe.mcmc.DrawParameters(cal.cbs, covariates = c(), mcmc = 1500,
   burnin = 500, thin = 50, chains = 2, mc.cores = NULL, trace = 100)
 }
 \arguments{
-\item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}}
+\item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}; e.g. output of \code{\link{elog2cbs}}}
 
 \item{covariates}{list of column names containing customer-level covariates}
 
@@ -20,29 +20,44 @@ abe.mcmc.DrawParameters(cal.cbs, covariates = c(), mcmc = 1500,
 
 \item{chains}{number of MCMC chains to be run}
 
-\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to min(chains, detectCores())}
+\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}}
 
-\item{trace}{print logging step every \code{trace} iteration}
+\item{trace}{print logging step every \code{trace}}
 }
 \value{
 2-element list:
 \itemize{
- \item{\code{level_1}}{list of \code{\link{mcmc.list}} objects; one for each customer, containing individual-level draws}
- \item{\code{level_2}}{\code{\link{mcmc.list}} object containing draws of heterogeneity parameters}
+ \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+ \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters}
 }
 }
 \description{
-Returns 2-element list
-  level_1:  3-dim array [draw x parameter x cust] wrapped as coda::mcmc.list object
-  level_2:  2-dim array [draw x parameter] wrapped as coda::mcmc.list object
+Returns draws from the posterior distributions of the Pareto/NBD (Abe)
+parameters, on cohort as well as on customer level.
 }
 \details{
-See \code{demo('pareto-nbd-abe')} for how to use this model.
+See \code{demo('pareto-nbd-abe')} for how to apply this model.
+}
+\examples{
+cbs <- cdnow.sample()$cbs
+cbs$sales.avg <- cbs$sales / (cbs$x + 1)
+param.draws <- abe.mcmc.DrawParameters(cbs, c("sales.avg", "sales"), 
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+
+# cohort-level parameter draws
+as.matrix(param.draws$level_2)
+# customer-level parameter draws for customer with ID '4'
+as.matrix(param.draws$level_1[["4"]])
+
+# estimate future transactions
+xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws, cbs$T.star)
+xstar.est <- apply(xstar.draws, 2, mean)
+head(xstar.est)
 }
 \references{
 Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
 }
 \seealso{
-\code{link{abe.GenerateData}} \code{\link{mcmc.PAlive}} \code{\link{mcmc.DrawFutureTransactions}}
+\code{\link{abe.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{elog2cum}
 \alias{elog2cum}
-\title{Convert Event Log to (weekly) cumulative number of repeat transactions}
+\title{Aggregate Event Log to cumulative number of repeat transactions}
 \usage{
 elog2cum(elog, by = 7)
 }
@@ -15,12 +15,12 @@ elog2cum(elog, by = 7)
 numeric vector
 }
 \description{
-Convert Event Log to (weekly) cumulative number of repeat transactions
+Aggregate Event Log to cumulative number of repeat transactions
 }
 \examples{
 elog <- cdnow.sample()$elog
 cum <- elog2cum(elog)
-plot(cum, typ='l')
+plot(cum, typ="l")
 }
 \seealso{
 \code{\link{elog2inc}}

@@ -1,40 +1,28 @@
 
 #' Estimate Regularity in Intertransaction Timings
 #' 
-#' Estimates degree of regularity of intertransaction timings of a customer cohort,
+#' Estimates degree of regularity of intertransaction timings of a customer
+#' cohort. This is done by 1) assuming same regularity across all customers 
+#' (\code{method = "wheat"}), or 2) by estimating regularity for each customer 
+#' seperately, as the shape parameter of a fitted gamma distribution, and then 
+#' return the median across estimates; this requires sufficient (>=10) 
+#' transactions per customer
 #' 
-#' This is done
-#'  - by either assuming same regularity across all customers; this then only 
-#'      require three transactions per customer
-#'      method: wheat
-#'  - or by estimating regularity for each customer seperately (as the shape
-#'      parameter of a fitted gamma distribution), and then return the 
-#'      median across estimates; this requires min. 10 transactions per customer
-#'      methods: mle, mle-minka, mle-thom, cv
-#' 
-#' @param elog data.frame with transaction logs; requires columns customer-id
-#'   'cust' and transaction time \code{t} or 'date'
-#' @param method \code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom}, \code{cv}
+#' @param elog event log; \code{data.frame} with columns \code{cust} and transaction time \code{t} or \code{date}
+#' @param method \code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom} or \code{cv}
 #' @param plot if \code{TRUE} then distribution of estimated regularity will be plotted
-#' @return estimated real-valued regularity parameter; rounded to an integer,
-#'   this can be used as \code{k} for estimating MBG/CNBD-k models
+#' @return estimated real-valued regularity parameter
 #' @references Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase regularity with two interpurchase times.'
+#' @references Dunn, Richard, Steven Reader, and Neil Wrigley. 'An investigation of the assumptions of the NBD model' Applied Statistics (1983): 249-259.
+#' @references Wu, Couchen, and H-L. Chen. 'A consumer purchasing model with learning and departure behaviour.'  Journal of the Operational Research Society (2000): 583-591.
+#' @references \url{http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf}
 #' @export
 #' @examples
-#' # generate Erlang-3 with various lambdas
-#' n <- 100
-#' k <- 3
-#' x <- 20
-#' elog <- do.call(rbind, lapply(1:n, function(i) {
-#'   lambda <- exp(rnorm(1))
-#'     data.frame(cust = i, t = cumsum(rgamma(x, k, k * lambda)))
-#'     }))
-#'     
-#' # estimate regularity parameter k
+#' elog <- cdnow.sample()$elog[, c("cust", "date")]
 #' estimateRegularity(elog, plot = TRUE, method = 'wheat')
 #' estimateRegularity(elog, plot = TRUE, method = 'mle-minka')
 #' estimateRegularity(elog, plot = TRUE, method = 'mle-thom')
-#' estimateRegularity(elog, plot = TRUE, method = 'cv') 
+#' estimateRegularity(elog, plot = TRUE, method = 'cv')
 estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
   if (!"cust" %in% names(elog)) 
     stop("Error in estimateRegularity: elog must have a column labelled \"cust\"")
@@ -129,35 +117,42 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 }
 
 
-#' Faster implementation of BTYD::dc.ElogToCbsCbt that also returns summary statistic for estimating regularity
+#' Convernt Event Log to customer-level summary statistic.
+#' 
+#' Takes the event log of a customer cohort, and returns a sufficient summary statistic for applying common BTYD models.
+#' 
+#' Note: compared to \code{\link[BTYD]{dc.ElogToCbsCbt}} this also adds a summary statistic for estimating regularity.
 #'
-#' Returns data.frame with
-#'      cust:   customer id (unique key)
-#'      x:      nr of recurring events in calibration period
-#'      t.x:    time between first and last event in calibration period
-#'      litt:   sum of logarithmic intertransaction timings durint calibration period 
-#'              this is a summary statistic for estimating regularity
-#'      sales:  sum of sales in calibration period
-#'      first:  date of first transaction in calibration period
-#'      T.cal:  time between first event and end of calibration period
-#'      T.star: length of holdout period
-#'      x.star: nr of events within holdout period
-#'      sales.star: sum of sales within holdout period
-#'      
-#' Customers without any transaction during calibration period are being dropped from the result.
-#' Transactions with identical `cust` and `date` field are treated as a single transaction, with `sales` being summed up
+#' Customers without any transaction during calibration period are being dropped from the result. Transactions with identical \code{cust} and \code{date} field are treated as a single transaction, with `sales` being summed up
 #'
 #' @param elog data.frame with columns 'cust' and 'date'; optionally with column 'sales'
 #' @param per time unit, either 'week', 'day', 'hour', 'min', 'sec'
 #' @param T.cal end date of calibration period
 #' @param T.tot end date of holdout period
-#' @return data.frame
+#' @return data.frame with fields
+#'  \item{\code{cust}}{customer id (unique key)}
+#'  \item{\code{x}}{number of recurring events in calibration period}
+#'  \item{\code{t.x}}{time between first and last event in calibration period}
+#'  \item{\code{litt}}{sum of logarithmic intertransaction timings durint calibration period}
+#'  \item{\code{sales}}{sum of sales in calibration period}
+#'  \item{\code{first}}{date of first transaction in calibration period}
+#'  \item{\code{T.cal}}{time between first event and end of calibration period}
+#'  \item{\code{T.star}}{length of holdout period}
+#'  \item{\code{x.star}}{number of events within holdout period}
+#'  \item{\code{sales.star}}{sum of sales within holdout period}
 #' @export
+#' @examples
+#' elog <- cdnow.sample()$elog
+#' cbs <- elog2cbs(elog, T.cal = "1998-01-01", T.tot = "1998-03-31")
+#' head(cbs)
 elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elog$date)) {
   cust <- first <- itt <- T.star <- x.star <- sales <- sales.star <- NULL  # suppress checkUsage warnings
   stopifnot(inherits(elog, "data.frame"))
   if (!all(c("cust", "date") %in% names(elog))) stop("`elog` must have fields `cust` and `date`")
   if (!any(c("Date", "POSIXt") %in% class(elog$date))) stop("`date` field must be of class `Date` or `POSIXt`")
+  if (is.character(T.cal)) T.cal <- as.Date(T.cal)
+  if (is.character(T.tot)) T.tot <- as.Date(T.tot)
+  stopifnot(T.tot >= T.cal)
   
   is.dt <- is.data.table(elog)
   has.sales <- "sales" %in% names(elog)
@@ -202,28 +197,35 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
 
 #' CDNow Sample Data
 #' 
-#' This is a convenience wrapper for data('cdnowElog', package='BTYD'), with
-#' same-day transactions being merged together for each customer.
+#' This is a convenience wrapper for \code{data('cdnowElog', package='BTYD')},
+#' with same-day transactions being merged together for each customer.
 #' 
 #' @references Fader, Peter S. and Bruce G.,S. Hardie, (2001), 'Forecasting
 #'   Repeat Sales at CDNOW: A Case Study,' Interfaces, 31 (May-June), Part 2 of
 #'   2, S94-S107.
-#' @return list with two data.frames: `elog` for the event logs and `cbs` for
-#'   the customer by sufficient summary
+#' @param T.cal final date of calibration period
+#' @param T.tot final date of holdout period
+#' @return list with two data.frames
+#' \item{elog}{event log, with fields \code{cust}, \code{date}, \code{sales} and \code{cds}}
+#' \item{cbs}{customer-level summary statistic generated with \code{\link{elog2cbs}}}
 #' @seealso \code{\link{elog2cbs}} 
 #' @export
-cdnow.sample <- function() {
+#' @examples
+#' cdnow <- cdnow.sample()
+#' head(cdnow$cbs)
+#' head(cdnow$elog)
+cdnow.sample <- function(T.cal = "1997-09-30", T.tot = "1998-06-30") {
   cds <- sales <- NULL  # suppress checkUsage warnings
   elog <- fread(system.file("data/cdnowElog.csv", package = "BTYD"))
   setnames(elog, "masterid", "cust")
   elog <- elog[, list(sales = sum(sales), cds = sum(cds)), by = "cust,date"]
   elog[, `:=`(date, as.Date(as.character(date), "%Y%m%d"))]
-  cbs <- elog2cbs(elog, per = "week", T.cal = as.Date("1997-09-30"))
+  cbs <- elog2cbs(elog, per = "week", T.cal = T.cal, T.tot = T.tot)
   return(list(elog = as.data.frame(elog), cbs = as.data.frame(cbs)))
 }
 
 
-#' Convert Event Log to (weekly) cumulative number of repeat transactions
+#' Aggregate Event Log to cumulative number of repeat transactions
 #' 
 #' @param elog Event Log
 #' @param by defaults to 7, which means weekly numbers
@@ -233,7 +235,7 @@ cdnow.sample <- function() {
 #' @examples 
 #' elog <- cdnow.sample()$elog
 #' cum <- elog2cum(elog)
-#' plot(cum, typ='l')
+#' plot(cum, typ="l")
 elog2cum <- function(elog, by = 7) {
   t0 <- sales <- NULL  # suppress checkUsage warnings
   stopifnot("cust" %in% names(elog))
@@ -252,7 +254,7 @@ elog2cum <- function(elog, by = 7) {
 }
 
 
-#' Convert Event Log to (weekly) incremental number of repeat transactions
+#' Aggregate Event Log to incremental number of repeat transactions
 #' 
 #' @param elog Event Log
 #' @param by defaults to 7, which means weekly numbers
@@ -262,19 +264,21 @@ elog2cum <- function(elog, by = 7) {
 #' @examples
 #' elog <- cdnow.sample()$elog
 #' inc <- elog2inc(elog)
-#' plot(inc, typ='l')
+#' plot(inc, typ="l")
 elog2inc <- function(elog, by = 7) {
   cum <- elog2cum(elog = elog, by = by)
   return(diff(cum))
 }
 
 
-#' Wrapper for BTYD::dc.check.model.params with additional check for parameter
-#' names if these are present
+#' Check Model Parameters
+#' 
+#' Wrapper for \code{BTYD::dc.check.model.params} with additional check for
+#' parameter names if these are present
 #'
 #' @param printnames Names to print parameter errors
 #' @param params model parameters
-#' @param func Function calling dc.check.model.params.safe
+#' @param func Function calling \code{dc.check.model.params.safe}
 #' @return stops program if there is something wrong with the parameters
 dc.check.model.params.safe <- function(printnames, params, func) {
   # first do basic checks
@@ -287,4 +291,45 @@ dc.check.model.params.safe <- function(printnames, params, func) {
         paste0(names(params), collapse = ","), call. = FALSE)
     }
   }
+}
+
+
+#' Generic Method for Tracking Plots
+#' 
+#' @param actual actual
+#' @param expected expected
+#' @param T.cal T.cal
+#' @param model model
+#' @param xlab xlab
+#' @param ylab ylab
+#' @param title title
+#' @param xticklab xticklab
+#' @param ymax ymax
+#' @return Matrix
+#' @seealso \code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.PlotTrackingInc}} \code{\link{bgcnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
+dc.PlotTracking <- function(actual, expected, T.cal = NULL, model = "Model",
+                            xlab = "", ylab = "", title = "", 
+                            xticklab = NULL, ymax = NULL) {
+
+  stopifnot(is.numeric(actual))
+  stopifnot(is.numeric(expected))
+  stopifnot(all(actual >= 0))
+  stopifnot(all(expected >= 0))
+  stopifnot(length(actual) == length(expected))
+  
+  if (is.null(ymax)) ymax <- max(c(actual, expected)) * 1.1
+  plot(actual, type = "l", xaxt = "n", xlab = xlab, ylab = ylab, col = 1, ylim = c(0, ymax), main = title)
+  lines(expected, lty = 2, col = 2)
+  if (is.null(xticklab)) {
+    axis(1, at = 1:length(actual), labels = 1:length(actual))
+  } else {
+    if (length(actual) != length(xticklab)) {
+      stop("Plot error, xticklab does not have the correct size")
+    }
+    axis(1, at = 1:length(actual), labels = xticklab)
+  }
+  if (!is.null(T.cal)) abline(v = max(T.cal), lty = 2)
+  leg.y <- ifelse(which.max(expected) == length(expected), max(c(actual, expected)) * 0.4, max(c(actual, expected)))
+  legend(x = length(actual), y = leg.y, legend = c("Actual", model), col = 1:2, lty = 1:2, lwd = 1, xjust = 1)
+  return(rbind(actual, expected))
 }
