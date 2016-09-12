@@ -94,36 +94,36 @@ NumericVector slice_sample_cpp(double (*logfn)(NumericVector, NumericVector),
   return x;
 }
 
-// draw from gamma distribution (for test purposes)
-
-double post_gamma(NumericVector x, NumericVector params) {
-  double alpha = params[0];
-  double beta = params[1];
-  return (alpha - 1) * log(x[0]) - beta * x[0];
-}
-
-// [[Rcpp::export]]
-NumericVector slice_sample_gamma(double alpha, double beta, double lower, double upper) {
-  NumericVector params = NumericVector::create(alpha, beta);
-  NumericVector x0 = NumericVector::create(alpha/beta);
-  double steps = 10;
-  double w = 3 * sqrt(alpha) / beta; // approx size of (q95-q05)
-  return slice_sample_cpp(post_gamma, params, x0, steps, w, lower, upper);
-}
-
-// draw from multivariate normal distribution (for test purposes)
-
-double post_mvnorm(NumericVector x, NumericVector sigma) {
-  return -log(2*3.141593) -0.5 * log(sigma[0]*sigma[3]-sigma[1]*sigma[2]) -0.5 * (1/(sigma[0]*sigma[3]-sigma[1]*sigma[2])) * 
-    (x[0]*x[0]*sigma[3] - x[0]*x[1]*sigma[2] - x[0]*x[1]*sigma[1] + x[1]*x[1]*sigma[0]);
-}
-
-// [[Rcpp::export]]
-NumericVector slice_sample_mvnorm(NumericVector sigma) {
-  NumericVector x0 = NumericVector::create(0.2, 0.3);
-  double steps = 20;
-  return slice_sample_cpp(post_mvnorm, sigma, x0, steps);
-}
+// // draw from gamma distribution (for test purposes)
+// 
+// double post_gamma(NumericVector x, NumericVector params) {
+//   double alpha = params[0];
+//   double beta = params[1];
+//   return (alpha - 1) * log(x[0]) - beta * x[0];
+// }
+// 
+// // [[Rcpp::export]]
+// NumericVector slice_sample_gamma(double alpha, double beta, double lower, double upper) {
+//   NumericVector params = NumericVector::create(alpha, beta);
+//   NumericVector x0 = NumericVector::create(alpha/beta);
+//   double steps = 10;
+//   double w = 3 * sqrt(alpha) / beta; // approx size of (q95-q05)
+//   return slice_sample_cpp(post_gamma, params, x0, steps, w, lower, upper);
+// }
+// 
+// // draw from multivariate normal distribution (for test purposes)
+// 
+// double post_mvnorm(NumericVector x, NumericVector sigma) {
+//   return -log(2*3.141593) -0.5 * log(sigma[0]*sigma[3]-sigma[1]*sigma[2]) -0.5 * (1/(sigma[0]*sigma[3]-sigma[1]*sigma[2])) * 
+//     (x[0]*x[0]*sigma[3] - x[0]*x[1]*sigma[2] - x[0]*x[1]*sigma[1] + x[1]*x[1]*sigma[0]);
+// }
+// 
+// // [[Rcpp::export]]
+// NumericVector slice_sample_mvnorm(NumericVector sigma) {
+//   NumericVector x0 = NumericVector::create(0.2, 0.3);
+//   double steps = 20;
+//   return slice_sample_cpp(post_mvnorm, sigma, x0, steps);
+// }
 
 // estimate parameters of gamma distribution
 

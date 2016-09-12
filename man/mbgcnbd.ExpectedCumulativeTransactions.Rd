@@ -7,12 +7,12 @@
 mbgcnbd.ExpectedCumulativeTransactions(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgnbd.ExpectedCumulativeTransactions}
+\item{...}{Arguments to be passed to \code{\link{bgnbd.ExpectedCumulativeTransactions}}}
 }
 \description{
 MBG/CNBD-k Expected Cumulative Transactions
 }
-\seealso{
-\code{\link{bgcnbd.ExpectedCumulativeTransactions}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

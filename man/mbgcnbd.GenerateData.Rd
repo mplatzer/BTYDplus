@@ -7,12 +7,12 @@
 mbgcnbd.GenerateData(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.GenerateData}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.GenerateData}}}
 }
 \description{
 Simulate data according to MBG/CNBD-k model assumptions
 }
-\seealso{
-\code{\link{bgcnbd.GenerateData}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

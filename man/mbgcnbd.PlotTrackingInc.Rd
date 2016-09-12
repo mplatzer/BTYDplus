@@ -7,12 +7,12 @@
 mbgcnbd.PlotTrackingInc(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.PlotTrackingInc}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.PlotTrackingInc}}}
 }
 \description{
 MBG/CNBD-k Tracking Incremental Transactions Comparison
 }
-\seealso{
-\code{\link{bgcnbd.PlotTrackingInc}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

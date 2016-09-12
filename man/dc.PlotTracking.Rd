@@ -4,8 +4,8 @@
 \alias{dc.PlotTracking}
 \title{Generic Method for Tracking Plots}
 \usage{
-dc.PlotTracking(actual, expected, T.cal = NULL, model = "Model",
-  xlab = "", ylab = "", title = "", xticklab = NULL, ymax = NULL)
+dc.PlotTracking(actual, expected, T.cal = NULL, xlab = "", ylab = "",
+  title = "", xticklab = NULL, ymax = NULL)
 }
 \arguments{
 \item{actual}{actual}
@@ -13,8 +13,6 @@ dc.PlotTracking(actual, expected, T.cal = NULL, model = "Model",
 \item{expected}{expected}
 
 \item{T.cal}{T.cal}
-
-\item{model}{model}
 
 \item{xlab}{xlab}
 

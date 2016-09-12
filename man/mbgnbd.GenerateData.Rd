@@ -13,7 +13,7 @@ mbgnbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 
 \item{T.star}{length of holdout period}
 
-\item{params}{BG/CNBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and \code{b}
+\item{params}{MBG/CNBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and \code{b}
 in that order.}
 
 \item{return.elog}{boolean - if \code{TRUE} then the event log is returned in 
@@ -28,10 +28,11 @@ Simulate data according to MBG/NBD model assumptions
 \references{
 Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
   validation and comparison of models for customer base analysis.
-  International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
-  Daniel, and Udo Wagner. 'Customer base analysis: The case for a central
-  variant of the Betageometric/NBD Model.' Marketing Journal of Research and
-  Management 3.2 (2007): 75-90.
+  International Journal of Research in Marketing 24(3) 201-209.
+
+Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+  for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+  Research and Management 3.2 (2007): 75-90.
 }
 \seealso{
 \code{\link{bgcnbd.GenerateData}}

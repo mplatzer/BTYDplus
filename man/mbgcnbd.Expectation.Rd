@@ -7,12 +7,12 @@
 mbgcnbd.Expectation(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.Expectation}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.Expectation}}}
 }
 \description{
 MBG/CNBD-k Expectation
 }
-\seealso{
-\code{\link{bgcnbd.Expectation}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

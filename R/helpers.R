@@ -299,7 +299,6 @@ dc.check.model.params.safe <- function(printnames, params, func) {
 #' @param actual actual
 #' @param expected expected
 #' @param T.cal T.cal
-#' @param model model
 #' @param xlab xlab
 #' @param ylab ylab
 #' @param title title
@@ -307,7 +306,7 @@ dc.check.model.params.safe <- function(printnames, params, func) {
 #' @param ymax ymax
 #' @return Matrix
 #' @seealso \code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.PlotTrackingInc}} \code{\link{bgcnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
-dc.PlotTracking <- function(actual, expected, T.cal = NULL, model = "Model",
+dc.PlotTracking <- function(actual, expected, T.cal = NULL,
                             xlab = "", ylab = "", title = "", 
                             xticklab = NULL, ymax = NULL) {
 
@@ -317,7 +316,7 @@ dc.PlotTracking <- function(actual, expected, T.cal = NULL, model = "Model",
   stopifnot(all(expected >= 0))
   stopifnot(length(actual) == length(expected))
   
-  if (is.null(ymax)) ymax <- max(c(actual, expected)) * 1.1
+  if (is.null(ymax)) ymax <- max(c(actual, expected)) * 1.05
   plot(actual, type = "l", xaxt = "n", xlab = xlab, ylab = ylab, col = 1, ylim = c(0, ymax), main = title)
   lines(expected, lty = 2, col = 2)
   if (is.null(xticklab)) {
@@ -329,7 +328,7 @@ dc.PlotTracking <- function(actual, expected, T.cal = NULL, model = "Model",
     axis(1, at = 1:length(actual), labels = xticklab)
   }
   if (!is.null(T.cal)) abline(v = max(T.cal), lty = 2)
-  leg.y <- ifelse(which.max(expected) == length(expected), max(c(actual, expected)) * 0.4, max(c(actual, expected)))
-  legend(x = length(actual), y = leg.y, legend = c("Actual", model), col = 1:2, lty = 1:2, lwd = 1, xjust = 1)
+  pos <- ifelse(which.max(expected) == length(expected), "bottomright", "topright")
+  legend(pos, legend = c("Actual", "Model"), col = 1:2, lty = 1:2, lwd = 1)
   return(rbind(actual, expected))
 }

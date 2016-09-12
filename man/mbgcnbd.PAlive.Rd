@@ -7,12 +7,12 @@
 mbgcnbd.PAlive(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.PAlive}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.PAlive}}}
 }
 \description{
 MBG/CNBD-k P(alive)
 }
-\seealso{
-\code{\link{bgcnbd.PAlive}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

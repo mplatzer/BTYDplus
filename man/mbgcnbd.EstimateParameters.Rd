@@ -7,12 +7,12 @@
 mbgcnbd.EstimateParameters(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.EstimateParameters}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.EstimateParameters}}}
 }
 \description{
 Parameter Estimation for the MBG/CNBD-k model
 }
-\seealso{
-\code{\link{bgcnbd.EstimateParameters}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

@@ -38,4 +38,23 @@ test_that("MBG/CNBD-k", {
   expect_true(min(cbs$x.star) >= 0)
   expect_true(all(cbs$x.star == round(cbs$x.star)))
   expect_true(all(cbs$palive >= 0 & cbs$palive <= 1))
+  
+  # test with CDNow
+  cdnow <- cdnow.sample()
+  cbs <- cdnow$cbs
+  elog <- cdnow$elog
+  params <- mbgcnbd.EstimateParameters(cbs)
+  
+  expect_equal(dim(mbgcnbd.pmf(params, c(28, 56), 0:9)), c(10, 2))
+  expect_equal(length(mbgcnbd.pmf(params, 56, 0:9)), 10)
+  expect_equal(length(mbgcnbd.pmf(params, 56, 0)), 1)
+  expect_equal(sum(mbgcnbd.pmf(params, 2, 0:100)), 1)
+  expect_silent(exp <- mbgcnbd.Expectation(params, 11))
+  cum <- mbgcnbd.ExpectedCumulativeTransactions(params, 11, 39, 12)
+  expect_true(all(diff(cum) > 0))
+  expect_equal(length(cum), 12)
+  expect_silent(mbgcnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal+cbs$T.star), elog2inc(elog)))
+  expect_silent(mbgcnbd.PlotTrackingCum(params, cbs$T.cal, max(cbs$T.cal+cbs$T.star), elog2cum(elog)))
+  mat <- mbgcnbd.PlotFrequencyInCalibration(params, cbs, 7)
+  expect_equal(mat[1,], mat[2,], tolerance = 0.1)
 }) 

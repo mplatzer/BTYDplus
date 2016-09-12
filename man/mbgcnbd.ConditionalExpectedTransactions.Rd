@@ -7,12 +7,12 @@
 mbgcnbd.ConditionalExpectedTransactions(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.ConditionalExpectedTransactions}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.ConditionalExpectedTransactions}}}
 }
 \description{
 MBG/CNBD-k Conditional Expected Transactions
 }
-\seealso{
-\code{\link{bgcnbd.ConditionalExpectedTransactions}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

@@ -584,9 +584,8 @@ bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data
   
   actual <- actual.cu.tracking.data
   expected <- bgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, length(actual), dropout_at_zero = dropout_at_zero)
-  model <- paste0(ifelse(dropout_at_zero, "MBG", "BG"), "/", ifelse(params[1] > 1, paste0("CNBD-", params[1]), "NBD"))
-  
-  dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal, model = model, 
+
+  dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
                   xlab = xlab, ylab = ylab, title = title, xticklab = xticklab, ymax = ymax)
 }
 
@@ -626,12 +625,12 @@ bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.dat
                                    xlab = "Week", ylab = "Transactions", 
                                    xticklab = NULL, title = "Tracking Weekly Transactions", 
                                    ymax = NULL, dropout_at_zero = FALSE) {
+  
   actual <- actual.inc.tracking.data
   expected <- BTYD::dc.CumulativeToIncremental(bgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, length(actual), 
     dropout_at_zero = dropout_at_zero))
-  model <- paste0(ifelse(dropout_at_zero, "MBG", "BG"), "/", ifelse(params[1] > 1, paste0("CNBD-", params[1]), "NBD"))
 
-  dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal, model = model, 
+  dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal, 
                   xlab = xlab, ylab = ylab, title = title, xticklab = xticklab, ymax = ymax)
 }
 

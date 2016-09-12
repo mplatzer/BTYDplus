@@ -7,12 +7,12 @@
 mbgcnbd.cbs.LL(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.cbs.LL}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.cbs.LL}}}
 }
 \description{
 Calculate the log-likelihood of the MBG/CNBD-k model
 }
-\seealso{
-\code{\link{bgcnbd.cbs.LL}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

@@ -7,12 +7,12 @@
 mbgcnbd.PlotTrackingCum(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.PlotTrackingCum}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.PlotTrackingCum}}}
 }
 \description{
 MBG/CNBD-k Tracking Cumulative Transactions Plot
 }
-\seealso{
-\code{\link{bgcnbd.PlotTrackingCum}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

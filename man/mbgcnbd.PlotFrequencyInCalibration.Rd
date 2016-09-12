@@ -7,12 +7,12 @@
 mbgcnbd.PlotFrequencyInCalibration(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.PlotFrequencyInCalibration}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.PlotFrequencyInCalibration}}}
 }
 \description{
 MBG/CNBD-k Plot Frequency in Calibration Period
 }
-\seealso{
-\code{\link{bgcnbd.PlotFrequencyInCalibration}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

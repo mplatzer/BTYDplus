@@ -7,12 +7,12 @@
 mbgcnbd.pmf(...)
 }
 \arguments{
-\item{...}{Arguments to be passed to bgcnbd.pmf}
+\item{...}{Arguments to be passed to \code{\link{bgcnbd.pmf}}}
 }
 \description{
 MBG/CNBD-k Unconditional Probability Distribution of Transactions
 }
-\seealso{
-\code{\link{bgcnbd.pmf}}
+\references{
+Platzer Michael, and Thomas Reutterer (forthcoming)
 }
 

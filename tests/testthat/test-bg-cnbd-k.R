@@ -30,6 +30,7 @@ test_that("BG/CNBD-k", {
   expect_equal(BTYD::bgnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
                bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
                tolerance = 0.001)
+  expect_silent(bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking, xticklab = 1:length(inc.tracking)))
   expect_equal(BTYD::bgnbd.ExpectedCumulativeTransactions(params, 11, 39, 12),
                bgcnbd.ExpectedCumulativeTransactions(c(1, params), 11, 39, 12),
                tolerance = 0.001)
@@ -82,5 +83,5 @@ test_that("BG/CNBD-k", {
   expect_equal(length(bgcnbd.pmf(params, 56, 0:9)), 10)
   expect_equal(length(bgcnbd.pmf(params, 56, 0)), 1)
   expect_equal(sum(bgcnbd.pmf(params, 2, 0:100)), 1)
-  
+
 }) 

@@ -16,10 +16,10 @@
 #' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
 #'   validation and comparison of models for customer base analysis.
-#'   International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
-#'   Daniel, and Udo Wagner. 'Customer base analysis: The case for a central
-#'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
-#'   Management 3.2 (2007): 75-90.
+#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+#'   for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+#'   Research and Management 3.2 (2007): 75-90.
 mbgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.param.value = 10000) {
   params <- mbgcnbd.EstimateParameters(cal.cbs, par.start, max.param.value, k = 1)
   return(params[2:5])
@@ -38,13 +38,12 @@ mbgnbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1, 1, 1), max.pa
 #' @return the total log-likelihood for the provided data.
 #' @export
 #' @seealso \code{\link{bgcnbd.cbs.LL}}
-#' @seealso \code{\link{mbgnbd.EstimateParameters}}
 #' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
 #'   validation and comparison of models for customer base analysis.
-#'   International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
-#'   Daniel, and Udo Wagner. 'Customer base analysis: The case for a central
-#'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
-#'   Management 3.2 (2007): 75-90.
+#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+#'   for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+#'   Research and Management 3.2 (2007): 75-90.
 mbgnbd.cbs.LL <- function(params, cal.cbs) {
   if (length(params) == 4) 
     params <- c(k = 1, params)
@@ -62,13 +61,12 @@ mbgnbd.cbs.LL <- function(params, cal.cbs) {
 #' @return a vector of log-likelihoods
 #' @export
 #' @seealso \code{\link{bgcnbd.LL}}
-#' @seealso \code{\link{mbgnbd.EstimateParameters}}
 #' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
 #'   validation and comparison of models for customer base analysis.
-#'   International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
-#'   Daniel, and Udo Wagner. 'Customer base analysis: The case for a central
-#'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
-#'   Management 3.2 (2007): 75-90.
+#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+#'   for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+#'   Research and Management 3.2 (2007): 75-90.
 mbgnbd.LL <- function(params, x, t.x, T.cal) {
   if (length(params) == 4) 
     params <- c(k = 1, params)
@@ -94,13 +92,12 @@ mbgnbd.LL <- function(params, x, t.x, T.cal) {
 #'   calibration period.
 #' @export
 #' @seealso \code{\link{bgcnbd.PAlive}}
-#' @seealso \code{\link{mbgnbd.EstimateParameters}}
 #' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
 #'   validation and comparison of models for customer base analysis.
-#'   International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
-#'   Daniel, and Udo Wagner. 'Customer base analysis: The case for a central
-#'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
-#'   Management 3.2 (2007): 75-90.
+#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+#'   for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+#'   Research and Management 3.2 (2007): 75-90.
 mbgnbd.PAlive <- function(params, x, t.x, T.cal) {
   if (length(params) == 4) 
     params <- c(k = 1, params)
@@ -130,13 +127,12 @@ mbgnbd.PAlive <- function(params, x, t.x, T.cal) {
 #'   number of transactions.
 #' @export
 #' @seealso \code{\link{bgcnbd.ConditionalExpectedTransactions}}
-#' @seealso \code{\link{mbgnbd.EstimateParameters}}
 #' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
 #'   validation and comparison of models for customer base analysis.
-#'   International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
-#'   Daniel, and Udo Wagner. 'Customer base analysis: The case for a central
-#'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
-#'   Management 3.2 (2007): 75-90.
+#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+#'   for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+#'   Research and Management 3.2 (2007): 75-90.
 mbgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   if (length(params) == 4) 
     params <- c(k = 1, params)
@@ -159,17 +155,71 @@ mbgnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 #'   greater than 1, this will be a vector of expected number of transactions.
 #' @export
 #' @seealso \code{\link{bgcnbd.pmf}}
-#' @seealso \code{\link{mbgnbd.EstimateParameters}}
 #' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
 #'   validation and comparison of models for customer base analysis.
-#'   International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
-#'   Daniel, and Udo Wagner. 'Customer base analysis: The case for a central
-#'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
-#'   Management 3.2 (2007): 75-90.
+#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+#'   for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+#'   Research and Management 3.2 (2007): 75-90.
 mbgnbd.pmf <- function(params, t, x) {
   if (length(params) == 4) 
     params <- c(k = 1, params)
   mbgcnbd.pmf(params = params, t = t, x = x)
+}
+
+
+#' MBG/NBD Expectation
+#' 
+#' Returns the number of repeat transactions that a randomly chosen customer
+#' (for whom we have no prior information) is expected to make in a given time
+#' period.
+#' 
+#' E(X(t) | k, r, alpha, a, b)
+#' 
+#' @param params MBG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and \code{b}
+#'   in that order.
+#' @param t length of time for which we are calculating the expected number of repeat transactions.
+#' @return Number of repeat transactions a customer is expected to make in a time period of length t.
+#' @export
+#' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
+#'   validation and comparison of models for customer base analysis.
+#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+#'   for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+#'   Research and Management 3.2 (2007): 75-90.
+#' @seealso \code{\link{bgcnbd.Expectation}}
+mbgnbd.Expectation <- function(params, t) {
+  if (length(params) == 4) 
+    params <- c(k = 1, params)
+  mbgcnbd.Expectation(params = params, t = t)
+}
+
+
+#' MBG/NBD Expected Cumulative Transactions
+#' 
+#' Calculates the expected cumulative total repeat transactions by all customers
+#' for the calibration and holdout periods.
+#' 
+#' @param params MBG/NBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and \code{b}
+#'   in that order.
+#' @param T.cal a vector to represent customers' calibration period lengths (in
+#'   other words, the \code{T.cal} column from a customer-by-sufficient-statistic
+#'   matrix).
+#' @param T.tot end of holdout period. Must be a single value, not a vector.
+#' @param n.periods.final number of time periods in the calibration and holdout periods.
+#' @return Vector of expected cumulative total repeat transactions by all customers.
+#' @export
+#' @seealso \code{\link{bgcnbd.ExpectedCumulativeTransactions}}
+#' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
+#'   validation and comparison of models for customer base analysis.
+#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+#'   for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+#'   Research and Management 3.2 (2007): 75-90.
+mbgnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final) {
+  if (length(params) == 4) 
+    params <- c(k = 1, params)
+  mbgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, n.periods.final)
 }
 
 
@@ -178,7 +228,7 @@ mbgnbd.pmf <- function(params, t, x) {
 #' @param n number of customers
 #' @param T.cal length of calibration period
 #' @param T.star length of holdout period
-#' @param params BG/CNBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and \code{b}
+#' @param params MBG/CNBD parameters - a vector with \code{r}, \code{alpha}, \code{a} and \code{b}
 #'   in that order.
 #' @param return.elog boolean - if \code{TRUE} then the event log is returned in 
 #'   addition to the CBS summary
@@ -187,10 +237,10 @@ mbgnbd.pmf <- function(params, t, x) {
 #' @seealso \code{\link{bgcnbd.GenerateData}}
 #' @references Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical
 #'   validation and comparison of models for customer base analysis.
-#'   International Journal of Research in Marketing 24(3) 201-209. - Hoppe,
-#'   Daniel, and Udo Wagner. 'Customer base analysis: The case for a central
-#'   variant of the Betageometric/NBD Model.' Marketing Journal of Research and
-#'   Management 3.2 (2007): 75-90.
+#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references Hoppe, Daniel, and Udo Wagner. 'Customer base analysis: The case
+#'   for a central variant of the Betageometric/NBD Model.' Marketing Journal of
+#'   Research and Management 3.2 (2007): 75-90.
 mbgnbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   if (length(params) == 4) 
     params <- c(k = 1, params)
