@@ -261,12 +261,17 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
 #' transactions that a randomly chosen customer (for whom we have no prior
 #' information) is expected to make in a given time period. \deqn{E(X(t))}.
 #' 
+#' The expected transactions need to be sampled. Due to this sampling, the
+#' return result varies from one call to another. Larger values of
+#' \code{sample_size} will generate more stable results.
+#' 
 #' @param draws MCMC draws as returned by
 #'   \code{\link{pnbd.mcmc.DrawParameters}}, 
 #'   \code{\link{pggg.mcmc.DrawParameters}} or
 #'   \code{\link{abe.mcmc.DrawParameters}}
 #' @param t Length of time for which we are calculating the expected number of 
 #'   transactions. May also be a vector.
+#' @param sample_size Sample size for estimating the probability distribution.
 #' @return Number of repeat transactions a customer is expected to make in a
 #'   time period of length t.
 #' @export
@@ -275,8 +280,8 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
 #'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 #' mcmc.Expectation(param.draws, t = c(26, 52))
-mcmc.Expectation <- function(draws, t) {
-  pmf <- mcmc.pmf(draws, t, 0:100)
+mcmc.Expectation <- function(draws, t, sample_size = 10000) {
+  pmf <- mcmc.pmf(draws, t, 0:100, sample_size = sample_size)
   apply(pmf * matrix(rep(0:100, length(t)), ncol=length(t)), 2, sum)
 }
 
@@ -284,8 +289,13 @@ mcmc.Expectation <- function(draws, t) {
 #' Expected Cumulative Transactions for Pareto/GGG, Pareto/NBD (HB) and
 #' Pareto/NBD (Abe)
 #' 
-#' Calculates the expected cumulative total repeat transactions by all customers
-#' for the calibration and holdout periods.
+#' Uses model parameter draws to return the expected number of repeat
+#' transactions that a randomly chosen customer (for whom we have no prior
+#' information) is expected to make in a given time period.
+#' 
+#' The expected transactions need to be sampled. Due to this sampling, the
+#' return result varies from one call to another. Larger values of
+#' \code{sample_size} will generate more stable results.
 #' 
 #' @param draws MCMC draws as returned by
 #'   \code{\link{pnbd.mcmc.DrawParameters}}, 
@@ -298,19 +308,21 @@ mcmc.Expectation <- function(draws, t) {
 #' @param T.tot End of holdout period. Must be a single value, not a vector.
 #' @param n.periods.final Number of time periods in the calibration and holdout
 #'   periods.
+#' @param sample_size Sample size for estimating the probability distribution.
 #' @return Numeric vector of expected cumulative total repeat transactions by
 #'   all customers.
 #' @export
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
+#' # short MCMC runs and small sample size to speedup demo
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) 
 #' # Returns a vector containing cumulative repeat transactions for 546 days.
 #' # All parameters are in weeks; the calibration period lasted 39 weeks
 #' # and the holdout period another 39.
 #' mcmc.ExpectedCumulativeTransactions(param.draws, 
-#'   T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
-mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.final) {
+#'   T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78, sample_size = 1000)
+mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.final, sample_size = 10000) {
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
   if (length(T.tot) > 1 || T.tot < 0 || !is.numeric(T.tot)) 
@@ -319,7 +331,6 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
     stop("n.periods.final must be a single numeric value and may not be negative.")
   
   nr_of_cust <- length(T.cal)
-  sample_size <- 10000
   cohort_draws <- as.matrix(draws$level_2)
   nr_of_draws <- nrow(cohort_draws)
   model <- ifelse(all(c("r", "alpha") %in% colnames(cohort_draws)), "pggg", "abe")
@@ -357,20 +368,24 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 }
 
 
-#' Tracking Cumulative Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and
+#' Tracking Cumulative Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and 
 #' Pareto/NBD (Abe)
 #' 
 #' Plots the actual and expected cumulative total repeat transactions by all 
 #' customers for the calibration and holdout periods, and returns this 
 #' comparison in a matrix.
 #' 
-#' @param draws MCMC draws as returned by
+#' The expected transactions need to be sampled. Due to this sampling, the
+#' return result varies from one call to another. Larger values of
+#' \code{sample_size} will generate more stable results.
+#' 
+#' @param draws MCMC draws as returned by 
 #'   \code{\link{pnbd.mcmc.DrawParameters}}, 
-#'   \code{\link{pggg.mcmc.DrawParameters}} or
+#'   \code{\link{pggg.mcmc.DrawParameters}} or 
 #'   \code{\link{abe.mcmc.DrawParameters}}
 #' @param T.cal A vector to represent customers' calibration period lengths (in 
-#'   other words, the \code{T.cal} column from a
-#'   customer-by-sufficient-statistic matrix). Considering rounding in order to
+#'   other words, the \code{T.cal} column from a 
+#'   customer-by-sufficient-statistic matrix). Considering rounding in order to 
 #'   speed up calculations.
 #' @param T.tot End of holdout period. Must be a single value, not a vector.
 #' @param actual.cu.tracking.data A vector containing the cumulative number of 
@@ -381,23 +396,28 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 #' @param xticklab A vector containing a label for each tick mark on the x axis.
 #' @param title Title placed on the top-center of the plot.
 #' @param ymax Upper boundary for y axis.
+#' @param sample_size Sample size for estimating the probability distribution.
+#'   See \code{\link{mcmc.ExpectedCumulativeTransactions}}.
 #' @return Matrix containing actual and expected cumulative repeat transactions.
 #' @export
-#' @seealso \code{\link{mcmc.PlotTrackingInc}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2cum}} 
+#' @seealso \code{\link{mcmc.PlotTrackingInc}}
+#'   \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2cum}}
 #' @examples
 #' cdnow <- cdnow.sample()
 #' cbs <- cdnow$cbs
 #' cum <- elog2cum(cdnow$elog)
+#' # short MCMC runs and small sample size to speedup demo
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
-#' mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 78, cum)
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) 
+#' mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 78, cum,
+#'   sample_size = 1000)
 mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data, 
                                  xlab = "Week", ylab = "Cumulative Transactions", 
                                  xticklab = NULL, title = "Tracking Cumulative Transactions", 
-                                 ymax = NULL) {
+                                 ymax = NULL, sample_size = 10000) {
 
   actual <- actual.cu.tracking.data
-  expected <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual))
+  expected <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual), sample_size = sample_size)
   
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
                   xlab = xlab, ylab = ylab, title = title, 
@@ -405,20 +425,24 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 }
 
 
-#' Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and
+#' Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and 
 #' Pareto/NBD (Abe)
 #' 
 #' Plots the actual and expected incremental total repeat transactions by all 
 #' customers for the calibration and holdout periods, and returns this 
 #' comparison in a matrix.
 #' 
-#' @param draws MCMC draws as returned by
+#' The expected transactions need to be sampled. Due to this sampling, the
+#' return result varies from one call to another. Larger values of
+#' \code{sample_size} will generate more stable results.
+#' 
+#' @param draws MCMC draws as returned by 
 #'   \code{\link{pnbd.mcmc.DrawParameters}}, 
-#'   \code{\link{pggg.mcmc.DrawParameters}} or
+#'   \code{\link{pggg.mcmc.DrawParameters}} or 
 #'   \code{\link{abe.mcmc.DrawParameters}}
 #' @param T.cal A vector to represent customers' calibration period lengths (in 
-#'   other words, the \code{T.cal} column from a
-#'   customer-by-sufficient-statistic matrix). Considering rounding in order to
+#'   other words, the \code{T.cal} column from a 
+#'   customer-by-sufficient-statistic matrix). Considering rounding in order to 
 #'   speed up calculations.
 #' @param T.tot End of holdout period. Must be a single value, not a vector.
 #' @param actual.inc.tracking.data A vector containing the incremental number of
@@ -429,24 +453,30 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 #' @param xticklab A vector containing a label for each tick mark on the x axis.
 #' @param title Title placed on the top-center of the plot.
 #' @param ymax Upper boundary for y axis.
-#' @return Matrix containing actual and expected incremental repeat
+#' @param sample_size Sample size for estimating the probability distribution.
+#'   See \code{\link{mcmc.ExpectedCumulativeTransactions}}.
+#' @return Matrix containing actual and expected incremental repeat 
 #'   transactions.
 #' @export
-#' @seealso \code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}} 
+#' @seealso \code{\link{mcmc.PlotTrackingCum}}
+#'   \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}}
 #' @examples
 #' cdnow <- cdnow.sample()
-#' cbs <-  cdnow$cbs
+#' cbs <- cdnow$cbs
 #' inc <- elog2inc(cdnow$elog)
+#' # short MCMC runs and small sample size to speedup demo
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
-#' mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 78, inc)
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) 
+#' mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 78, inc,
+#'   sample_size = 1000)
 mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data, 
                                  xlab = "Week", ylab = "Transactions", 
                                  xticklab = NULL, title = "Tracking Weekly Transactions", 
-                                 ymax = NULL) {
+                                 ymax = NULL, sample_size = 10000) {
   
   actual <- actual.inc.tracking.data
-  expected <- BTYD::dc.CumulativeToIncremental(mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual)))
+  expected_cum <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual), sample_size = sample_size)
+  expected <- BTYD::dc.CumulativeToIncremental(expected_cum)
   
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
                   xlab = xlab, ylab = ylab, title = title, 

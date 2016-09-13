@@ -312,11 +312,8 @@ xbgcnbd.Expectation <- function(params, t, dropout_at_zero = NULL) {
   
   # to save computation time, we collapse vector `t` on to its unique values
   ts <- unique(t)
-  names(ts) <- ts
-  ts_map <- sapply(ts, function(t) {
-    # call C++ implementation
-    bgcnbd_exp_cpp(params, t, dropout_at_zero)
-  })
+  ts_map <- bgcnbd_exp_cpp(params, ts, dropout_at_zero)
+  names(ts_map) <- ts
   res <- (ts_map[as.character(t)])
   return(res)
 }

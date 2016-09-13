@@ -4,7 +4,7 @@
 \alias{mcmc.Expectation}
 \title{Unconditional Expectation for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)}
 \usage{
-mcmc.Expectation(draws, t)
+mcmc.Expectation(draws, t, sample_size = 10000)
 }
 \arguments{
 \item{draws}{MCMC draws as returned by
@@ -14,6 +14,8 @@ mcmc.Expectation(draws, t)
 
 \item{t}{Length of time for which we are calculating the expected number of 
 transactions. May also be a vector.}
+
+\item{sample_size}{Sample size for estimating the probability distribution.}
 }
 \value{
 Number of repeat transactions a customer is expected to make in a
@@ -23,6 +25,11 @@ Number of repeat transactions a customer is expected to make in a
 Uses model parameter draws to return the expected number of repeat
 transactions that a randomly chosen customer (for whom we have no prior
 information) is expected to make in a given time period. \deqn{E(X(t))}.
+}
+\details{
+The expected transactions need to be sampled. Due to this sampling, the
+return result varies from one call to another. Larger values of
+\code{sample_size} will generate more stable results.
 }
 \examples{
 cbs <- cdnow.sample()$cbs # load CDNow summary data

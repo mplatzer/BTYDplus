@@ -540,17 +540,22 @@ double bgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zer
 }
 
 // [[Rcpp::export]]
-double bgcnbd_exp_cpp(NumericVector params, double t, bool dropout_at_zero = false) {
-  double res = 0;
+NumericVector bgcnbd_exp_cpp(NumericVector params, NumericVector t, bool dropout_at_zero = false) {
+  int N = t.size();
+  NumericVector res = rep(0.0, N);
+  
   // heuristic: stop infinite sum at 99.9% quantile of NBD; but at least 100
   int k        = params[0];
   double r     = params[1];
   double alpha = params[2];
-  int stop = k * R::qnbinom(0.9999, r, alpha/(alpha+t), TRUE, FALSE);
-  if (stop < 100) stop = 100;
+  int stop;
   //Rcpp::Rcout << " stop:" << stop << std::endl;
-  for (int i=1; i<stop; i++) {
-    res += i * bgcnbd_pmf_cpp(params, t, i, dropout_at_zero);
+  for (int j=0; j<N; j++) {
+    stop = k * R::qnbinom(0.9999, r, alpha/(alpha+t[j]), TRUE, FALSE);
+    if (stop < 100) stop = 100;
+    for (int i=1; i<stop; i++) {
+      res[j] += i * bgcnbd_pmf_cpp(params, t[j], i, dropout_at_zero);
+    }
   }
   return res;
 }
