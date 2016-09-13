@@ -6,8 +6,8 @@ test_that("BG/CNBD-k", {
   # validate against BTYD implementation
   set.seed(1)
   params <- c(1, 0.85, 1.45, 0.79, 2.42)
-  n <- 8000
-  data <- bgcnbd.GenerateData(n = n, T.cal = round(runif(n, 4, 32)), T.star = 32, params = params, return.elog = TRUE)
+  n <- 2000
+  data <- bgcnbd.GenerateData(n = n, T.cal = round(runif(n, 4, 32)/4)*4, T.star = 32, params = params, return.elog = TRUE)
   cbs  <- data$cbs
   elog <- data$elog
   params.est.btyd <- BTYD::bgnbd.EstimateParameters(cbs)
@@ -41,9 +41,9 @@ test_that("BG/CNBD-k", {
   
   # generate artificial BG/CNBD-k data
   set.seed(1)
-  n <- 8000
+  n <- 2000
   params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-  data <- bgcnbd.GenerateData(n = n, T.cal = round(runif(n, 12, 96)/4)*4, T.star = c(32, 64), params = params, return.elog = TRUE)
+  data <- bgcnbd.GenerateData(n = n, T.cal = round(runif(n, 7, 70)/7)*7, T.star = c(32, 64), params = params, return.elog = TRUE)
   cbs <- data$cbs
   elog <- data$elog
   
@@ -54,14 +54,7 @@ test_that("BG/CNBD-k", {
   
   expect_equal(params[1], est[1])
   expect_equal(est, est.fixed.k)
-  
-  # require less than 10% deviation in estimated parameters
-  ape <- function(act, est) abs(act - est)/act
-  expect_true(ape(params[1], k.est) < 0.05)
-  expect_true(ape(params[2], est[2]) < 0.1)
-  expect_true(ape(params[3], est[3]) < 0.1)
-  expect_true(ape(params[4], est[4]) < 0.1)
-  expect_true(ape(params[5], est[5]) < 0.1)
+  expect_equal(params, est, tolerance = 0.1)
   
   # estimate future transactions & P(alive) with true parameters
   cbs$x.est32 <- bgcnbd.ConditionalExpectedTransactions(params, 32, cbs$x, cbs$t.x, cbs$T.cal)
@@ -69,6 +62,7 @@ test_that("BG/CNBD-k", {
   cbs$palive <- bgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
   
   # require less than 5% deviation
+  ape <- function(act, est) abs(act - est)/act
   expect_true(ape(sum(cbs$x.star32), sum(cbs$x.est32)) < 0.05)
   expect_true(ape(sum(cbs$x.star64), sum(cbs$x.est64)) < 0.05)
   expect_true(ape(sum(cbs$palive), sum(cbs$alive)) < 0.05)

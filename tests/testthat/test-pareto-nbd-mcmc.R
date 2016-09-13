@@ -43,7 +43,7 @@ test_that("Pareto/NBD MCMC", {
   
   # estimate parameters via Ma/Liu
   draws_maliu <- pnbd.mcmc.DrawParameters(cbs, mc.cores = 1, 
-                                          mcmc = 100, burnin = 0, thin = 10, chains = 2,
+                                          mcmc = 10, burnin = 0, thin = 2, chains = 2,
                                           use_data_augmentation = FALSE)
   expect_equal(apply(as.matrix(draws_maliu$level_2), 2, mean),
                apply(as.matrix(draws$level_2), 2, mean), tolerance = 1)
