@@ -4,7 +4,7 @@
 #' Returns draws from the posterior distributions of the Pareto/NBD (Abe)
 #' parameters, on cohort as well as on customer level.
 #' 
-#' See \code{demo('pareto-nbd-abe')} for how to apply this model.
+#' See \code{demo('pareto-abe')} for how to apply this model.
 #' 
 #' @param cal.cbs Calibration period customer-by-sufficient-statistic (CBS) 
 #'   data.frame. It must contain a row for each customer, and columns \code{x} 

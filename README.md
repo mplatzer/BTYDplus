@@ -20,8 +20,8 @@ library(BTYDplus)
 ```
 demo(package="BTYDplus")
 demo("cdnow")          # Demonstration of fitting various models to the CDNow data set
-demo("bg-cnbd-k")      # Demonstration of BG/CNBD-k model
-demo("pareto-nbd-abe") # Demonstration of Abe's Pareto/NBD variant
+demo("mbg-cnbd-k")     # Demonstration of BG/CNBD-k model
+demo("pareto-abe")     # Demonstration of Abe's Pareto/NBD variant
 demo("pareto-ggg")     # Demonstration of Pareto/NBD & Pareto/GGG model
 ```
 

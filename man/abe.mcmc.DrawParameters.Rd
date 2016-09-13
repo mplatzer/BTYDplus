@@ -38,7 +38,7 @@ Returns draws from the posterior distributions of the Pareto/NBD (Abe)
 parameters, on cohort as well as on customer level.
 }
 \details{
-See \code{demo('pareto-nbd-abe')} for how to apply this model.
+See \code{demo('pareto-abe')} for how to apply this model.
 }
 \examples{
 cbs <- cdnow.sample()$cbs

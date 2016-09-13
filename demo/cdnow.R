@@ -15,9 +15,6 @@ x <- readline("Estimate Models via MLE (press Enter)")
 # BG/NBD (from BTYD package)
 (params.bgnbd <- BTYD::bgnbd.EstimateParameters(cbs))
 
-# MBG/NBD
-(params.mbgnbd <- mbgnbd.EstimateParameters(cbs))
-
 # MBG/CNBD-k
 (params.mbgcnbd <- mbgcnbd.EstimateParameters(cbs))
 # -> MBG/CNBD-k is identical to MBG/NBD, as no regularity is detected, hence k=1
