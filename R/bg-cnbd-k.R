@@ -850,7 +850,7 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
                           churn = churn, alive = churn > (length(ts.cal) - 1))
     for (tstar in T.star) {
       colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
-      cbs_list[[i]][[colname]] <- length(times[times >= max(T.cal) & times < (max(T.cal) + tstar)])
+      cbs_list[[i]][[colname]] <- length(times[times > max(T.cal) & times <= (max(T.cal) + tstar)])
     }
   }
   cbs <- setDF(rbindlist(cbs_list))

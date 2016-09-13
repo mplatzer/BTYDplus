@@ -314,7 +314,7 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
       1 == 0, 0, sum(log(itts[1:(length(ts.cal) - 1)]))), alive = tau > T.cal[i])
     for (tstar in T.star) {
       colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
-      cbs_list[[i]][[colname]] <- length(times[times >= max(T.cal) & times < (max(T.cal) + tstar)])
+      cbs_list[[i]][[colname]] <- length(times[times > max(T.cal) & times <= (max(T.cal) + tstar)])
     }
   }
   cbs <- setDF(rbindlist(cbs_list))

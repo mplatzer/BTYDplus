@@ -230,21 +230,23 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
   # use posterior mean
   draw_idx_cnt <- table(sample(nr_of_draws, size = sample_size, replace = TRUE))
   model <- ifelse(all(c("r", "alpha") %in% colnames(cohort_draws)), "pggg", "abe")
-  pmf <- sapply(t, function(t) {
-    xs <- do.call(c, lapply(names(draw_idx_cnt), function(idx) {
-      n <- unname(draw_idx_cnt[idx])
-      if (model == "pggg") {
-        params <- as.list(cohort_draws[as.integer(idx),])
-        pggg.GenerateData(n = n, T.cal = t, T.star = 0, params = params)$cbs$x
-      } else if (model == "abe") {
-        p <- cohort_draws[as.integer(idx),]
-        params <- list()
-        params$beta  <- matrix(p[grepl("^log\\_", names(p))], byrow = TRUE, ncol = 2)
-        params$gamma <- matrix(c(p["var_log_lambda"], p["cov_log_lambda_log_mu"], p["cov_log_lambda_log_mu"], p["var_log_mu"]), ncol = 2)
-        abe.GenerateData(n = n, T.cal = t, T.star = 0, params = params)$cbs$x
-      }
-    }))
-    sapply(x, function(x) sum(xs==x)) / sample_size
+  cbs <- rbindlist(lapply(names(draw_idx_cnt), function(idx) {
+    n <- unname(draw_idx_cnt[idx])
+    if (model == "pggg") {
+      params <- as.list(cohort_draws[as.integer(idx), ])
+      cbs <- pggg.GenerateData(n = n, T.cal = 0, T.star = unique(t), params = params)$cbs
+    } else if (model == "abe") {
+      p <- cohort_draws[as.integer(idx), ]
+      params <- list()
+      params$beta  <- matrix(p[grepl("^log\\_", names(p))], byrow = TRUE, ncol = 2)
+      params$gamma <- matrix(c(p["var_log_lambda"], p["cov_log_lambda_log_mu"], p["cov_log_lambda_log_mu"], p["var_log_mu"]), ncol = 2)
+      cbs <- abe.GenerateData(n = n, T.cal = 0, T.star = unique(t), params = params)$cbs
+    }
+  }))
+  pmf <- sapply(1:length(t), function(idx) {
+    col <- ifelse(uniqueN(t) == 1, "x.star", paste0("x.star", t[idx]))
+    stopifnot(col %in% names(cbs))
+    sapply(x, function(x) sum(cbs[[col]]==x) / sample_size)
   })
   if (length(x) == 1) pmf <- t(pmf)
   rownames(pmf) <- x
@@ -274,10 +276,8 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
 #'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 #' mcmc.Expectation(param.draws, t = c(26, 52))
 mcmc.Expectation <- function(draws, t) {
-  unique_ts <- unique(t)
-  out <- sapply(unique_ts, function(t) sum(0:100 * mcmc.pmf(draws, t, 0:100)))
-  names(out) <- unique_ts
-  unname(out[as.character(t)])
+  pmf <- mcmc.pmf(draws, t, 0:100)
+  apply(pmf * matrix(rep(0:100, length(t)), ncol=length(t)), 2, sum)
 }
 
 
@@ -308,7 +308,8 @@ mcmc.Expectation <- function(draws, t) {
 #' # Returns a vector containing cumulative repeat transactions for 546 days.
 #' # All parameters are in weeks; the calibration period lasted 39 weeks
 #' # and the holdout period another 39.
-#' mcmc.ExpectedCumulativeTransactions(param.draws, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
+#' mcmc.ExpectedCumulativeTransactions(param.draws, 
+#'   T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
 mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.final) {
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
@@ -316,7 +317,7 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
     stop("T.cal must be a single numeric value and may not be negative.")
   if (length(n.periods.final) > 1 || n.periods.final < 0 || !is.numeric(n.periods.final)) 
     stop("n.periods.final must be a single numeric value and may not be negative.")
-
+  
   nr_of_cust <- length(T.cal)
   sample_size <- 10000
   cohort_draws <- as.matrix(draws$level_2)
