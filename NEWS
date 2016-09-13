@@ -1,4 +1,12 @@
 
+Changes in version 0.8.1 (2016-09-13):
+
+    o   improved documentation and demos
+
+    o   removed MBG/NBD methods, as these are easily accessible via the MBG/CNBD-k methods
+    
+    o   allow `T.star` to be a vector in GenerateData methods for MCMC models
+    
 Changes in version 0.8.0 (2016-09-12):
 
     o   added `pnbd.GenerateData`
