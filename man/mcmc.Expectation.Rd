@@ -4,33 +4,37 @@
 \alias{mcmc.Expectation}
 \title{Unconditional Expectation for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)}
 \usage{
-mcmc.Expectation(draws, t)
+mcmc.Expectation(draws, t, sample_size = 10000)
 }
 \arguments{
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-\code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by
+\code{\link{pnbd.mcmc.DrawParameters}}, 
+\code{\link{pggg.mcmc.DrawParameters}} or
+\code{\link{abe.mcmc.DrawParameters}}}
 
-\item{t}{length of time for which we are calculating the expected number of 
+\item{t}{Length of time for which we are calculating the expected number of 
 transactions. May also be a vector.}
+
+\item{sample_size}{Sample size for estimating the probability distribution.}
 }
 \value{
-Number of repeat transactions a customer is expected to make in a time period of length t.
+Number of repeat transactions a customer is expected to make in a
+  time period of length t.
 }
 \description{
 Uses model parameter draws to return the expected number of repeat
 transactions that a randomly chosen customer (for whom we have no prior
-information) is expected to make in a given time period.
+information) is expected to make in a given time period. \deqn{E(X(t))}.
 }
 \details{
-E(X(t))
+The expected transactions need to be sampled. Due to this sampling, the
+return result varies from one call to another. Larger values of
+\code{sample_size} will generate more stable results.
 }
 \examples{
 cbs <- cdnow.sample()$cbs # load CDNow summary data
 param.draws <- pnbd.mcmc.DrawParameters(cbs, 
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 mcmc.Expectation(param.draws, t = c(26, 52))
-}
-\seealso{
-\code{\link{bgcnbd.Expectation}} \code{\link{mcmc.pmf}}
 }
 

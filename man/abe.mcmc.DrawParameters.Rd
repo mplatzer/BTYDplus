@@ -2,34 +2,36 @@
 % Please edit documentation in R/pareto-nbd-abe.R
 \name{abe.mcmc.DrawParameters}
 \alias{abe.mcmc.DrawParameters}
-\title{HB Pareto/NBD variant as described in Abe (2009) - Parameter Draws}
+\title{Pareto/NBD (Abe) Parameter Draws}
 \usage{
 abe.mcmc.DrawParameters(cal.cbs, covariates = c(), mcmc = 1500,
   burnin = 500, thin = 50, chains = 2, mc.cores = NULL, trace = 100)
 }
 \arguments{
-\item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}; e.g. output of \code{\link{elog2cbs}}}
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS) 
+data.frame. It must contain a row for each customer, and columns \code{x} 
+for frequency, \code{t.x} for recency and \code{T.cal} for the total time 
+observed. A correct format can be easily generated based on the complete
+event log of a customer cohort with \code{\link{elog2cbs}}.}
 
-\item{covariates}{list of column names containing customer-level covariates}
+\item{covariates}{A vector of columns of \code{cal.cbs} which contain customer-level covariates.}
 
-\item{mcmc}{number of MCMC steps}
+\item{mcmc}{Number of MCMC steps.}
 
-\item{burnin}{number of initial MCMC steps which are discarded}
+\item{burnin}{Number of initial MCMC steps which are discarded.}
 
-\item{thin}{only every thin-th MCMC step will be returned}
+\item{thin}{Only every \code{thin}-th MCMC step will be returned.}
 
-\item{chains}{number of MCMC chains to be run}
+\item{chains}{Number of MCMC chains to be run.}
 
-\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}}
+\item{mc.cores}{Number of cores to use in parallel (Unix only). Defaults to \code{min(chains, detectCores())}.}
 
-\item{trace}{print logging step every \code{trace}}
+\item{trace}{Print logging statement every \code{trace}-th iteration. Not available for \code{mc.cores > 1}.}
 }
 \value{
-2-element list:
-\itemize{
- \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{lambda}, \code{tau}, \code{z}, \code{mu}}
- \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters}
-}
+List of length 2:
+\item{\code{level_1}}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+\item{\code{level_2}}{\code{\link{mcmc.list}}, with draws for cohort-level parameters}
 }
 \description{
 Returns draws from the posterior distributions of the Pareto/NBD (Abe)

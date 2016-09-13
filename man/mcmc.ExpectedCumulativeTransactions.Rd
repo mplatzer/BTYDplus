@@ -2,39 +2,53 @@
 % Please edit documentation in R/mcmc.R
 \name{mcmc.ExpectedCumulativeTransactions}
 \alias{mcmc.ExpectedCumulativeTransactions}
-\title{Expected Cumulative Transactions for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)}
+\title{Expected Cumulative Transactions for Pareto/GGG, Pareto/NBD (HB) and
+Pareto/NBD (Abe)}
 \usage{
-mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, n.periods.final)
+mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, n.periods.final,
+  sample_size = 10000)
 }
 \arguments{
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-\code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by
+\code{\link{pnbd.mcmc.DrawParameters}}, 
+\code{\link{pggg.mcmc.DrawParameters}} or
+\code{\link{abe.mcmc.DrawParameters}}}
 
-\item{T.cal}{a vector to represent customers' calibration period lengths (in
-other words, the \code{T.cal} column from a customer-by-sufficient-statistic
-matrix). Considering rounding in order to speed up calculations.}
+\item{T.cal}{A vector to represent customers' calibration period lengths (in 
+other words, the \code{T.cal} column from a
+customer-by-sufficient-statistic matrix). Considering rounding in order to
+speed up calculations.}
 
-\item{T.tot}{end of holdout period. Must be a single value, not a vector.}
+\item{T.tot}{End of holdout period. Must be a single value, not a vector.}
 
-\item{n.periods.final}{number of time periods in the calibration and holdout periods.}
+\item{n.periods.final}{Number of time periods in the calibration and holdout
+periods.}
+
+\item{sample_size}{Sample size for estimating the probability distribution.}
 }
 \value{
-Vector of expected cumulative total repeat transactions by all customers.
+Numeric vector of expected cumulative total repeat transactions by
+  all customers.
 }
 \description{
-Calculates the expected cumulative total repeat transactions by all customers
-for the calibration and holdout periods.
+Uses model parameter draws to return the expected number of repeat
+transactions that a randomly chosen customer (for whom we have no prior
+information) is expected to make in a given time period.
+}
+\details{
+The expected transactions need to be sampled. Due to this sampling, the
+return result varies from one call to another. Larger values of
+\code{sample_size} will generate more stable results.
 }
 \examples{
 cbs <- cdnow.sample()$cbs
+# short MCMC runs and small sample size to speedup demo
 param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) 
 # Returns a vector containing cumulative repeat transactions for 546 days.
 # All parameters are in weeks; the calibration period lasted 39 weeks
 # and the holdout period another 39.
-mcmc.ExpectedCumulativeTransactions(param.draws, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
-}
-\seealso{
-\code{\link{bgcnbd.ExpectedCumulativeTransactions}}
+mcmc.ExpectedCumulativeTransactions(param.draws, 
+  T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78, sample_size = 1000)
 }
 

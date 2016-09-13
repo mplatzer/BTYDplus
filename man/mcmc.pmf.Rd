@@ -7,28 +7,30 @@
 mcmc.pmf(draws, t, x, sample_size = 10000)
 }
 \arguments{
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-\code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by
+\code{\link{pnbd.mcmc.DrawParameters}}, 
+\code{\link{pggg.mcmc.DrawParameters}} or
+\code{\link{abe.mcmc.DrawParameters}}}
 
-\item{t}{length of time for which we are calculating the expected number of 
+\item{t}{Length of time for which we are calculating the expected number of 
 transactions. May also be a vector.}
 
-\item{x}{number of transactions for which probability is calculated. May also be a vector.}
+\item{x}{Number of transactions for which probability is calculated. May also
+be a vector.}
 
 \item{sample_size}{Sample size for estimating the probability distribution.}
 }
 \value{
-P(X(t)=x). If either \code{t} or \code{x} is a
-  vector, then the output will be a vector as well. If both are vectors, the
-  output will be a matrix.
+\eqn{P(X(t)=x)}. If either \code{t} or \code{x} is a vector, then the
+  output will be a vector as well. If both are vectors, the output will be a 
+  matrix.
 }
 \description{
-Return the probability distribution of purchase frequencies for a random customer in a given time period, i.e. P(X(t)=x)
-}
-\details{
-This is estimated by generating \code{sample_size} number of random customers
-that follow the provided parameter draws. Due to this sampling, the return
-result varies from one call to another.
+Return the probability distribution of purchase frequencies for a random
+customer in a given time period, i.e. \eqn{P(X(t)=x)}. This is estimated by
+generating \code{sample_size} number of random customers that follow the
+provided parameter draws. Due to this sampling, the return result varies from
+one call to another.
 }
 \examples{
 cbs <- cdnow.sample()$cbs # load CDNow summary data
@@ -36,8 +38,5 @@ param.draws <- pnbd.mcmc.DrawParameters(cbs,
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
 mcmc.pmf(param.draws, t = 52, x = 0:6)
 mcmc.pmf(param.draws, t = c(26, 52), x = 0:6)
-}
-\seealso{
-\code{\link{bgcnbd.pmf}} \code{\link[BTYD]{pnbd.pmf}}
 }
 

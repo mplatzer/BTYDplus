@@ -1,24 +1,26 @@
 
-#' HB Pareto/NBD variant as described in Abe (2009) - Parameter Draws
+#' Pareto/NBD (Abe) Parameter Draws
 #' 
 #' Returns draws from the posterior distributions of the Pareto/NBD (Abe)
 #' parameters, on cohort as well as on customer level.
 #' 
 #' See \code{demo('pareto-nbd-abe')} for how to apply this model.
 #' 
-#' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}; e.g. output of \code{\link{elog2cbs}}
-#' @param covariates list of column names containing customer-level covariates
-#' @param mcmc number of MCMC steps
-#' @param burnin number of initial MCMC steps which are discarded
-#' @param thin only every thin-th MCMC step will be returned
-#' @param chains number of MCMC chains to be run
-#' @param mc.cores number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}
-#' @param trace print logging step every \code{trace} 
-#' @return 2-element list:
-##' \itemize{
-##'  \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{lambda}, \code{tau}, \code{z}, \code{mu}}
-##'  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters}
-##' }
+#' @param cal.cbs Calibration period customer-by-sufficient-statistic (CBS) 
+#'   data.frame. It must contain a row for each customer, and columns \code{x} 
+#'   for frequency, \code{t.x} for recency and \code{T.cal} for the total time 
+#'   observed. A correct format can be easily generated based on the complete
+#'   event log of a customer cohort with \code{\link{elog2cbs}}.
+#' @param covariates A vector of columns of \code{cal.cbs} which contain customer-level covariates.
+#' @param mcmc Number of MCMC steps.
+#' @param burnin Number of initial MCMC steps which are discarded.
+#' @param thin Only every \code{thin}-th MCMC step will be returned.
+#' @param chains Number of MCMC chains to be run.
+#' @param mc.cores Number of cores to use in parallel (Unix only). Defaults to \code{min(chains, detectCores())}.
+#' @param trace Print logging statement every \code{trace}-th iteration. Not available for \code{mc.cores > 1}.
+#' @return List of length 2:
+#' \item{\code{level_1}}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+#' \item{\code{level_2}}{\code{\link{mcmc.list}}, with draws for cohort-level parameters}
 #' @export
 #' @seealso \code{\link{abe.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 #' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
@@ -243,21 +245,19 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burn
 }
 
 
-#' Generate artificial data which follows Abe's Pareto/NBD model variant.
+#' Simulate data according to Pareto/NBD (Abe) model assumptions
 #'
-#' Returns 2-element list
-#' * cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star' 
-#'        this is the summary statistics data.frame which contains all 
-#'        needed information for parameter estimation
-#' * elog: data.frame with 'cust', \code{t}
-#'
-#' @param n number of customers
-#' @param T.cal length of calibration period
-#' @param T.star length of holdout period
-#' @param params list of parameters: {beta, gamma}
-#' @param return.elog if \code{TRUE} then the event-log is returned as well; decreases performance
-#' 
-#' @return 2-elemnt list
+#' @param n Number of customers.
+#' @param T.cal Length of calibration period. If a vector is provided, then it
+#'   is assumed that customers have different 'birth' dates, i.e.
+#'   \eqn{max(T.cal)-T.cal}.
+#' @param T.star Length of holdout period. This may be a vector.
+#' @param params A list of model parameters: \code{beta} and \code{gamma}.
+#' @param return.elog If \code{TRUE} then the event log is returned in addition 
+#'   to the CBS summary.
+#' @return List of length 2:
+#' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
+#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
 #' @export
 #' @examples 
 #' # generate artificial Pareto/NBD Abe with 2 covariates
@@ -271,8 +271,6 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   
   if (length(T.cal) == 1) 
     T.cal <- rep(T.cal, n)
-  if (length(T.star) == 1) 
-    T.star <- rep(T.star, n)
   if (!is.matrix(params$beta)) 
     params$beta <- matrix(params$beta, nrow = 1, ncol = 2)
   
@@ -297,7 +295,7 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     mu <- mus[i]
     tau <- taus[i]
     # sample 'sufficiently' large amount of inter-transaction times
-    minT <- min(T.cal[i] + T.star[i], tau)
+    minT <- min(T.cal[i] + max(T.star), tau)
     nr_of_itt_draws <- max(10, minT * lambda)
     itts <- rexp(nr_of_itt_draws * 2, rate = lambda)
     if (sum(itts) < minT) 
@@ -307,27 +305,30 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     if (sum(itts) < minT) 
       stop("not enough inter-transaction times sampled: ", sum(itts), " < ", tau)
     times <- cumsum(c(0, itts))
-    times <- times[times < tau]
+    times <- times[times <= tau]
     if (return.elog) 
-      elog_list[[i]] <- data.frame(cust = i, t = times[times < (T.cal[i] + T.star[i])])
+      elog_list[[i]] <- data.table(cust = i, t = times[times <= (T.cal[i] + max(T.star))])
     # determine frequency, recency, etc.
-    ts.cal <- times[times < T.cal[i]]
-    ts.star <- times[times >= T.cal[i] & times < (T.cal[i] + T.star[i])]
+    ts.cal <- times[times <= T.cal[i]]
     cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), litt = ifelse(length(ts.cal) - 
-      1 == 0, 0, sum(log(itts[1:(length(ts.cal) - 1)]))), alive = tau > T.cal[i], x.star = length(ts.star))
+      1 == 0, 0, sum(log(itts[1:(length(ts.cal) - 1)]))), alive = tau > T.cal[i])
+    for (tstar in T.star) {
+      colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
+      cbs_list[[i]][[colname]] <- length(times[times > max(T.cal) & times <= (max(T.cal) + tstar)])
+    }
   }
-  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs <- setDF(rbindlist(cbs_list))
   cbs$lambda <- lambdas
   cbs$mu <- mus
   cbs$tau <- taus
   cbs$T.cal <- T.cal
-  cbs$T.star <- T.star
+  if (length(T.star) == 1) 
+    cbs$T.star <- T.star
   rownames(cbs) <- NULL
   cbs <- cbind(cbs, covars)
   out <- list(cbs = cbs)
   if (return.elog) {
-    elog <- do.call(rbind.data.frame, elog_list)
-    out$elog <- elog
+    out$elog <- setDF(rbindlist(elog_list))
   }
   return(out)
 }

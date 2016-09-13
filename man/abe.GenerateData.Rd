@@ -2,30 +2,31 @@
 % Please edit documentation in R/pareto-nbd-abe.R
 \name{abe.GenerateData}
 \alias{abe.GenerateData}
-\title{Generate artificial data which follows Abe's Pareto/NBD model variant.}
+\title{Simulate data according to Pareto/NBD (Abe) model assumptions}
 \usage{
 abe.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 }
 \arguments{
-\item{n}{number of customers}
+\item{n}{Number of customers.}
 
-\item{T.cal}{length of calibration period}
+\item{T.cal}{Length of calibration period. If a vector is provided, then it
+is assumed that customers have different 'birth' dates, i.e.
+\eqn{max(T.cal)-T.cal}.}
 
-\item{T.star}{length of holdout period}
+\item{T.star}{Length of holdout period. This may be a vector.}
 
-\item{params}{list of parameters: {beta, gamma}}
+\item{params}{A list of model parameters: \code{beta} and \code{gamma}.}
 
-\item{return.elog}{if \code{TRUE} then the event-log is returned as well; decreases performance}
+\item{return.elog}{If \code{TRUE} then the event log is returned in addition 
+to the CBS summary.}
 }
 \value{
-2-elemnt list
+List of length 2:
+\item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
+\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
 }
 \description{
-Returns 2-element list
-* cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star' 
-       this is the summary statistics data.frame which contains all 
-       needed information for parameter estimation
-* elog: data.frame with 'cust', \code{t}
+Simulate data according to Pareto/NBD (Abe) model assumptions
 }
 \examples{
 # generate artificial Pareto/NBD Abe with 2 covariates

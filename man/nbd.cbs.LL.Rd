@@ -10,14 +10,14 @@ nbd.cbs.LL(params, cal.cbs)
 \item{params}{NBD parameters - a vector with r and alpha, in that
 order.}
 
-\item{cal.cbs}{calibration period CBS. It must contain columns for frequency 
+\item{cal.cbs}{Calibration period CBS. It must contain columns for frequency 
 \code{x} and total time observed \code{T.cal}. Optionally a column \code{custs} can be 
 provided, which represents number of customers with a specific combination 
 of frequency \code{x} and \code{T.cal} data.frame with columns \code{x} and \code{T.cal} and 
 optional \code{custs}.}
 }
 \value{
-the total log-likelihood for the provided data.
+The total log-likelihood for the provided data.
 }
 \description{
 Calculate the log-likelihood of the NBD model

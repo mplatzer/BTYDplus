@@ -6,7 +6,8 @@ test_that("Pareto/GGG MCMC", {
   # generate artificial Pareto/GGG data
   params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 10, s = 0.8, beta = 12)
   n <- 100
-  cbs <- pggg.GenerateData(n, 52, 52, params, TRUE)$cbs
+  expect_silent(pggg.GenerateData(n, 52, c(26, 52), params, TRUE))
+  cbs <- pggg.GenerateData(n, 52, 52, params, FALSE)$cbs
   
   # estimate parameters
   draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 100, burnin = 20, thin = 10, chains = 2)

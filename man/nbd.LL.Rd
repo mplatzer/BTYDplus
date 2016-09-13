@@ -10,12 +10,12 @@ nbd.LL(params, x, T.cal)
 \item{params}{NBD parameters - a vector with \code{r} and \code{alpha}, in that
 order.}
 
-\item{x}{frequency, i.e. number of re-purchases}
+\item{x}{Frequency, i.e. number of re-purchases.}
 
-\item{T.cal}{total time of observation period}
+\item{T.cal}{Total time of observation period.}
 }
 \value{
-a vector of log-likelihoods
+A numberic vector of log-likelihoods.
 }
 \description{
 Calculate the log-likelihood of the NBD model

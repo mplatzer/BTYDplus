@@ -13,11 +13,11 @@ test_that("estimateRegularity", {
   }))
   
   # Estimate regularity parameter k
-  k.est.1 <- estimateRegularity(elog)
-  k.est.2 <- estimateRegularity(elog, method = "mle")
-  k.est.3 <- estimateRegularity(elog, method = "mle-minka")
-  k.est.4 <- estimateRegularity(elog, method = "mle-thom")
-  k.est.5 <- estimateRegularity(elog, method = "cv")
+  k.est.1 <- estimateRegularity(elog, plot = TRUE)
+  k.est.2 <- estimateRegularity(elog, method = "mle", plot = TRUE)
+  k.est.3 <- estimateRegularity(elog, method = "mle-minka", plot = TRUE)
+  k.est.4 <- estimateRegularity(elog, method = "mle-thom", plot = TRUE)
+  k.est.5 <- estimateRegularity(elog, method = "cv", plot = TRUE)
   
   # require less than 5% deviation in estimated parameters
   ape <- function(act, est) abs(act - est)/act

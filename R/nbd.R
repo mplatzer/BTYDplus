@@ -3,14 +3,14 @@
 #' 
 #' Estimates parameters for the NBD model via Maximum Likelihood Estimation.
 #' 
-#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#' @param cal.cbs Calibration period CBS. It must contain columns for frequency 
 #'   \code{x} and total time observed \code{T.cal}. Optionally a column \code{custs} can be 
 #'   provided, which represents number of customers with a specific combination 
 #'   of frequency \code{x} and \code{T.cal}.
-#' @param par.start initial NBD parameters - a vector with \code{r} and \code{alpha} in 
+#' @param par.start Initial NBD parameters - a vector with \code{r} and \code{alpha} in 
 #'   that order.
-#' @param max.param.value the upper bound on parameters
-#' @return list of estimated parameters
+#' @param max.param.value Upper bound on parameters.
+#' @return List of estimated parameters.
 #' @export
 #' @references EHRENBERG, ASC. 'The Pattern of Consumer Purchases.' Quantitative
 #'   techniques in marketing analysis: text and readings (1962): 355.
@@ -37,12 +37,12 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
 #' 
 #' @param params NBD parameters - a vector with r and alpha, in that
 #'   order.
-#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
+#' @param cal.cbs Calibration period CBS. It must contain columns for frequency 
 #'   \code{x} and total time observed \code{T.cal}. Optionally a column \code{custs} can be 
 #'   provided, which represents number of customers with a specific combination 
 #'   of frequency \code{x} and \code{T.cal} data.frame with columns \code{x} and \code{T.cal} and 
 #'   optional \code{custs}.
-#' @return the total log-likelihood for the provided data.
+#' @return The total log-likelihood for the provided data.
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs
@@ -65,9 +65,9 @@ nbd.cbs.LL <- function(params, cal.cbs) {
 #' 
 #' @param params NBD parameters - a vector with \code{r} and \code{alpha}, in that
 #'   order.
-#' @param x frequency, i.e. number of re-purchases
-#' @param T.cal total time of observation period
-#' @return a vector of log-likelihoods
+#' @param x Frequency, i.e. number of re-purchases.
+#' @param T.cal Total time of observation period.
+#' @return A numberic vector of log-likelihoods.
 #' @export
 #' @seealso \code{\link{nbd.cbs.LL}}
 nbd.LL <- function(params, x, T.cal) {
@@ -99,11 +99,11 @@ nbd.LL <- function(params, x, T.cal) {
 #' period.
 #' 
 #' @param params NBD parameters - a vector with \code{r} and \code{alpha}, in that order.
-#' @param T.star length of time for which we are calculating the expected number
+#' @param T.star Length of time for which we are calculating the expected number
 #'   of transactions.
-#' @param x number of repeat transactions in the calibration period \code{T.cal}, or a
+#' @param x Number of repeat transactions in the calibration period \code{T.cal}, or a
 #'   vector of calibration period frequencies.
-#' @param T.cal length of calibration period, or a vector of calibration period
+#' @param T.cal Length of calibration period, or a vector of calibration period
 #'   lengths.
 #' @return Number of transactions a customer is expected to make in a time
 #'   period of length t, conditional on their past behavior. If any of the input
@@ -141,13 +141,15 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 
 #' Simulate data according to NBD model assumptions
 #' 
-#' @param n number of customers
-#' @param T.cal length of calibration period
-#' @param T.star length of holdout period
-#' @param params NBD parameters - a vector with \code{r} and \code{alpha} in that order
-#' @param return.elog boolean - if \code{TRUE} then the event log is returned in
-#'   addition to the CBS summary
-#' @return list with elements \code{cbs} and \code{elog} containing data.frames
+#' @param n Number of customers.
+#' @param T.cal Length of calibration period.
+#' @param T.star Length of holdout period. This may be a vector.
+#' @param params NBD parameters - a vector with \code{r} and \code{alpha} in that order.
+#' @param return.elog If \code{TRUE} then the event log is returned in addition 
+#'   to the CBS summary.
+#' @return List of length 2:
+#' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
+#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
 #' @export
 #' @examples
 #' n <- 1000  # no. of customers
@@ -166,8 +168,6 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   
   if (length(T.cal) == 1) 
     T.cal <- rep(T.cal, n)
-  if (length(T.star) == 1) 
-    T.star <- rep(T.star, n)
   
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape = r, rate = alpha)
@@ -178,23 +178,26 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   for (i in 1:n) {
     lambda <- lambdas[i]
     # sample transaction times
-    times <- cumsum(c(0, rexp(10 * (T.cal[i] + T.star[i]) * lambda, rate = lambda)))
+    times <- cumsum(c(0, rexp(10 * (T.cal[i] + max(T.star)) * lambda, rate = lambda)))
     if (return.elog) 
-      elog_list <- data.frame(cust = i, t = times[times < (T.cal[i] + T.star[i])])
+      elog_list[[i]] <- data.table(cust = i, t = times[times <= (T.cal[i] + max(T.star))])
     # determine frequency, recency, etc.
-    ts.cal <- times[times < T.cal[i]]
-    ts.star <- times[times >= T.cal[i] & times < (T.cal[i] + T.star[i])]
-    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), x.star = length(ts.star))
+    ts.cal <- times[times <= T.cal[i]]
+    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal))
+    for (tstar in T.star) {
+      colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
+      cbs_list[[i]][[colname]] <- length(times[times > max(T.cal) & times <= (max(T.cal) + tstar)])
+    }
   }
-  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs <- setDF(rbindlist(cbs_list))
   cbs$lambda <- lambdas
   cbs$T.cal <- T.cal
-  cbs$T.star <- T.star
+  if (length(T.star) == 1) 
+    cbs$T.star <- T.star
   rownames(cbs) <- NULL
   out <- list(cbs = cbs)
   if (return.elog) {
-    elog <- do.call(rbind.data.frame, elog_list)
-    out$elog <- elog
+    out$elog <- setDF(rbindlist(elog_list))
   }
   return(out)
 }

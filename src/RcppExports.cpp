@@ -5,31 +5,6 @@
 
 using namespace Rcpp;
 
-// slice_sample_gamma
-NumericVector slice_sample_gamma(double alpha, double beta, double lower, double upper);
-RcppExport SEXP BTYDplus_slice_sample_gamma(SEXP alphaSEXP, SEXP betaSEXP, SEXP lowerSEXP, SEXP upperSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
-    Rcpp::traits::input_parameter< double >::type lower(lowerSEXP);
-    Rcpp::traits::input_parameter< double >::type upper(upperSEXP);
-    rcpp_result_gen = Rcpp::wrap(slice_sample_gamma(alpha, beta, lower, upper));
-    return rcpp_result_gen;
-END_RCPP
-}
-// slice_sample_mvnorm
-NumericVector slice_sample_mvnorm(NumericVector sigma);
-RcppExport SEXP BTYDplus_slice_sample_mvnorm(SEXP sigmaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type sigma(sigmaSEXP);
-    rcpp_result_gen = Rcpp::wrap(slice_sample_mvnorm(sigma));
-    return rcpp_result_gen;
-END_RCPP
-}
 // slice_sample_gamma_parameters
 NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector init, NumericVector hyper, double steps, double w);
 RcppExport SEXP BTYDplus_slice_sample_gamma_parameters(SEXP dataSEXP, SEXP initSEXP, SEXP hyperSEXP, SEXP stepsSEXP, SEXP wSEXP) {
@@ -121,13 +96,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // bgcnbd_exp_cpp
-double bgcnbd_exp_cpp(NumericVector params, double t, bool dropout_at_zero);
+NumericVector bgcnbd_exp_cpp(NumericVector params, NumericVector t, bool dropout_at_zero);
 RcppExport SEXP BTYDplus_bgcnbd_exp_cpp(SEXP paramsSEXP, SEXP tSEXP, SEXP dropout_at_zeroSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type params(paramsSEXP);
-    Rcpp::traits::input_parameter< double >::type t(tSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type t(tSEXP);
     Rcpp::traits::input_parameter< bool >::type dropout_at_zero(dropout_at_zeroSEXP);
     rcpp_result_gen = Rcpp::wrap(bgcnbd_exp_cpp(params, t, dropout_at_zero));
     return rcpp_result_gen;

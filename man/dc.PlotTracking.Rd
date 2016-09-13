@@ -4,35 +4,11 @@
 \alias{dc.PlotTracking}
 \title{Generic Method for Tracking Plots}
 \usage{
-dc.PlotTracking(actual, expected, T.cal = NULL, model = "Model",
-  xlab = "", ylab = "", title = "", xticklab = NULL, ymax = NULL)
-}
-\arguments{
-\item{actual}{actual}
-
-\item{expected}{expected}
-
-\item{T.cal}{T.cal}
-
-\item{model}{model}
-
-\item{xlab}{xlab}
-
-\item{ylab}{ylab}
-
-\item{title}{title}
-
-\item{xticklab}{xticklab}
-
-\item{ymax}{ymax}
-}
-\value{
-Matrix
+dc.PlotTracking(actual, expected, T.cal = NULL, xlab = "", ylab = "",
+  title = "", xticklab = NULL, ymax = NULL)
 }
 \description{
 Generic Method for Tracking Plots
 }
-\seealso{
-\code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.PlotTrackingInc}} \code{\link{bgcnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
-}
+\keyword{internal}
 

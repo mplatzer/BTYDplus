@@ -41,4 +41,10 @@ test_that("Pareto/NBD MCMC", {
   expect_true(all(cbs$x.star == round(cbs$x.star)))
   expect_true(all(cbs$palive >= 0 & cbs$palive <= 1))
   
+  # estimate parameters via Ma/Liu
+  draws_maliu <- pnbd.mcmc.DrawParameters(cbs, mc.cores = 1, 
+                                          mcmc = 10, burnin = 0, thin = 2, chains = 2,
+                                          use_data_augmentation = FALSE)
+  expect_equal(apply(as.matrix(draws_maliu$level_2), 2, mean),
+               apply(as.matrix(draws$level_2), 2, mean), tolerance = 1)
 }) 

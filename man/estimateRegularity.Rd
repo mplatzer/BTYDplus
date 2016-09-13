@@ -7,14 +7,17 @@
 estimateRegularity(elog, method = "wheat", plot = FALSE)
 }
 \arguments{
-\item{elog}{event log; \code{data.frame} with columns \code{cust} and transaction time \code{t} or \code{date}}
+\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and
+transaction time \code{t} or \code{date}}
 
-\item{method}{\code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom} or \code{cv}}
+\item{method}{Either \code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom} or
+\code{cv}.}
 
-\item{plot}{if \code{TRUE} then distribution of estimated regularity will be plotted}
+\item{plot}{If \code{TRUE} then distribution of estimated regularity will be
+plotted.}
 }
 \value{
-estimated real-valued regularity parameter
+Estimated real-valued regularity parameter.
 }
 \description{
 Estimates degree of regularity of intertransaction timings of a customer
@@ -32,11 +35,15 @@ estimateRegularity(elog, plot = TRUE, method = 'mle-thom')
 estimateRegularity(elog, plot = TRUE, method = 'cv')
 }
 \references{
-Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase regularity with two interpurchase times.'
+Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase
+  regularity with two interpurchase times.'
 
-Dunn, Richard, Steven Reader, and Neil Wrigley. 'An investigation of the assumptions of the NBD model' Applied Statistics (1983): 249-259.
+Dunn, Richard, Steven Reader, and Neil Wrigley. 'An investigation
+  of the assumptions of the NBD model' Applied Statistics (1983): 249-259.
 
-Wu, Couchen, and H-L. Chen. 'A consumer purchasing model with learning and departure behaviour.'  Journal of the Operational Research Society (2000): 583-591.
+Wu, Couchen, and H-L. Chen. 'A consumer purchasing model with
+  learning and departure behaviour.'  Journal of the Operational Research
+  Society (2000): 583-591.
 
 \url{http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf}
 }

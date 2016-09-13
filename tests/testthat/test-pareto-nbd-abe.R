@@ -9,8 +9,9 @@ test_that("Pareto/NBD Abe MCMC", {
   params <- list()
   params$beta <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
   params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
+  expect_silent(abe.GenerateData(n = 100, T.cal = 32, T.star = c(16, 32), params, return.elog = TRUE))
   n <- 5000
-  cbs <- abe.GenerateData(n, T.cal = 32, T.star = 32, params, return.elog = TRUE)$cbs
+  cbs <- abe.GenerateData(n, T.cal = 32, T.star = 32, params, return.elog = FALSE)$cbs
   
   # estimate parameters
   draws <- abe.mcmc.DrawParameters(cbs, covariates = c("covariate_1", "covariate_2"), mc.cores = 1)
