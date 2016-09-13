@@ -25,7 +25,7 @@ pggg.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
 \item{trace}{print logging step every \code{trace} iteration}
 }
 \value{
-2-element list:
+List of length 2:
 \itemize{
  \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}, \code{t}, \code{gamma}}

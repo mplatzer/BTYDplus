@@ -231,6 +231,9 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
     }))
     sapply(x, function(x) sum(xs==x)) / sample_size
   })
+  if (length(x) == 1) pmf <- t(pmf)
+  rownames(pmf) <- x
+  colnames(pmf) <- t
   drop(pmf)
 }
 

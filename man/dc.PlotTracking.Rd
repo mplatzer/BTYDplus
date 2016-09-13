@@ -30,7 +30,5 @@ Matrix
 \description{
 Generic Method for Tracking Plots
 }
-\seealso{
-\code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.PlotTrackingInc}} \code{\link{bgcnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
-}
+\keyword{internal}
 

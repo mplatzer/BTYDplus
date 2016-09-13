@@ -1,38 +1,60 @@
 
-#' Parameter Estimation for the BG/CNBD-k model
+#' (M)BG/CNBD-k Parameter Estimation
 #' 
-#' Estimates parameters for the BG/CNBD-k via Maximum Likelihood Estimation.
+#' Estimates parameters for the (M)BG/CNBD-k model via Maximum Likelihood
+#' Estimation.
 #' 
-#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   \code{x}, for recency \code{t.x} and total time observed \code{T.cal}.
-#'   Optionally a column \code{custs} can be provided, which represents number
-#'   of customers with a specific combination of frequency \code{x}, recency
-#'   \code{t.x} and \code{T.cal}.
-#' @param k specified degree of regularity for Erlang-k distributed 
-#'   interpurchase times; needs to be integer-value; if this is not specified, 
-#'   then grid search from 1 to 12 is performed; this however requires column 
-#'   \code{litt} to be present in cal.cbs, which represents sum of logarithmic 
-#'   interpurchase times during calibration period;
-#' @param par.start initial BG/CNBD-k parameters - a vector with \code{r},
+#' @param cal.cbs Calibration period customer-by-sufficient-statistic (CBS) 
+#'   data.frame. It must contain a row for each customer, and columns \code{x} 
+#'   for frequency, \code{t.x} for recency , \code{T.cal} for the total time 
+#'   observed, as well as the sum over logarithmic intertransaction times 
+#'   \code{litt}, in case that \code{k} is not provided. A correct format can be
+#'   easily generated based on the complete event log of a customer cohort with 
+#'   \code{\link{elog2cbs}}.
+#' @param k Integer-valued degree of regularity for Erlang-k distributed 
+#'   interpurchase times. By default this \code{k} is not provdied, and a grid 
+#'   search from 1 to 12 is performed in order to determine the best-fitting 
+#'   \code{k}. The grid search is stopped early, if the log-likelihood doesn't
+#'   increase anymore when increasing k beyond 4.
+#' @param par.start Initial (M)BG/CNBD-k parameters. A vector with \code{r}, 
 #'   \code{alpha}, \code{a} and \code{b} in that order.
-#' @param max.param.value the upper bound on parameters
-#' @param trace print logging step every \code{trace} iteration
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
-#' @return list of estimated parameters
+#' @param max.param.value Upper bound on parameters.
+#' @param trace If larger than 0, then the parameter values are is printed every 
+#'   \code{trace}-step of the maximum likelihood estimation search.
+#' @return A vector of estimated parameters.
 #' @export
-#' @seealso \code{\link{elog2cbs}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples
-#' cbs <- cdnow.sample()$cbs # load CDNow summary data
-#' params <- bgcnbd.EstimateParameters(cbs)
-bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 3), max.param.value = 10000, trace = 0, 
-  dropout_at_zero = FALSE) {
-  
-  dc.check.model.params.safe(c("r", "alpha", "a", "b"), par.start, "bgcnbd.EstimateParameters")
+#' cbs <- cdnow.sample()$cbs
+#' (params <- mbgcnbd.EstimateParameters(cbs))
+#' @export
+mbgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, 
+                                       par.start = c(1, 3, 1, 3), max.param.value = 10000, 
+                                       trace = 0) {
+  xbgcnbd.EstimateParameters(cal.cbs, k = NULL,
+                             par.start = c(1, 3, 1, 3), max.param.value = 10000, 
+                             trace = 0, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.EstimateParameters
+#' @export
+bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, 
+                                      par.start = c(1, 3, 1, 3), max.param.value = 10000, 
+                                      trace = 0) {
+  xbgcnbd.EstimateParameters(cal.cbs, k = NULL,
+                             par.start = c(1, 3, 1, 3), max.param.value = 10000, 
+                             trace = 0, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, 
+                                       par.start = c(1, 3, 1, 3), max.param.value = 10000, 
+                                       trace = 0, dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
+  dc.check.model.params.safe(c("r", "alpha", "a", "b"), par.start, "xbgcnbd.EstimateParameters")
   
   # either `k` or `litt` need to be present
-  if (is.null(k) & !"litt" %in% colnames(cal.cbs)) 
+  if (is.null(k) & !"litt" %in% colnames(cal.cbs))
     stop("Either regularity parameter k need to be specified, or a column with logarithmic interpurchase times litt need to be present in cal.cbs")
   
   # if `k` is not specified we do grid search for `k`
@@ -40,15 +62,15 @@ bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 
     params <- list()
     LL <- c()
     for (k in 1:12) {
-      params[[k]] <- tryCatch(bgcnbd.EstimateParameters(cal.cbs = cal.cbs, k = k, par.start = par.start, max.param.value = max.param.value, 
-        trace = trace, dropout_at_zero = dropout_at_zero), error = function(e) {
-        e
-      })
+      params[[k]] <- tryCatch(xbgcnbd.EstimateParameters(cal.cbs = cal.cbs, k = k, par.start = par.start, max.param.value = max.param.value, 
+                                                         trace = trace, dropout_at_zero = dropout_at_zero), error = function(e) {
+                                                           e
+                                                         })
       if (inherits(params[[k]], "error")) {
         params[[k]] <- NULL
-        break  # stop if parameters could not be estimated, e.g. if bgcnbd.LL returns Inf
+        break  # stop if parameters could not be estimated, e.g. if xbgcnbd.LL returns Inf
       }
-      LL[k] <- bgcnbd.cbs.LL(params = params[[k]], cal.cbs = cal.cbs, dropout_at_zero = dropout_at_zero)
+      LL[k] <- xbgcnbd.cbs.LL(params = params[[k]], cal.cbs = cal.cbs, dropout_at_zero = dropout_at_zero)
       if (k > 4 && LL[k] < LL[k - 1] && LL[k - 1] < LL[k - 2]) 
         break  # stop if LL gets worse for increasing k
     }
@@ -56,27 +78,27 @@ bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 
     return(params[[k]])
   }
   
-  # if `litt` is missing, we set it to zero, so that bgcnbd.cbs.LL does not complain; however this makes LL values
+  # if `litt` is missing, we set it to zero, so that xbgcnbd.cbs.LL does not complain; however this makes LL values
   # for different k values not comparable
   if (!"litt" %in% colnames(cal.cbs)) 
     cal.cbs[, "litt"] <- 0
   
   count <- 0
-  bgcnbd.eLL <- function(params, k, cal.cbs, max.param.value, dropout_at_zero) {
+  xbgcnbd.eLL <- function(params, k, cal.cbs, max.param.value, dropout_at_zero) {
     params <- exp(params)
     params[params > max.param.value] <- max.param.value
     params <- c(k, params)
-    loglik <- bgcnbd.cbs.LL(params = params, cal.cbs = cal.cbs, dropout_at_zero = dropout_at_zero)
+    loglik <- xbgcnbd.cbs.LL(params = params, cal.cbs = cal.cbs, dropout_at_zero = dropout_at_zero)
     count <<- count + 1
     if (trace > 0 & count%%trace == 0) 
-      cat("bgcnbd.EstimateParameters - iter", count, ":", sprintf("%12.2f", loglik), ":", sprintf("%10.6f", 
-        params), "\n")
+      cat("xbgcnbd.EstimateParameters - k:", sprintf("%2.0f", k)," step:", sprintf("%4.0f", count), " - ", sprintf("%12.1f", loglik), ":", sprintf("%10.4f", 
+                                                                                                                                                   params), "\n")
     return(-1 * loglik)
   }
   
   logparams <- log(par.start)
-  results <- optim(logparams, bgcnbd.eLL, cal.cbs = cal.cbs, k = k, max.param.value = max.param.value, dropout_at_zero = dropout_at_zero, 
-    method = "L-BFGS-B")
+  results <- optim(logparams, xbgcnbd.eLL, cal.cbs = cal.cbs, k = k, max.param.value = max.param.value, dropout_at_zero = dropout_at_zero, 
+                   method = "L-BFGS-B")
   estimated.params <- exp(results$par)
   estimated.params[estimated.params > max.param.value] <- max.param.value
   estimated.params <- c(k, estimated.params)
@@ -85,55 +107,69 @@ bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, par.start = c(1, 3, 1, 
 }
 
 
-#' Calculate the log-likelihood of the BG/CNBD-k model
+
+#' (M)BG/CNBD-k Log-Likelihood
 #' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r},
-#'   \code{alpha}, \code{a} and \code{b} in that order.
-#' @param cal.cbs calibration period CBS. It must contain columns for frequency 
-#'   \code{x}, for recency \code{t.x}, for sum of logarithmic interpurchase
-#'   times \code{litt} and total time observed \code{T.cal}. Optionally a column
-#'   \code{custs} can be provided, which represents number of customers with a
-#'   specific combination of frequency \code{x} and \code{T.cal}.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
-#' @return the total log-likelihood for the provided data.
-#' @export
-#' @seealso \code{\link{bgcnbd.EstimateParameters}}
+#' Calculates the log-likelihood of the (M)BG/CNBD-k model.
+#' 
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param cal.cbs Calibration period customer-by-sufficient-statistic (CBS) 
+#'   data.frame. It must contain a row for each customer, and columns \code{x} 
+#'   for frequency, \code{t.x} for recency , \code{T.cal} for the total time 
+#'   observed, as well as the sum over logarithmic intertransaction times 
+#'   \code{litt}. A correct format can be easily generated based on the complete
+#'   event log of a customer cohort with \code{\link{elog2cbs}}.
+#' @param x frequency, i.e. number of re-purchases
+#' @param t.x recency, i.e. time elapsed from first purchase to last purchase
+#' @param T.cal total time of observation period
+#' @param litt sum of logarithmic interpurchase times
+#' @return For \code{bgcnbd.cbs.LL}, the total log-likelihood of the provided
+#'   data. For \code{bgcnbd.LL}, a vector of log-likelihoods as long as the
+#'   longest input vector (\code{x}, \code{t.x}, or \code{T.cal}).
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
-#' @examples
-#' cbs <- cdnow.sample()$cbs # load CDNow summary data
-#' params <- bgcnbd.EstimateParameters(cbs)
-#' bgcnbd.cbs.LL(params, cbs)
-bgcnbd.cbs.LL <- function(params, cal.cbs, dropout_at_zero = FALSE) {
-  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.cbs.LL")
-  tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
-  tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
-  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
-  tryCatch(litt <- cal.cbs$litt, error = function(e) stop("Error in bgcnbd.cbs.LL: cal.cbs must have a column for sum over logarithmic inter-transaction-times labelled \"litt\""))
+#' @export
+mbgcnbd.cbs.LL <- function(params, cal.cbs) {
+  xbgcnbd.cbs.LL(params, cal.cbs, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.cbs.LL
+#' @export
+mbgcnbd.LL <- function(params, x, t.x, T.cal, litt) {
+  xbgcnbd.LL(params, x, t.x, T.cal, litt, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.cbs.LL
+#' @export
+bgcnbd.cbs.LL <- function(params, cal.cbs) {
+  xbgcnbd.cbs.LL(params, cal.cbs, dropout_at_zero = FALSE)
+}
+
+#' @rdname mbgcnbd.cbs.LL
+#' @export
+bgcnbd.LL <- function(params, x, t.x, T.cal, litt) {
+  xbgcnbd.LL(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.cbs.LL <- function(params, cal.cbs, dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.cbs.LL")
+  tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
+  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  tryCatch(litt <- cal.cbs$litt, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a column for sum over logarithmic inter-transaction-times labelled \"litt\""))
   if ("custs" %in% colnames(cal.cbs)) {
     custs <- cal.cbs$custs
   } else {
     custs <- rep(1, length(x))
   }
-  return(sum(custs * bgcnbd.LL(params = params, x = x, t.x = t.x, T.cal = T.cal, litt = litt, dropout_at_zero = dropout_at_zero)))
+  return(sum(custs * xbgcnbd.LL(params = params, x = x, t.x = t.x, T.cal = T.cal, litt = litt, dropout_at_zero = dropout_at_zero)))
 }
 
-
-#' Calculate the log-likelihood of the BG/CNBD-k model
-#' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
-#'   and \code{b} in that order.
-#' @param x frequency, i.e. number of re-purchases
-#' @param t.x recency, i.e. time elapsed from first purchase to last purchase
-#' @param T.cal total time of observation period
-#' @param litt sum of logarithmic interpurchase times
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
-#' @return a vector of log-likelihoods
-#' @export
-#' @seealso \code{\link{bgcnbd.cbs.LL}}
-#' @references Platzer Michael, and Thomas Reutterer (forthcoming)
-bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
+#' @keywords internal
+xbgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -143,7 +179,7 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
     warning("Maximum vector length not a multiple of the length of T.cal")
   if (max.length%%length(litt)) 
     warning("Maximum vector length not a multiple of the length of litt")
-  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.LL")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.LL")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   if (any(x < 0) || !is.numeric(x)) 
@@ -165,8 +201,9 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
   P2 <- lbeta(a, b + x + ifelse(dropout_at_zero, 1, 0)) - lbeta(a, b)
   P3 <- lgamma(r + k * x) - lgamma(r) + r * log(alpha)
   P4 <- -1 * (r + k * x) * log(alpha + T.cal)
-  S1 <- as.numeric(dropout_at_zero | x > 0) * a/(b + x - 1 + ifelse(dropout_at_zero, 1, 0)) * ((alpha + T.cal)/(alpha + 
-    t.x))^(r + k * x)
+  S1 <- as.numeric(dropout_at_zero | x > 0) * 
+    a/(b + x - 1 + ifelse(dropout_at_zero, 1, 0)) * 
+    ((alpha + T.cal)/(alpha + t.x))^(r + k * x)
   S2 <- 1
   if (k > 1) {
     for (j in 1:(k - 1)) {
@@ -179,40 +216,49 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = FALSE) {
 }
 
 
-#' BG/CNBD-k Probability Mass Function
+
+#' (M)BG/CNBD-k Probability Mass Function
 #' 
-#' Uses BG/CNBD-k model parameters to return the probability distribution of
-#' purchase frequencies for a random customer in a given time period, i.e.
-#' P(X(t)=x|r,alpha,a,b)
+#' Uses (M)BG/CNBD-k model parameters to return the probability distribution of 
+#' purchase frequencies for a random customer in a given time period, i.e. 
+#' \eqn{P(X(t)=x|r,alpha,a,b)}.
 #' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-#'   in that order.
-#' @param t length of time for which we are calculating the expected number of 
-#'   transactions.
-#' @param x number of transactions for which probability is calculated.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
-#' @return P(X(t)=x|r,alpha,a,b). If either \code{t} or \code{x} is a
-#'   vector, then the output will be a vector as well. If both are vectors, the
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param t Length end of time period for which probability is being computed. 
+#'   May also be a vector.
+#' @param x Number of repeat transactions for which probability is calculated.
+#'   May also be a vector.
+#' @return \eqn{P(X(t)=x|r,alpha,a,b)}. If either \code{t} or \code{x} is a 
+#'   vector, then the output will be a vector as well. If both are vectors, the 
 #'   output will be a matrix.
 #' @export
-#' @seealso \code{\link{bgcnbd.Expectation}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples
 #' cbs <- cdnow.sample()$cbs # load CDNow summary data
-#' params <- bgcnbd.EstimateParameters(cbs)
-#' bgcnbd.pmf(params, t = c(26, 52), x = 0:6)
-#' bgcnbd.pmf(params, t = 52, x = 0:6)
-bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
-  
-  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.pmf")
+#' params <- mbgcnbd.EstimateParameters(cbs)
+#' mbgcnbd.pmf(params, t = c(26, 52), x = 0:6)
+#' mbgcnbd.pmf(params, t = 52, x = 0:6)
+mbgcnbd.pmf <- function(params, t, x) {
+  xbgcnbd.pmf(params, t, x, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.pmf
+#' @export
+bgcnbd.pmf <- function(params, t, x) {
+  xbgcnbd.pmf(params, t, x, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.pmf <- function(params, t, x, dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.pmf")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   
   pmf <- as.matrix(sapply(t, function(t) {
     sapply(x, function(x) {
-      # call C++ implementation
-      bgcnbd_pmf_cpp(params, t, x, dropout_at_zero)
+      bgcnbd_pmf_cpp(params, t, x, dropout_at_zero) # call fast C++ implementation
     })
   }))
   if (length(x) == 1) pmf <- t(pmf)
@@ -222,36 +268,43 @@ bgcnbd.pmf <- function(params, t, x, dropout_at_zero = FALSE) {
 }
 
 
-#' BG/CNBD-k Expectation
+
+#' (M)BG/CNBD-k Expectation
 #' 
 #' Returns the number of repeat transactions that a randomly chosen customer
 #' (for whom we have no prior information) is expected to make in a given time
-#' period.
+#' period, i.e. \eqn{E(X(t) | k, r, alpha, a, b)}.
 #' 
-#' E(X(t) | k, r, alpha, a, b)
-#' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-#'   in that order.
-#' @param t length of time for which we are calculating the expected number of repeat transactions.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param t Length of time for which we are calculating the expected number of repeat transactions.
 #' @return Number of repeat transactions a customer is expected to make in a time period of length t.
 #' @export
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
-#' @seealso \code{\link{bgcnbd.pmf}}
 #' @examples
 #' cbs <- cdnow.sample()$cbs # load CDNow summary data
-#' params <- bgcnbd.EstimateParameters(cbs)
-#' bgcnbd.Expectation(params, t = 52)
-bgcnbd.Expectation <- function(params, t, dropout_at_zero = FALSE) {
-  
-  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.Expectation")
+#' params <- mbgcnbd.EstimateParameters(cbs)
+#' mbgcnbd.Expectation(params, t = c(26, 52))
+mbgcnbd.Expectation <- function(params, t) {
+  xbgcnbd.Expectation(params, t, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.Expectation
+#' @export
+bgcnbd.Expectation <- function(params, t) {
+  xbgcnbd.Expectation(params, t, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.Expectation <- function(params, t, dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.Expectation")
   if (any(t < 0) || !is.numeric(t)) 
     stop("t must be numeric and may not contain negative numbers.")
   
   # estimate computation time, and warn if it will take too long
   if (uniqueN(t) > 100) {
-    estimated_time <- system.time(bgcnbd.Expectation(params, max(t), dropout_at_zero))["elapsed"]
+    estimated_time <- system.time(xbgcnbd.Expectation(params, max(t), dropout_at_zero))["elapsed"]
     if (uniqueN(t) * estimated_time > 60) {
       cat("note: computation will take long for many unique time values (`t`, `T.cal`, `T.star`,...) - consider rounding!")
     }
@@ -264,38 +317,49 @@ bgcnbd.Expectation <- function(params, t, dropout_at_zero = FALSE) {
     # call C++ implementation
     bgcnbd_exp_cpp(params, t, dropout_at_zero)
   })
-  res <- unname(ts_map[as.character(t)])
+  res <- (ts_map[as.character(t)])
   return(res)
 }
 
 
-#' BG/CNBD-k P(alive)
+
+#' (M)BG/CNBD-k P(alive)
 #' 
-#' Uses BG/CNBD-k model parameters and a customer's past transaction behavior 
+#' Uses (M)BG/CNBD-k model parameters and a customer's past transaction behavior 
 #' to return the probability that they are still alive at the end of the 
 #' calibration period.
 #' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
-#'   and \code{b} in that order.
-#' @param x number of repeat transactions in the calibration period T.cal, or a 
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param x Number of repeat transactions in the calibration period T.cal, or a 
 #'   vector of calibration period frequencies.
-#' @param t.x recency, i.e. length between first and last transaction during 
+#' @param t.x Recency, i.e. length between first and last transaction during 
 #'   calibration period.
-#' @param T.cal length of calibration period, or a vector of calibration period 
+#' @param T.cal Length of calibration period, or a vector of calibration period 
 #'   lengths.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
 #' @return Probability that the customer is still alive at the end of the 
 #'   calibration period.
 #' @export
-#' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples
 #' cbs <- cdnow.sample()$cbs # load CDNow summary data
-#' params <- bgcnbd.EstimateParameters(cbs)
-#' palive <- bgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
+#' params <- mbgcnbd.EstimateParameters(cbs)
+#' palive <- mbgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
+#' head(palive) # Probability of being alive for first 6 customers
 #' mean(palive) # Estimated share of customers to be still alive
-bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
+mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
+  xbgcnbd.PAlive(params, x, t.x, T.cal, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.PAlive
+#' @export
+bgcnbd.PAlive <- function(params, x, t.x, T.cal) {
+  xbgcnbd.PAlive(params, x, t.x, T.cal, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
   max.length <- max(length(x), length(t.x), length(T.cal))
   if (max.length%%length(x)) 
     warning("Maximum vector length not a multiple of the length of x")
@@ -303,7 +367,7 @@ bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
     warning("Maximum vector length not a multiple of the length of t.x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PAlive")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.PAlive")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   if (any(x < 0) || !is.numeric(x)) 
@@ -336,37 +400,48 @@ bgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = FALSE) {
 }
 
 
-#' BG/CNBD-k Conditional Expected Transactions
+#' (M)BG/CNBD-k Conditional Expected Transactions
 #' 
-#' Uses BG/CNBD-k model parameters and a customer's past transaction behavior 
+#' Uses (M)BG/CNBD-k model parameters and a customer's past transaction behavior 
 #' to return the number of transactions they are expected to make in a given 
 #' time period.
 #' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a}
-#'   and \code{b} in that order.
-#' @param T.star length of time for which we are calculating the expected number
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param T.star Length of time for which we are calculating the expected number
 #'   of transactions.
-#' @param x number of repeat transactions in the calibration period T.cal, or a 
+#' @param x Number of repeat transactions in the calibration period T.cal, or a 
 #'   vector of calibration period frequencies.
-#' @param t.x recency, i.e. length between first and last transaction during 
+#' @param t.x Recency, i.e. length between first and last transaction during 
 #'   calibration period.
-#' @param T.cal length of calibration period, or a vector of calibration period 
+#' @param T.cal Length of calibration period, or a vector of calibration period 
 #'   lengths.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
 #' @return Number of transactions a customer is expected to make in a time 
 #'   period of length t, conditional on their past behavior. If any of the input
 #'   parameters has a length greater than 1, this will be a vector of expected 
 #'   number of transactions.
 #' @export
-#' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples
 #' cbs <- cdnow.sample()$cbs # load CDNow summary data
-#' params <- bgcnbd.EstimateParameters(cbs)
-#' xstar.est <- bgcnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+#' params <- mbgcnbd.EstimateParameters(cbs)
+#' xstar.est <- mbgcnbd.ConditionalExpectedTransactions(params, 
+#'   cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+#' head(xstar.est) # expected number of transactions for first 6 customers
 #' sum(xstar.est) # expected total number of transactions during holdout
-bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal, dropout_at_zero = FALSE) {
+mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
+  xbgcnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.ConditionalExpectedTransactions
+#' @export
+bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
+  xbgcnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal, dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
   max.length <- max(length(T.star), length(x), length(t.x), length(T.cal))
   if (max.length%%length(T.star)) 
     warning("Maximum vector length not a multiple of the length of T.star")
@@ -376,7 +451,7 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
     warning("Maximum vector length not a multiple of the length of t.x")
   if (max.length%%length(T.cal)) 
     warning("Maximum vector length not a multiple of the length of T.cal")
-  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.ConditionalExpectedTransactions")
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.ConditionalExpectedTransactions")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   if (any(T.star < 0) || !is.numeric(T.star)) 
@@ -425,13 +500,13 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
   G <- function(r, alpha, a, b) 1 - (alpha/(alpha + T.star))^r * h2f1(r, b + 1, a + b, T.star/(alpha + T.star))
   P1 <- (a + b + x - 1 + ifelse(dropout_at_zero, 1, 0))/(a - 1)
   P2 <- G(r + x, k * alpha + T.cal, a, b + x - 1 + ifelse(dropout_at_zero, 1, 0))
-  P3 <- bgcnbd.PAlive(params = params, x = x, t.x = t.x, T.cal = T.cal, dropout_at_zero = dropout_at_zero)
+  P3 <- xbgcnbd.PAlive(params = params, x = x, t.x = t.x, T.cal = T.cal, dropout_at_zero = dropout_at_zero)
   exp <- P1 * P2 * P3
   # adjust bias BG/NBD-based approximation by scaling via the Unconditional Expectations (for wich we have exact
   # expression)
   if (k > 1) {
-    sum.cal <- sum(bgcnbd.Expectation(params = params, t = T.cal, dropout_at_zero = dropout_at_zero))
-    sum.tot <- sum(bgcnbd.Expectation(params = params, t = T.cal + T.star, dropout_at_zero = dropout_at_zero))
+    sum.cal <- sum(xbgcnbd.Expectation(params = params, t = T.cal, dropout_at_zero = dropout_at_zero))
+    sum.tot <- sum(xbgcnbd.Expectation(params = params, t = T.cal + T.star, dropout_at_zero = dropout_at_zero))
     bias.corr <- (sum.tot - sum.cal)/sum(exp)
     exp <- exp * bias.corr
   }
@@ -439,40 +514,55 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 }
 
 
-#' BG/CNBD-k Plot Frequency in Calibration Period
+
+#' (M)BG/CNBD-k Plot Frequency in Calibration Period
 #' 
 #' Plots a histogram and returns a matrix comparing the actual and expected
 #' number of customers who made a certain number of repeat transactions in the
 #' calibration period, binned according to calibration period frequencies.
 #' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-#'   in that order.
-#' @param cal.cbs calibration period CBS (customer by sufficient statistic). It
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param cal.cbs calibration period CBS (customer by sufficient statistic). It 
 #'   must contain columns for frequency ('x') and total time observed ('T.cal').
-#' @param censor integer used to censor the data.
-#' @param xlab descriptive label for the x axis.
-#' @param ylab descriptive label for the y axis.
-#' @param title title placed on the top-center of the plot.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
-#' @return Calibration period repeat transaction frequency comparison matrix (actual vs. expected).
-#'
+#' @param censor Cutoff point for number of transactions in plot.
+#' @param xlab Descriptive label for the x axis.
+#' @param ylab Descriptive label for the y axis.
+#' @param title Title placed on the top-center of the plot.
+#' @return Calibration period repeat transaction frequency comparison matrix
+#'   (actual vs. expected).
 #' @export
-#' @seealso \code{\link[BTYD]{bgnbd.PlotFrequencyInCalibration}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
-#' params <- bgcnbd.EstimateParameters(cbs)
-#' bgcnbd.PlotFrequencyInCalibration(params, cbs)
+#' params <- mbgcnbd.EstimateParameters(cbs)
+#' mbgcnbd.PlotFrequencyInCalibration(params, cbs)
+mbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7, 
+                                               xlab = "Calibration period transactions", 
+                                               ylab = "Customers", 
+                                               title = "Frequency of Repeat Transactions") {
+  xbgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor, xlab, ylab, title, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.PlotFrequencyInCalibration
+#' @export
 bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7, 
-                                              xlab = "Calibration period transactions", 
-                                              ylab = "Customers", 
-                                              title = "Frequency of Repeat Transactions", 
-                                              dropout_at_zero = FALSE) {
-  
-  tryCatch(x_act <- cal.cbs$x, error = function(e) stop("Error in bgcnbd.PlotFrequencyInCalibration: cal.cbs must have a frequency column labelled \"x\""))
-  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in bgcnbd.PlotFrequencyInCalibration: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
-  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.PlotFrequencyInCalibration")
+                                               xlab = "Calibration period transactions", 
+                                               ylab = "Customers", 
+                                               title = "Frequency of Repeat Transactions") {
+  xbgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor, xlab, ylab, title, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7, 
+                                               xlab = "Calibration period transactions", 
+                                               ylab = "Customers", 
+                                               title = "Frequency of Repeat Transactions", 
+                                               dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
+  tryCatch(x_act <- cal.cbs$x, error = function(e) stop("Error in xbgcnbd.PlotFrequencyInCalibration: cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in xbgcnbd.PlotFrequencyInCalibration: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.PlotFrequencyInCalibration")
   
   # actual
   x_act[x_act > censor] <- censor
@@ -481,7 +571,7 @@ bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
   # expected
   x_est <- sapply(unique(T.cal), function(tcal) {
     n <- sum(cal.cbs$T.cal == tcal)
-    prop <- bgcnbd.pmf(params, t = tcal, x=0:(censor-1), dropout_at_zero = dropout_at_zero)
+    prop <- xbgcnbd.pmf(params, t = tcal, x=0:(censor-1), dropout_at_zero = dropout_at_zero)
     prop <- c(prop, 1-sum(prop))
     prop * (n / nrow(cal.cbs))
   })
@@ -492,41 +582,49 @@ bgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
   colnames(mat) <- c(0:(censor-1), paste0(censor, "+"))
   
   barplot(mat, beside = TRUE, col = 1:2, main = title, xlab = xlab, ylab = ylab, ylim = c(0, max(mat) * 1.1))
-  model <- paste0(ifelse(dropout_at_zero, "MBG", "BG"), "/", ifelse(params[1] > 1, paste0("CNBD-", params[1]), "NBD"))
-  legend("topright", legend = c("Actual", model), col = 1:2, lty = 1:2, lwd = 1, xjust = 1)
+  legend("topright", legend = c("Actual", "Model"), col = 1:2, lty = 1:2, lwd = 1, xjust = 1)
   
   colnames(mat) <- paste0("freq.", colnames(mat))
   mat
 }
 
 
-#' BG/CNBD-k Expected Cumulative Transactions
+
+#' (M)BG/CNBD-k Expected Cumulative Transactions
 #' 
 #' Calculates the expected cumulative total repeat transactions by all customers
 #' for the calibration and holdout periods.
 #' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-#'   in that order.
-#' @param T.cal a vector to represent customers' calibration period lengths (in
-#'   other words, the \code{T.cal} column from a customer-by-sufficient-statistic
-#'   matrix).
-#' @param T.tot end of holdout period. Must be a single value, not a vector.
-#' @param n.periods.final number of time periods in the calibration and holdout periods.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
-#' @return Vector of expected cumulative total repeat transactions by all customers.
-#' 
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param T.cal A vector to represent customers' calibration period lengths.
+#' @param T.tot End of holdout period. Must be a single value, not a vector.
+#' @param n.periods.final Number of time periods in the calibration and holdout
+#'   periods.
+#' @return Vector of length \code{n.periods.final} with expected cumulative
+#'   total repeat transactions by all customers.
 #' @export
-#' @seealso \code{\link[BTYD]{bgnbd.ExpectedCumulativeTransactions}}
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
-#' params <- c(1, 0.243, 4.414, 0.793, 2.426)
+#' params <- mbgcnbd.EstimateParameters(cbs)
 #' # Returns a vector containing cumulative repeat transactions for 546 days.
 #' # All parameters are in weeks; the calibration period lasted 39 weeks
 #' # and the holdout period another 39.
-#' bgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
-bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final, dropout_at_zero = FALSE) {
-  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.ExpectedCumulativeTransactions")
+#' mbgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
+mbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final) {
+  xbgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, n.periods.final, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.ExpectedCumulativeTransactions
+#' @export
+bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final) {
+  xbgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, n.periods.final, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final, dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.ExpectedCumulativeTransactions")
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
   if (length(T.tot) > 1 || T.tot < 0 || !is.numeric(T.tot)) 
@@ -539,126 +637,180 @@ bgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.period
   expected.transactions <- sapply(intervals, function(interval) {
     if (interval <= min(cust.birth.periods)) 
       return(0)
-    sum(bgcnbd.Expectation(params = params, t = interval - cust.birth.periods[cust.birth.periods < interval], 
-      dropout_at_zero = dropout_at_zero))
+    sum(xbgcnbd.Expectation(params = params, t = interval - cust.birth.periods[cust.birth.periods < interval], 
+                            dropout_at_zero = dropout_at_zero))
   })
   return(expected.transactions)
 }
 
 
-#' BG/CNBD-k Tracking Cumulative Transactions Plot
+
+#' (M)BG/CNBD-k Tracking Cumulative Transactions Plot
 #' 
 #' Plots the actual and expected cumulative total repeat transactions by all
 #' customers for the calibration and holdout periods, and returns this
 #' comparison in a matrix.
 #' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-#'   in that order.
-#' @param T.cal a vector to represent customers' calibration period lengths (in
-#'   other words, the 'T.cal' column from a customer-by-sufficient-statistic
-#'   matrix).
-#' @param T.tot end of holdout period. Must be a single value, not a vector.
-#' @param actual.cu.tracking.data vector containing the cumulative number of
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param T.cal A vector to represent customers' calibration period lengths.
+#' @param T.tot End of holdout period. Must be a single value, not a vector.
+#' @param actual.cu.tracking.data A vector containing the cumulative number of
 #'   repeat transactions made by customers for each period in the total time
 #'   period (both calibration and holdout periods).
-#' @param xlab descriptive label for the x axis.
-#' @param ylab descriptive label for the y axis.
-#' @param xticklab vector containing a label for each tick mark on the x axis.
-#' @param title title placed on the top-center of the plot.
-#' @param ymax upper boundary for y axis.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
+#' @param xlab Descriptive label for the x axis.
+#' @param ylab Descriptive label for the y axis.
+#' @param xticklab A vector containing a label for each tick mark on the x axis.
+#' @param title Title placed on the top-center of the plot.
+#' @param ymax Upper boundary for y axis.
 #' @return Matrix containing actual and expected cumulative repeat transactions.
 #' @export
-#' @seealso \code{\link[BTYD]{bgnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
+#' @seealso \code{\link{bgcnbd.PlotTrackingInc}}
 #' @examples
 #' cdnow <- cdnow.sample()
 #' cbs <- cdnow$cbs
 #' cum <- elog2cum(cdnow$elog)
-#' params <- bgcnbd.EstimateParameters(cbs)
-#' bgcnbd.PlotTrackingCum(params, cbs$T.cal, T.tot = 78, cum)
-bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data, 
-                                   xlab = "Week", ylab = "Cumulative Transactions", 
-                                   xticklab = NULL, title = "Tracking Cumulative Transactions", 
-                                   ymax = NULL, dropout_at_zero = FALSE) {
-  
-  actual <- actual.cu.tracking.data
-  expected <- bgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, length(actual), dropout_at_zero = dropout_at_zero)
+#' params <- mbgcnbd.EstimateParameters(cbs)
+#' mbgcnbd.PlotTrackingCum(params, cbs$T.cal, T.tot = 78, cum)
+mbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data, 
+                                    xlab = "Week", ylab = "Cumulative Transactions", 
+                                    xticklab = NULL, title = "Tracking Cumulative Transactions", 
+                                    ymax = NULL) {
+  xbgcnbd.PlotTrackingCum(params, T.cal, T.tot, actual.cu.tracking.data, 
+                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = TRUE)
+}
 
+#' @rdname mbgcnbd.PlotTrackingCum
+#' @export
+bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data, 
+                                    xlab = "Week", ylab = "Cumulative Transactions", 
+                                    xticklab = NULL, title = "Tracking Cumulative Transactions", 
+                                    ymax = NULL) {
+  xbgcnbd.PlotTrackingCum(params, T.cal, T.tot, actual.cu.tracking.data, 
+                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data, 
+                                    xlab = "Week", ylab = "Cumulative Transactions", 
+                                    xticklab = NULL, title = "Tracking Cumulative Transactions", 
+                                    ymax = NULL, dropout_at_zero = NULL) {
+  
+  stopifnot(!is.null(dropout_at_zero))
+  actual <- actual.cu.tracking.data
+  expected <- xbgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, length(actual), 
+                                                     dropout_at_zero = dropout_at_zero)
+  
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
                   xlab = xlab, ylab = ylab, title = title, xticklab = xticklab, ymax = ymax)
 }
 
 
-#' BG/CNBD-k Tracking Incremental Transactions Comparison
+
+#' (M)BG/CNBD-k Tracking Incremental Transactions Comparison
 #' 
 #' Plots the actual and expected incremental total repeat transactions by all
 #' customers for the calibration and holdout periods, and returns this
 #' comparison in a matrix.
 #' 
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r}, \code{alpha}, \code{a} and \code{b}
-#'   in that order.
-#' @param T.cal a vector to represent customers' calibration period lengths (in
-#'   other words, the 'T.cal' column from a customer-by-sufficient-statistic
-#'   matrix).
-#' @param T.tot end of holdout period. Must be a single value, not a vector.
-#' @param actual.inc.tracking.data vector containing the incremental number of
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param T.cal A vector to represent customers' calibration period lengths.
+#' @param T.tot End of holdout period. Must be a single value, not a vector.
+#' @param actual.inc.tracking.data A vector containing the incremental number of
 #'   repeat transactions made by customers for each period in the total time
 #'   period (both calibration and holdout periods).
-#' @param xlab descriptive label for the x axis.
-#' @param ylab descriptive label for the y axis.
-#' @param xticklab vector containing a label for each tick mark on the x axis.
-#' @param title title placed on the top-center of the plot.
-#' @param ymax upper boundary for y axis.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
+#' @param xlab Descriptive label for the x axis.
+#' @param ylab Descriptive label for the y axis.
+#' @param xticklab A vector containing a label for each tick mark on the x axis.
+#' @param title Title placed on the top-center of the plot.
+#' @param ymax Upper boundary for y axis.
 #' @return Matrix containing actual and expected incremental repeat transactions.
 #' @export
-#' @seealso \code{\link[BTYD]{bgnbd.PlotTrackingInc}} \code{\link{bgcnbd.PlotTrackingCum}}
+#' @seealso \code{\link{bgcnbd.PlotTrackingCum}}
 #' @examples
 #' cdnow <- cdnow.sample()
 #' cbs <- cdnow$cbs
 #' inc <- elog2inc(cdnow$elog)
-#' params <- bgcnbd.EstimateParameters(cbs)
-#' bgcnbd.PlotTrackingInc(params, cbs$T.cal, T.tot = 78, inc)
-bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data, 
-                                   xlab = "Week", ylab = "Transactions", 
-                                   xticklab = NULL, title = "Tracking Weekly Transactions", 
-                                   ymax = NULL, dropout_at_zero = FALSE) {
-  
-  actual <- actual.inc.tracking.data
-  expected <- BTYD::dc.CumulativeToIncremental(bgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, length(actual), 
-    dropout_at_zero = dropout_at_zero))
+#' params <- mbgcnbd.EstimateParameters(cbs)
+#' mbgcnbd.PlotTrackingInc(params, cbs$T.cal, T.tot = 78, inc)
+mbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data, 
+                                    xlab = "Week", ylab = "Transactions", 
+                                    xticklab = NULL, title = "Tracking Weekly Transactions", 
+                                    ymax = NULL) {
+  xbgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data, 
+                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = TRUE)
+}
 
+#' @rdname mbgcnbd.PlotTrackingInc
+#' @export
+bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data, 
+                                    xlab = "Week", ylab = "Transactions", 
+                                    xticklab = NULL, title = "Tracking Weekly Transactions", 
+                                    ymax = NULL) {
+  xbgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data, 
+                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data, 
+                                    xlab = "Week", ylab = "Transactions", 
+                                    xticklab = NULL, title = "Tracking Weekly Transactions", 
+                                    ymax = NULL, dropout_at_zero = NULL) {
+  
+  stopifnot(!is.null(dropout_at_zero))
+  actual <- actual.inc.tracking.data
+  expected_cum <- xbgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, length(actual), 
+                                                         dropout_at_zero = dropout_at_zero)
+  expected <- BTYD::dc.CumulativeToIncremental(expected_cum)
+  
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal, 
                   xlab = xlab, ylab = ylab, title = title, xticklab = xticklab, ymax = ymax)
 }
 
 
-#' Simulate data according to BG/CNBD-k model assumptions
+
+#' Simulate data according to (M)BG/CNBD-k model assumptions
 #' 
-#' @param n number of customers
-#' @param T.cal length of calibration period; if vector then it is assumed that
-#'   customers have different 'birth' dates, i.e. max(T.cal)-T.cal
-#' @param T.star length(s) of holdout period(s); assumed to be same for all
-#'   customers
-#' @param params BG/CNBD-k parameters - a vector with \code{k}, \code{r},
-#'   \code{alpha}, \code{a} and \code{b} in that order.
-#' @param dropout_at_zero Boolean; the mbg-methods are simple wrapper methods,
-#'   which set this parameter to TRUE
-#' @param return.elog boolean - if \code{TRUE} then the event log is returned in 
-#'   addition to the CBS summary
-#' @return list with elements \code{cbs} and \code{elog} containing data.frames
+#' @param n Number of customers.
+#' @param T.cal Length of calibration period. If a vector is provided, then it
+#'   is assumed that customers have different 'birth' dates, i.e.
+#'   \eqn{max(T.cal)-T.cal}.
+#' @param T.star Length of holdout period. This may be a vector.
+#' @param params A vector with model parameters \code{k}, \code{r}, 
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param return.elog If \code{TRUE} then the event log is returned in addition
+#'   to the CBS summary
+#' @return List of length 2:
+##' \itemize{
+##'  \item{\code{cbs }}{A data.frame with a row for each customer and the summary statistic as columns.}
+##'  \item{\code{elog }}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
+##' }
 #' @export
-#' @seealso \code{\link{bgcnbd.EstimateParameters}}
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples
 #' params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-#' data <- bgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32, params, return.elog = TRUE)
-#' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
-#' elog <- data$elog  # Event log - one row per event/purchase
-bgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = FALSE, dropout_at_zero = FALSE) {
-  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "bgcnbd.GenerateData")
+#' data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32, params, return.elog = TRUE)
+#' 
+#' # customer by sufficient summary statistic - one row per customer
+#' head(data$cbs)
+#' 
+#' # event log - one row per event/transaction
+#' head(data$elog)
+mbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = FALSE) {
+  xbgcnbd.GenerateData(n, T.cal, T.star, params, return.elog, dropout_at_zero = TRUE)
+}
+
+#' @rdname mbgcnbd.GenerateData
+#' @export
+bgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = FALSE) {
+  xbgcnbd.GenerateData(n, T.cal, T.star, params, return.elog, dropout_at_zero = FALSE)
+}
+
+#' @keywords internal
+xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = FALSE, dropout_at_zero = NULL) {
+  stopifnot(!is.null(dropout_at_zero))
+  dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.GenerateData")
   if (params[1] != floor(params[1]) | params[1] < 1) 
     stop("k must be integer being greater or equal to 1.")
   
@@ -696,7 +848,7 @@ bgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = F
     ts.cal <- times[times < max(T.cal)]
     ts.star <- times[times >= max(T.cal) & times < (max(T.cal) + T.star[i])]
     cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal) - (max(T.cal) - T.cal[i]), litt = sum(log(diff(ts.cal))), 
-      churn = churn, alive = churn > (length(ts.cal) - 1))
+                          churn = churn, alive = churn > (length(ts.cal) - 1))
     for (tstar in T.star) {
       colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
       cbs_list[[i]][[colname]] <- length(times[times >= max(T.cal) & times < (max(T.cal) + tstar)])

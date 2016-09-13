@@ -280,6 +280,7 @@ elog2inc <- function(elog, by = 7) {
 #' @param params model parameters
 #' @param func Function calling \code{dc.check.model.params.safe}
 #' @return stops program if there is something wrong with the parameters
+#' @keywords internal
 dc.check.model.params.safe <- function(printnames, params, func) {
   # first do basic checks
   dc.check.model.params(printnames, params, func)
@@ -305,7 +306,7 @@ dc.check.model.params.safe <- function(printnames, params, func) {
 #' @param xticklab xticklab
 #' @param ymax ymax
 #' @return Matrix
-#' @seealso \code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.PlotTrackingInc}} \code{\link{bgcnbd.PlotTrackingCum}} \code{\link{bgcnbd.PlotTrackingInc}}
+#' @keywords internal
 dc.PlotTracking <- function(actual, expected, T.cal = NULL,
                             xlab = "", ylab = "", title = "", 
                             xticklab = NULL, ymax = NULL) {

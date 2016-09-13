@@ -14,7 +14,7 @@
 #' @param mc.cores number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}
 #' @param param_init list of 2nd-level parameter start values
 #' @param trace print logging step every \code{trace} iteration
-#' @return 2-element list:
+#' @return List of length 2:
 ##' \itemize{
 ##'  \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
 ##'  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}, \code{t}, \code{gamma}}

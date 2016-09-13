@@ -5,38 +5,38 @@ test_that("BG/CNBD-k", {
   
   # validate against BTYD implementation
   set.seed(1)
-  params <- c(0.85, 1.45, 0.79, 2.42)
+  params <- c(1, 0.85, 1.45, 0.79, 2.42)
   n <- 8000
-  data <- bgnbd.GenerateData(n = n, T.cal = round(runif(n, 4, 32)), T.star = 32, params = params, return.elog = TRUE)
+  data <- bgcnbd.GenerateData(n = n, T.cal = round(runif(n, 4, 32)), T.star = 32, params = params, return.elog = TRUE)
   cbs  <- data$cbs
   elog <- data$elog
   params.est.btyd <- BTYD::bgnbd.EstimateParameters(cbs)
   params.est.btyd_plus <- bgcnbd.EstimateParameters(cbs, k = 1)[-1]
   expect_equal(unname(round(params.est.btyd, 2)), 
                unname(round(params.est.btyd_plus, 2)))
-  expect_equal(BTYD::bgnbd.PAlive(params, 0, 0, 32), 
-               bgcnbd.PAlive(c(1, params), 0, 0, 32))
-  expect_equal(BTYD::bgnbd.PAlive(params, 1, 16, 32), 
-               bgcnbd.PAlive(c(1, params), 1, 16, 32))
-  expect_equal(BTYD::bgnbd.Expectation(params, 1:3), 
-               bgcnbd.Expectation(c(1, params), 1:3))
-  expect_equal(BTYD::bgnbd.ConditionalExpectedTransactions(params, 32, 1, 16, 32), 
-               bgcnbd.ConditionalExpectedTransactions(c(1, params), 32, 1, 16, 32))
-  expect_equal(unname(BTYD::bgnbd.pmf(params, 32, 0:2)), 
-               unname(bgcnbd.pmf(c(1, params), 32, 0:2)))
-  expect_equal(BTYD::bgnbd.PlotFrequencyInCalibration(params, cbs, 7), 
-               bgcnbd.PlotFrequencyInCalibration(c(1, params), cbs, 7), tolerance = 0.001)
+  expect_equal(BTYD::bgnbd.PAlive(params[-1], 0, 0, 32), 
+               bgcnbd.PAlive(params, 0, 0, 32))
+  expect_equal(BTYD::bgnbd.PAlive(params[-1], 1, 16, 32), 
+               bgcnbd.PAlive(params, 1, 16, 32))
+  expect_equal(unname(BTYD::bgnbd.Expectation(params[-1], 1:3)),
+               unname(bgcnbd.Expectation(params, 1:3)))
+  expect_equal(BTYD::bgnbd.ConditionalExpectedTransactions(params[-1], 32, 1, 16, 32), 
+               bgcnbd.ConditionalExpectedTransactions(params, 32, 1, 16, 32))
+  expect_equal(unname(BTYD::bgnbd.pmf(params[-1], 32, 0:2)), 
+               unname(bgcnbd.pmf(params, 32, 0:2)))
+  expect_equal(BTYD::bgnbd.PlotFrequencyInCalibration(params[-1], cbs, 7), 
+               bgcnbd.PlotFrequencyInCalibration(params, cbs, 7), tolerance = 0.001)
   inc.tracking <- elog2inc(elog, by = 1)
-  expect_equal(BTYD::bgnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
-               bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
+  expect_equal(BTYD::bgnbd.PlotTrackingInc(params[-1], cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
+               bgcnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
                tolerance = 0.001)
-  expect_silent(bgcnbd.PlotTrackingInc(c(1, params), cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking, xticklab = 1:length(inc.tracking)))
-  expect_equal(BTYD::bgnbd.ExpectedCumulativeTransactions(params, 11, 39, 12),
-               bgcnbd.ExpectedCumulativeTransactions(c(1, params), 11, 39, 12),
+  expect_silent(bgcnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking, xticklab = 1:length(inc.tracking)))
+  expect_equal(BTYD::bgnbd.ExpectedCumulativeTransactions(params[-1], 11, 39, 12),
+               bgcnbd.ExpectedCumulativeTransactions(params, 11, 39, 12),
                tolerance = 0.001)
   cu.tracking <- cumsum(inc.tracking)
-  expect_equal(BTYD::bgnbd.PlotTrackingCum(params, cbs$T.cal, 32 + 32, cu.tracking), 
-               bgcnbd.PlotTrackingCum(c(1, params), cbs$T.cal, 32 + 32, cu.tracking), 
+  expect_equal(BTYD::bgnbd.PlotTrackingCum(params[-1], cbs$T.cal, 32 + 32, cu.tracking), 
+               bgcnbd.PlotTrackingCum(params, cbs$T.cal, 32 + 32, cu.tracking), 
                tolerance = 0.001)
   
   # generate artificial BG/CNBD-k data
