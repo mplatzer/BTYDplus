@@ -180,9 +180,9 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     # sample transaction times
     times <- cumsum(c(0, rexp(10 * (T.cal[i] + max(T.star)) * lambda, rate = lambda)))
     if (return.elog) 
-      elog_list <- data.frame(cust = i, t = times[times < (T.cal[i] + max(T.star))])
+      elog_list[[i]] <- data.frame(cust = i, t = times[times <= (T.cal[i] + max(T.star))])
     # determine frequency, recency, etc.
-    ts.cal <- times[times < T.cal[i]]
+    ts.cal <- times[times <= T.cal[i]]
     cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal))
     for (tstar in T.star) {
       colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))

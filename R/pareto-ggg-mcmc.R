@@ -307,11 +307,11 @@ pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     if (sum(itts) < minT) 
       stop("not enough inter-transaction times sampled: ", sum(itts), " < ", minT)
     times <- cumsum(c(0, itts))
-    times <- times[times < tau]
+    times <- times[times <= tau]
     if (return.elog) 
-      elog_list[[i]] <- data.frame(cust = i, t = times[times < (T.cal[i] + max(T.star))])
+      elog_list[[i]] <- data.frame(cust = i, t = times[times <= (T.cal[i] + max(T.star))])
     # determine frequency, recency, etc.
-    ts.cal <- times[times < T.cal[i]]
+    ts.cal <- times[times <= T.cal[i]]
     cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), litt = ifelse(length(ts.cal) - 
       1 == 0, 0, sum(log(itts[1:(length(ts.cal) - 1)]))), alive = tau > T.cal[i])
     for (tstar in T.star) {

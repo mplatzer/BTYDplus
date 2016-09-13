@@ -843,9 +843,9 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
     # sample transaction times
     times <- cumsum(c(max(T.cal) - T.cal[i], rgamma(churn, shape = k, rate = lambda)))
     if (return.elog) 
-      elog_list[[i]] <- data.frame(cust = i, t = times[times < (max(T.cal) + max(T.star))])
+      elog_list[[i]] <- data.frame(cust = i, t = times[times <= (max(T.cal) + max(T.star))])
     # determine frequency, recency, etc.
-    ts.cal <- times[times < max(T.cal)]
+    ts.cal <- times[times <= max(T.cal)]
     cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal) - (max(T.cal) - T.cal[i]), litt = sum(log(diff(ts.cal))), 
                           churn = churn, alive = churn > (length(ts.cal) - 1))
     for (tstar in T.star) {
