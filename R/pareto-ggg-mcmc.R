@@ -250,7 +250,7 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL) 
 #' @param params A list of model parameters \code{r}, 
 #'   \code{alpha}, \code{s}, \code{beta}, \code{t} and \code{gamma}.
 #' @param return.elog If \code{TRUE} then the event log is returned in addition 
-#'   to the CBS summary
+#'   to the CBS summary.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
@@ -265,8 +265,6 @@ pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   
   if (length(T.cal) == 1) 
     T.cal <- rep(T.cal, n)
-  if (length(T.star) == 1) 
-    T.star <- rep(T.star, n)
   
   # sample regularity parameter k for each customer
   if (all(c("t", "gamma") %in% names(params))) {
@@ -299,7 +297,7 @@ pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     mu <- mus[i]
     tau <- taus[i]
     # sample 'sufficiently' large amount of inter-transaction times
-    minT <- min(T.cal[i] + T.star[i], tau)
+    minT <- min(T.cal[i] + max(T.star), tau)
     nr_of_itt_draws <- max(10, round(minT * lambda))
     itts <- rgamma(nr_of_itt_draws * 2, shape = k, rate = k * lambda)
     if (sum(itts) < minT) 
@@ -311,12 +309,15 @@ pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     times <- cumsum(c(0, itts))
     times <- times[times < tau]
     if (return.elog) 
-      elog_list[[i]] <- data.frame(cust = i, t = times[times < (T.cal[i] + T.star[i])])
+      elog_list[[i]] <- data.frame(cust = i, t = times[times < (T.cal[i] + max(T.star))])
     # determine frequency, recency, etc.
     ts.cal <- times[times < T.cal[i]]
-    ts.star <- times[times >= T.cal[i] & times < (T.cal[i] + T.star[i])]
     cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), litt = ifelse(length(ts.cal) - 
-      1 == 0, 0, sum(log(itts[1:(length(ts.cal) - 1)]))), alive = tau > T.cal[i], x.star = length(ts.star))
+      1 == 0, 0, sum(log(itts[1:(length(ts.cal) - 1)]))), alive = tau > T.cal[i])
+    for (tstar in T.star) {
+      colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
+      cbs_list[[i]][[colname]] <- length(times[times >= max(T.cal) & times < (max(T.cal) + tstar)])
+    }
   }
   cbs <- do.call(rbind.data.frame, cbs_list)
   cbs$k <- ks
@@ -324,7 +325,8 @@ pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   cbs$mu <- mus
   cbs$tau <- taus
   cbs$T.cal <- T.cal
-  cbs$T.star <- T.star
+  if (length(T.star) == 1) 
+    cbs$T.star <- T.star
   rownames(cbs) <- NULL
   out <- list(cbs = cbs)
   if (return.elog) {

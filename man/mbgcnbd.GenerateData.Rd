@@ -21,24 +21,15 @@ is assumed that customers have different 'birth' dates, i.e.
 \item{params}{A vector with model parameters \code{k}, \code{r}, 
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
-<<<<<<< HEAD
-\item{return.elog}{If \code{TRUE} then the event log is returned in addition 
-=======
 \item{return.elog}{If \code{TRUE} then the event log is returned in addition
->>>>>>> 672284976d437c7fc3ab407549dc7b1af6488744
-to the CBS summary}
+to the CBS summary.}
 }
 \value{
 List of length 2:
-<<<<<<< HEAD
-\item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
-\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
-=======
 \itemize{
  \item{\code{cbs }}{A data.frame with a row for each customer and the summary statistic as columns.}
  \item{\code{elog }}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
 }
->>>>>>> 672284976d437c7fc3ab407549dc7b1af6488744
 }
 \description{
 Simulate data according to (M)BG/CNBD-k model assumptions

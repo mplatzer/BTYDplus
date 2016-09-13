@@ -19,7 +19,7 @@ is assumed that customers have different 'birth' dates, i.e.
 \code{alpha}, \code{s}, \code{beta}.}
 
 \item{return.elog}{If \code{TRUE} then the event log is returned in addition 
-to the CBS summary}
+to the CBS summary.}
 }
 \value{
 List of length 2:

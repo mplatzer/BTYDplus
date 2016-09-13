@@ -780,7 +780,7 @@ xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
 #' @param params A vector with model parameters \code{k}, \code{r}, 
 #'   \code{alpha}, \code{a} and \code{b}, in that order.
 #' @param return.elog If \code{TRUE} then the event log is returned in addition
-#'   to the CBS summary
+#'   to the CBS summary.
 #' @return List of length 2:
 ##' \itemize{
 ##'  \item{\code{cbs }}{A data.frame with a row for each customer and the summary statistic as columns.}
@@ -846,7 +846,6 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
       elog_list[[i]] <- data.frame(cust = i, t = times[times < (max(T.cal) + max(T.star))])
     # determine frequency, recency, etc.
     ts.cal <- times[times < max(T.cal)]
-    ts.star <- times[times >= max(T.cal) & times < (max(T.cal) + T.star[i])]
     cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal) - (max(T.cal) - T.cal[i]), litt = sum(log(diff(ts.cal))), 
                           churn = churn, alive = churn > (length(ts.cal) - 1))
     for (tstar in T.star) {

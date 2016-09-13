@@ -18,7 +18,7 @@ is assumed that customers have different 'birth' dates, i.e.
 \item{params}{A list of model parameters: \code{beta} and \code{gamma}.}
 
 \item{return.elog}{If \code{TRUE} then the event log is returned in addition 
-to the CBS summary}
+to the CBS summary.}
 }
 \value{
 List of length 2:

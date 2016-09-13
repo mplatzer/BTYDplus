@@ -11,12 +11,12 @@ nbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 
 \item{T.cal}{Length of calibration period.}
 
-\item{T.star}{Length of holdout period.}
+\item{T.star}{Length of holdout period. This may be a vector.}
 
-\item{params}{NBD parameters - a vector with \code{r} and \code{alpha} in that order}
+\item{params}{NBD parameters - a vector with \code{r} and \code{alpha} in that order.}
 
 \item{return.elog}{If \code{TRUE} then the event log is returned in addition 
-to the CBS summary}
+to the CBS summary.}
 }
 \value{
 List of length 2:

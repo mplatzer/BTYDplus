@@ -254,7 +254,7 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #' @param params A list of model parameters \code{r}, 
 #'   \code{alpha}, \code{s}, \code{beta}.
 #' @param return.elog If \code{TRUE} then the event log is returned in addition 
-#'   to the CBS summary
+#'   to the CBS summary.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}

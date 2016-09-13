@@ -31,15 +31,8 @@ event log of a customer cohort with \code{\link{elog2cbs}}.}
 }
 \value{
 List of length 2:
-<<<<<<< HEAD
 \item{\code{level_1}}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
 \item{\code{level_2}}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}, \code{t}, \code{gamma}}
-=======
-\itemize{
- \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
- \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}, \code{t}, \code{gamma}}
-}
->>>>>>> 672284976d437c7fc3ab407549dc7b1af6488744
 }
 \description{
 Returns draws from the posterior distributions of the Pareto/GGG
