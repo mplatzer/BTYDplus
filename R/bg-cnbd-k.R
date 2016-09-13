@@ -779,11 +779,13 @@ xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params A vector with model parameters \code{k}, \code{r}, 
 #'   \code{alpha}, \code{a} and \code{b}, in that order.
-#' @param return.elog If \code{TRUE} then the event log is returned in addition 
+#' @param return.elog If \code{TRUE} then the event log is returned in addition
 #'   to the CBS summary
 #' @return List of length 2:
-#' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
-#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
+##' \itemize{
+##'  \item{\code{cbs }}{A data.frame with a row for each customer and the summary statistic as columns.}
+##'  \item{\code{elog }}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
+##' }
 #' @export
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples
