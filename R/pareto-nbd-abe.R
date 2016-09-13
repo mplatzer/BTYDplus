@@ -307,7 +307,7 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     times <- cumsum(c(0, itts))
     times <- times[times <= tau]
     if (return.elog) 
-      elog_list[[i]] <- data.frame(cust = i, t = times[times <= (T.cal[i] + max(T.star))])
+      elog_list[[i]] <- data.table(cust = i, t = times[times <= (T.cal[i] + max(T.star))])
     # determine frequency, recency, etc.
     ts.cal <- times[times <= T.cal[i]]
     cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), litt = ifelse(length(ts.cal) - 
@@ -317,7 +317,7 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
       cbs_list[[i]][[colname]] <- length(times[times >= max(T.cal) & times < (max(T.cal) + tstar)])
     }
   }
-  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs <- setDF(rbindlist(cbs_list))
   cbs$lambda <- lambdas
   cbs$mu <- mus
   cbs$tau <- taus
@@ -328,8 +328,7 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   cbs <- cbind(cbs, covars)
   out <- list(cbs = cbs)
   if (return.elog) {
-    elog <- do.call(rbind.data.frame, elog_list)
-    out$elog <- elog
+    out$elog <- setDF(rbindlist(elog_list))
   }
   return(out)
 }

@@ -843,7 +843,7 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
     # sample transaction times
     times <- cumsum(c(max(T.cal) - T.cal[i], rgamma(churn, shape = k, rate = lambda)))
     if (return.elog) 
-      elog_list[[i]] <- data.frame(cust = i, t = times[times <= (max(T.cal) + max(T.star))])
+      elog_list[[i]] <- data.table(cust = i, t = times[times <= (max(T.cal) + max(T.star))])
     # determine frequency, recency, etc.
     ts.cal <- times[times <= max(T.cal)]
     cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal) - (max(T.cal) - T.cal[i]), litt = sum(log(diff(ts.cal))), 
@@ -853,7 +853,7 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
       cbs_list[[i]][[colname]] <- length(times[times >= max(T.cal) & times < (max(T.cal) + tstar)])
     }
   }
-  cbs <- do.call(rbind.data.frame, cbs_list)
+  cbs <- setDF(rbindlist(cbs_list))
   cbs$lambda <- lambdas
   cbs$p <- ps
   cbs$k <- k
@@ -863,8 +863,7 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
   rownames(cbs) <- NULL
   out <- list(cbs = cbs)
   if (return.elog) {
-    elog <- do.call(rbind.data.frame, elog_list)
-    out$elog <- elog
+    out$elog <- setDF(rbindlist(elog_list))
   }
   return(out)
 }
