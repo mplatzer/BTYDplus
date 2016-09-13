@@ -1,27 +1,30 @@
 
-#' Hierarchical Bayes implementation of Pareto/GGG - Parameter Draws
+#' Pareto/GGG Parameter Draws
 #'
-#' Returns draws from the posterior distributions of the Pareto/NBD (HB)
+#' Returns draws from the posterior distributions of the Pareto/GGG
 #' parameters, on cohort as well as on customer level.
-#'
+#' 
 #' See \code{demo('pareto-ggg')} for how to apply this model.
 #'
-#' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}, \code{litt}; e.g. output of \code{\link{elog2cbs}}
-#' @param mcmc number of MCMC steps
-#' @param burnin number of initial MCMC steps which are discarded
-#' @param thin only every thin-th MCMC step will be returned
-#' @param chains number of MCMC chains to be run
-#' @param mc.cores number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}
-#' @param param_init list of 2nd-level parameter start values
-#' @param trace print logging step every \code{trace} iteration
-#' @return 2-element list:
-##' \itemize{
-##'  \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
-##'  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}, \code{t}, \code{gamma}}
-##' }
+#' @param cal.cbs Calibration period customer-by-sufficient-statistic (CBS) 
+#'   data.frame. It must contain a row for each customer, and columns \code{x} 
+#'   for frequency, \code{t.x} for recency , \code{T.cal} for the total time 
+#'   observed, as well as the sum over logarithmic intertransaction times 
+#'   \code{litt}. A correct format can be easily generated based on the complete
+#'   event log of a customer cohort with \code{\link{elog2cbs}}.
+#' @param mcmc Number of MCMC steps.
+#' @param burnin Number of initial MCMC steps which are discarded.
+#' @param thin Only every \code{thin}-th MCMC step will be returned.
+#' @param chains Number of MCMC chains to be run.
+#' @param mc.cores Number of cores to use in parallel (Unix only). Defaults to \code{min(chains, detectCores())}.
+#' @param param_init List of start values for cohort-level parameters.
+#' @param trace Print logging statement every \code{trace}-th iteration. Not available for \code{mc.cores > 1}.
+#' @return List of length 2:
+#' \item{\code{level_1}}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+#' \item{\code{level_2}}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}, \code{t}, \code{gamma}}
 #' @export
 #' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
-#' @seealso \code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{elog2cbs} }
+#' @seealso \code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
 #' param.draws <- pggg.mcmc.DrawParameters(cbs, 
@@ -214,11 +217,12 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 
 #' Pareto/GGG Plot Regularity Rate Heterogeneity
 #' 
-#' Plots and returns the estimated gamma distribution of k (customers' regularity in interpurchase times).
+#' Plots and returns the estimated gamma distribution of k (customers'
+#' regularity in interpurchase times).
 #' 
-#' @param draws MCMC draws returned by \code{\link{pggg.mcmc.DrawParameters}}
-#' @param xmax upper bound for x-scale
-#' @param fn optional function to summarize individual-level draws for k, e.g. 'mean'
+#' @param draws MCMC draws as returned by \code{\link{pggg.mcmc.DrawParameters}}.
+#' @param xmax Upper bound for x-scale
+#' @param fn Optional function to summarize individual-level draws for k, e.g. 'mean'.
 #'
 #' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 #' @export
@@ -236,21 +240,20 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL) 
 }
 
 
-#' Generate artificial data which follows Pareto/GGG model assumptions
+#' Simulate data according to Pareto/GGG model assumptions
 #'
-#' Returns 2-element list
-#' * cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star' 
-#'        this is the summary statistics data.frame which contains all 
-#'        needed information for parameter estimation
-#' * elog: data.frame with 'cust', \code{t}
-#'
-#' @param n number of customers
-#' @param T.cal length of calibration period
-#' @param T.star length of holdout period
-#' @param params list of parameters: {r, alpha, s, beta, t, gamma}
-#' @param return.elog if \code{TRUE} then the event-log is returned as well; decreases performance
-#' 
-#' @return 2-elemnt list
+#' @param n Number of customers.
+#' @param T.cal Length of calibration period. If a vector is provided, then it
+#'   is assumed that customers have different 'birth' dates, i.e.
+#'   \eqn{max(T.cal)-T.cal}.
+#' @param T.star Length of holdout period. This may be a vector.
+#' @param params A list of model parameters \code{r}, 
+#'   \code{alpha}, \code{s}, \code{beta}, \code{t} and \code{gamma}.
+#' @param return.elog If \code{TRUE} then the event log is returned in addition 
+#'   to the CBS summary
+#' @return List of length 2:
+#' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
+#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
 #' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 #' @export
 #' @examples

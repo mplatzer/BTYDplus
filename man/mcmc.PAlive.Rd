@@ -7,10 +7,14 @@
 mcmc.PAlive(draws)
 }
 \arguments{
-\item{draws}{MCMC parameter draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC parameter draws as returned by 
+\code{\link{pnbd.mcmc.DrawParameters}}, 
+\code{\link{pggg.mcmc.DrawParameters}} or 
+\code{\link{abe.mcmc.DrawParameters}}.}
 }
 \value{
-numeric vector with the customers' probabilities of being still alive at end of calibration period
+Numeric vector with the customers' probabilities of being still alive
+  at end of calibration period
 }
 \description{
 Calculates P(alive) based on MCMC parameter draws

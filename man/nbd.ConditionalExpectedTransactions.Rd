@@ -9,13 +9,13 @@ nbd.ConditionalExpectedTransactions(params, T.star, x, T.cal)
 \arguments{
 \item{params}{NBD parameters - a vector with \code{r} and \code{alpha}, in that order.}
 
-\item{T.star}{length of time for which we are calculating the expected number
+\item{T.star}{Length of time for which we are calculating the expected number
 of transactions.}
 
-\item{x}{number of repeat transactions in the calibration period \code{T.cal}, or a
+\item{x}{Number of repeat transactions in the calibration period \code{T.cal}, or a
 vector of calibration period frequencies.}
 
-\item{T.cal}{length of calibration period, or a vector of calibration period
+\item{T.cal}{Length of calibration period, or a vector of calibration period
 lengths.}
 }
 \value{

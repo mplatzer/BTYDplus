@@ -7,14 +7,15 @@
 pggg.plotRegularityRateHeterogeneity(draws, xmax = NULL, fn = NULL)
 }
 \arguments{
-\item{draws}{MCMC draws returned by \code{\link{pggg.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by \code{\link{pggg.mcmc.DrawParameters}}.}
 
-\item{xmax}{upper bound for x-scale}
+\item{xmax}{Upper bound for x-scale}
 
-\item{fn}{optional function to summarize individual-level draws for k, e.g. 'mean'}
+\item{fn}{Optional function to summarize individual-level draws for k, e.g. 'mean'.}
 }
 \description{
-Plots and returns the estimated gamma distribution of k (customers' regularity in interpurchase times).
+Plots and returns the estimated gamma distribution of k (customers'
+regularity in interpurchase times).
 }
 \references{
 Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).

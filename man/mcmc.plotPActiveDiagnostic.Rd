@@ -8,11 +8,12 @@ mcmc.plotPActiveDiagnostic(cbs, xstar,
   title = "Diagnostic Plot for P(active)")
 }
 \arguments{
-\item{cbs}{data.frame with column \code{x} and \code{x.star}}
+\item{cbs}{A data.frame with column \code{x} and \code{x.star}.}
 
-\item{xstar}{future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}}
+\item{xstar}{Future transaction draws as returned by
+\code{\link{mcmc.DrawFutureTransactions}}.}
 
-\item{title}{plot title}
+\item{title}{Plot title.}
 }
 \description{
 Draw diagnostic plot to inspect error in P(active).

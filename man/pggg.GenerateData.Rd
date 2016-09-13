@@ -2,30 +2,32 @@
 % Please edit documentation in R/pareto-ggg-mcmc.R
 \name{pggg.GenerateData}
 \alias{pggg.GenerateData}
-\title{Generate artificial data which follows Pareto/GGG model assumptions}
+\title{Simulate data according to Pareto/GGG model assumptions}
 \usage{
 pggg.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 }
 \arguments{
-\item{n}{number of customers}
+\item{n}{Number of customers.}
 
-\item{T.cal}{length of calibration period}
+\item{T.cal}{Length of calibration period. If a vector is provided, then it
+is assumed that customers have different 'birth' dates, i.e.
+\eqn{max(T.cal)-T.cal}.}
 
-\item{T.star}{length of holdout period}
+\item{T.star}{Length of holdout period. This may be a vector.}
 
-\item{params}{list of parameters: {r, alpha, s, beta, t, gamma}}
+\item{params}{A list of model parameters \code{r}, 
+\code{alpha}, \code{s}, \code{beta}, \code{t} and \code{gamma}.}
 
-\item{return.elog}{if \code{TRUE} then the event-log is returned as well; decreases performance}
+\item{return.elog}{If \code{TRUE} then the event log is returned in addition 
+to the CBS summary}
 }
 \value{
-2-elemnt list
+List of length 2:
+\item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
+\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
 }
 \description{
-Returns 2-element list
-* cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star' 
-       this is the summary statistics data.frame which contains all 
-       needed information for parameter estimation
-* elog: data.frame with 'cust', \code{t}
+Simulate data according to Pareto/GGG model assumptions
 }
 \examples{
 params <- list(t = 4.5, gamma = 1.5, r = 5, alpha = 10, s = 0.8, beta = 12)

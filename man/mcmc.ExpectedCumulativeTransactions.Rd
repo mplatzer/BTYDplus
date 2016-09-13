@@ -2,24 +2,30 @@
 % Please edit documentation in R/mcmc.R
 \name{mcmc.ExpectedCumulativeTransactions}
 \alias{mcmc.ExpectedCumulativeTransactions}
-\title{Expected Cumulative Transactions for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)}
+\title{Expected Cumulative Transactions for Pareto/GGG, Pareto/NBD (HB) and
+Pareto/NBD (Abe)}
 \usage{
 mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, n.periods.final)
 }
 \arguments{
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-\code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by
+\code{\link{pnbd.mcmc.DrawParameters}}, 
+\code{\link{pggg.mcmc.DrawParameters}} or
+\code{\link{abe.mcmc.DrawParameters}}}
 
-\item{T.cal}{a vector to represent customers' calibration period lengths (in
-other words, the \code{T.cal} column from a customer-by-sufficient-statistic
-matrix). Considering rounding in order to speed up calculations.}
+\item{T.cal}{A vector to represent customers' calibration period lengths (in 
+other words, the \code{T.cal} column from a
+customer-by-sufficient-statistic matrix). Considering rounding in order to
+speed up calculations.}
 
-\item{T.tot}{end of holdout period. Must be a single value, not a vector.}
+\item{T.tot}{End of holdout period. Must be a single value, not a vector.}
 
-\item{n.periods.final}{number of time periods in the calibration and holdout periods.}
+\item{n.periods.final}{Number of time periods in the calibration and holdout
+periods.}
 }
 \value{
-Vector of expected cumulative total repeat transactions by all customers.
+Numeric vector of expected cumulative total repeat transactions by
+  all customers.
 }
 \description{
 Calculates the expected cumulative total repeat transactions by all customers
@@ -33,8 +39,5 @@ param.draws <- pnbd.mcmc.DrawParameters(cbs,
 # All parameters are in weeks; the calibration period lasted 39 weeks
 # and the holdout period another 39.
 mcmc.ExpectedCumulativeTransactions(param.draws, T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78)
-}
-\seealso{
-\code{\link{bgcnbd.ExpectedCumulativeTransactions}}
 }
 

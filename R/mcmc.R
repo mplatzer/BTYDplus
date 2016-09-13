@@ -1,8 +1,12 @@
 
 #' Calculates P(alive) based on MCMC parameter draws
-#'
-#' @param draws MCMC parameter draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
-#' @return numeric vector with the customers' probabilities of being still alive at end of calibration period
+#' 
+#' @param draws MCMC parameter draws as returned by 
+#'   \code{\link{pnbd.mcmc.DrawParameters}}, 
+#'   \code{\link{pggg.mcmc.DrawParameters}} or 
+#'   \code{\link{abe.mcmc.DrawParameters}}.
+#' @return Numeric vector with the customers' probabilities of being still alive
+#'   at end of calibration period
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs
@@ -17,19 +21,22 @@ mcmc.PAlive <- function(draws) {
 
 #' Samples number of future transactions based on MCMC parameter draws
 #' 
-#' For each customer and each provided MCMC parameter draw this method will
+#' For each customer and each provided MCMC parameter draw this method will 
 #' sample the number of transactions during the holdout period \code{T.star}. If
-#' argument \code{size} is provided then it returns a flexible number of draws,
-#' whereas for each customer and each draw it will first make a draw from the
+#' argument \code{size} is provided then it returns a flexible number of draws, 
+#' whereas for each customer and each draw it will first make a draw from the 
 #' parameter draws.
 #' 
-#' @param cal.cbs data.frame with column \code{t.x} and \code{T.cal}
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
-#' @param T.star length of period for which future transactions are counted
-#' @param size number of samples to draw; defaults to the same number of
-#'   parameter draws that are passed to \code{draws}
-#' @return 2-dim matrix [draw x cust] with sampled future transactions
+#' @param cal.cbs Calibration period customer-by-sufficient-statistic (CBS)
+#'   data.frame.
+#' @param draws MCMC draws as returned by
+#'   \code{\link{pnbd.mcmc.DrawParameters}}, 
+#'   \code{\link{pggg.mcmc.DrawParameters}} or 
+#'   \code{\link{abe.mcmc.DrawParameters}}.
+#' @param T.star Length of period for which future transactions are counted.
+#' @param size Number of samples to draw; defaults to the same number of 
+#'   parameter draws that are passed to \code{draws}.
+#' @return 2-dim matrix [draw x cust] with sampled future transactions.
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs 
@@ -113,8 +120,10 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star,
 
 #' Calculates P(active) based on drawn future transactions.
 #'
-#' @param xstar future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}
-#' @return numeric vector with the customers' probabilities of being active during the holdout period
+#' @param xstar Future transaction draws as returned by 
+#'   \code{\link{mcmc.DrawFutureTransactions}}.
+#' @return numeric A vector with the customers' probabilities of being active
+#'   during the holdout period.
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs 
@@ -128,9 +137,12 @@ mcmc.PActive <- function(xstar) {
 
 
 #' (Re-)set burnin of MCMC chains.
-#'
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}}, \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
-#' @param burnin new start index
+#' 
+#' @param draws MCMC draws as returned by
+#'   \code{\link{pnbd.mcmc.DrawParameters}}, 
+#'   \code{\link{pggg.mcmc.DrawParameters}} or 
+#'   \code{\link{abe.mcmc.DrawParameters}}.
+#' @param burnin New start index.
 #' @return 2-element list with MCMC draws
 #' @export
 #' @examples
@@ -147,10 +159,11 @@ mcmc.setBurnin <- function(draws, burnin) {
 
 
 #' Draw diagnostic plot to inspect error in P(active).
-#'
-#' @param cbs data.frame with column \code{x} and \code{x.star}
-#' @param xstar future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}
-#' @param title plot title
+#' 
+#' @param cbs A data.frame with column \code{x} and \code{x.star}.
+#' @param xstar Future transaction draws as returned by
+#'   \code{\link{mcmc.DrawFutureTransactions}}.
+#' @param title Plot title.
 #' @export
 #' @examples
 #' cbs <- cdnow.sample()$cbs
@@ -186,23 +199,25 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
 
 #' Probability Mass Function for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)
 #' 
-#' Return the probability distribution of purchase frequencies for a random customer in a given time period, i.e. P(X(t)=x)
+#' Return the probability distribution of purchase frequencies for a random
+#' customer in a given time period, i.e. \eqn{P(X(t)=x)}. This is estimated by
+#' generating \code{sample_size} number of random customers that follow the
+#' provided parameter draws. Due to this sampling, the return result varies from
+#' one call to another.
 #' 
-#' This is estimated by generating \code{sample_size} number of random customers
-#' that follow the provided parameter draws. Due to this sampling, the return
-#' result varies from one call to another.
-#' 
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
-#' @param t length of time for which we are calculating the expected number of 
+#' @param draws MCMC draws as returned by
+#'   \code{\link{pnbd.mcmc.DrawParameters}}, 
+#'   \code{\link{pggg.mcmc.DrawParameters}} or
+#'   \code{\link{abe.mcmc.DrawParameters}}
+#' @param t Length of time for which we are calculating the expected number of 
 #'   transactions. May also be a vector.
-#' @param x number of transactions for which probability is calculated. May also be a vector.
+#' @param x Number of transactions for which probability is calculated. May also
+#'   be a vector.
 #' @param sample_size Sample size for estimating the probability distribution.
-#' @return P(X(t)=x). If either \code{t} or \code{x} is a
-#'   vector, then the output will be a vector as well. If both are vectors, the
-#'   output will be a matrix.
+#' @return \eqn{P(X(t)=x)}. If either \code{t} or \code{x} is a vector, then the
+#'   output will be a vector as well. If both are vectors, the output will be a 
+#'   matrix.
 #' @export
-#' @seealso \code{\link{bgcnbd.pmf}} \code{\link[BTYD]{pnbd.pmf}}
 #' @examples
 #' cbs <- cdnow.sample()$cbs # load CDNow summary data
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
@@ -231,6 +246,9 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
     }))
     sapply(x, function(x) sum(xs==x)) / sample_size
   })
+  if (length(x) == 1) pmf <- t(pmf)
+  rownames(pmf) <- x
+  colnames(pmf) <- t
   drop(pmf)
 }
 
@@ -239,17 +257,17 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
 #' 
 #' Uses model parameter draws to return the expected number of repeat
 #' transactions that a randomly chosen customer (for whom we have no prior
-#' information) is expected to make in a given time period.
+#' information) is expected to make in a given time period. \deqn{E(X(t))}.
 #' 
-#' E(X(t))
-#' 
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
-#' @param t length of time for which we are calculating the expected number of 
+#' @param draws MCMC draws as returned by
+#'   \code{\link{pnbd.mcmc.DrawParameters}}, 
+#'   \code{\link{pggg.mcmc.DrawParameters}} or
+#'   \code{\link{abe.mcmc.DrawParameters}}
+#' @param t Length of time for which we are calculating the expected number of 
 #'   transactions. May also be a vector.
-#' @return Number of repeat transactions a customer is expected to make in a time period of length t.
+#' @return Number of repeat transactions a customer is expected to make in a
+#'   time period of length t.
 #' @export
-#' @seealso \code{\link{bgcnbd.Expectation}} \code{\link{mcmc.pmf}}
 #' @examples
 #' cbs <- cdnow.sample()$cbs # load CDNow summary data
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
@@ -263,21 +281,26 @@ mcmc.Expectation <- function(draws, t) {
 }
 
 
-#' Expected Cumulative Transactions for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)
+#' Expected Cumulative Transactions for Pareto/GGG, Pareto/NBD (HB) and
+#' Pareto/NBD (Abe)
 #' 
 #' Calculates the expected cumulative total repeat transactions by all customers
 #' for the calibration and holdout periods.
 #' 
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
-#' @param T.cal a vector to represent customers' calibration period lengths (in
-#'   other words, the \code{T.cal} column from a customer-by-sufficient-statistic
-#'   matrix). Considering rounding in order to speed up calculations.
-#' @param T.tot end of holdout period. Must be a single value, not a vector.
-#' @param n.periods.final number of time periods in the calibration and holdout periods.
-#' @return Vector of expected cumulative total repeat transactions by all customers.
+#' @param draws MCMC draws as returned by
+#'   \code{\link{pnbd.mcmc.DrawParameters}}, 
+#'   \code{\link{pggg.mcmc.DrawParameters}} or
+#'   \code{\link{abe.mcmc.DrawParameters}}
+#' @param T.cal A vector to represent customers' calibration period lengths (in 
+#'   other words, the \code{T.cal} column from a
+#'   customer-by-sufficient-statistic matrix). Considering rounding in order to
+#'   speed up calculations.
+#' @param T.tot End of holdout period. Must be a single value, not a vector.
+#' @param n.periods.final Number of time periods in the calibration and holdout
+#'   periods.
+#' @return Numeric vector of expected cumulative total repeat transactions by
+#'   all customers.
 #' @export
-#' @seealso \code{\link{bgcnbd.ExpectedCumulativeTransactions}}
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
@@ -333,29 +356,33 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 }
 
 
-#' Tracking Cumulative Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)
+#' Tracking Cumulative Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and
+#' Pareto/NBD (Abe)
 #' 
-#' Plots the actual and expected cumulative total repeat transactions by all
-#' customers for the calibration and holdout periods, and returns this
+#' Plots the actual and expected cumulative total repeat transactions by all 
+#' customers for the calibration and holdout periods, and returns this 
 #' comparison in a matrix.
 #' 
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
-#' @param T.cal a vector to represent customers' calibration period lengths (in
-#'   other words, the \code{T.cal} column from a customer-by-sufficient-statistic
-#'   matrix). Considering rounding in order to speed up calculations.
-#' @param T.tot end of holdout period. Must be a single value, not a vector.
-#' @param actual.cu.tracking.data vector containing the cumulative number of
-#'   repeat transactions made by customers for each period in the total time
+#' @param draws MCMC draws as returned by
+#'   \code{\link{pnbd.mcmc.DrawParameters}}, 
+#'   \code{\link{pggg.mcmc.DrawParameters}} or
+#'   \code{\link{abe.mcmc.DrawParameters}}
+#' @param T.cal A vector to represent customers' calibration period lengths (in 
+#'   other words, the \code{T.cal} column from a
+#'   customer-by-sufficient-statistic matrix). Considering rounding in order to
+#'   speed up calculations.
+#' @param T.tot End of holdout period. Must be a single value, not a vector.
+#' @param actual.cu.tracking.data A vector containing the cumulative number of 
+#'   repeat transactions made by customers for each period in the total time 
 #'   period (both calibration and holdout periods).
-#' @param xlab descriptive label for the x axis.
-#' @param ylab descriptive label for the y axis.
-#' @param xticklab vector containing a label for each tick mark on the x axis.
-#' @param title title placed on the top-center of the plot.
-#' @param ymax upper boundary for y axis.
+#' @param xlab Descriptive label for the x axis.
+#' @param ylab Descriptive label for the y axis.
+#' @param xticklab A vector containing a label for each tick mark on the x axis.
+#' @param title Title placed on the top-center of the plot.
+#' @param ymax Upper boundary for y axis.
 #' @return Matrix containing actual and expected cumulative repeat transactions.
 #' @export
-#' @seealso \code{\link{mcmc.PlotTrackingInc}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2cum}} \code{\link[BTYD]{bgnbd.PlotTrackingCum}} 
+#' @seealso \code{\link{mcmc.PlotTrackingInc}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2cum}} 
 #' @examples
 #' cdnow <- cdnow.sample()
 #' cbs <- cdnow$cbs
@@ -377,29 +404,34 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 }
 
 
-#' Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)
+#' Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and
+#' Pareto/NBD (Abe)
 #' 
-#' Plots the actual and expected incremental total repeat transactions by all
-#' customers for the calibration and holdout periods, and returns this
+#' Plots the actual and expected incremental total repeat transactions by all 
+#' customers for the calibration and holdout periods, and returns this 
 #' comparison in a matrix.
 #' 
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
-#' @param T.cal a vector to represent customers' calibration period lengths (in
-#'   other words, the \code{T.cal} column from a customer-by-sufficient-statistic
-#'   matrix). Considering rounding in order to speed up calculations.
-#' @param T.tot end of holdout period. Must be a single value, not a vector.
-#' @param actual.inc.tracking.data vector containing the incremental number of
-#'   repeat transactions made by customers for each period in the total time
+#' @param draws MCMC draws as returned by
+#'   \code{\link{pnbd.mcmc.DrawParameters}}, 
+#'   \code{\link{pggg.mcmc.DrawParameters}} or
+#'   \code{\link{abe.mcmc.DrawParameters}}
+#' @param T.cal A vector to represent customers' calibration period lengths (in 
+#'   other words, the \code{T.cal} column from a
+#'   customer-by-sufficient-statistic matrix). Considering rounding in order to
+#'   speed up calculations.
+#' @param T.tot End of holdout period. Must be a single value, not a vector.
+#' @param actual.inc.tracking.data A vector containing the incremental number of
+#'   repeat transactions made by customers for each period in the total time 
 #'   period (both calibration and holdout periods).
-#' @param xlab descriptive label for the x axis.
-#' @param ylab descriptive label for the y axis.
-#' @param xticklab vector containing a label for each tick mark on the x axis.
-#' @param title title placed on the top-center of the plot.
-#' @param ymax upper boundary for y axis.
-#' @return Matrix containing actual and expected incremental repeat transactions.
+#' @param xlab Descriptive label for the x axis.
+#' @param ylab Descriptive label for the y axis.
+#' @param xticklab A vector containing a label for each tick mark on the x axis.
+#' @param title Title placed on the top-center of the plot.
+#' @param ymax Upper boundary for y axis.
+#' @return Matrix containing actual and expected incremental repeat
+#'   transactions.
 #' @export
-#' @seealso \code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}} \code{\link[BTYD]{bgnbd.PlotTrackingCum}} 
+#' @seealso \code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}} 
 #' @examples
 #' cdnow <- cdnow.sample()
 #' cbs <-  cdnow$cbs
@@ -430,21 +462,23 @@ mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data,
 #' The method \code{\link{mcmc.pmf}} is called to calculate the expected numbers
 #' based on the corresponding model.
 #' 
-#' @param draws MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-#'   \code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}
-#' @param cal.cbs calibration period CBS (customer by sufficient statistic). It
-#'   must contain columns for frequency ('x') and total time observed ('T.cal').
-#' @param censor integer used to censor the data.
-#' @param xlab descriptive label for the x axis.
-#' @param ylab descriptive label for the y axis.
-#' @param title title placed on the top-center of the plot.
+#' @param draws MCMC draws as returned by
+#'   \code{\link{pnbd.mcmc.DrawParameters}}, 
+#'   \code{\link{pggg.mcmc.DrawParameters}} or
+#'   \code{\link{abe.mcmc.DrawParameters}}
+#' @param cal.cbs Calibration period customer-by-sufficient-statistic (CBS) 
+#'   data.frame. It must contain columns for frequency ('x') and total time
+#'   observed ('T.cal').
+#' @param censor Cutoff point for number of transactions in plot.
+#' @param xlab Descriptive label for the x axis.
+#' @param ylab Descriptive label for the y axis.
+#' @param title Title placed on the top-center of the plot.
 #' @param sample_size Sample size for estimating the probability distribution.
 #'   See \code{\link{mcmc.pmf}}.
 #' @return Calibration period repeat transaction frequency comparison matrix
 #'   (actual vs. expected).
-#'   
 #' @export
-#' @seealso \code{\link[BTYD]{bgnbd.PlotFrequencyInCalibration}} \code{\link{mcmc.pmf}}
+#' @seealso \code{\link{mcmc.pmf}}
 #' @examples 
 #' cbs <- cdnow.sample()$cbs
 #' # for demo purposes we use short MCMC runs and small sample size

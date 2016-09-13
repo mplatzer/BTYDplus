@@ -1,24 +1,26 @@
 
-#' HB Pareto/NBD variant as described in Abe (2009) - Parameter Draws
+#' Pareto/NBD (Abe) Parameter Draws
 #' 
 #' Returns draws from the posterior distributions of the Pareto/NBD (Abe)
 #' parameters, on cohort as well as on customer level.
 #' 
 #' See \code{demo('pareto-nbd-abe')} for how to apply this model.
 #' 
-#' @param cal.cbs data.frame with columns \code{x}, \code{t.x}, \code{T.cal}; e.g. output of \code{\link{elog2cbs}}
-#' @param covariates list of column names containing customer-level covariates
-#' @param mcmc number of MCMC steps
-#' @param burnin number of initial MCMC steps which are discarded
-#' @param thin only every thin-th MCMC step will be returned
-#' @param chains number of MCMC chains to be run
-#' @param mc.cores number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}
-#' @param trace print logging step every \code{trace} 
-#' @return 2-element list:
-##' \itemize{
-##'  \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{lambda}, \code{tau}, \code{z}, \code{mu}}
-##'  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters}
-##' }
+#' @param cal.cbs Calibration period customer-by-sufficient-statistic (CBS) 
+#'   data.frame. It must contain a row for each customer, and columns \code{x} 
+#'   for frequency, \code{t.x} for recency and \code{T.cal} for the total time 
+#'   observed. A correct format can be easily generated based on the complete
+#'   event log of a customer cohort with \code{\link{elog2cbs}}.
+#' @param covariates A vector of columns of \code{cal.cbs} which contain customer-level covariates.
+#' @param mcmc Number of MCMC steps.
+#' @param burnin Number of initial MCMC steps which are discarded.
+#' @param thin Only every \code{thin}-th MCMC step will be returned.
+#' @param chains Number of MCMC chains to be run.
+#' @param mc.cores Number of cores to use in parallel (Unix only). Defaults to \code{min(chains, detectCores())}.
+#' @param trace Print logging statement every \code{trace}-th iteration. Not available for \code{mc.cores > 1}.
+#' @return List of length 2:
+#' \item{\code{level_1}}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+#' \item{\code{level_2}}{\code{\link{mcmc.list}}, with draws for cohort-level parameters}
 #' @export
 #' @seealso \code{\link{abe.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 #' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
@@ -243,21 +245,19 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burn
 }
 
 
-#' Generate artificial data which follows Abe's Pareto/NBD model variant.
+#' Simulate data according to Pareto/NBD (Abe) model assumptions
 #'
-#' Returns 2-element list
-#' * cbs: data.frame with 'cust', \code{x}, \code{t.x}, \code{T.cal}, 'T.star', 'x.star' 
-#'        this is the summary statistics data.frame which contains all 
-#'        needed information for parameter estimation
-#' * elog: data.frame with 'cust', \code{t}
-#'
-#' @param n number of customers
-#' @param T.cal length of calibration period
-#' @param T.star length of holdout period
-#' @param params list of parameters: {beta, gamma}
-#' @param return.elog if \code{TRUE} then the event-log is returned as well; decreases performance
-#' 
-#' @return 2-elemnt list
+#' @param n Number of customers.
+#' @param T.cal Length of calibration period. If a vector is provided, then it
+#'   is assumed that customers have different 'birth' dates, i.e.
+#'   \eqn{max(T.cal)-T.cal}.
+#' @param T.star Length of holdout period. This may be a vector.
+#' @param params A list of model parameters: \code{beta} and \code{gamma}.
+#' @param return.elog If \code{TRUE} then the event log is returned in addition 
+#'   to the CBS summary
+#' @return List of length 2:
+#' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
+#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
 #' @export
 #' @examples 
 #' # generate artificial Pareto/NBD Abe with 2 covariates

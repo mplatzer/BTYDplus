@@ -2,30 +2,34 @@
 % Please edit documentation in R/pareto-nbd-mcmc.R
 \name{pnbd.mcmc.DrawParameters}
 \alias{pnbd.mcmc.DrawParameters}
-\title{Hierarchical Bayes variant of Pareto/NBD - Parameter Draws}
+\title{Pareto/NBD (HB) Parameter Draws}
 \usage{
 pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
   chains = 2, mc.cores = NULL, use_data_augmentation = TRUE,
   param_init = NULL, trace = 100)
 }
 \arguments{
-\item{cal.cbs}{data.frame with columns \code{x}, \code{t.x}, \code{T.cal}; e.g. output of \code{\link{elog2cbs}}}
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS) 
+data.frame. It must contain a row for each customer, and columns \code{x} 
+for frequency, \code{t.x} for recency and \code{T.cal} for the total time 
+observed. A correct format can be easily generated based on the complete
+event log of a customer cohort with \code{\link{elog2cbs}}.}
 
-\item{mcmc}{number of MCMC steps}
+\item{mcmc}{Number of MCMC steps.}
 
-\item{burnin}{number of initial MCMC steps which are discarded}
+\item{burnin}{Number of initial MCMC steps which are discarded.}
 
-\item{thin}{only every thin-th MCMC step will be returned}
+\item{thin}{Only every \code{thin}-th MCMC step will be returned.}
 
-\item{chains}{number of MCMC chains to be run}
+\item{chains}{Number of MCMC chains to be run.}
 
-\item{mc.cores}{number of cores to use in parallel (Unix only); defaults to \code{min(chains, detectCores())}}
+\item{mc.cores}{Number of cores to use in parallel (Unix only). Defaults to \code{min(chains, detectCores())}.}
 
 \item{use_data_augmentation}{determines MCMC method to be used}
 
-\item{param_init}{list of 2nd-level parameter start values}
+\item{param_init}{List of start values for cohort-level parameters.}
 
-\item{trace}{print logging step every \code{trace} iteration}
+\item{trace}{Print logging statement every \code{trace}-th iteration. Not available for \code{mc.cores > 1}.}
 }
 \value{
 2-element list:

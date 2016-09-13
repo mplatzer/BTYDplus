@@ -7,14 +7,14 @@
 cdnow.sample(T.cal = "1997-09-30", T.tot = "1998-06-30")
 }
 \arguments{
-\item{T.cal}{final date of calibration period}
+\item{T.cal}{Final date of calibration period.}
 
-\item{T.tot}{final date of holdout period}
+\item{T.tot}{Final date of holdout period.}
 }
 \value{
-list with two data.frames
-\item{elog}{event log, with fields \code{cust}, \code{date}, \code{sales} and \code{cds}}
-\item{cbs}{customer-level summary statistic generated with \code{\link{elog2cbs}}}
+List of length 2:
+\item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns, generated with \code{\link{elog2cbs}}}
+\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date}, \code{sales} and \code{cds}.}
 }
 \description{
 This is a convenience wrapper for \code{data('cdnowElog', package='BTYD')},
@@ -29,8 +29,5 @@ head(cdnow$elog)
 Fader, Peter S. and Bruce G.,S. Hardie, (2001), 'Forecasting
   Repeat Sales at CDNOW: A Case Study,' Interfaces, 31 (May-June), Part 2 of
   2, S94-S107.
-}
-\seealso{
-\code{\link{elog2cbs}}
 }
 

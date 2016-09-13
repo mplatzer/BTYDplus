@@ -7,10 +7,12 @@
 mcmc.PActive(xstar)
 }
 \arguments{
-\item{xstar}{future transaction draws returned by \code{\link{mcmc.DrawFutureTransactions}}}
+\item{xstar}{Future transaction draws as returned by 
+\code{\link{mcmc.DrawFutureTransactions}}.}
 }
 \value{
-numeric vector with the customers' probabilities of being active during the holdout period
+numeric A vector with the customers' probabilities of being active
+  during the holdout period.
 }
 \description{
 Calculates P(active) based on drawn future transactions.

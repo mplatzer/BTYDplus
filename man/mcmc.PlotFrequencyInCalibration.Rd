@@ -9,19 +9,22 @@ mcmc.PlotFrequencyInCalibration(draws, cal.cbs, censor = 7,
   title = "Frequency of Repeat Transactions", sample_size = 1000)
 }
 \arguments{
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-\code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by
+\code{\link{pnbd.mcmc.DrawParameters}}, 
+\code{\link{pggg.mcmc.DrawParameters}} or
+\code{\link{abe.mcmc.DrawParameters}}}
 
-\item{cal.cbs}{calibration period CBS (customer by sufficient statistic). It
-must contain columns for frequency ('x') and total time observed ('T.cal').}
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS) 
+data.frame. It must contain columns for frequency ('x') and total time
+observed ('T.cal').}
 
-\item{censor}{integer used to censor the data.}
+\item{censor}{Cutoff point for number of transactions in plot.}
 
-\item{xlab}{descriptive label for the x axis.}
+\item{xlab}{Descriptive label for the x axis.}
 
-\item{ylab}{descriptive label for the y axis.}
+\item{ylab}{Descriptive label for the y axis.}
 
-\item{title}{title placed on the top-center of the plot.}
+\item{title}{Title placed on the top-center of the plot.}
 
 \item{sample_size}{Sample size for estimating the probability distribution.
 See \code{\link{mcmc.pmf}}.}
@@ -47,6 +50,6 @@ param.draws <- pnbd.mcmc.DrawParameters(cbs,
 mcmc.PlotFrequencyInCalibration(param.draws, cbs, sample_size = 100)
 }
 \seealso{
-\code{\link[BTYD]{bgnbd.PlotFrequencyInCalibration}} \code{\link{mcmc.pmf}}
+\code{\link{mcmc.pmf}}
 }
 

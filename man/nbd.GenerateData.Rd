@@ -7,19 +7,21 @@
 nbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 }
 \arguments{
-\item{n}{number of customers}
+\item{n}{Number of customers.}
 
-\item{T.cal}{length of calibration period}
+\item{T.cal}{Length of calibration period.}
 
-\item{T.star}{length of holdout period}
+\item{T.star}{Length of holdout period.}
 
 \item{params}{NBD parameters - a vector with \code{r} and \code{alpha} in that order}
 
-\item{return.elog}{boolean - if \code{TRUE} then the event log is returned in
-addition to the CBS summary}
+\item{return.elog}{If \code{TRUE} then the event log is returned in addition 
+to the CBS summary}
 }
 \value{
-list with elements \code{cbs} and \code{elog} containing data.frames
+List of length 2:
+\item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
+\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
 }
 \description{
 Simulate data according to NBD model assumptions

@@ -8,24 +8,27 @@ mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star,
   size = NULL)
 }
 \arguments{
-\item{cal.cbs}{data.frame with column \code{t.x} and \code{T.cal}}
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)
+data.frame.}
 
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-\code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by
+\code{\link{pnbd.mcmc.DrawParameters}}, 
+\code{\link{pggg.mcmc.DrawParameters}} or 
+\code{\link{abe.mcmc.DrawParameters}}.}
 
-\item{T.star}{length of period for which future transactions are counted}
+\item{T.star}{Length of period for which future transactions are counted.}
 
-\item{size}{number of samples to draw; defaults to the same number of
-parameter draws that are passed to \code{draws}}
+\item{size}{Number of samples to draw; defaults to the same number of 
+parameter draws that are passed to \code{draws}.}
 }
 \value{
-2-dim matrix [draw x cust] with sampled future transactions
+2-dim matrix [draw x cust] with sampled future transactions.
 }
 \description{
-For each customer and each provided MCMC parameter draw this method will
+For each customer and each provided MCMC parameter draw this method will 
 sample the number of transactions during the holdout period \code{T.star}. If
-argument \code{size} is provided then it returns a flexible number of draws,
-whereas for each customer and each draw it will first make a draw from the
+argument \code{size} is provided then it returns a flexible number of draws, 
+whereas for each customer and each draw it will first make a draw from the 
 parameter draws.
 }
 \examples{

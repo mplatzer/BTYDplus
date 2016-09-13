@@ -2,42 +2,47 @@
 % Please edit documentation in R/mcmc.R
 \name{mcmc.PlotTrackingInc}
 \alias{mcmc.PlotTrackingInc}
-\title{Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)}
+\title{Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and
+Pareto/NBD (Abe)}
 \usage{
 mcmc.PlotTrackingInc(draws, T.cal, T.tot, actual.inc.tracking.data,
   xlab = "Week", ylab = "Transactions", xticklab = NULL,
   title = "Tracking Weekly Transactions", ymax = NULL)
 }
 \arguments{
-\item{draws}{MCMC draws returned by \code{\link{pnbd.mcmc.DrawParameters}},
-\code{\link{pggg.mcmc.DrawParameters}} or \code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by
+\code{\link{pnbd.mcmc.DrawParameters}}, 
+\code{\link{pggg.mcmc.DrawParameters}} or
+\code{\link{abe.mcmc.DrawParameters}}}
 
-\item{T.cal}{a vector to represent customers' calibration period lengths (in
-other words, the \code{T.cal} column from a customer-by-sufficient-statistic
-matrix). Considering rounding in order to speed up calculations.}
+\item{T.cal}{A vector to represent customers' calibration period lengths (in 
+other words, the \code{T.cal} column from a
+customer-by-sufficient-statistic matrix). Considering rounding in order to
+speed up calculations.}
 
-\item{T.tot}{end of holdout period. Must be a single value, not a vector.}
+\item{T.tot}{End of holdout period. Must be a single value, not a vector.}
 
-\item{actual.inc.tracking.data}{vector containing the incremental number of
-repeat transactions made by customers for each period in the total time
+\item{actual.inc.tracking.data}{A vector containing the incremental number of
+repeat transactions made by customers for each period in the total time 
 period (both calibration and holdout periods).}
 
-\item{xlab}{descriptive label for the x axis.}
+\item{xlab}{Descriptive label for the x axis.}
 
-\item{ylab}{descriptive label for the y axis.}
+\item{ylab}{Descriptive label for the y axis.}
 
-\item{xticklab}{vector containing a label for each tick mark on the x axis.}
+\item{xticklab}{A vector containing a label for each tick mark on the x axis.}
 
-\item{title}{title placed on the top-center of the plot.}
+\item{title}{Title placed on the top-center of the plot.}
 
-\item{ymax}{upper boundary for y axis.}
+\item{ymax}{Upper boundary for y axis.}
 }
 \value{
-Matrix containing actual and expected incremental repeat transactions.
+Matrix containing actual and expected incremental repeat
+  transactions.
 }
 \description{
-Plots the actual and expected incremental total repeat transactions by all
-customers for the calibration and holdout periods, and returns this
+Plots the actual and expected incremental total repeat transactions by all 
+customers for the calibration and holdout periods, and returns this 
 comparison in a matrix.
 }
 \examples{
@@ -49,6 +54,6 @@ param.draws <- pnbd.mcmc.DrawParameters(cbs,
 mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 78, inc)
 }
 \seealso{
-\code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}} \code{\link[BTYD]{bgnbd.PlotTrackingCum}}
+\code{\link{mcmc.PlotTrackingCum}} \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}}
 }
 

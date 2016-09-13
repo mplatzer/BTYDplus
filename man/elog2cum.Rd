@@ -7,12 +7,14 @@
 elog2cum(elog, by = 7)
 }
 \arguments{
-\item{elog}{Event Log}
+\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and 
+transaction time \code{t} or \code{date}.}
 
-\item{by}{defaults to 7, which means weekly numbers}
+\item{by}{Only return every \code{}-th number. Defaults to 7, and thus
+returns weekly numbers.}
 }
 \value{
-numeric vector
+Numeric vector of cumulative repeat transactions.
 }
 \description{
 Aggregate Event Log to cumulative number of repeat transactions
