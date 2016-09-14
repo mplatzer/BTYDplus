@@ -33,6 +33,10 @@ cbs$palive <- mcmc.PAlive(param.draws)
 #' calculate P(active)
 cbs$pactive <- apply(xstar.draws, 2, function(x) mean(x > 0))
 
+#mcmc.plotPActiveDiagnostic()
+#mcmc.PlotTrackingInc()
+#mcmc.PlotFrequencyInCalibration()
+
 
 x <- readline("Estimate Pareto/GGG and Pareto/NBD (HB) for simulated data (press Enter)")
 
