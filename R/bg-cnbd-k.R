@@ -470,8 +470,6 @@ xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
   b <- params[5]
   if (round(a, 2) == 1) 
     a <- a + 0.01  # P1 not defined for a=1, so we add slight noise in such rare cases
-  if (k > 1) 
-    cat("note: conditional expected transactions can only be approximated for k>1\n")
   if (requireNamespace("gsl", quietly = TRUE)) {
     h2f1 <- gsl::hyperg_2F1
   } else {
@@ -579,7 +577,7 @@ xbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
   colnames(mat) <- c(0:(censor-1), paste0(censor, "+"))
   
   barplot(mat, beside = TRUE, col = 1:2, main = title, xlab = xlab, ylab = ylab, ylim = c(0, max(mat) * 1.1))
-  legend("topright", legend = c("Actual", "Model"), col = 1:2, lty = 1:2, lwd = 1, xjust = 1)
+  legend("topright", legend = c("Actual", "Model"), col = 1:2, lty = 1, lwd = 2)
   
   colnames(mat) <- paste0("freq.", colnames(mat))
   mat

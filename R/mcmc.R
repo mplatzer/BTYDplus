@@ -34,7 +34,7 @@ mcmc.PAlive <- function(draws) {
 #'   \code{\link{pggg.mcmc.DrawParameters}} or 
 #'   \code{\link{abe.mcmc.DrawParameters}}.
 #' @param T.star Length of period for which future transactions are counted.
-#' @param size Number of samples to draw; defaults to the same number of 
+#' @param sample_size Number of samples to draw. Defaults to the same number of 
 #'   parameter draws that are passed to \code{draws}.
 #' @return 2-dim matrix [draw x cust] with sampled future transactions.
 #' @export
@@ -45,15 +45,15 @@ mcmc.PAlive <- function(draws) {
 #' cbs$xstar.est <- apply(xstar.draws, 2, mean)
 #' cbs$pactive <- mcmc.PActive(xstar.draws)
 #' head(cbs)
-mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star, size = NULL) {
+mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star, sample_size = NULL) {
   
-  if (is.null(size)) {
+  if (is.null(sample_size)) {
     nr_of_draws <- niter(draws$level_2) * nchain(draws$level_2)
   } else {
-    stopifnot(is.numeric(size))
-    nr_of_draws <- as.integer(size)
+    stopifnot(is.numeric(sample_size))
+    nr_of_draws <- as.integer(sample_size)
   }
-  stopifnot(size >= 1)
+  stopifnot(nr_of_draws >= 1)
   nr_of_cust <- length(draws$level_1)
   parameters <- varnames(draws$level_1[[1]])
   
@@ -83,8 +83,8 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star,
     }
     lambdas <- drop(as.matrix(draws$level_1[[cust]][, "lambda"]))
     stopifnot(length(taus) == length(ks) && length(taus) == length(lambdas))
-    if (!is.null(size)) {
-      idx <- sample(length(taus), size = size, replace = TRUE)
+    if (!is.null(sample_size)) {
+      idx <- sample(length(taus), size = sample_size, replace = TRUE)
       taus <- taus[idx]
       ks <- ks[idx]
       lambdas <- lambdas[idx]

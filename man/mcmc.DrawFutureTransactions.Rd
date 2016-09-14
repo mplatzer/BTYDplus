@@ -5,7 +5,7 @@
 \title{Samples number of future transactions based on MCMC parameter draws}
 \usage{
 mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star,
-  size = NULL)
+  sample_size = NULL)
 }
 \arguments{
 \item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)
@@ -18,7 +18,7 @@ data.frame.}
 
 \item{T.star}{Length of period for which future transactions are counted.}
 
-\item{size}{Number of samples to draw; defaults to the same number of 
+\item{sample_size}{Number of samples to draw. Defaults to the same number of 
 parameter draws that are passed to \code{draws}.}
 }
 \value{

@@ -1,73 +1,120 @@
 
-#' load CDNow data
-cdnow <- cdnow.sample()
-elog  <- cdnow$elog
-cbs   <- cdnow$cbs
+#' Load transaction records of 2357 CDNow customers.
+elog <- cdnow.sample()$elog
 
-x <- readline("Estimate Models via MLE (press Enter)")
+#' Convert from event log to customer-by-sufficient-statistic summary.
+#' Split into 39 weeks calibration, and 39 weeks holdout period.
+cbs <- elog2cbs(elog, T.cal = "1997-09-30", T.tot = "1998-06-30")
+head(cbs)
 
-# NBD
+
+x <- readline("Estimate NBD model (press Enter)")
+
+# Estimate NBD model parameters.
 (params.nbd <- nbd.EstimateParameters(cbs))
 
-# Pareto/NBD (from BTYD package)
-(params.pnbd <- BTYD::pnbd.EstimateParameters(cbs))
+# Predict transactions at customer level with NBD model.
+cbs$xstar.nbd <- nbd.ConditionalExpectedTransactions(
+                   params = params.nbd, 
+                   T.star = cbs$T.star, 
+                   x      = cbs$x, 
+                   T.cal  = cbs$T.cal)
 
-# BG/NBD (from BTYD package)
-(params.bgnbd <- BTYD::bgnbd.EstimateParameters(cbs))
+# Estimate total transactions during holdout, based on NBD model.
+sum(cbs$xstar.nbd) 
 
-# MBG/CNBD-k
+
+x <- readline("Estimate MBG/CNBD-k model (press Enter)")
+
+# Estimate MBG/CNBD-k model parameters.
 (params.mbgcnbd <- mbgcnbd.EstimateParameters(cbs))
-# -> MBG/CNBD-k is identical to MBG/NBD, as no regularity is detected, hence k=1
+#' k=1 -> no regularity detected for CDNow
+
+# Predict transactions at customer level with MBG/CNBD-k model.
+cbs$xstar.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(
+                       params = params.mbgcnbd,
+                       T.star = cbs$T.star, 
+                       x      = cbs$x, 
+                       t.x    = cbs$t.x, 
+                       T.cal  = cbs$T.cal)
+
+# Estimate total transactions during holdout, based on MBG/CNBD-k model.
+sum(cbs$xstar.mbgcnbd)
+
+# Estimate probabilty of being still a customer at end of calibration period.
+cbs$palive.mbgcnbd <- mbgcnbd.PAlive(
+                        params = params.mbgcnbd,
+                        x      = cbs$x,
+                        t.x    = cbs$t.x,
+                        T.cal  = cbs$T.cal)
+
+# Estimate share of retained customers at end of calibration period.
+mean(cbs$palive.mbgcnbd)
 
 
-x <- readline("Compare Log-Likelihoods (press Enter)")
+x <- readline("Compare Log-Likelihoods of various models (press Enter)")
 
-rbind(`NBD` = nbd.cbs.LL(params.nbd, cbs), 
-      `Pareto/NBD` = BTYD::pnbd.cbs.LL(params.pnbd, cbs), 
-      `BG/NBD` = BTYD::bgnbd.cbs.LL(params.bgnbd, cbs), 
-      `MBG/NBD` = mbgnbd.cbs.LL(params.mbgnbd, cbs), 
-      `MBG/CNBD-k` = mbgcnbd.cbs.LL(params.mbgcnbd, cbs))
-# -> MBG/NBD provides best fit according to LL
+params.pnbd <- BTYD::pnbd.EstimateParameters(cbs) # estimate Pareto/NBD
+params.bgcnbd <- bgcnbd.EstimateParameters(cbs)  # estimate BG/CNBD-k
 
-
-x <- readline("Estimate Transactions in Holdout period (press Enter)")
-
-cbs$xstar.nbd <- nbd.ConditionalExpectedTransactions(params.nbd, cbs$T.star, cbs$x, cbs$T.cal)
-cbs$xstar.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$xstar.bgnbd <- BTYD::bgnbd.ConditionalExpectedTransactions(params.bgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$xstar.mbgnbd <- mbgnbd.ConditionalExpectedTransactions(params.mbgnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$xstar.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+(ll <- c(`NBD`        = nbd.cbs.LL(params.nbd, cbs),
+        `Pareto/NBD` = BTYD::pnbd.cbs.LL(params.pnbd, cbs), 
+        `BG/CNBD-k`  = bgcnbd.cbs.LL(params.bgcnbd, cbs), 
+        `MBG/CNBD-k` = mbgcnbd.cbs.LL(params.mbgcnbd, cbs)))
+names(which.max(ll))
+# -> MBG/CNBD-k provides best fit according to log-likelihood
 
 
-x <- readline("Estimate P(alive) (press Enter)")
+x <- readline("Plot Frequency in Calibration (press Enter)")
 
-cbs$palive.nbd <- 1
-cbs$palive.pnbd <- BTYD::pnbd.PAlive(params = params.pnbd, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$palive.bgnbd <- BTYD::bgnbd.PAlive(params = params.bgnbd, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$palive.mbgnbd <- mbgnbd.PAlive(params = params.mbgnbd, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$palive.mbgcnbd <- mbgcnbd.PAlive(params = params.mbgcnbd, cbs$x, cbs$t.x, cbs$T.cal)
+op <- par(mfrow = c(1, 2))
+nil <- mbgcnbd.PlotFrequencyInCalibration(params.mbgcnbd, cbs, censor = 7, title = "MBG/CNBD-k")
+nil <- BTYD::pnbd.PlotFrequencyInCalibration(params.pnbd, cbs, censor = 7, title = "Pareto/NBD")
+par(op)
+
+
+x <- readline("Plot Incremental Transactions (press Enter)")
+
+inc <- elog2inc(elog)
+op <- par(mfrow = c(1, 2))
+nil <- mbgcnbd.PlotTrackingInc(params.mbgcnbd, cbs$T.cal, T.tot = 78, inc, title = "MBG/CNBD-k")
+nil <- BTYD::pnbd.PlotTrackingInc(params.pnbd, cbs$T.cal, T.tot = 78, inc, title = "Pareto/NBD")
+par(op)
 
 
 x <- readline("Compare Forecasting Accuracy (press Enter)")
 
-MAE <- function(a, f) mean(abs(a - f))
-RMSE <- function(a, f) sqrt(mean((a - f)^2))
-MSLE <- function(a, f) mean(((log(a + 1) - log(f + 1)))^2)
-BIAS <- function(a, f) sum(f)/sum(a) - 1
-bench <- function(cbs, models) {
-  acc <- t(sapply(models, function(model) {
-    est <- cbs[[paste0("xstar.", model)]]
-    c(MAE(cbs$x.star, est),
-      RMSE(cbs$x.star, est), 
-      MSLE(cbs$x.star, est), 
-      BIAS(cbs$x.star, est))
-  }))
-  colnames(acc) <- c("MAE", "RMSE", "MSLE", "BIAS")
-  round(acc, 3)
-}
+cbs$xstar.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(
+                    params  = params.pnbd,
+                    T.star  = cbs$T.star,
+                    x       = cbs$x,
+                    t.x     = cbs$t.x,
+                    T.cal   = cbs$T.cal)
+cbs$xstar.bgcnbd <- bgcnbd.ConditionalExpectedTransactions(
+                      params  = params.bgcnbd,
+                      T.star  = cbs$T.star,
+                      x       = cbs$x,
+                      t.x     = cbs$t.x,
+                      T.cal   = cbs$T.cal)
 
-bench(cbs, c("nbd", "pnbd", "bgnbd", "mbgnbd", "mbgcnbd"))
-#' Pareto/NBD and MBG/NBD provide best forecasts
+measures <- c(
+  "MAE" = function(a, f) mean(abs(a - f)),
+  "RMSE" = function(a, f) sqrt(mean((a - f)^2)),
+  "MSLE" = function(a, f) mean(((log(a + 1) - log(f + 1)))^2),
+  "BIAS" = function(a, f) sum(f)/sum(a) - 1)
+models <- c(
+  "NBD" = "nbd",
+  "Pareto/NBD" = "pnbd",
+  "BG/CNBD-k" = "bgcnbd",
+  "MBG/CNBD-k" = "mbgcnbd")
+
+sapply(measures, function(measure) {
+  sapply(models, function(model) {
+    err <- do.call(measure, list(a = cbs$x.star, f = cbs[[paste0("xstar.", model)]]))
+    round(err, 3)
+  })
+})
+#' -> Pareto/NBD and MBG/CNBD-k provide best forecasts
 
 
 x <- readline("Calculate CLV (press Enter)")
@@ -83,33 +130,12 @@ cbs$sales.avg[cbs$sales.avg == 0] <- min(cbs$sales.avg[cbs$sales.avg > 0])
 spend.params <- BTYD::spend.EstimateParameters(cbs$sales.avg, cbs$x + 1)
 cbs$sales.avg.est <- BTYD::spend.expected.value(spend.params, cbs$sales.avg, cbs$x + 1)
 
-#' Calculate CLV for Pareto/NBD
-cbs$sales.pnbd <- cbs$sales.avg.est * cbs$xstar.pnbd
-cat("Estimated Sales:", round(sum(cbs$sales.pnbd), 1), "\n") 
-cat("Actual Sales:", round(sum(cbs$sales.star), 1), "\n") 
+#' Estimated total sales during holdout for MBG/CNBD-k
+cbs$sales.mbgcnbd <- cbs$sales.avg.est * cbs$xstar.mbgcnbd
+c("Estimated Sales" = sum(cbs$sales.mbgcnbd),
+  "Actual Sales"    = sum(cbs$sales.star))
 
 
-x <- readline("Estimate Pareto/NBD (HB) model via MCMC (press Enter)")
+x <- readline("For a demo of Pareto/GGG and Pareto/NBD (HB) see `demo(\"pareto-ggg\")`.")
 
-#' draw parameter estimates
-params.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 1500, burnin = 1500, chains = 4)
-params.mcmc <- as.list(summary(params.draws$level_2)$quantiles[, "50%"])
-rbind(`Pareto/NBD (MCMC)` = round(unlist(params.mcmc), 3), 
-      `Pareto/NBD (MLE)` = round(params.pnbd, 3))
-#' -> Parameter Estimates between MLE and MCMC match closely
-
-#' draw future transaction estimates
-xstar.draws <- mcmc.DrawFutureTransactions(cbs, params.draws)
-cbs$xstar.mcmc <- apply(xstar.draws, 2, mean)
-
-#' estimate P(alive)
-cbs$palive.mcmc <- mcmc.PAlive(params.draws)
-
-#' estimate P(active)
-cbs$pactive.mcmc <- mcmc.PActive(xstar.draws)
-
-#' plot P(active) diagnostic plot
-mcmc.plotPActiveDiagnostic(cbs, xstar.draws)
-
-
-x <- readline("For a demo of Pareto/GGG see `demo(\"pareto-ggg\")`")
+x <- readline("For a demo of Pareto/NBD (Abe) see `demo(\"pareto-abe\")`.")

@@ -1,7 +1,11 @@
 
+Changes in version 0.x.x (2016-xx-xx):
+
+    o   rewrote demos
+
 Changes in version 0.8.2 (2016-09-13):
 
-    o   improved documentation and demos
+    o   improved documentation
 
     o   removed MBG/NBD methods, as these are easily accessible via the MBG/CNBD-k methods
     
