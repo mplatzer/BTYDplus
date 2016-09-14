@@ -1,4 +1,4 @@
+cdnow          Demonstration of fitting various models to the CDNow data set
 mbg-cnbd-k     Demonstration of MBG/CNBD-k model
 pareto-abe     Demonstration of Abe's Pareto/NBD variant
-pareto-ggg     Demonstration of Pareto/NBD & Pareto/GGG model
-cdnow          Demonstration of fitting various models to the CDNow data set
+pareto-ggg     Demonstration of Pareto/NBD (HB) & Pareto/GGG model

@@ -1,84 +1,89 @@
 
-x <- readline("Estimate MBG/CNBD-k for CDNow data (press Enter)")
-
-#' load CDNow data
-cdnow <- cdnow.sample()
-elog  <- cdnow$elog
-cbs   <- cdnow$cbs
-
-#' estimate MBG/CNBD-k parameters
-(params <- mbgcnbd.EstimateParameters(cbs))
-#' k=1 -> no regularity detected for CDNow
-
-#' estimate transactions in holdout period
-cbs$xstar.est <- mbgcnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-
-#' estimate probability of being alive at end of calibration period
-cbs$palive <- mbgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
-
-#' plot estimated incremental transactions
-inc <- elog2inc(elog)
-nil <- mbgcnbd.PlotTrackingInc(params, cbs$T.cal, T.tot = 78, inc)
-
-
-x <- readline("Estimate MBG/CNBD-k for self generated data (press Enter)")
-
-#' generate artificial MBG/CNBD-3 data
-n <- 4000 # number of customers
-T.cal <- round(runif(n, 24, 32)/4)*4  # 24-32 weeks of calibration period
-T.star <- 32  # 32 weeks of hold-out period
-params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-#' regularity in interpurchase-times (Erlang-k)
-#' purchase frequency lambda_i ~ Gamma(r, alpha) 
-#' dropout probability p_i ~ Beta(a, b)
+#' Simulate artificial MBG/CNBD-3 data.
+set.seed(1234)
+n      <- 4000                         # number of customers
+T.cal  <- round(runif(n, 24, 32)/4)*4  # 24-32 weeks of calibration period
+T.star <- 32                           # 32 weeks of hold-out period
+params <- c(k = 3,                  # regularity in interpurchase-times (Erlang-k)
+            r = 0.85, alpha = 1.45, # purchase frequency lambda_i ~ Gamma(r, alpha) 
+            a = 0.79, b = 2.42)     # dropout probability p_i ~ Beta(a, b)
 data <- mbgcnbd.GenerateData(n, T.cal, T.star, params, return.elog = TRUE)
-cbs <- data$cbs  # CBS summary - one record per customer
+
+cbs  <- data$cbs   # CBS summary - one record per customer
+head(cbs)
+
 elog <- data$elog  # Event log - one row per event/purchase
+head(elog)
 
-#' estimate regularity from event log
+
+x <- readline("Estimate regularity via Wheat/Morrison estimator (press Enter)")
+
 (k.est <- estimateRegularity(elog))
-#' -> Wheat-Morrison estimator correctly detects Erlang-3
-
-#' estimate parameters, and compare to true parameters
-params_k <- mbgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
-params_1 <- BTYD::bgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
-rbind(actual = params, 
-      `MBG/CNBD-k` = round(params_k, 2), 
-      `BG/NBD` = c(1, round(params_1, 2)))
-#' -> underlying parameters are successfully identified via Maximum Likelihood Estimation
-
-#' estimate future transactions in holdout-period
-cbs$xstar_k <- mbgcnbd.ConditionalExpectedTransactions(params_k, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$xstar_1 <- BTYD::bgnbd.ConditionalExpectedTransactions(params_1, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
-
-#' estimate P(alive)
-cbs$palive_k <- mbgcnbd.PAlive(params_k, cbs$x, cbs$t.x, cbs$T.cal)
-cbs$palive_1 <- BTYD::bgnbd.PAlive(params_1, cbs$x, cbs$t.x, cbs$T.cal)
-
-#' compare forecast accuracy to bg/nbd
-rbind(`MBG/CNBD-k` = mean(abs(cbs$x.star - cbs$xstar_k)), 
-      `BG/NBD` = mean(abs(cbs$x.star - cbs$xstar_1)))
-#' -> MBG/CNBD-k forecast more accurate than MBG/NBD
-
-#' compare forecast bias to bg/nbd
-rbind(`MBG/CNBD-k` = 1 - sum(cbs$xstar_k)/sum(cbs$x.star), 
-      `BG/NBD` = 1 - sum(cbs$xstar_1)/sum(cbs$x.star))
-#' -> Unbiased estimate for MBG/CNBD-k
+#' -> Wheat-Morrison estimator correctly detects Erlang-3.
 
 
-x <- readline("Compare aggregate fit in calibration to MBG/NBD (press Enter)")
+x <- readline("Estimate MBG/CNBD-k model (press Enter)")
+
+params.mbgcnbd <- mbgcnbd.EstimateParameters(cbs)
+params.pnbd    <- BTYD::pnbd.EstimateParameters(cbs)
+rbind(`Actual`     = params, 
+      `MBG/CNBD-k` = round(params.mbgcnbd, 2), 
+      `Pareto/NBD` = c(1, round(params.pnbd, 2)))
+#' -> Underlying parameters are successfully recovered.
+
+
+x <- readline("Estimate transactions during holdout period (press Enter)")
+
+cbs$xstar.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(
+                 params = params.mbgcnbd, 
+                 T.star = cbs$T.star, 
+                 x      = cbs$x, 
+                 t.x    = cbs$t.x, 
+                 T.cal  = cbs$T.cal)
+cbs$xstar.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(
+                 params = params.pnbd, 
+                 T.star = cbs$T.star, 
+                 x      = cbs$x, 
+                 t.x    = cbs$t.x, 
+                 T.cal  = cbs$T.cal)
+
+#' compare forecast accuracy to Pareto/NBD
+(mae <- c(`MBG/CNBD-k` = mean(abs(cbs$x.star - cbs$xstar.mbgcnbd)), 
+         `Pareto/NBD` = mean(abs(cbs$x.star - cbs$xstar.pnbd))))
+(lift <- 1 - mae[1]/mae[2])
+#' -> 11% lift in customer-level accuracy when taking regularity into account
+
+
+x <- readline("Estimate probabilty of being still alive at end of calibration (press Enter)")
+
+cbs$palive.mbgcnbd <- mbgcnbd.PAlive(
+                  params = params.mbgcnbd, 
+                  x      = cbs$x, 
+                  t.x    = cbs$t.x, 
+                  T.cal  = cbs$T.cal)
+cbs$palive.pnbd <- BTYD::pnbd.PAlive(
+                  params = params.pnbd, 
+                  x      = cbs$x, 
+                  t.x    = cbs$t.x, 
+                  T.cal  = cbs$T.cal)
+rbind(`Actual` = mean(cbs$alive),
+      `MBG/CNBD-k` = mean(cbs$palive.mbgcnbd),
+      `Pareto/NBD` = mean(cbs$palive.pnbd))
+
+
+x <- readline("Compare aggregate fit in calibration to Pareto/NBD (press Enter)")
 
 op <- par(mfrow = c(1, 2))
-nil <- mbgcnbd.PlotFrequencyInCalibration(params_k, cbs, censor = 7, title = "MBG/CNBD-k")
-nil <- BTYD::bgnbd.PlotFrequencyInCalibration(params_1, cbs, censor = 7, title = "BG/NBD")
+nil <- mbgcnbd.PlotFrequencyInCalibration(params.mbgcnbd, cbs, censor = 7, title = "MBG/CNBD-k")
+nil <- BTYD::pnbd.PlotFrequencyInCalibration(params.pnbd, cbs, censor = 7, title = "Pareto/NBD")
 par(op)
 
 
-x <- readline("Compare incremental transactions in holdout to MBG/NBD (press Enter)")
+x <- readline("Compare incremental transactions in holdout to Pareto/NBD (press Enter)")
 
 op <- par(mfrow = c(1, 2))
 inc <- elog2inc(elog, by = 1)
 T.tot <- max(cbs$T.cal + cbs$T.star)
-inc_k <- mbgcnbd.PlotTrackingInc(params_k, cbs$T.cal, T.tot, inc, title = "MBG/CNBD-k")
-inc_1 <- BTYD::bgnbd.PlotTrackingInc(params_1, cbs$T.cal, T.tot, inc, title = "BG/NBD")
+nil <- mbgcnbd.PlotTrackingInc(params.mbgcnbd, cbs$T.cal, T.tot, inc, title = "MBG/CNBD-k")
+nil <- BTYD::pnbd.PlotTrackingInc(params.pnbd, cbs$T.cal, T.tot, inc, title = "Pareto/NBD")
 par(op)
