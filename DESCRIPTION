@@ -1,13 +1,16 @@
 Package: BTYDplus
 Type: Package
 Title: Extension of R Package BTYD
-Version: 0.7.2
-Date: 2016-09-07
+Version: 0.8.3
+Date: 2016-09-15
 Authors@R: person("Michael", "Platzer", email = "michael.platzer@gmail.com", role = c("aut", "cre"))
-Description: Extends the functionality of BTYD package by providing methods for
-    parameter estimation and scoring for NBD, G/G/NBD, MBG/NBD, BG/CNBD-k and
-    MBG/CNBD-k models, as well as MCMC samples for Pareto/NBD,
-    Abe's Pareto/NBD variant and Pareto/GGG.
+Description: This package provides advanced statistical methods to describe and predict 
+  customer's purchase behavior. It uses historic transaction records to fit a probabilistic model, 
+  which then allows to compute quantities of managerial interest on a cohort- as well as on a 
+  customer level (Customer Lifetime Value, Customer Equity, P(alive), etc.). This package complements 
+  the BTYD package by providing several additional buy-till-you-die models, that have been published 
+  in the marketing literature, but whose implementation are complex and non-trivial. These models are: 
+  NBD, MBG/NBD, BG/CNBD-k, MBG/CNBD-k, Pareto/NBD (HB), Pareto/NBD (Abe) and Pareto/GGG.
 URL: https://github.com/mplatzer/BTYDplus
 BugReports: https://github.com/mplatzer/BTYDplus/issues
 License: GPL-3
