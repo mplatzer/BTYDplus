@@ -27,7 +27,7 @@
 #' @references (M)BG/CNBD-k: Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @references MBG/NBD: Batislam, E.P., M. Denizel, A. Filiztekin. 2007.
 #'   Empirical validation and comparison of models for customer base analysis.
-#'   International Journal of Research in Marketing 24(3) 201–209.
+#'   International Journal of Research in Marketing 24(3) 201-209.
 #' @examples
 #' cbs <- cdnow.sample()$cbs
 #' (params <- mbgcnbd.EstimateParameters(cbs))
