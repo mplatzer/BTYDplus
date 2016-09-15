@@ -11,7 +11,13 @@ test_that("MBG/CNBD-k", {
   cbs <- data$cbs
   elog <- data$elog
   
-  # estimate parameters
+  # estimate parameters with fixed k
+  est1 <- mbgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
+  expect_equal(as.integer(est1[1]), 1L)
+  est2 <- mbgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")], k = 2)
+  expect_equal(as.integer(est[1]), 2L)
+  
+  # estimate parameters with unspecified k
   est <- mbgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
   expect_equal(est, params, tolerance = 0.1)
   

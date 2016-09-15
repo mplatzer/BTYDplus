@@ -44,3 +44,14 @@ test_that("elog2cum", {
   expect_equal(diff(cum), inc)
   
 })  
+
+
+test_that("plotSampledTimingPatterns", {
+  
+  elog <- cdnow.sample()$elog
+  expect_silent(plotSampledTimingPatterns(elog))
+  expect_silent(plotSampledTimingPatterns(elog, T.cal = "1997-09-30"))
+  expect_silent(plotSampledTimingPatterns(elog, n = 100))
+  expect_silent(plotSampledTimingPatterns(head(elog, 5), T.cal = "1997-09-30"))
+
+})

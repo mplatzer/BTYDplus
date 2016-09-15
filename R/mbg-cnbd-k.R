@@ -23,7 +23,11 @@
 #'   \code{trace}-step of the maximum likelihood estimation search.
 #' @return A vector of estimated parameters.
 #' @export
-#' @references Platzer Michael, and Thomas Reutterer (forthcoming)
+#' @seealso \code{\link[BTYD]{bgnbd.EstimateParameters}}
+#' @references (M)BG/CNBD-k: Platzer Michael, and Thomas Reutterer (forthcoming)
+#' @references MBG/NBD: Batislam, E.P., M. Denizel, A. Filiztekin. 2007.
+#'   Empirical validation and comparison of models for customer base analysis.
+#'   International Journal of Research in Marketing 24(3) 201–209.
 #' @examples
 #' cbs <- cdnow.sample()$cbs
 #' (params <- mbgcnbd.EstimateParameters(cbs))
@@ -31,9 +35,9 @@
 mbgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, 
                                        par.start = c(1, 3, 1, 3), max.param.value = 10000, 
                                        trace = 0) {
-  xbgcnbd.EstimateParameters(cal.cbs, k = NULL,
-                             par.start = c(1, 3, 1, 3), max.param.value = 10000, 
-                             trace = 0, dropout_at_zero = TRUE)
+  xbgcnbd.EstimateParameters(cal.cbs, k = k,
+                             par.start = par.start, max.param.value = max.param.value, 
+                             trace = trace, dropout_at_zero = TRUE)
 }
 
 #' @rdname mbgcnbd.EstimateParameters
@@ -41,9 +45,19 @@ mbgcnbd.EstimateParameters <- function(cal.cbs, k = NULL,
 bgcnbd.EstimateParameters <- function(cal.cbs, k = NULL, 
                                       par.start = c(1, 3, 1, 3), max.param.value = 10000, 
                                       trace = 0) {
-  xbgcnbd.EstimateParameters(cal.cbs, k = NULL,
-                             par.start = c(1, 3, 1, 3), max.param.value = 10000, 
-                             trace = 0, dropout_at_zero = FALSE)
+  xbgcnbd.EstimateParameters(cal.cbs, k = k,
+                             par.start = par.start, max.param.value = max.param.value, 
+                             trace = trace, dropout_at_zero = FALSE)
+}
+
+#' @rdname mbgcnbd.EstimateParameters
+#' @export
+mbgnbd.EstimateParameters <- function(cal.cbs,
+                                      par.start = c(1, 3, 1, 3), max.param.value = 10000, 
+                                      trace = 0) {
+  xbgcnbd.EstimateParameters(cal.cbs, k = 1,
+                             par.start = par.start, max.param.value = max.param.value, 
+                             trace = trace, dropout_at_zero = TRUE)
 }
 
 #' @keywords internal
