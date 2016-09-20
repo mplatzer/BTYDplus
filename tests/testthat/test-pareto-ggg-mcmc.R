@@ -25,6 +25,7 @@ test_that("Pareto/GGG MCMC", {
   skip('not run as it takes too long; run this manually')
   skip_on_cran()
   skip_on_travis()
+  skip_on_appveyor()
   
   # generate artificial Pareto/GGG data
   params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 10, s = 0.8, beta = 12)
