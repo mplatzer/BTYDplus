@@ -11,7 +11,7 @@ Description: This package provides advanced statistical methods to describe and 
   the BTYD package by providing several additional buy-till-you-die models, that have been published 
   in the marketing literature, but whose implementation are complex and non-trivial. These models are: 
   NBD, MBG/NBD, BG/CNBD-k, MBG/CNBD-k, Pareto/NBD (HB), Pareto/NBD (Abe) and Pareto/GGG.
-URL: https://github.com/mplatzer/BTYDplus
+URL: https://github.com/mplatzer/BTYDplus#readme
 BugReports: https://github.com/mplatzer/BTYDplus/issues
 License: GPL-3
 LinkingTo: Rcpp
