@@ -7,12 +7,12 @@
 #' first two years, and had their first purchase in the first quarter of 2006. 
 #' This resulted in 10483 transactions being recorded for 1525 customers during 
 #' a period of two years (2006-2007).
-#'
+#' 
 #' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the 
 #'   Moments: Timing Regularity Helps to Better Predict Customer Activity.' 
 #'   Marketing Science (2016).
-#'
+#'   
 #' @format A data frame with 10483 rows and 2 variables: \describe{ 
-#'   \item{cust}{customer ID, character vector} \item{date}{transaction date, 
+#'   \item{cust}{customer ID, factor vector} \item{date}{transaction date, 
 #'   Date vector} }
-"grocery"
+"groceryElog"
