@@ -21,7 +21,7 @@ library(BTYDplus)
 ## Getting Started
 
 ```
-demo("cdnow")          # Demonstration of fitting various models to the CDNow data set
+demo("cdnow")          # Demonstration of fitting various models to the CDNow dataset
 demo("mbg-cnbd-k")     # Demonstration of MBG/CNBD-k model
 demo("pareto-abe")     # Demonstration of Abe's Pareto/NBD variant
 demo("pareto-ggg")     # Demonstration of Pareto/NBD (HB) & Pareto/GGG model
