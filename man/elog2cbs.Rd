@@ -2,15 +2,14 @@
 % Please edit documentation in R/helpers.R
 \name{elog2cbs}
 \alias{elog2cbs}
-\title{Convernt Event Log to customer-level summary statistic.}
+\title{Convernt Event Log to customer-level summary statistic}
 \usage{
-elog2cbs(elog, per = "week", T.cal = max(elog$date),
-  T.tot = max(elog$date))
+elog2cbs(elog, per = "week", T.cal = NULL, T.tot = NULL)
 }
 \arguments{
-\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and
-transaction time \code{t} or \code{date}. If column \code{sales} is
-present, it will be aggregated as well.}
+\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and 
+transaction date/time \code{date}. If column \code{sales} is present, it
+will be aggregated as well.}
 
 \item{per}{Time unit, either 'week', 'day', 'hour', 'min', 'sec'.}
 
@@ -19,25 +18,30 @@ present, it will be aggregated as well.}
 \item{T.tot}{End date of holdout period.}
 }
 \value{
-data.frame with fields
- \item{\code{cust}}{customer id (unique key)}
- \item{\code{x}}{number of recurring events in calibration period}
- \item{\code{t.x}}{time between first and last event in calibration period}
- \item{\code{litt}}{sum of logarithmic intertransaction timings durint calibration period}
- \item{\code{sales}}{sum of sales in calibration period}
- \item{\code{first}}{date of first transaction in calibration period}
- \item{\code{T.cal}}{time between first event and end of calibration period}
- \item{\code{T.star}}{length of holdout period}
- \item{\code{x.star}}{number of events within holdout period}
- \item{\code{sales.star}}{sum of sales within holdout period}
+data.frame with fields 
+\item{\code{cust}}{customer id (unique key)}
+\item{\code{x}}{number of recurring events in calibration period} 
+\item{\code{t.x}}{time between first and last event in calibration period} 
+\item{\code{litt}}{sum of logarithmic intertransaction timings durint
+  calibration period} 
+\item{\code{sales}}{sum of sales in calibration period; only if \code{elog$sales} is provided}
+\item{\code{first}}{date of first transaction in calibration period} 
+\item{\code{T.cal}}{time between first event and end of calibration period}
+\item{\code{T.star}}{length of holdout period; only if \code{T.cal} is provided} 
+\item{\code{x.star}}{number of events within holdout period; only if \code{T.cal} is provided} 
+\item{\code{sales.star}}{sum of sales within holdout period; only if \code{T.cal} and \code{elog$sales} are provided}
 }
 \description{
-Takes the event log of a customer cohort, and returns a sufficient summary statistic for applying common BTYD models.
+Takes the event log of a customer cohort, and returns a sufficient summary
+statistic for applying common BTYD models.
 }
 \details{
-Note: compared to \code{\link[BTYD]{dc.ElogToCbsCbt}} this also adds a summary statistic for estimating regularity.
+Note: compared to \code{\link[BTYD]{dc.ElogToCbsCbt}} this also adds a
+summary statistic for estimating regularity.
 
-Customers without any transaction during calibration period are being dropped from the result. Transactions with identical \code{cust} and \code{date} field are treated as a single transaction, with `sales` being summed up
+Customers without any transaction during calibration period are being dropped
+from the result. Transactions with identical \code{cust} and \code{date}
+field are treated as a single transaction, with `sales` being summed up.
 }
 \examples{
 elog <- cdnow.sample()$elog

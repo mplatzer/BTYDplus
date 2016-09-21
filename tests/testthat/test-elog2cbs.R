@@ -16,12 +16,18 @@ test_that("elog2cbs", {
   expect_is(elog2cbs(elog_dt), "data.table")
 
   # check column names
-  cols <- c("cust", "x", "t.x", "litt", "sales", "first", "T.cal", "T.star", "x.star", "sales.star")
-  expect_named(elog2cbs(elog), cols)
-  expect_named(elog2cbs(elog, T.cal = T.cal), cols)
-  expect_named(elog2cbs(elog, T.cal = T.cal, T.tot = T.tot), cols)
-  expect_named(elog2cbs(elog_s), cols)
-  expect_named(elog2cbs(elog_dt), cols)
+  expect_named(elog2cbs(elog), 
+               c("cust", "x", "t.x", "litt", "first", "T.cal"))
+  expect_named(elog2cbs(elog_dt), 
+               c("cust", "x", "t.x", "litt", "first", "T.cal"))
+  expect_named(elog2cbs(elog_s), 
+               c("cust", "x", "t.x", "litt", "sales", "first", "T.cal"))
+  expect_named(elog2cbs(elog_s, T.cal = T.cal), 
+               c("cust", "x", "t.x", "litt", "sales", "first", "T.cal", "T.star", "x.star", "sales.star"))
+  expect_named(elog2cbs(elog, T.cal = T.cal, T.tot = T.tot), 
+               c("cust", "x", "t.x", "litt", "first", "T.cal", "T.star", "x.star"))
+  expect_named(elog2cbs(elog[, c("cust", "date")], T.cal = T.cal),
+               c("cust", "x", "t.x", "litt", "first", "T.cal", "T.star", "x.star"))
   
   # check number of returned customers
   expect_equal(uniqueN(elog$cust), nrow(elog2cbs(elog)))
