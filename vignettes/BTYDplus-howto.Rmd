@@ -49,13 +49,17 @@ All aforementioned models benefit from closed-form solutions for key expressions
 
 The analysis process of an existing customer cohort starts out by collecting a complete log of all transactions. How a customer base is split into cohorts is up to the analyst, but commonly these are defined based on customers' first transaction date and/or the acquisition channel. The data requirements for such a transaction log are minimal, and only require a customer ID field (`cust`) and a date or timestamp field (`date` or `t`). If we later on want to estimate the monetary component, the transacion log should also contain a corresponding field `sales`.
 
-```{r}
-elog <- cdnow.sample()$elog
-head(elog)
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(cdnow.sample()$elog[, c("cust", "date", "sales")], 6))
 ```
 
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(elog, 10))
+The BTYDplus package provides some helper methods for dealing with such event logs. For one, we can
+
+
+```{r}
+elog <- cdnow.sample()$elog
+plot(elog2inc(elog, by = 7), typ = "l")
+head(elog)
 ```
 
 ```{r, fig.show='hold'}
