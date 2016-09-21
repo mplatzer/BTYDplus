@@ -8,7 +8,7 @@ plotSampledTimingPatterns(elog, T.cal = NULL, n = 50,
   title = "Sampled Timing Patterns")
 }
 \arguments{
-\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and 
+\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and
 transaction time \code{t} or \code{date}.}
 
 \item{T.cal}{End of calibration period, which is visualized as a vertical line.}

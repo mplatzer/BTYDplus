@@ -21,10 +21,10 @@ Estimated real-valued regularity parameter.
 }
 \description{
 Estimates degree of regularity of intertransaction timings of a customer
-cohort. This is done by 1) assuming same regularity across all customers 
-(\code{method = "wheat"}), or 2) by estimating regularity for each customer 
-seperately, as the shape parameter of a fitted gamma distribution, and then 
-return the median across estimates; this requires sufficient (>=10) 
+cohort. This is done by 1) assuming same regularity across all customers
+(\code{method = "wheat"}), or 2) by estimating regularity for each customer
+seperately, as the shape parameter of a fitted gamma distribution, and then
+return the median across estimates; this requires sufficient (>=10)
 transactions per customer
 }
 \examples{

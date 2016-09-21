@@ -8,7 +8,7 @@ elog2cbs(elog, per = "week", T.cal = max(elog$date),
   T.tot = max(elog$date))
 }
 \arguments{
-\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and 
+\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and
 transaction time \code{t} or \code{date}. If column \code{sales} is
 present, it will be aggregated as well.}
 

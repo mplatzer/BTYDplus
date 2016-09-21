@@ -1,13 +1,13 @@
 
 #' Estimate Regularity in Intertransaction Timings
-#' 
+#'
 #' Estimates degree of regularity of intertransaction timings of a customer
-#' cohort. This is done by 1) assuming same regularity across all customers 
-#' (\code{method = "wheat"}), or 2) by estimating regularity for each customer 
-#' seperately, as the shape parameter of a fitted gamma distribution, and then 
-#' return the median across estimates; this requires sufficient (>=10) 
+#' cohort. This is done by 1) assuming same regularity across all customers
+#' (\code{method = "wheat"}), or 2) by estimating regularity for each customer
+#' seperately, as the shape parameter of a fitted gamma distribution, and then
+#' return the median across estimates; this requires sufficient (>=10)
 #' transactions per customer
-#' 
+#'
 #' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}
 #' @param method Either \code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom} or
@@ -24,7 +24,7 @@
 #'   Society (2000): 583-591.
 #' @references
 #'   \url{http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf}
-#'   
+#'
 #' @export
 #' @examples
 #' elog <- cdnow.sample()$elog[, c("cust", "date")]
@@ -33,11 +33,11 @@
 #' estimateRegularity(elog, plot = TRUE, method = 'mle-thom')
 #' estimateRegularity(elog, plot = TRUE, method = 'cv')
 estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
-  if (!"cust" %in% names(elog)) 
+  if (!"cust" %in% names(elog))
     stop("Error in estimateRegularity: elog must have a column labelled \"cust\"")
-  if (!"date" %in% names(elog) & !"t" %in% names(elog)) 
+  if (!"date" %in% names(elog) & !"t" %in% names(elog))
     stop("Error in estimateRegularity: elog must have a column labelled \"t\" or \"date\"")
-  if (!"t" %in% names(elog)) 
+  if (!"t" %in% names(elog))
     elog$t <- as.numeric(elog$date)
   trans <- split(elog, elog$cust)
   if (method == "wheat") {
@@ -63,7 +63,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
       par(op)
     }
     return(r)
-    
+
   } else {
     if (method == "mle" | method == "mle-minka") {
       # Maximum Likelihood Estimator http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation
@@ -83,7 +83,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
           return(k)
         }
       }))
-      
+
     } else if (method == "mle-thom") {
       # Approximation for ML estimator Thom (1968); see Dunn, Richard, Steven Reader, and Neil Wrigley.  'An
       # investigation of the assumptions of the NBD model' Applied Statistics (1983): 249-259.
@@ -96,7 +96,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
           return(d)
         }
       }))
-      
+
     } else if (method == "cv") {
       # Estimate regularity by analyzing coefficient of variation Wu, Couchen, and H-L. Chen. 'A consumer purchasing
       # model with learning and departure behaviour.'  Journal of the Operational Research Society (2000): 583-591.
@@ -109,9 +109,9 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
         }
       }))
     }
-    if (length(ks) == 0) 
+    if (length(ks) == 0)
       stop("No customers with 10 or more transactions.")
-    
+
     if (plot) {
       ymax <- median(ks) * 3
       boxplot(ks, horizontal = TRUE, ylim = c(0, ymax), frame = FALSE, axes = FALSE)
@@ -120,15 +120,15 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
       abline(v = 1:ymax, lty = "dotted", col = "lightgray")
       boxplot(ks, horizontal = TRUE, add = TRUE, col = "gray", frame = FALSE, axes = FALSE)
     }
-    
+
     return(median(ks))
   }
 }
 
 
 #' Plot timing patterns of sampled customers.
-#' 
-#' @param elog Event log, a \code{data.frame} with columns \code{cust} and 
+#'
+#' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}.
 #' @param T.cal End of calibration period, which is visualized as a vertical line.
 #' @param n Number of sampled customers.
@@ -138,7 +138,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 #' elog <- cdnow.sample()$elog
 #' plotSampledTimingPatterns(elog, T.cal = "1997-09-30")
 plotSampledTimingPatterns <- function(elog, T.cal = NULL, n = 50, title = "Sampled Timing Patterns") {
-  
+
   cust <- first <- t <- V1 <- NULL  # suppress checkUsage warnings
   elog_dt <- setDT(copy(elog))
   custs <- sample(unique(elog_dt$cust), size = min(n, uniqueN(elog_dt$cust)), replace = FALSE)
@@ -152,8 +152,8 @@ plotSampledTimingPatterns <- function(elog, T.cal = NULL, n = 50, title = "Sampl
   setkeyv(elog_dt, "cust")
   op <- par(mar = c(0.5,0.5,2.5,0.5))
   ymax <- ifelse(is.null(T.cal), n, ceiling(n * 1.05))
-  plot(1, xlim = rg, ylim = c(1, ymax), typ = "n", 
-       axes = FALSE, frame = FALSE, 
+  plot(1, xlim = rg, ylim = c(1, ymax), typ = "n",
+       axes = FALSE, frame = FALSE,
        xlab = "", ylab = "",
        main = title)
   for (i in 1:n) {
@@ -170,19 +170,19 @@ plotSampledTimingPatterns <- function(elog, T.cal = NULL, n = 50, title = "Sampl
     text("Calibration",  x = T.cal - (T.cal - rg[1]) / 2, y = ymax, col = "#454545")
     text("Holdout",  x = T.cal + (rg[2] - T.cal) / 2, y = ymax, col = "#454545")
   }
-  
+
 }
 
 
 #' Convernt Event Log to customer-level summary statistic.
-#' 
+#'
 #' Takes the event log of a customer cohort, and returns a sufficient summary statistic for applying common BTYD models.
-#' 
+#'
 #' Note: compared to \code{\link[BTYD]{dc.ElogToCbsCbt}} this also adds a summary statistic for estimating regularity.
 #'
 #' Customers without any transaction during calibration period are being dropped from the result. Transactions with identical \code{cust} and \code{date} field are treated as a single transaction, with `sales` being summed up
 #'
-#' @param elog Event log, a \code{data.frame} with columns \code{cust} and 
+#' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}. If column \code{sales} is
 #'   present, it will be aggregated as well.
 #' @param per Time unit, either 'week', 'day', 'hour', 'min', 'sec'.
@@ -212,7 +212,7 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
   if (is.character(T.cal)) T.cal <- as.Date(T.cal)
   if (is.character(T.tot)) T.tot <- as.Date(T.tot)
   stopifnot(T.tot >= T.cal)
-  
+
   is.dt <- is.data.table(elog)
   has.sales <- "sales" %in% names(elog)
   # convert to data.table for improved performance
@@ -232,7 +232,7 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
   # compute intertransaction times
   elog_dt[, `:=`(itt, c(0, diff(t))), by = "cust"]
   # count events in calibration period
-  cbs <- elog_dt[date <= T.cal, list(x = .N - 1, t.x = max(t), litt = sum(log(itt[itt > 0])), sales = sum(sales)), 
+  cbs <- elog_dt[date <= T.cal, list(x = .N - 1, t.x = max(t), litt = sum(log(itt[itt > 0])), sales = sum(sales)),
     by = "cust,first"]
   cbs[, `:=`(T.cal, as.numeric(difftime(T.cal, first, units = per)))]
   cbs[, `:=`(T.star, as.numeric(difftime(T.tot, first, units = per)) - T.cal)]
@@ -255,10 +255,10 @@ elog2cbs <- function(elog, per = "week", T.cal = max(elog$date), T.tot = max(elo
 
 
 #' CDNow Sample Data
-#' 
+#'
 #' This is a convenience wrapper for \code{data('cdnowElog', package='BTYD')},
 #' with same-day transactions being merged together for each customer.
-#' 
+#'
 #' @references Fader, Peter S. and Bruce G.,S. Hardie, (2001), 'Forecasting
 #'   Repeat Sales at CDNOW: A Case Study,' Interfaces, 31 (May-June), Part 2 of
 #'   2, S94-S107.
@@ -283,24 +283,27 @@ cdnow.sample <- function(T.cal = "1997-09-30", T.tot = "1998-06-30") {
 }
 
 
-#' Aggregate Event Log to cumulative number of repeat transactions
-#' 
-#' @param elog Event log, a \code{data.frame} with columns \code{cust} and 
+#' Aggregate Event Log to cumulative number of (repeat) transactions
+#'
+#' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}.
 #' @param by Only return every \code{}-th number. Defaults to 7, and thus
 #'   returns weekly numbers.
+#' @param first If TRUE, then the first transaction for each customer is being
+#'   counted as well
 #' @return Numeric vector of cumulative repeat transactions.
 #' @export
 #' @seealso \code{\link{elog2inc}}
-#' @examples 
+#' @examples
 #' elog <- cdnow.sample()$elog
 #' cum <- elog2cum(elog)
 #' plot(cum, typ="l")
-elog2cum <- function(elog, by = 7) {
+elog2cum <- function(elog, by = 7, first = FALSE) {
   t0 <- sales <- N <- NULL  # suppress checkUsage warnings
   stopifnot("cust" %in% names(elog))
+  stopifnot(is.logical(first) & length(first) == 1)
   is.dt <- is.data.table(elog)
-  if (!is.dt) 
+  if (!is.dt)
     elog <- as.data.table(elog) else elog <- copy(elog)
   if (!"t" %in% names(elog)) {
     stopifnot("date" %in% names(elog))
@@ -309,19 +312,21 @@ elog2cum <- function(elog, by = 7) {
   }
   elog[, `:=`(t0, min(t)), by = "cust"]
   grid <- data.table(t = 0 : ceiling(max(elog$t)))
-  grid <- merge(grid, elog[t > t0, .N, keyby = list(t = ceiling(t))], all.x = TRUE, by = "t")
+  grid <- merge(grid, elog[first | t > t0, .N, keyby = list(t = ceiling(t))], all.x = TRUE, by = "t")
   inc <- grid[is.na(N), N := 0L]$N
   cum <- c(cumsum(inc)[seq(by, length(inc) - 1, by = by)], sum(inc))
   return(cum)
 }
 
 
-#' Aggregate Event Log to incremental number of repeat transactions
-#' 
-#' @param elog Event log, a \code{data.frame} with columns \code{cust} and 
+#' Aggregate Event Log to incremental number of (repeat) transactions
+#'
+#' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}.
 #' @param by Only return every \code{}-th number. Defaults to 7, and thus
 #'   returns weekly numbers.
+#' @param first If TRUE, then the first transaction for each customer is being
+#'   counted as well
 #' @return Numeric vector of repeat transactions.
 #' @export
 #' @seealso \code{\link{elog2cum}}
@@ -329,14 +334,14 @@ elog2cum <- function(elog, by = 7) {
 #' elog <- cdnow.sample()$elog
 #' inc <- elog2inc(elog)
 #' plot(inc, typ="l")
-elog2inc <- function(elog, by = 7) {
-  cum <- elog2cum(elog = elog, by = by)
+elog2inc <- function(elog, by = 7, first = FALSE) {
+  cum <- elog2cum(elog = elog, by = by, first = first)
   return(diff(cum))
 }
 
 
 #' Check Model Parameters
-#' 
+#'
 #' Wrapper for \code{BTYD::dc.check.model.params} with additional check for
 #' parameter names if these are present
 #'
@@ -348,7 +353,7 @@ dc.check.model.params.safe <- function(printnames, params, func) {
   if (!is.null(names(params))) {
     idx <- names(params) != ""
     if (any(printnames[idx] != names(params)[idx])) {
-      stop("Error in ", func, ": Parameter names do not match - ", paste0(printnames, collapse = ","), " != ", 
+      stop("Error in ", func, ": Parameter names do not match - ", paste0(printnames, collapse = ","), " != ",
         paste0(names(params), collapse = ","), call. = FALSE)
     }
   }
@@ -356,10 +361,10 @@ dc.check.model.params.safe <- function(printnames, params, func) {
 
 
 #' Generic Method for Tracking Plots
-#' 
+#'
 #' @keywords internal
 dc.PlotTracking <- function(actual, expected, T.cal = NULL,
-                            xlab = "", ylab = "", title = "", 
+                            xlab = "", ylab = "", title = "",
                             xticklab = NULL, ymax = NULL) {
 
   stopifnot(is.numeric(actual))
@@ -367,7 +372,7 @@ dc.PlotTracking <- function(actual, expected, T.cal = NULL,
   stopifnot(all(actual >= 0))
   stopifnot(all(expected >= 0))
   stopifnot(length(actual) == length(expected))
-  
+
   if (is.null(ymax)) ymax <- max(c(actual, expected)) * 1.05
   plot(actual, type = "l", xaxt = "n", xlab = xlab, ylab = ylab, col = 1, ylim = c(0, ymax), main = title)
   lines(expected, lty = 2, col = 2)
