@@ -12,7 +12,7 @@ groceryElog
 }
 \description{
 These data came from an online retailer offering a broad range of grocery 
-categories. The original data set spans four years, but lacked the customers’
+categories. The original data set spans four years, but lacked the customers'
 acquisition date. Therefore, we constructed a quasi cohort by limiting the 
 provided data analysis to those customers who haven't purchased at all in the
 first two years, and had their first purchase in the first quarter of 2006. 
