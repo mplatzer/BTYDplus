@@ -20,12 +20,15 @@ test_that("dc.check.model.params.safe", {
 
 test_that("elog2cum", {
 
-  data <- cdnow.sample()
-  cum <- elog2cum(data$elog)
+  cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"), 
+                        stringsAsFactors = FALSE, 
+                        col.names = c("cust", "sampleid", "date", "cds", "sales"))
+  cdnowElog$date <- as.Date(as.character(cdnowElog$date), format = "%Y%m%d")
+  cum <- elog2cum(cdnowElog)
   utils::data(cdnowSummary, package="BTYD", envir = environment())
   expect_equal(cum, cdnowSummary$cu.tracking)
 
-  inc <- elog2inc(data$elog)
+  inc <- elog2inc(cdnowElog)
   expect_equal(diff(cum), inc)
 
   elog <- data.frame(cust = c(1, 1, 1, 3, 3), t = c(0, 9, 18, 4, 6))
