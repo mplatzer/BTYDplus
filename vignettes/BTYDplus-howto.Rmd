@@ -66,9 +66,15 @@ lines(weekly_inc_repeat, col = "red")
 plotSampledTimingPatterns(elog, n = 20)
 ```
 
-The BTYDplus package also provides an fast implementation for converting the event log into a customer-by-sufficient-statistic summary table, which is the required format for all of the model methods.
+The BTYDplus package also provides a fast implementation for converting the event log into a customer-by-sufficient-statistic summary table, which is the required format for the BTYD models. Note, that compared to BTYD::dc.ElogToCbsCbt this also adds a summary statistic (`litt`) for estimating regularity.
 
 ```{r}
+# convert from event log to summary statistic
+cbs <- elog2cbs(elog)
+head(cbs)
+
+# split event log into calibration and holdout period, to validate model performance
+range(elog$date)
 cbs <- elog2cbs(elog, T.cal = "1997-09-30", T.tot = "1998-06-30")
 ```
 
