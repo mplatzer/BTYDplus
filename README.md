@@ -27,10 +27,6 @@ demo("pareto-abe")   # Demonstration of Abe's Pareto/NBD variant with CDNow data
 demo("pareto-ggg")   # Demonstration of Pareto/NBD (HB) & Pareto/GGG model with grocery dataset
 ```
 
-## Contributions
-
-We certainly welcome all feedback and contributions to this package! Please use [GitHub Issues](https://github.com/mplatzer/BTYDplus/issues) for filing bug reports and feature requests, and provide your contributions in the form of [Pull Requests](https://help.github.com/articles/about-pull-requests/). See also [these general guidelines](https://guides.github.com/activities/contributing-to-open-source/#contributing) to contribute to Open Source projects on GitHub.
-
 ## Implemented Models
 
 These R source files extend the functionality of the BTYD package by providing functions for parameter estimation and scoring for NBD, MBG/NBD, BG/CNBD-k, MBG/CNBD-k, Pareto/NBD (HB), Pareto/NBD (Abe) and Pareto/GGG.
@@ -41,3 +37,7 @@ These R source files extend the functionality of the BTYD package by providing f
 * **Pareto/NBD (HB)** Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007.
 * **Pareto/NBD (Abe)** Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553.
 * **Pareto/GGG** Platzer, Michael, and Thomas Reutterer. "Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity." Marketing Science (2016).
+
+## Contributions
+
+We certainly welcome all feedback and contributions to this package! Please use [GitHub Issues](https://github.com/mplatzer/BTYDplus/issues) for filing bug reports and feature requests, and provide your contributions in the form of [Pull Requests](https://help.github.com/articles/about-pull-requests/). See also [these general guidelines](https://guides.github.com/activities/contributing-to-open-source/#contributing) to contribute to Open Source projects on GitHub.

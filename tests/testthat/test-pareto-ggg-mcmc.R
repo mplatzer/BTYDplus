@@ -10,7 +10,7 @@ test_that("Pareto/GGG MCMC", {
   cbs <- pggg.GenerateData(n, 52, 52, params, FALSE)$cbs
   
   # estimate parameters
-  draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 100, burnin = 20, thin = 10, chains = 2)
+  draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 100, burnin = 20, thin = 10, chains = 2, mc.cores = 1)
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
   expect_equal(length(draws$level_1), n)
   expect_true(is.mcmc.list(draws$level_1[[1]]))
