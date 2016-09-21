@@ -4,9 +4,7 @@
 #' Estimates parameters for the NBD model via Maximum Likelihood Estimation.
 #' 
 #' @param cal.cbs Calibration period CBS. It must contain columns for frequency 
-#'   \code{x} and total time observed \code{T.cal}. Optionally a column \code{custs} can be 
-#'   provided, which represents number of customers with a specific combination 
-#'   of frequency \code{x} and \code{T.cal}.
+#'   \code{x} and total time observed \code{T.cal}.
 #' @param par.start Initial NBD parameters - a vector with \code{r} and \code{alpha} in 
 #'   that order.
 #' @param max.param.value Upper bound on parameters.
@@ -39,10 +37,7 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
 #' @param params NBD parameters - a vector with r and alpha, in that
 #'   order.
 #' @param cal.cbs Calibration period CBS. It must contain columns for frequency 
-#'   \code{x} and total time observed \code{T.cal}. Optionally a column \code{custs} can be 
-#'   provided, which represents number of customers with a specific combination 
-#'   of frequency \code{x} and \code{T.cal} data.frame with columns \code{x} and \code{T.cal} and 
-#'   optional \code{custs}.
+#'   \code{x} and total time observed \code{T.cal}.
 #' @return The total log-likelihood for the provided data.
 #' @export
 #' @examples
@@ -54,12 +49,7 @@ nbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.cbs.LL")
   tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
   tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
-  if ("custs" %in% colnames(cal.cbs)) {
-    custs <- cal.cbs$custs
-  } else {
-    custs <- rep(1, length(x))
-  }
-  return(sum(custs * nbd.LL(params, x, T.cal)))
+  return(sum(nbd.LL(params, x, T.cal)))
 }
 
 

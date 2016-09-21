@@ -39,7 +39,7 @@ time period.
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
-params <- mbgcnbd.EstimateParameters(cbs)
+params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 # estimate transactions for next 12 weeks
 xstar.est <- mbgcnbd.ConditionalExpectedTransactions(params, 
   T.star = 12, cbs$x, cbs$t.x, cbs$T.cal)

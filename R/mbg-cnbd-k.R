@@ -174,12 +174,7 @@ xbgcnbd.cbs.LL <- function(params, cal.cbs, dropout_at_zero = NULL) {
   tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
   tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
   tryCatch(litt <- cal.cbs$litt, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a column for sum over logarithmic inter-transaction-times labelled \"litt\""))
-  if ("custs" %in% colnames(cal.cbs)) {
-    custs <- cal.cbs$custs
-  } else {
-    custs <- rep(1, length(x))
-  }
-  return(sum(custs * xbgcnbd.LL(params = params, x = x, t.x = t.x, T.cal = T.cal, litt = litt, dropout_at_zero = dropout_at_zero)))
+  return(sum(xbgcnbd.LL(params = params, x = x, t.x = t.x, T.cal = T.cal, litt = litt, dropout_at_zero = dropout_at_zero)))
 }
 
 #' @keywords internal
