@@ -2,22 +2,25 @@
 % Please edit documentation in R/helpers.R
 \name{elog2inc}
 \alias{elog2inc}
-\title{Aggregate Event Log to incremental number of repeat transactions}
+\title{Aggregate Event Log to incremental number of (repeat) transactions}
 \usage{
-elog2inc(elog, by = 7)
+elog2inc(elog, by = 7, first = FALSE)
 }
 \arguments{
-\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and 
+\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and
 transaction time \code{t} or \code{date}.}
 
 \item{by}{Only return every \code{}-th number. Defaults to 7, and thus
 returns weekly numbers.}
+
+\item{first}{If TRUE, then the first transaction for each customer is being
+counted as well}
 }
 \value{
 Numeric vector of repeat transactions.
 }
 \description{
-Aggregate Event Log to incremental number of repeat transactions
+Aggregate Event Log to incremental number of (repeat) transactions
 }
 \examples{
 elog <- cdnow.sample()$elog
