@@ -11,7 +11,7 @@ test_that("Pareto/NBD MCMC", {
   cbs <- pnbd.GenerateData(n, 52, 52, params, TRUE)$cbs
   
   # estimate parameters
-  draws <- pnbd.mcmc.DrawParameters(cbs)
+  draws <- pnbd.mcmc.DrawParameters(cbs, mc.cores = 1)
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
   
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
@@ -44,7 +44,7 @@ test_that("Pareto/NBD MCMC", {
   # estimate parameters via Ma/Liu
   draws_maliu <- pnbd.mcmc.DrawParameters(cbs,
                                           mcmc = 10, burnin = 0, thin = 2, chains = 2,
-                                          use_data_augmentation = FALSE)
+                                          use_data_augmentation = FALSE, mc.cores = 1)
   expect_equal(apply(as.matrix(draws_maliu$level_2), 2, mean),
                apply(as.matrix(draws$level_2), 2, mean), tolerance = 1)
 }) 

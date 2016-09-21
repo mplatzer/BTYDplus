@@ -14,7 +14,7 @@ test_that("Pareto/NBD Abe MCMC", {
   cbs <- abe.GenerateData(n, T.cal = 32, T.star = 32, params, return.elog = FALSE)$cbs
   
   # estimate parameters
-  draws <- abe.mcmc.DrawParameters(cbs, covariates = c("covariate_1", "covariate_2"))
+  draws <- abe.mcmc.DrawParameters(cbs, covariates = c("covariate_1", "covariate_2"), mc.cores = 1)
   
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
   expect_true(all(c("lambda", "mu", "z", "tau") %in% colnames(as.matrix(draws$level_1[[1]]))))
