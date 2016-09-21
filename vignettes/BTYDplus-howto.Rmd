@@ -53,19 +53,25 @@ The analysis process of an existing customer cohort starts out by collecting a c
 knitr::kable(head(cdnow.sample()$elog[, c("cust", "date", "sales")], 6))
 ```
 
-The BTYDplus package provides some helper methods for dealing with such event logs. For one, we can
-
-
-```{r}
-elog <- cdnow.sample()$elog
-plot(elog2inc(elog, by = 7), typ = "l")
-head(elog)
-```
+The BTYDplus package provides various helper methods for dealing with such event logs. For one, we can convert the logs into weekly and/or daily incremental number of repeat transactions, and have these plotted. Further, we can plot the transaction dates of some randomly sampled customers, to get a feeling for the various timing patterns.
 
 ```{r, fig.show='hold'}
-plotSampledTimingPatterns(elog, n = 25)
-plotSampledTimingPatterns(elog, n = 25)
+elog <- cdnow.sample()$elog
+weekly_inc_all    <- elog2inc(elog, by = 7, first = TRUE)
+weekly_inc_repeat <- elog2inc(elog, by = 7, first = FALSE)
+plot(weekly_inc_all, typ = "l", frame = FALSE,
+     ylab = "", xlab = "", main = "Weekly Transactions")
+lines(weekly_inc_repeat, col = "red")
+
+plotSampledTimingPatterns(elog, n = 20)
 ```
+
+The BTYDplus package also provides an fast implementation for converting the event log into a customer-by-sufficient-statistic summary table, which is the required format for all of the model methods.
+
+```{r}
+cbs <- elog2cbs(elog, T.cal = "1997-09-30", T.tot = "1998-06-30")
+```
+
 
 # Maximum Likelihood Estimated Models
 
