@@ -43,10 +43,10 @@ test_that("elog2cum", {
 
 test_that("plotSampledTimingPatterns", {
 
-  elog <- cdnow.sample()$elog
-  expect_silent(plotSampledTimingPatterns(elog))
-  expect_silent(plotSampledTimingPatterns(elog, T.cal = "1997-09-30"))
-  expect_silent(plotSampledTimingPatterns(elog, n = 100))
-  expect_silent(plotSampledTimingPatterns(head(elog, 5), T.cal = "1997-09-30"))
+  data("groceryElog")
+  expect_silent(plotSampledTimingPatterns(groceryElog))
+  expect_silent(plotSampledTimingPatterns(groceryElog, T.cal = "2006-12-31"))
+  expect_silent(plotSampledTimingPatterns(groceryElog, n = 100))
+  expect_silent(plotSampledTimingPatterns(head(groceryElog, 5), T.cal = "2006-12-31"))
 
 })
