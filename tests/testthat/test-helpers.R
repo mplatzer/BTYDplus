@@ -36,14 +36,14 @@ test_that("elog2cum", {
   data <- cdnow.sample()
   cum <- elog2cum(data$elog)
   utils::data(cdnowSummary, package="BTYD", envir = environment())
-  expect_equal(head(cum, 66), head(cdnowSummary$cu.tracking, 66))
-  # Note: for some weird reason these match only for the first 66 weeks?!
-  # Probably an issue in BTYD package
+  expect_equal(cum, cdnowSummary$cu.tracking)
 
   inc <- elog2inc(data$elog)  
   expect_equal(diff(cum), inc)
   
-})  
+  elog <- data.table(cust = c(1, 1, 1, 3, 3), t = c(0, 9, 18, 4, 6))
+  expect_equal(elog2cum(elog, by = 7), c(1, 2, 3))
+})
 
 
 test_that("plotSampledTimingPatterns", {

@@ -272,7 +272,7 @@ xbgcnbd.pmf <- function(params, t, x, dropout_at_zero = NULL) {
   
   pmf <- as.matrix(sapply(t, function(t) {
     sapply(x, function(x) {
-      bgcnbd_pmf_cpp(params, t, x, dropout_at_zero) # call fast C++ implementation
+      xbgcnbd_pmf_cpp(params, t, x, dropout_at_zero) # call fast C++ implementation
     })
   }))
   if (length(x) == 1) pmf <- t(pmf)
@@ -326,7 +326,7 @@ xbgcnbd.Expectation <- function(params, t, dropout_at_zero = NULL) {
   
   # to save computation time, we collapse vector `t` on to its unique values
   ts <- unique(t)
-  ts_map <- bgcnbd_exp_cpp(params, ts, dropout_at_zero)
+  ts_map <- xbgcnbd_exp_cpp(params, ts, dropout_at_zero)
   names(ts_map) <- ts
   res <- (ts_map[as.character(t)])
   return(res)

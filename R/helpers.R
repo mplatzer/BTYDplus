@@ -297,7 +297,7 @@ cdnow.sample <- function(T.cal = "1997-09-30", T.tot = "1998-06-30") {
 #' cum <- elog2cum(elog)
 #' plot(cum, typ="l")
 elog2cum <- function(elog, by = 7) {
-  t0 <- sales <- NULL  # suppress checkUsage warnings
+  t0 <- sales <- N <- NULL  # suppress checkUsage warnings
   stopifnot("cust" %in% names(elog))
   is.dt <- is.data.table(elog)
   if (!is.dt) 
@@ -308,8 +308,10 @@ elog2cum <- function(elog, by = 7) {
     elog[, `:=`(t, as.numeric(date) - cohort_start)]
   }
   elog[, `:=`(t0, min(t)), by = "cust"]
-  inc <- elog[t > t0, .N, keyby = list(t = ceiling(t))]$N
-  cum <- c(0, cumsum(inc)[seq(by, length(inc) - 1, by = by)], sum(inc))
+  grid <- data.table(t = 0 : ceiling(max(elog$t)))
+  grid <- merge(grid, elog[t > t0, .N, keyby = list(t = ceiling(t))], all.x = TRUE, by = "t")
+  inc <- grid[is.na(N), N := 0L]$N
+  cum <- c(cumsum(inc)[seq(by, length(inc) - 1, by = by)], sum(inc))
   return(cum)
 }
 
