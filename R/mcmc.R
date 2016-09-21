@@ -329,11 +329,10 @@ mcmc.Expectation <- function(draws, t, sample_size = 10000) {
 #' cbs <- elog2cbs(groceryElog)
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
 #'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
-#' # Returns a vector containing cumulative repeat transactions for 728 days.
-#' # All parameters are in weeks; the calibration period lasted 52 weeks
-#' # and the holdout period another 52.
+#' # Returns a vector containing expected cumulative repeat transactions for 104
+#' # weeks, with every eigth week being reported.
 #' mcmc.ExpectedCumulativeTransactions(param.draws, 
-#'   T.cal = cbs$T.cal, T.tot = 104, n.periods.final = 104, sample_size = 1000)
+#'   T.cal = cbs$T.cal, T.tot = 104, n.periods.final = 104/8, sample_size = 1000)
 mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.final, sample_size = 10000) {
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
@@ -421,7 +420,7 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
 #'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
 #' mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 104, cum,
-#'   sample_size = 1000)
+#'   sample_size = 400)
 mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data, 
                                  xlab = "Week", ylab = "Cumulative Transactions", 
                                  xticklab = NULL, title = "Tracking Cumulative Transactions", 
@@ -478,7 +477,7 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
 #'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
 #' mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 104, inc,
-#'   sample_size = 1000)
+#'   sample_size = 400)
 mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data, 
                                  xlab = "Week", ylab = "Transactions", 
                                  xticklab = NULL, title = "Tracking Weekly Transactions", 
