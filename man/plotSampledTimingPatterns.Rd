@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{plotSampledTimingPatterns}
 \alias{plotSampledTimingPatterns}
-\title{Plot timing patterns of sampled customers.}
+\title{Plot timing patterns of sampled customers}
 \usage{
 plotSampledTimingPatterns(elog, T.cal = NULL, n = 50,
   title = "Sampled Timing Patterns")
@@ -18,7 +18,7 @@ transaction time \code{t} or \code{date}.}
 \item{title}{Plot title.}
 }
 \description{
-Plot timing patterns of sampled customers.
+Plot timing patterns of sampled customers
 }
 \examples{
 elog <- cdnow.sample()$elog

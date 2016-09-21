@@ -4,6 +4,7 @@
 - bugfix for `elog2inc` and `elog2cum` for elogs where dates are missing
 - added `groceryElog` dataset
 - use `groceryElog` dataset for demos that can leverage regularity
+- `elog2cbs` prunes columns, if `elog$sales` or `T.cal` is not provided
 
 0.8.3
 - rewrote demos
