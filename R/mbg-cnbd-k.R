@@ -440,7 +440,7 @@ xbgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = NULL) {
 #' @examples
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog)
-#' params <- mbgcnbd.EstimateParameters(cbs)
+#' params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 #' # estimate transactions for next 12 weeks
 #' xstar.est <- mbgcnbd.ConditionalExpectedTransactions(params, 
 #'   T.star = 12, cbs$x, cbs$t.x, cbs$T.cal)
@@ -623,11 +623,11 @@ xbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
 #' @examples
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog)
-#' params <- mbgcnbd.EstimateParameters(cbs)
-#' # Returns a vector containing cumulative repeat transactions for 546 days.
-#' # All parameters are in weeks; the calibration period lasted 39 weeks
-#' # and the holdout period another 39.
-#' mbgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal, T.tot = 104, n.periods.final = 104/4)
+#' params <- mbgcnbd.EstimateParameters(cbs, k = 2)
+#' # Returns a vector containing expected cumulative repeat transactions for 104
+#' # weeks, with every eigth week being reported.
+#' mbgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal, 
+#'   T.tot = 104, n.periods.final = 104/8)
 mbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final) {
   xbgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, n.periods.final, dropout_at_zero = TRUE)
 }
@@ -688,7 +688,7 @@ xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.perio
 #' groceryElog <- groceryElog[groceryElog$date < "2006-06-30", ]
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-04-30")
 #' cum <- elog2cum(groceryElog)
-#' params <- mbgcnbd.EstimateParameters(cbs)
+#' params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 #' mbgcnbd.PlotTrackingCum(params, cbs$T.cal, 
 #'   T.tot = max(cbs$T.cal + cbs$T.star), cum)
 mbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data, 
@@ -752,7 +752,7 @@ xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.dat
 #' groceryElog <- groceryElog[groceryElog$date < "2006-06-30", ]
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-04-30")
 #' inc <- elog2inc(groceryElog)
-#' params <- mbgcnbd.EstimateParameters(cbs)
+#' params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 #' mbgcnbd.PlotTrackingInc(params, cbs$T.cal, 
 #'   T.tot = max(cbs$T.cal + cbs$T.star), inc)
 mbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data, 
