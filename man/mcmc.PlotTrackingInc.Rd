@@ -61,7 +61,7 @@ inc <- elog2inc(groceryElog)
 param.draws <- pnbd.mcmc.DrawParameters(cbs, 
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
 mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 104, inc,
-  sample_size = 1000)
+  sample_size = 400)
 }
 \seealso{
 \code{\link{mcmc.PlotTrackingCum}}

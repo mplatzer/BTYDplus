@@ -9,9 +9,7 @@ nbd.EstimateParameters(cal.cbs, par.start = c(1, 1),
 }
 \arguments{
 \item{cal.cbs}{Calibration period CBS. It must contain columns for frequency 
-\code{x} and total time observed \code{T.cal}. Optionally a column \code{custs} can be 
-provided, which represents number of customers with a specific combination 
-of frequency \code{x} and \code{T.cal}.}
+\code{x} and total time observed \code{T.cal}.}
 
 \item{par.start}{Initial NBD parameters - a vector with \code{r} and \code{alpha} in 
 that order.}

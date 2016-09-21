@@ -31,10 +31,10 @@ for the calibration and holdout periods.
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
-params <- mbgcnbd.EstimateParameters(cbs)
-# Returns a vector containing cumulative repeat transactions for 546 days.
-# All parameters are in weeks; the calibration period lasted 39 weeks
-# and the holdout period another 39.
-mbgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal, T.tot = 104, n.periods.final = 104/4)
+params <- mbgcnbd.EstimateParameters(cbs, k = 2)
+# Returns a vector containing expected cumulative repeat transactions for 104
+# weeks, with every eigth week being reported.
+mbgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal, 
+  T.tot = 104, n.periods.final = 104/8)
 }
 
