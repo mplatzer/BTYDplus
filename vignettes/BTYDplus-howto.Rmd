@@ -47,23 +47,27 @@ All aforementioned models benefit from closed-form solutions for key expressions
 
 ### Workflow
 
-The typical analysis process starts out by reading in a complete log of all events or transactions of an existing customer cohort. It is up to the analyst to define how a customer base is split into cohorts, but typically these are defined based on customers' first transaction date and/or the acquisition channel. The data requirements for such an event log are minimal, and only consist of a customer ID field (`cust`) and a date or timestamp field (`date`). If the analysis should also cover the monetary component, the event log needs to contain a corresponding field `sales`. In order to get started quickly, BTYDplus provides an event log for customers of an online grocery store `data("groceryElog")`.
+The typical analysis process starts out by reading in a complete log of all events or transactions of an existing customer cohort. It is up to the analyst to define how a customer base is split into cohorts, but typically these are defined based on customers' first transaction date and/or the acquisition channel. The data requirements for such an event log are minimal, and only consist of a customer ID field (`cust`) and a date or timestamp field (`date`). If the analysis should also cover the monetary component, the event log needs to contain a corresponding field `sales`. In order to get started quickly, BTYDplus provides an event log for customers of an online grocery store (`data("groceryElog")`).
 
 ```{r, echo=FALSE, results='asis'}
-knitr::kable(head(cdnow.sample()$elog[, c("cust", "date", "sales")], 6), caption = "CDNow Event Log")
+cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"), 
+                      stringsAsFactors = FALSE, 
+                      col.names = c("cust", "sampleid", "date", "cds", "sales"))
+cdnowElog$date <- as.Date(as.character(cdnowElog$date), format = "%Y%m%d")
+knitr::kable(head(cdnowElog[, c("cust", "date", "sales")], 6), caption = "First Entries of CDNow Event Log")
 ```
 
 The BTYDplus package provides various helper methods for dealing with such transaction logs. For one, we can convert the logs into weekly and/or daily incremental number of repeat transactions, and have these plotted. Further, we can plot the transaction dates of some randomly sampled customers, to get a feeling for the various timing patterns.
 
 ```{r, fig.show='hold'}
-cdnowElog <- cdnow.sample()$elog
-weekly_inc_all    <- elog2inc(cdnowElog, by = 7, first = TRUE)
-weekly_inc_repeat <- elog2inc(cdnowElog, by = 7, first = FALSE)
+data("groceryElog")
+weekly_inc_all    <- elog2inc(groceryElog, by = 7, first = TRUE)
+weekly_inc_repeat <- elog2inc(groceryElog, by = 7, first = FALSE)
 plot(weekly_inc_all, typ = "l", frame = FALSE,
      ylab = "", xlab = "", main = "Weekly Transactions")
 lines(weekly_inc_repeat, col = "red")
 
-plotSampledTimingPatterns(cdnowElog, n = 20)
+plotSampledTimingPatterns(groceryElog, n = 20)
 ```
 
 The BTYDplus package also provides with `elog2cbs` a fast implementation for converting the event log into a customer-by-sufficient-statistic summary table, which is the required format for applying the buy-till-you-die models. Note, that compared to BTYD::dc.ElogToCbsCbt this also adds a summary statistic for estimating regularity (`litt`), and summarizes sales, if these are present in the event log. By specifying an end date for the calibration period (`T.cal`), we can easily generate summary statistics split into calibration and holdout period, which can then be used to evaluate forecasting accuracy of our models.
