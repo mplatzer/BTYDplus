@@ -308,8 +308,10 @@ elog2cum <- function(elog, by = 7) {
     elog[, `:=`(t, as.numeric(date) - cohort_start)]
   }
   elog[, `:=`(t0, min(t)), by = "cust"]
-  inc <- elog[t > t0, .N, keyby = list(t = ceiling(t))]$N
-  cum <- c(0, cumsum(inc)[seq(by, length(inc) - 1, by = by)], sum(inc))
+  grid <- data.table(t = 0 : ceiling(max(elog$t)))
+  grid <- merge(grid, elog[t > t0, .N, keyby = list(t = ceiling(t))], all.x = TRUE, by = "t")
+  inc <- grid[is.na(N), N := 0L]$N
+  cum <- c(cumsum(inc)[seq(by, length(inc) - 1, by = by)], sum(inc))
   return(cum)
 }
 
