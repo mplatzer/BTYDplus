@@ -505,7 +505,7 @@ NumericVector pggg_slice_sample(String what,
 // ********* BG/CNBD-k **********
 
 // [[Rcpp::export]]
-double bgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zero = false) {
+double xbgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zero = false) {
   if (params.size() != 5) ::Rf_error("params needs to be of size 5 with (k, r, alpha, a, b)");
   if (t == 0) return(0);
   int k        = params[0];
@@ -518,7 +518,6 @@ double bgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zer
   double P1 = exp(lgamma(b+survivals+1)+lgamma(a+b)-lgamma(b)-lgamma(a+b+survivals+1));
   double P2a = 0;
   for (int i = k*x; i <= k*x+k-1; i++) {
-     // TODO: check whether we can vectorize this loop
     P2a += exp(lgamma(r+i) + r*log(alpha) + i*log(t) - lgamma(i+1) - lgamma(r) - (r+i)*log(alpha+t));
   }
   double P2b;
@@ -529,7 +528,6 @@ double bgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zer
     if (x>0) {
       double cmf = 0;
       for (int i = 0; i <= k*x-1; i++) {
-        // TODO: check whether we can vectorize this loop
         cmf += exp(lgamma(r+i) + r*log(alpha) + i*log(t) - lgamma(i+1) - lgamma(r) - (r+i)*log(alpha+t));
       }
       P2b = P2b * (1-cmf);
@@ -540,7 +538,7 @@ double bgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zer
 }
 
 // [[Rcpp::export]]
-NumericVector bgcnbd_exp_cpp(NumericVector params, NumericVector t, bool dropout_at_zero = false) {
+NumericVector xbgcnbd_exp_cpp(NumericVector params, NumericVector t, bool dropout_at_zero = false) {
   int N = t.size();
   NumericVector res = rep(0.0, N);
   
@@ -549,12 +547,18 @@ NumericVector bgcnbd_exp_cpp(NumericVector params, NumericVector t, bool dropout
   double r     = params[1];
   double alpha = params[2];
   int stop;
-  //Rcpp::Rcout << " stop:" << stop << std::endl;
+  double add;
   for (int j=0; j<N; j++) {
     stop = k * R::qnbinom(0.9999, r, alpha/(alpha+t[j]), TRUE, FALSE);
+    //Rcpp::Rcout << " stop:" << stop << std::endl;
     if (stop < 100) stop = 100;
     for (int i=1; i<stop; i++) {
-      res[j] += i * bgcnbd_pmf_cpp(params, t[j], i, dropout_at_zero);
+      add = i * xbgcnbd_pmf_cpp(params, t[j], i, dropout_at_zero);
+      res[j] += add;
+      if (add < 1e-8 & i >= 100) {
+        //Rcpp::Rcout << " break:" << i << std::endl;
+        break;
+      }
     }
   }
   return res;
@@ -563,10 +567,10 @@ NumericVector bgcnbd_exp_cpp(NumericVector params, NumericVector t, bool dropout
 
 /*** R
   params <- c(3, 0.5, 2, 0.3, 0.6)
-  stopifnot(round(bgcnbd_ll_cpp(params, c(3,4), c(12,12), c(14,14), c(3,3)), 5) == c( -10.42500,-12.22396))
-  stopifnot(round(bgcnbd_pmf_cpp(params, 10, 2), 5) == 0.05669)
-  stopifnot(round(bgcnbd_pmf_cpp(params, 10, 2, TRUE), 5) == 0.04548)
-  stopifnot(round(sum(sapply(0:1000, function(i) bgcnbd_pmf_cpp(params, 10, i))), 5) == 1)
-  stopifnot(round(sum(sapply(1:1000, function(i) i * bgcnbd_pmf_cpp(params, 10, i))), 5) ==
-            round(bgcnbd_exp_cpp(params, 10), 5))
+  stopifnot(round(xbgcnbd_ll_cpp(params, c(3,4), c(12,12), c(14,14), c(3,3)), 5) == c( -10.42500,-12.22396))
+  stopifnot(round(xbgcnbd_pmf_cpp(params, 10, 2), 5) == 0.05669)
+  stopifnot(round(xbgcnbd_pmf_cpp(params, 10, 2, TRUE), 5) == 0.04548)
+  stopifnot(round(sum(sapply(0:1000, function(i) xbgcnbd_pmf_cpp(params, 10, i))), 5) == 1)
+  stopifnot(round(sum(sapply(1:1000, function(i) i * xbgcnbd_pmf_cpp(params, 10, i))), 5) ==
+            round(xbgcnbd_exp_cpp(params, 10), 5))
 */

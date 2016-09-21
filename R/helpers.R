@@ -297,7 +297,7 @@ cdnow.sample <- function(T.cal = "1997-09-30", T.tot = "1998-06-30") {
 #' cum <- elog2cum(elog)
 #' plot(cum, typ="l")
 elog2cum <- function(elog, by = 7) {
-  t0 <- sales <- NULL  # suppress checkUsage warnings
+  t0 <- sales <- N <- NULL  # suppress checkUsage warnings
   stopifnot("cust" %in% names(elog))
   is.dt <- is.data.table(elog)
   if (!is.dt) 
