@@ -25,7 +25,8 @@ List of estimated parameters.
 Estimates parameters for the NBD model via Maximum Likelihood Estimation.
 }
 \examples{
-cbs <- cdnow.sample()$cbs
+data("groceryElog")
+cbs <- elog2cbs(groceryElog)
 nbd.EstimateParameters(cbs)
 }
 \references{

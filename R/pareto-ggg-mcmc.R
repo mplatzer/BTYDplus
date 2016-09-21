@@ -26,9 +26,10 @@
 #' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 #' @seealso \code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 #' @examples 
-#' cbs <- cdnow.sample()$cbs
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 #' param.draws <- pggg.mcmc.DrawParameters(cbs, 
-#'   mcmc = 20, burnin = 10, thin = 2, chains = 1) # short MCMC runs for demo purposes
+#'   mcmc = 20, burnin = 10, thin = 2, chains = 1) # short MCMC to run demo fast
 #' 
 #' # cohort-level parameter draws
 #' as.matrix(param.draws$level_2)
@@ -226,7 +227,14 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #'
 #' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 #' @export
+#' @examples
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
+#' param.draws <- pggg.mcmc.DrawParameters(cbs, 
+#'   mcmc = 20, burnin = 10, thin = 2, chains = 1) # short MCMC to run demo fast
+#' pggg.plotRegularityRateHeterogeneity(param.draws)
 pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL) {
+  stopifnot("t" %in% coda::varnames(draws$level_2))
   ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
   if (!is.null(fn)) 
     ks <- apply(ks, 2, fn)

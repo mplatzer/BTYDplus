@@ -9,8 +9,10 @@
 #'   at end of calibration period
 #' @export
 #' @examples
-#' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' mcmc.PAlive(param.draws)
 mcmc.PAlive <- function(draws) {
   nr_of_cust <- length(draws$level_1)
@@ -39,8 +41,10 @@ mcmc.PAlive <- function(draws) {
 #' @return 2-dim matrix [draw x cust] with sampled future transactions.
 #' @export
 #' @examples
-#' cbs <- cdnow.sample()$cbs 
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 #' cbs$xstar.est <- apply(xstar.draws, 2, mean)
 #' cbs$pactive <- mcmc.PActive(xstar.draws)
@@ -126,8 +130,10 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star,
 #'   during the holdout period.
 #' @export
 #' @examples
-#' cbs <- cdnow.sample()$cbs 
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 #' cbs$pactive <- mcmc.PActive(xstar.draws)
 #' head(cbs)
@@ -146,8 +152,10 @@ mcmc.PActive <- function(xstar) {
 #' @return 2-element list with MCMC draws
 #' @export
 #' @examples
-#' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' param.draws.stable <- mcmc.setBurnin(param.draws, burnin = 200)
 mcmc.setBurnin <- function(draws, burnin) {
   if (burnin < start(draws$level_2) | burnin > end(draws$level_2)) 
@@ -166,8 +174,10 @@ mcmc.setBurnin <- function(draws, burnin) {
 #' @param title Plot title.
 #' @export
 #' @examples
-#' cbs <- cdnow.sample()$cbs
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 #' mcmc.plotPActiveDiagnostic(cbs, xstar.draws)
 mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for P(active)") {
@@ -219,9 +229,10 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
 #'   matrix.
 #' @export
 #' @examples
-#' cbs <- cdnow.sample()$cbs # load CDNow summary data
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog)
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' mcmc.pmf(param.draws, t = 52, x = 0:6)
 #' mcmc.pmf(param.draws, t = c(26, 52), x = 0:6)
 mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
@@ -276,9 +287,10 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
 #'   time period of length t.
 #' @export
 #' @examples
-#' cbs <- cdnow.sample()$cbs # load CDNow summary data
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs,
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' mcmc.Expectation(param.draws, t = c(26, 52))
 mcmc.Expectation <- function(draws, t, sample_size = 10000) {
   pmf <- mcmc.pmf(draws, t, 0:100, sample_size = sample_size)
@@ -312,16 +324,16 @@ mcmc.Expectation <- function(draws, t, sample_size = 10000) {
 #' @return Numeric vector of expected cumulative total repeat transactions by
 #'   all customers.
 #' @export
-#' @examples 
-#' cbs <- cdnow.sample()$cbs
-#' # short MCMC runs and small sample size to speedup demo
+#' @examples
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog)
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) 
-#' # Returns a vector containing cumulative repeat transactions for 546 days.
-#' # All parameters are in weeks; the calibration period lasted 39 weeks
-#' # and the holdout period another 39.
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
+#' # Returns a vector containing cumulative repeat transactions for 728 days.
+#' # All parameters are in weeks; the calibration period lasted 52 weeks
+#' # and the holdout period another 52.
 #' mcmc.ExpectedCumulativeTransactions(param.draws, 
-#'   T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78, sample_size = 1000)
+#'   T.cal = cbs$T.cal, T.tot = 104, n.periods.final = 104, sample_size = 1000)
 mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.final, sample_size = 10000) {
   if (any(T.cal < 0) || !is.numeric(T.cal)) 
     stop("T.cal must be numeric and may not contain negative numbers.")
@@ -403,13 +415,12 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 #' @seealso \code{\link{mcmc.PlotTrackingInc}}
 #'   \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2cum}}
 #' @examples
-#' cdnow <- cdnow.sample()
-#' cbs <- cdnow$cbs
-#' cum <- elog2cum(cdnow$elog)
-#' # short MCMC runs and small sample size to speedup demo
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
+#' cum <- elog2cum(groceryElog)
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) 
-#' mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 78, cum,
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
+#' mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 104, cum,
 #'   sample_size = 1000)
 mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data, 
                                  xlab = "Week", ylab = "Cumulative Transactions", 
@@ -461,13 +472,12 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 #' @seealso \code{\link{mcmc.PlotTrackingCum}}
 #'   \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}}
 #' @examples
-#' cdnow <- cdnow.sample()
-#' cbs <- cdnow$cbs
-#' inc <- elog2inc(cdnow$elog)
-#' # short MCMC runs and small sample size to speedup demo
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
+#' inc <- elog2inc(groceryElog)
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) 
-#' mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 78, inc,
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
+#' mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 104, inc,
 #'   sample_size = 1000)
 mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data, 
                                  xlab = "Week", ylab = "Transactions", 
@@ -511,10 +521,10 @@ mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data,
 #' @export
 #' @seealso \code{\link{mcmc.pmf}}
 #' @examples 
-#' cbs <- cdnow.sample()$cbs
-#' # for demo purposes we use short MCMC runs and small sample size
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1)
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' mcmc.PlotFrequencyInCalibration(param.draws, cbs, sample_size = 100)
 mcmc.PlotFrequencyInCalibration <- function(draws, cal.cbs, censor = 7, 
                                             xlab = "Calibration period transactions", 

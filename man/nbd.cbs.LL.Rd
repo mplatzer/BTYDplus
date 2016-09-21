@@ -23,7 +23,8 @@ The total log-likelihood for the provided data.
 Calculate the log-likelihood of the NBD model
 }
 \examples{
-cbs <- cdnow.sample()$cbs
+data("groceryElog")
+cbs <- elog2cbs(groceryElog)
 params <- nbd.EstimateParameters(cbs)
 nbd.cbs.LL(params, cbs)
 }

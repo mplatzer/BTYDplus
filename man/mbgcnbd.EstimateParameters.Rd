@@ -46,7 +46,8 @@ Estimates parameters for the (M)BG/CNBD-k model via Maximum Likelihood
 Estimation.
 }
 \examples{
-cbs <- cdnow.sample()$cbs
+data("groceryElog")
+cbs <- elog2cbs(groceryElog)
 (params <- mbgcnbd.EstimateParameters(cbs))
 }
 \references{

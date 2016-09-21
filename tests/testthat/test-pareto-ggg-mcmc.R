@@ -22,7 +22,6 @@ test_that("Pareto/GGG MCMC", {
   # plot regularity rate
   pggg.plotRegularityRateHeterogeneity(draws)
   
-  skip('not run as it takes too long; run this manually')
   skip_on_cran()
   skip_on_travis()
   skip_on_appveyor()

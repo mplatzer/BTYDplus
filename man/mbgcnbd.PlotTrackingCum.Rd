@@ -44,11 +44,13 @@ customers for the calibration and holdout periods, and returns this
 comparison in a matrix.
 }
 \examples{
-cdnow <- cdnow.sample()
-cbs <- cdnow$cbs
-cum <- elog2cum(cdnow$elog)
+data("groceryElog")
+groceryElog <- groceryElog[groceryElog$date < "2006-06-30", ]
+cbs <- elog2cbs(groceryElog, T.cal = "2006-04-30")
+cum <- elog2cum(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs)
-mbgcnbd.PlotTrackingCum(params, cbs$T.cal, T.tot = 78, cum)
+mbgcnbd.PlotTrackingCum(params, cbs$T.cal, 
+  T.tot = max(cbs$T.cal + cbs$T.star), cum)
 }
 \seealso{
 \code{\link{bgcnbd.PlotTrackingInc}}

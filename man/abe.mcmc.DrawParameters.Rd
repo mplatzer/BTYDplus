@@ -41,10 +41,11 @@ parameters, on cohort as well as on customer level.
 See \code{demo('pareto-abe')} for how to apply this model.
 }
 \examples{
-cbs <- cdnow.sample()$cbs
-cbs$sales.avg <- cbs$sales / (cbs$x + 1)
-param.draws <- abe.mcmc.DrawParameters(cbs, c("sales.avg", "sales"), 
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+data("groceryElog")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
+cbs$cov1 <- as.integer(cbs$cust) \%\% 2 # create dummy covariate
+param.draws <- abe.mcmc.DrawParameters(cbs, c("cov1"), 
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 
 # cohort-level parameter draws
 as.matrix(param.draws$level_2)

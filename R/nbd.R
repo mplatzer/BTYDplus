@@ -15,7 +15,8 @@
 #' @references EHRENBERG, ASC. 'The Pattern of Consumer Purchases.' Quantitative
 #'   techniques in marketing analysis: text and readings (1962): 355.
 #' @examples
-#' cbs <- cdnow.sample()$cbs
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog)
 #' nbd.EstimateParameters(cbs)
 nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value = 10000) {
   dc.check.model.params.safe(c("r", "alpha"), par.start, "nbd.EstimateParameters")
@@ -45,7 +46,8 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
 #' @return The total log-likelihood for the provided data.
 #' @export
 #' @examples
-#' cbs <- cdnow.sample()$cbs
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog)
 #' params <- nbd.EstimateParameters(cbs)
 #' nbd.cbs.LL(params, cbs)
 nbd.cbs.LL <- function(params, cal.cbs) {
@@ -111,7 +113,8 @@ nbd.LL <- function(params, x, T.cal) {
 #'   number of transactions.
 #' @export
 #' @examples
-#' cbs <- cdnow.sample()$cbs
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 #' params <- nbd.EstimateParameters(cbs)
 #' xstar.est <- nbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$T.cal)
 #' sum(xstar.est) # expected total number of transactions during holdout

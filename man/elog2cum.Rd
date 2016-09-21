@@ -7,25 +7,26 @@
 elog2cum(elog, by = 7, first = FALSE)
 }
 \arguments{
-\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and
+\item{elog}{Event log, a \code{data.frame} with columns \code{cust} and 
 transaction time \code{t} or \code{date}.}
 
-\item{by}{Only return every \code{}-th number. Defaults to 7, and thus
+\item{by}{Only return every \code{}-th number. Defaults to 7, and thus 
 returns weekly numbers.}
 
-\item{first}{If TRUE, then the first transaction for each customer is being
+\item{first}{If TRUE, then the first transaction for each customer is being 
 counted as well}
 }
 \value{
 Numeric vector of cumulative repeat transactions.
 }
 \description{
-Aggregate Event Log to cumulative number of (repeat) transactions
+Duplicate transactions with identical `cust` and `date` (or `t`) field are
+counted only once.
 }
 \examples{
-elog <- cdnow.sample()$elog
-cum <- elog2cum(elog)
-plot(cum, typ="l")
+data("groceryElog")
+cum <- elog2cum(groceryElog)
+plot(cum, typ="l", frame = FALSE)
 }
 \seealso{
 \code{\link{elog2inc}}
