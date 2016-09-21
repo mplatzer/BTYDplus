@@ -1,5 +1,4 @@
 cdnow          Demonstration of fitting various models to the CDNow dataset
-grocery        Demonstration of fitting various models to the grocery dataset
-mbg-cnbd-k     Demonstration of MBG/CNBD-k model
-pareto-abe     Demonstration of Abe's Pareto/NBD variant
-pareto-ggg     Demonstration of Pareto/NBD (HB) & Pareto/GGG model
+mbg-cnbd-k     Demonstration of MBG/CNBD-k model with grocery dataset
+pareto-abe     Demonstration of Abe's Pareto/NBD variant with CDNow dataset
+pareto-ggg     Demonstration of Pareto/NBD (HB) & Pareto/GGG model with grocery dataset

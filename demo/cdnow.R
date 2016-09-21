@@ -136,6 +136,6 @@ c("Estimated Sales" = sum(cbs$sales.mbgcnbd),
   "Actual Sales"    = sum(cbs$sales.star))
 
 
-x <- readline("For a demo of Pareto/GGG and Pareto/NBD (HB) see `demo(\"pareto-ggg\")`.")
-
 x <- readline("For a demo of Pareto/NBD (Abe) see `demo(\"pareto-abe\")`.")
+
+x <- readline("For a demo of Pareto/GGG and Pareto/NBD (HB) see `demo(\"pareto-ggg\")`.")
