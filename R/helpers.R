@@ -294,7 +294,7 @@ elog2cbs <- function(elog, per = "week", T.cal = NULL, T.tot = NULL) {
 #' cum <- elog2cum(groceryElog)
 #' plot(cum, typ="l", frame = FALSE)
 elog2cum <- function(elog, by = 7, first = FALSE) {
-  t0 <- sales <- N <- NULL  # suppress checkUsage warnings
+  t0 <- sales <- N <- cust <- NULL  # suppress checkUsage warnings
   stopifnot("cust" %in% names(elog))
   stopifnot(is.logical(first) & length(first) == 1)
   is.dt <- is.data.table(elog)
@@ -308,7 +308,7 @@ elog2cum <- function(elog, by = 7, first = FALSE) {
     cohort_start <- min(as.numeric(elog$date))
     elog[, `:=`(t, as.numeric(date) - cohort_start)]
   }
-  elog <- unique(elog[, .(cust, t)])
+  elog <- unique(elog[, list(cust, t)])
   elog[, `:=`(t0, min(t)), by = "cust"]
   grid <- data.table(t = 0 : ceiling(max(elog$t)))
   grid <- merge(grid, elog[first | t > t0, .N, keyby = list(t = ceiling(t))], all.x = TRUE, by = "t")
