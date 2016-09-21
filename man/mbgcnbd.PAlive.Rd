@@ -32,7 +32,8 @@ to return the probability that they are still alive at the end of the
 calibration period.
 }
 \examples{
-cbs <- cdnow.sample()$cbs # load CDNow summary data
+data("groceryElog")
+cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs)
 palive <- mbgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
 head(palive) # Probability of being alive for first 6 customers

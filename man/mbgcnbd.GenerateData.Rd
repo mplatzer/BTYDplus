@@ -36,7 +36,8 @@ Simulate data according to (M)BG/CNBD-k model assumptions
 }
 \examples{
 params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32, params, return.elog = TRUE)
+data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32, 
+  params, return.elog = TRUE)
 
 # customer by sufficient summary statistic - one row per customer
 head(data$cbs)

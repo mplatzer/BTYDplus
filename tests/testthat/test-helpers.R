@@ -18,19 +18,6 @@ test_that("dc.check.model.params.safe", {
 })
 
 
-test_that("cdnow.sample", {
-
-  data <- cdnow.sample()
-  expect_equal(names(data), c("elog", "cbs"))
-  expect_is(data$cbs, "data.frame")
-  expect_is(data$elog, "data.frame")
-  expect_equal(names(data$elog), c("cust", "date", "sales", "cds"))
-  expect_equal(names(data$cbs), c("cust", "x", "t.x", "litt", "sales", "first", "T.cal", "T.star", "x.star", "sales.star"))
-  expect_equal(nrow(data$cbs), 2357)
-  expect_equal(min(data$cbs$T.cal), 27)
-})
-
-
 test_that("elog2cum", {
 
   data <- cdnow.sample()
@@ -41,10 +28,13 @@ test_that("elog2cum", {
   inc <- elog2inc(data$elog)
   expect_equal(diff(cum), inc)
 
-  elog <- data.table(cust = c(1, 1, 1, 3, 3), t = c(0, 9, 18, 4, 6))
+  elog <- data.frame(cust = c(1, 1, 1, 3, 3), t = c(0, 9, 18, 4, 6))
   expect_equal(elog2cum(elog, by = 7), c(1, 2, 3))
   expect_equal(elog2cum(elog, by = 7, first = TRUE), c(3, 4, 5))
   expect_equal(diff(elog2cum(elog, by = 7, first = TRUE)), elog2inc(elog, by = 7, first = TRUE))
+
+  elog <- data.table(cust = c(1, 1, 1, 1, 3, 3), t = c(0, 9, 9, 18, 4, 6))
+  expect_equal(elog2cum(elog, by = 7), c(1, 2, 3))
 })
 
 

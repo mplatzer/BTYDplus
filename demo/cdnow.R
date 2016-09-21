@@ -1,10 +1,14 @@
 
 #' Load transaction records of 2357 CDNow customers.
-elog <- cdnow.sample()$elog
+cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"), 
+                      stringsAsFactors = FALSE, 
+                      col.names = c("cust", "sampleid", "date", "cds", "sales"))
+cdnowElog$date <- as.Date(as.character(cdnowElog$date), format = "%Y%m%d")
+head(cdnowElog)
 
 #' Convert from event log to customer-by-sufficient-statistic summary.
 #' Split into 39 weeks calibration, and 39 weeks holdout period.
-cbs <- elog2cbs(elog, T.cal = "1997-09-30", T.tot = "1998-06-30")
+cbs <- elog2cbs(cdnowElog, T.cal = "1997-09-30", T.tot = "1998-06-30")
 head(cbs)
 
 
@@ -75,7 +79,7 @@ par(op)
 
 x <- readline("Plot Incremental Transactions (press Enter)")
 
-inc <- elog2inc(elog)
+inc <- elog2inc(cdnowElog)
 op <- par(mfrow = c(1, 2))
 nil <- mbgcnbd.PlotTrackingInc(params.mbgcnbd, cbs$T.cal, T.tot = 78, inc, title = "MBG/CNBD-k")
 nil <- BTYD::pnbd.PlotTrackingInc(params.pnbd, cbs$T.cal, T.tot = 78, inc, title = "Pareto/NBD")
@@ -99,7 +103,6 @@ cbs$xstar.bgcnbd <- bgcnbd.ConditionalExpectedTransactions(
 
 measures <- c(
   "MAE" = function(a, f) mean(abs(a - f)),
-  "RMSE" = function(a, f) sqrt(mean((a - f)^2)),
   "MSLE" = function(a, f) mean(((log(a + 1) - log(f + 1)))^2),
   "BIAS" = function(a, f) sum(f)/sum(a) - 1)
 models <- c(
@@ -136,6 +139,4 @@ c("Estimated Sales" = sum(cbs$sales.mbgcnbd),
   "Actual Sales"    = sum(cbs$sales.star))
 
 
-x <- readline("For a demo of Pareto/NBD (Abe) see `demo(\"pareto-abe\")`.")
-
-x <- readline("For a demo of Pareto/GGG and Pareto/NBD (HB) see `demo(\"pareto-ggg\")`.")
+x <- readline("For a demo of Pareto/NBD (Abe) with CDNow see `demo(\"pareto-abe\")`.")

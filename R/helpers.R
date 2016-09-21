@@ -27,11 +27,11 @@
 #'
 #' @export
 #' @examples
-#' elog <- cdnow.sample()$elog[, c("cust", "date")]
-#' estimateRegularity(elog, plot = TRUE, method = 'wheat')
-#' estimateRegularity(elog, plot = TRUE, method = 'mle-minka')
-#' estimateRegularity(elog, plot = TRUE, method = 'mle-thom')
-#' estimateRegularity(elog, plot = TRUE, method = 'cv')
+#' data("groceryElog")
+#' estimateRegularity(groceryElog, plot = TRUE, method = 'wheat')
+#' estimateRegularity(groceryElog, plot = TRUE, method = 'mle-minka')
+#' estimateRegularity(groceryElog, plot = TRUE, method = 'mle-thom')
+#' estimateRegularity(groceryElog, plot = TRUE, method = 'cv')
 estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
   if (!"cust" %in% names(elog))
     stop("Error in estimateRegularity: elog must have a column labelled \"cust\"")
@@ -114,11 +114,11 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 
     if (plot) {
       ymax <- median(ks) * 3
-      boxplot(ks, horizontal = TRUE, ylim = c(0, ymax), frame = FALSE, axes = FALSE)
+      suppressWarnings(boxplot(ks, horizontal = TRUE, ylim = c(0, ymax), frame = FALSE, axes = FALSE))
       axis(1, at = 0:ymax)
       axis(3, at = 0:ymax, labels = rep("", 1 + ymax))
       abline(v = 1:ymax, lty = "dotted", col = "lightgray")
-      boxplot(ks, horizontal = TRUE, add = TRUE, col = "gray", frame = FALSE, axes = FALSE)
+      suppressWarnings(boxplot(ks, horizontal = TRUE, add = TRUE, col = "gray", frame = FALSE, axes = FALSE))
     }
 
     return(median(ks))
@@ -135,9 +135,9 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 #' @param title Plot title.
 #' @export
 #' @examples
-#' elog <- cdnow.sample()$elog
-#' plotSampledTimingPatterns(elog, T.cal = "1997-09-30")
-plotSampledTimingPatterns <- function(elog, T.cal = NULL, n = 50, title = "Sampled Timing Patterns") {
+#' data("groceryElog")
+#' plotSampledTimingPatterns(groceryElog, T.cal = "2006-12-31")
+plotSampledTimingPatterns <- function(elog, T.cal = NULL, n = 30, title = "Sampled Timing Patterns") {
 
   cust <- first <- t <- V1 <- NULL  # suppress checkUsage warnings
   elog_dt <- setDT(copy(elog))
@@ -206,8 +206,8 @@ plotSampledTimingPatterns <- function(elog, T.cal = NULL, n = 50, title = "Sampl
 #' \item{\code{sales.star}}{sum of sales within holdout period; only if \code{T.cal} and \code{elog$sales} are provided}
 #' @export
 #' @examples
-#' elog <- cdnow.sample()$elog
-#' cbs <- elog2cbs(elog, T.cal = "1998-01-01", T.tot = "1998-03-31")
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 #' head(cbs)
 elog2cbs <- function(elog, per = "week", T.cal = NULL, T.tot = NULL) {
   cust <- first <- itt <- T.star <- x.star <- sales <- sales.star <- NULL  # suppress checkUsage warnings
@@ -275,62 +275,40 @@ elog2cbs <- function(elog, per = "week", T.cal = NULL, T.tot = NULL) {
 }
 
 
-#' CDNow Sample Data
-#'
-#' This is a convenience wrapper for \code{data('cdnowElog', package='BTYD')},
-#' with same-day transactions being merged together for each customer.
-#'
-#' @references Fader, Peter S. and Bruce G.,S. Hardie, (2001), 'Forecasting
-#'   Repeat Sales at CDNOW: A Case Study,' Interfaces, 31 (May-June), Part 2 of
-#'   2, S94-S107.
-#' @param T.cal Final date of calibration period.
-#' @param T.tot Final date of holdout period.
-#' @return List of length 2:
-#' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns, generated with \code{\link{elog2cbs}}}
-#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date}, \code{sales} and \code{cds}.}
-#' @export
-#' @examples
-#' cdnow <- cdnow.sample()
-#' head(cdnow$cbs)
-#' head(cdnow$elog)
-cdnow.sample <- function(T.cal = "1997-09-30", T.tot = "1998-06-30") {
-  cds <- sales <- NULL  # suppress checkUsage warnings
-  elog <- fread(system.file("data/cdnowElog.csv", package = "BTYD"))
-  setnames(elog, "masterid", "cust")
-  elog <- elog[, list(sales = sum(sales), cds = sum(cds)), by = "cust,date"]
-  elog[, `:=`(date, as.Date(as.character(date), "%Y%m%d"))]
-  cbs <- elog2cbs(elog, per = "week", T.cal = T.cal, T.tot = T.tot)
-  return(list(elog = as.data.frame(elog), cbs = as.data.frame(cbs)))
-}
-
-
 #' Aggregate Event Log to cumulative number of (repeat) transactions
-#'
-#' @param elog Event log, a \code{data.frame} with columns \code{cust} and
+#' 
+#' Duplicate transactions with identical `cust` and `date` (or `t`) field are
+#' counted only once.
+#' 
+#' @param elog Event log, a \code{data.frame} with columns \code{cust} and 
 #'   transaction time \code{t} or \code{date}.
-#' @param by Only return every \code{}-th number. Defaults to 7, and thus
+#' @param by Only return every \code{}-th number. Defaults to 7, and thus 
 #'   returns weekly numbers.
-#' @param first If TRUE, then the first transaction for each customer is being
+#' @param first If TRUE, then the first transaction for each customer is being 
 #'   counted as well
 #' @return Numeric vector of cumulative repeat transactions.
 #' @export
 #' @seealso \code{\link{elog2inc}}
 #' @examples
-#' elog <- cdnow.sample()$elog
-#' cum <- elog2cum(elog)
-#' plot(cum, typ="l")
+#' data("groceryElog")
+#' cum <- elog2cum(groceryElog)
+#' plot(cum, typ="l", frame = FALSE)
 elog2cum <- function(elog, by = 7, first = FALSE) {
   t0 <- sales <- N <- NULL  # suppress checkUsage warnings
   stopifnot("cust" %in% names(elog))
   stopifnot(is.logical(first) & length(first) == 1)
   is.dt <- is.data.table(elog)
-  if (!is.dt)
-    elog <- as.data.table(elog) else elog <- copy(elog)
+  if (!is.dt) {
+    elog <- as.data.table(elog)
+  } else {
+    elog <- copy(elog)
+  }
   if (!"t" %in% names(elog)) {
     stopifnot("date" %in% names(elog))
     cohort_start <- min(as.numeric(elog$date))
     elog[, `:=`(t, as.numeric(date) - cohort_start)]
   }
+  elog <- unique(elog[, .(cust, t)])
   elog[, `:=`(t0, min(t)), by = "cust"]
   grid <- data.table(t = 0 : ceiling(max(elog$t)))
   grid <- merge(grid, elog[first | t > t0, .N, keyby = list(t = ceiling(t))], all.x = TRUE, by = "t")
@@ -352,9 +330,9 @@ elog2cum <- function(elog, by = 7, first = FALSE) {
 #' @export
 #' @seealso \code{\link{elog2cum}}
 #' @examples
-#' elog <- cdnow.sample()$elog
-#' inc <- elog2inc(elog)
-#' plot(inc, typ="l")
+#' data("groceryElog")
+#' inc <- elog2inc(groceryElog)
+#' plot(inc, typ="l", frame = FALSE)
 elog2inc <- function(elog, by = 7, first = FALSE) {
   cum <- elog2cum(elog = elog, by = by, first = first)
   return(diff(cum))

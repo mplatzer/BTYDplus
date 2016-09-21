@@ -44,8 +44,8 @@ from the result. Transactions with identical \code{cust} and \code{date}
 field are treated as a single transaction, with `sales` being summed up.
 }
 \examples{
-elog <- cdnow.sample()$elog
-cbs <- elog2cbs(elog, T.cal = "1998-01-01", T.tot = "1998-03-31")
+data("groceryElog")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 head(cbs)
 }
 

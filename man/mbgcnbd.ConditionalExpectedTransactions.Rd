@@ -37,10 +37,12 @@ to return the number of transactions they are expected to make in a given
 time period.
 }
 \examples{
-cbs <- cdnow.sample()$cbs # load CDNow summary data
+data("groceryElog")
+cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs)
+# estimate transactions for next 12 weeks
 xstar.est <- mbgcnbd.ConditionalExpectedTransactions(params, 
-  cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+  T.star = 12, cbs$x, cbs$t.x, cbs$T.cal)
 head(xstar.est) # expected number of transactions for first 6 customers
 sum(xstar.est) # expected total number of transactions during holdout
 }

@@ -54,13 +54,12 @@ return result varies from one call to another. Larger values of
 \code{sample_size} will generate more stable results.
 }
 \examples{
-cdnow <- cdnow.sample()
-cbs <- cdnow$cbs
-cum <- elog2cum(cdnow$elog)
-# short MCMC runs and small sample size to speedup demo
+data("groceryElog")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
+cum <- elog2cum(groceryElog)
 param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) 
-mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 78, cum,
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
+mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 104, cum,
   sample_size = 1000)
 }
 \seealso{

@@ -42,9 +42,10 @@ parameters, on cohort as well as on customer level.
 See \code{demo('pareto-ggg')} for how to apply this model.
 }
 \examples{
-cbs <- cdnow.sample()$cbs
+data("groceryElog")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 param.draws <- pggg.mcmc.DrawParameters(cbs, 
-  mcmc = 20, burnin = 10, thin = 2, chains = 1) # short MCMC runs for demo purposes
+  mcmc = 20, burnin = 10, thin = 2, chains = 1) # short MCMC to run demo fast
 
 # cohort-level parameter draws
 as.matrix(param.draws$level_2)

@@ -2,7 +2,7 @@
 - add argument `first` to `elog2cum` and `elog2inc`
 - added AppVeyor for automated build tests on Windows
 - bugfix for `elog2inc` and `elog2cum` for elogs where dates are missing
-- added `groceryElog` dataset
+- added `groceryElog` dataset, and remove `cdnow.sample()`
 - use `groceryElog` dataset for demos that can leverage regularity
 - `elog2cbs` prunes columns, if `elog$sales` or `T.cal` is not provided
 

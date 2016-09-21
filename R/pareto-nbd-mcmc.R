@@ -45,9 +45,10 @@
 #' @references Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD model and possible extensions.' Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
 #' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
 #' @examples 
-#' cbs <- cdnow.sample()$cbs
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' 
 #' # cohort-level parameter draws
 #' as.matrix(param.draws$level_2)

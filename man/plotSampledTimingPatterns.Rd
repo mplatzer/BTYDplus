@@ -4,7 +4,7 @@
 \alias{plotSampledTimingPatterns}
 \title{Plot timing patterns of sampled customers}
 \usage{
-plotSampledTimingPatterns(elog, T.cal = NULL, n = 50,
+plotSampledTimingPatterns(elog, T.cal = NULL, n = 30,
   title = "Sampled Timing Patterns")
 }
 \arguments{
@@ -21,7 +21,7 @@ transaction time \code{t} or \code{date}.}
 Plot timing patterns of sampled customers
 }
 \examples{
-elog <- cdnow.sample()$elog
-plotSampledTimingPatterns(elog, T.cal = "1997-09-30")
+data("groceryElog")
+plotSampledTimingPatterns(groceryElog, T.cal = "2006-12-31")
 }
 

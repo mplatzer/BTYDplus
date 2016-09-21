@@ -24,11 +24,12 @@
 #' @export
 #' @seealso \code{\link{abe.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 #' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
-#' @examples 
-#' cbs <- cdnow.sample()$cbs
-#' cbs$sales.avg <- cbs$sales / (cbs$x + 1)
-#' param.draws <- abe.mcmc.DrawParameters(cbs, c("sales.avg", "sales"), 
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+#' @examples
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
+#' cbs$cov1 <- as.integer(cbs$cust) %% 2 # create dummy covariate
+#' param.draws <- abe.mcmc.DrawParameters(cbs, c("cov1"), 
+#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' 
 #' # cohort-level parameter draws
 #' as.matrix(param.draws$level_2)
@@ -259,7 +260,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burn
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
 #' @export
-#' @examples 
+#' @examples
 #' # generate artificial Pareto/NBD Abe with 2 covariates
 #' params <- list()
 #' params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)

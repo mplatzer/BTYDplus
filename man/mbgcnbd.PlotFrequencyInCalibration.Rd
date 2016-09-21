@@ -38,7 +38,8 @@ number of customers who made a certain number of repeat transactions in the
 calibration period, binned according to calibration period frequencies.
 }
 \examples{
-cbs <- cdnow.sample()$cbs
+data("groceryElog")
+cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs)
 mbgcnbd.PlotFrequencyInCalibration(params, cbs)
 }

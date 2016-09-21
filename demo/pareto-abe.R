@@ -1,6 +1,13 @@
-#' Load CDNow summary data
-cbs <- cdnow.sample()$cbs
-set.seed(1234)
+
+#' Load transaction records of 2357 CDNow customers.
+cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"), 
+                      stringsAsFactors = FALSE, 
+                      col.names = c("cust", "sampleid", "date", "cds", "sales"))
+cdnowElog$date <- as.Date(as.character(cdnowElog$date), format = "%Y%m%d")
+
+#' Convert from event log to customer-by-sufficient-statistic summary.
+#' Split into 39 weeks calibration, and 39 weeks holdout period.
+cbs <- elog2cbs(cdnowElog, T.cal = "1997-09-30", T.tot = "1998-06-30")
 
 
 x <- readline("Estimate Pareto/NBD Abe without covariates (press Enter)")
@@ -17,7 +24,7 @@ round(summary(draws.m1$level_2)$quantiles[, c("2.5%", "50%", "97.5%")], 2)
 x <- readline("Estimate Pareto/NBD Abe with covariates (press Enter)")
 
 #' Append dollar amount of first purchase to use as covariate
-first <- aggregate(sales ~ cust, cdnow.sample()$elog, head, n = 1)
+first <- aggregate(sales ~ cust, cdnowElog, head, n = 1)
 names(first) <- c("cust", "first.sales")
 cbs <- merge(cbs, first, by = "cust")
 
@@ -30,8 +37,8 @@ draws.m2 <- abe.mcmc.DrawParameters(
 round(summary(draws.m2$level_2)$quantiles[, c("2.5%", "50%", "97.5%")], 4)
 #' -> Parameter Estimates match Table 3 in Abe (2009), except for 
 #' `log_lambda_first` and `log_mu_first`; note however, that via simulation we
-#' can establish that the implementation is able to re-identify the underlying
-#' parameters correctly
+#' can establish that our implementation is able to re-identify the underlying
+#' parameters correctly; see `tests/testthat/test-pareto-nbd-abe.R`
 
 
 x <- readline("Compare predictive performance of the two models (press Enter)")

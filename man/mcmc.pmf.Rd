@@ -33,9 +33,10 @@ provided parameter draws. Due to this sampling, the return result varies from
 one call to another.
 }
 \examples{
-cbs <- cdnow.sample()$cbs # load CDNow summary data
+data("groceryElog")
+cbs <- elog2cbs(groceryElog)
 param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC runs for demo purposes
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 mcmc.pmf(param.draws, t = 52, x = 0:6)
 mcmc.pmf(param.draws, t = c(26, 52), x = 0:6)
 }

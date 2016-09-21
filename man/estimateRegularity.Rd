@@ -28,11 +28,11 @@ return the median across estimates; this requires sufficient (>=10)
 transactions per customer
 }
 \examples{
-elog <- cdnow.sample()$elog[, c("cust", "date")]
-estimateRegularity(elog, plot = TRUE, method = 'wheat')
-estimateRegularity(elog, plot = TRUE, method = 'mle-minka')
-estimateRegularity(elog, plot = TRUE, method = 'mle-thom')
-estimateRegularity(elog, plot = TRUE, method = 'cv')
+data("groceryElog")
+estimateRegularity(groceryElog, plot = TRUE, method = 'wheat')
+estimateRegularity(groceryElog, plot = TRUE, method = 'mle-minka')
+estimateRegularity(groceryElog, plot = TRUE, method = 'mle-thom')
+estimateRegularity(groceryElog, plot = TRUE, method = 'cv')
 }
 \references{
 Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase

@@ -23,9 +23,9 @@ Numeric vector of repeat transactions.
 Aggregate Event Log to incremental number of (repeat) transactions
 }
 \examples{
-elog <- cdnow.sample()$elog
-inc <- elog2inc(elog)
-plot(inc, typ="l")
+data("groceryElog")
+inc <- elog2inc(groceryElog)
+plot(inc, typ="l", frame = FALSE)
 }
 \seealso{
 \code{\link{elog2cum}}

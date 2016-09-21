@@ -41,14 +41,14 @@ return result varies from one call to another. Larger values of
 \code{sample_size} will generate more stable results.
 }
 \examples{
-cbs <- cdnow.sample()$cbs
-# short MCMC runs and small sample size to speedup demo
+data("groceryElog")
+cbs <- elog2cbs(groceryElog)
 param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) 
-# Returns a vector containing cumulative repeat transactions for 546 days.
-# All parameters are in weeks; the calibration period lasted 39 weeks
-# and the holdout period another 39.
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
+# Returns a vector containing cumulative repeat transactions for 728 days.
+# All parameters are in weeks; the calibration period lasted 52 weeks
+# and the holdout period another 52.
 mcmc.ExpectedCumulativeTransactions(param.draws, 
-  T.cal = cbs$T.cal, T.tot = 78, n.periods.final = 78, sample_size = 1000)
+  T.cal = cbs$T.cal, T.tot = 104, n.periods.final = 104, sample_size = 1000)
 }
 
