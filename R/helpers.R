@@ -134,14 +134,14 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 #' @param T.cal End of calibration period, which is visualized as a vertical line.
 #' @param T.tot End of observation period
 #' @param title Plot title.
-#' @param headers Vector of length 2 for adding headers to the plot, e.g. 
+#' @param headers Vector of length 2 for adding headers to the plot, e.g.
 #'   \code{c("Calibration", "Holdout")}.
 #' @export
 #' @examples
 #' data("groceryElog")
 #' plotTimingPatterns(groceryElog, T.tot = "2008-12-31")
 #' plotTimingPatterns(groceryElog, T.cal = "2006-12-31", headers = c("Calibration", "Holdout"))
-plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL, 
+plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
                                title = "Sampled Timing Patterns", headers = NULL) {
 
   cust <- first <- t <- V1 <- NULL  # suppress checkUsage warnings
@@ -191,49 +191,66 @@ plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
 
 
 #' Convert Event Log to customer-level summary statistic
-#' 
-#' Takes the transaction log of a customer cohort, and returns a sufficient
-#' summary statistic for applying common BTYD models.
-#' 
-#' Note: compared to \code{\link[BTYD]{dc.ElogToCbsCbt}} this also adds a
-#' summary statistic for estimating regularity.
-#' 
-#' Customers without any transaction during calibration period are being dropped
-#' from the result. Transactions with identical \code{cust} and \code{date}
-#' field are treated as a single transaction, with `sales` being summed up.
-#' 
-#' @param elog Event log, a \code{data.frame} with columns \code{cust} and 
-#'   transaction date/time \code{date}. If column \code{sales} is present, it
-#'   will be aggregated as well.
-#' @param per Time unit, either 'week', 'day', 'hour', 'min', 'sec'.
-#' @param T.cal End date of calibration period.
-#' @param T.tot End date of holdout period.
-#' @return data.frame with fields 
-#' \item{\code{cust}}{customer id (unique key)}
-#' \item{\code{x}}{number of recurring events in calibration period} 
-#' \item{\code{t.x}}{time between first and last event in calibration period} 
-#' \item{\code{litt}}{sum of logarithmic intertransaction timings durint
-#'   calibration period} 
-#' \item{\code{sales}}{sum of sales in calibration period; only if \code{elog$sales} is provided}
-#' \item{\code{first}}{date of first transaction in calibration period} 
-#' \item{\code{T.cal}}{time between first event and end of calibration period}
-#' \item{\code{T.star}}{length of holdout period; only if \code{T.cal} is provided} 
-#' \item{\code{x.star}}{number of events within holdout period; only if \code{T.cal} is provided} 
-#' \item{\code{sales.star}}{sum of sales within holdout period; only if \code{T.cal} and \code{elog$sales} are provided}
+#'
+#' Efficient implementation for the conversion of an event log into a
+#' customer-by-sufficient-statistic (CBS) \code{data.frame}, with a row for each
+#' customer, which is the required data format for estimating model parameters.
+#'
+#' The time unit for expressing `t.x`, `T.cal` and `litt` are determined via the
+#' argument `units`, which is passed forward to method `difftime`, and defaults
+#' to `weeks`.
+#'
+#' Argument `T.tot` allows one to specify the end of the observation period,
+#' i.e. the last possible date of an event to still be included in the event
+#' log. If `T.tot` is not provided, then the date of the last recorded event
+#' will be assumed to coincide with the end of the observation period. If
+#' `T.tot` is provided, then any event that occurs after that date is discarded.
+#'
+#' Argument `T.cal` allows one to split the summary statistics into a
+#' calibration and a holdout period. This can be useful for evaluating
+#' forecasting accuracy for a given dataset. If `T.cal` is not provided, then
+#' the whole observation period is considered, and is then subsequently used for
+#' for estimating model parameters. If it is provided, then the returned
+#' `data.frame` contains two additional fields, with `x.star` representing the
+#' number of repeat transactions during the holdout period of length `T.star`.
+#' And only those customers are contained, who have had at least one event
+#' during the calibration period.
+#'
+#' Transactions with identical \code{cust} and \code{date} field are treated as
+#' a single transaction, with `sales` being summed up.
+#'
+#' @param elog Event log, a \code{data.frame} with field \code{cust} for the
+#'   customer ID and field \code{date} for the date/time of the event, which
+#'   should be of type \code{Date} or \code{POSIXt}. If a field \code{sales} is
+#'   present, it will be aggregated as well.
+#' @param units Time unit, either \code{week}, \code{day}, \code{hour},
+#'   \code{min} or \code{sec}. See \code{\link[base]{difftime}}.
+#' @param T.cal End date of calibration period. Defaults to
+#'   \code{max(elog$date)}.
+#' @param T.tot End date of the observation period. Defaults to
+#'   \code{max(elog$date)}.
+#' @return \code{data.frame} with fields:
+#'  \item{\code{cust}}{Customer id (unique key).}
+#'  \item{\code{x}}{Number of recurring events in calibration period.}
+#'  \item{\code{t.x}}{Time between first and last event in calibration period.}
+#'  \item{\code{litt}}{Sum of logarithmic intertransaction timings durint calibration period.}
+#'  \item{\code{sales}}{Sum of sales in calibration period. Only if \code{elog$sales} is provided.}
+#'  \item{\code{first}}{Date of first transaction in calibration period.}
+#'  \item{\code{T.cal}}{Time between first event and end of calibration period.}
+#'  \item{\code{T.star}}{Length of holdout period. Only if \code{T.cal} is provided.}
+#'  \item{\code{x.star}}{Number of events within holdout period. Only if \code{T.cal} is provided.}
+#'  \item{\code{sales.star}}{Sum of sales within holdout period. Only if \code{T.cal} and \code{elog$sales} are provided.}
 #' @export
 #' @examples
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 #' head(cbs)
-elog2cbs <- function(elog, per = "week", T.cal = NULL, T.tot = NULL) {
+elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
   cust <- first <- itt <- T.star <- x.star <- sales <- sales.star <- NULL  # suppress checkUsage warnings
   stopifnot(inherits(elog, "data.frame"))
   if (!all(c("cust", "date") %in% names(elog))) stop("`elog` must have fields `cust` and `date`")
   if (!any(c("Date", "POSIXt") %in% class(elog$date))) stop("`date` field must be of class `Date` or `POSIXt`")
   if ("sales" %in% names(elog) & !is.numeric(elog$sales)) stop("`sales` field must be numeric")
-  is.dt <- is.data.table(elog)
-  has.holdout <- !is.null(T.cal)
-  has.sales <- "sales" %in% names(elog)
   if (is.null(T.cal)) T.cal <- max(elog$date)
   if (is.null(T.tot)) T.tot <- max(elog$date)
   if (is.character(T.cal)) T.cal <- as.Date(T.cal)
@@ -241,7 +258,11 @@ elog2cbs <- function(elog, per = "week", T.cal = NULL, T.tot = NULL) {
   stopifnot(T.cal >= min(elog$date) & T.cal <= max(elog$date))
   stopifnot(T.tot >= min(elog$date) & T.tot <= max(elog$date))
   stopifnot(T.tot >= T.cal)
-  
+
+  is.dt <- is.data.table(elog)
+  has.holdout <- T.cal < T.tot
+  has.sales <- "sales" %in% names(elog)
+
   # convert to data.table for improved performance
   elog_dt <- data.table(elog)
   setkey(elog_dt, cust, date)
@@ -255,21 +276,21 @@ elog2cbs <- function(elog, per = "week", T.cal = NULL, T.tot = NULL) {
   elog_dt <- elog_dt[, list(sales = sum(sales)), by = "cust,date"]
   # determine time since first date for each customer
   elog_dt[, `:=`(first, min(date)), by = "cust"]
-  elog_dt[, `:=`(t, as.numeric(difftime(date, first, units = per))), by = "cust"]
+  elog_dt[, `:=`(t, as.numeric(difftime(date, first, units = units))), by = "cust"]
   # compute intertransaction times
   elog_dt[, `:=`(itt, c(0, diff(t))), by = "cust"]
   # count events in calibration period
-  cbs <- elog_dt[date <= T.cal, 
-                 list(x = .N - 1, 
-                      t.x = max(t), 
-                      litt = sum(log(itt[itt > 0])), 
+  cbs <- elog_dt[date <= T.cal,
+                 list(x = .N - 1,
+                      t.x = max(t),
+                      litt = sum(log(itt[itt > 0])),
                       sales = sum(sales)),
                  by = "cust,first"]
-  cbs[, `:=`(T.cal, as.numeric(difftime(T.cal, first, units = per)))]
+  cbs[, `:=`(T.cal, as.numeric(difftime(T.cal, first, units = units)))]
   setkey(cbs, cust)
   # count events in validation period
   if (has.holdout) {
-    cbs[, `:=`(T.star, as.numeric(difftime(T.tot, first, units = per)) - T.cal)]
+    cbs[, `:=`(T.star, as.numeric(difftime(T.tot, first, units = units)) - T.cal)]
     val <- elog_dt[date > T.cal & date <= T.tot, list(x.star = .N, sales.star = sum(sales)), keyby = "cust"]
     cbs <- merge(cbs, val, all.x = TRUE, by = "cust")
     cbs[is.na(x.star), `:=`(x.star, 0)]
@@ -292,15 +313,15 @@ elog2cbs <- function(elog, per = "week", T.cal = NULL, T.tot = NULL) {
 
 
 #' Aggregate Event Log to cumulative number of (repeat) transactions
-#' 
+#'
 #' Duplicate transactions with identical `cust` and `date` (or `t`) field are
 #' counted only once.
-#' 
-#' @param elog Event log, a \code{data.frame} with columns \code{cust} and 
+#'
+#' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}.
-#' @param by Only return every \code{}-th number. Defaults to 7, and thus 
+#' @param by Only return every \code{}-th number. Defaults to 7, and thus
 #'   returns weekly numbers.
-#' @param first If TRUE, then the first transaction for each customer is being 
+#' @param first If TRUE, then the first transaction for each customer is being
 #'   counted as well
 #' @return Numeric vector of cumulative repeat transactions.
 #' @export
