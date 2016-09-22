@@ -1,12 +1,16 @@
 
 #' Estimate Regularity in Intertransaction Timings
 #'
-#' Estimates degree of regularity of intertransaction timings of a customer
-#' cohort. This is done by 1) assuming same regularity across all customers
-#' (\code{method = "wheat"}), or 2) by estimating regularity for each customer
-#' seperately, as the shape parameter of a fitted gamma distribution, and then
-#' return the median across estimates; this requires sufficient (>=10)
-#' transactions per customer
+#' The models (M)BG/CNBD-k and Pareto/GGG are capable of leveraging regularity
+#' within transaction timings for improving forecast accuracy. This method
+#' provides a quick check for the degree of regularity in the event timings. A
+#' return value of close to 1 supports the assumption of exponentially
+#' distributed intertransaction times, whereas values significantly larger than
+#' 1 reveal the presence of regularity. Estimation is either done by 1) assuming
+#' a same degree of regularity across all customers (\code{method = "wheat"}), or 2) by
+#' estimating regularity for each customer seperately, as the shape parameter of
+#' a fitted gamma distribution, and then return the median across estimates. The
+#' latter methods, though, require sufficient (>=10) transactions per customer.
 #'
 #' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}
@@ -14,6 +18,7 @@
 #'   \code{cv}.
 #' @param plot If \code{TRUE} then distribution of estimated regularity will be
 #'   plotted.
+#' @param title Plot title.
 #' @return Estimated real-valued regularity parameter.
 #' @references Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase
 #'   regularity with two interpurchase times.'
@@ -32,7 +37,7 @@
 #' estimateRegularity(groceryElog, plot = TRUE, method = 'mle-minka')
 #' estimateRegularity(groceryElog, plot = TRUE, method = 'mle-thom')
 #' estimateRegularity(groceryElog, plot = TRUE, method = 'cv')
-estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
+estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "") {
   if (!"cust" %in% names(elog))
     stop("Error in estimateRegularity: elog must have a column labelled \"cust\"")
   if (!"date" %in% names(elog) & !"t" %in% names(elog))
@@ -53,8 +58,9 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
     }))
     r <- (1 - 4 * var(M))/(8 * var(M))
     if (plot) {
-      op <- par(mar = c(1, 2, 1, 2))
-      plot(density(M), main = "", sub = "", xlab = "", ylab = "", lwd = 2, frame = FALSE, axes = FALSE)
+      mar_top <- ifelse(title != "", 2.5, 1)
+      op <- par(mar = c(1, 2, mar_top, 2))
+      plot(density(M), main = title, sub = "", xlab = "", ylab = "", lwd = 2, frame = FALSE, axes = FALSE)
       polygon(density(M), col = "lightgray", border = 1)
       fn1 <- function(x) dbeta(x, 1, 1)
       fnr <- function(x) dbeta(x, round(r), round(r))
@@ -114,7 +120,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 
     if (plot) {
       ymax <- median(ks) * 3
-      suppressWarnings(boxplot(ks, horizontal = TRUE, ylim = c(0, ymax), frame = FALSE, axes = FALSE))
+      suppressWarnings(boxplot(ks, horizontal = TRUE, ylim = c(0, ymax), frame = FALSE, axes = FALSE, main = title))
       axis(1, at = 0:ymax)
       axis(3, at = 0:ymax, labels = rep("", 1 + ymax))
       abline(v = 1:ymax, lty = "dotted", col = "lightgray")

@@ -4,7 +4,7 @@
 \alias{estimateRegularity}
 \title{Estimate Regularity in Intertransaction Timings}
 \usage{
-estimateRegularity(elog, method = "wheat", plot = FALSE)
+estimateRegularity(elog, method = "wheat", plot = FALSE, title = "")
 }
 \arguments{
 \item{elog}{Event log, a \code{data.frame} with columns \code{cust} and
@@ -15,17 +15,23 @@ transaction time \code{t} or \code{date}}
 
 \item{plot}{If \code{TRUE} then distribution of estimated regularity will be
 plotted.}
+
+\item{title}{Plot title.}
 }
 \value{
 Estimated real-valued regularity parameter.
 }
 \description{
-Estimates degree of regularity of intertransaction timings of a customer
-cohort. This is done by 1) assuming same regularity across all customers
-(\code{method = "wheat"}), or 2) by estimating regularity for each customer
-seperately, as the shape parameter of a fitted gamma distribution, and then
-return the median across estimates; this requires sufficient (>=10)
-transactions per customer
+The models (M)BG/CNBD-k and Pareto/GGG are capable of leveraging regularity
+within transaction timings for improving forecast accuracy. This method
+provides a quick check for the degree of regularity in the event timings. A
+return value of close to 1 supports the assumption of exponentially
+distributed intertransaction times, whereas values significantly larger than
+1 reveal the presence of regularity. Estimation is either done by 1) assuming
+a same degree of regularity across all customers (\code{method = "wheat"}), or 2) by
+estimating regularity for each customer seperately, as the shape parameter of
+a fitted gamma distribution, and then return the median across estimates. The
+latter methods, though, require sufficient (>=10) transactions per customer.
 }
 \examples{
 data("groceryElog")

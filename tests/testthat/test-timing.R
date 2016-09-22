@@ -2,7 +2,7 @@ context("timing")
 
 test_that("estimateRegularity", {
   cat('test timing\n')
-  
+
   # generate Erlang-3 with various lambdas
   set.seed(1)
   nr_of_customers <- 1000
@@ -11,14 +11,17 @@ test_that("estimateRegularity", {
     lambda <- exp(rnorm(1))
     data.table(cust = i, t = cumsum(rgamma(50, k, k * lambda)))
   }))
-  
+
   # Estimate regularity parameter k
+  k.est.1 <- estimateRegularity(elog)
   k.est.1 <- estimateRegularity(elog, plot = TRUE)
+  k.est.1 <- estimateRegularity(elog, plot = TRUE, title = "Plot Title")
+  k.est.1 <- estimateRegularity(elog, plot = TRUE, title = "")
   k.est.2 <- estimateRegularity(elog, method = "mle", plot = TRUE)
-  k.est.3 <- estimateRegularity(elog, method = "mle-minka", plot = TRUE)
-  k.est.4 <- estimateRegularity(elog, method = "mle-thom", plot = TRUE)
+  k.est.3 <- estimateRegularity(elog, method = "mle-minka", plot = TRUE, title = "Plot Title")
+  k.est.4 <- estimateRegularity(elog, method = "mle-thom", plot = TRUE, title = "")
   k.est.5 <- estimateRegularity(elog, method = "cv", plot = TRUE)
-  
+
   # require less than 5% deviation in estimated parameters
   ape <- function(act, est) abs(act - est)/act
   expect_true(ape(k, k.est.1) < 0.05)
@@ -26,5 +29,5 @@ test_that("estimateRegularity", {
   expect_true(ape(k, k.est.3) < 0.05)
   expect_true(ape(k, k.est.4) < 0.05)
   expect_true(ape(k, k.est.5) < 0.05)
-  
-}) 
+
+})
