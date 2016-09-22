@@ -262,7 +262,7 @@ elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
   if (is.character(T.cal)) T.cal <- as.Date(T.cal)
   if (is.character(T.tot)) T.tot <- as.Date(T.tot)
   stopifnot(T.cal >= min(elog$date) & T.cal <= max(elog$date))
-  stopifnot(T.tot >= min(elog$date) & T.tot <= max(elog$date))
+  stopifnot(T.tot >= min(elog$date))
   stopifnot(T.tot >= T.cal)
 
   is.dt <- is.data.table(elog)
