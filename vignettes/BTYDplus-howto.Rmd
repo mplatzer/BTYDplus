@@ -62,7 +62,7 @@ All of the aforementioned models benefit from closed-form solutions for key expr
 
 ## Workflow
 
-The typical analysis process starts out by reading in a complete log of all events or transactions of an existing customer cohort. It is up to the analyst to define how a customer base is split into cohorts, but typically these are defined based on customers' first transaction date and/or the acquisition channel. The data requirements for such an event log are minimal, and only consist of a customer ID field (`cust`) and a date or timestamp field (`date`). If the analysis should also cover the monetary component, the event log needs to contain a corresponding field `sales`. In order to get started quickly, BTYDplus provides an event log for customers of an online grocery store (`data("groceryElog")`). Further, for each BTYDplus model a data generating method is available (`*.GenerateData`), in order to simulate transaction logs, that follow the corresponding model assumptions.
+The typical analysis process starts out by reading in a complete log of all events or transactions of an existing customer cohort. It is up to the analyst to define how a customer base is split into cohorts, but typically these are defined based on customers' first transaction date and/or the acquisition channel. The data requirements for such an event log are minimal, and only consist of a customer ID field `cust` and a `date` field of class `Date` or `POSIXt`. If the analysis should also cover the monetary component, the event log needs to contain a corresponding field `sales`. In order to get started quickly, BTYDplus provides an event log for customers of an online grocery store (`data("groceryElog")`). Further, for each BTYDplus model a data generating method is available (`*.GenerateData`), in order to simulate transaction logs, that follow the corresponding model assumptions.
 
 ```{r, echo=FALSE, results='asis'}
 cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"), 
@@ -80,23 +80,29 @@ BTYDplus provides various model-independent helper methods for handling and desc
 
 ### Convert Transaction Log to CBS format
 
-The `elog2cbs` method is a fast implementation for converting the event log into a customer-by-sufficient-statistic summary table, which is the required format for applying BTYD and BTYDplus models. Note, that compared to `BTYD::dc.ElogToCbsCbt` this implementation also adds a summary statistic for estimating regularity (`litt`), plus aggregates sales, if these are present in the event log (`sales`). 
+The `elog2cbs` method is an efficient implementation for the conversion of an event log into a customer-by-sufficient-statistic (CBS) `data.frame`, with a row for each customer, which is the required data format for estimating model parameters.
 
 ```{r}
-# convert from event log to customer-by-sufficient-statistic format
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
 head(cbs, 5)
 ```
 
-By specifying an end date for the calibration period (`T.cal`), it is possible to generate summary statistics split into calibration and holdout period, which can be useful for evaluating forecasting accuracy for a given dataset.
+Returned field `cust` is the unique customer ID, `x` the number of repeat transaction, `t.x` the time of the last recorded transaction, `litt` the sum over logarithmic intertransaction times (required for estimating regularity), `first` the date of the first transaction, and `T.cal` the duration between the first transaction and the end of the calibration period. If the provided `elog` data.frame contains a field `sales`, then this will be summed up, and returned as an additional field, named `sales`. Note, that transactions with identical `cust` and `date` field are counted as a single transaction, but with `sales` being summed up.
+
+The time unit for expressing `t.x`, `T.cal` and `litt` are determined via the argument `units`, which is passed forward to method `difftime`, and defaults to `weeks`.
+
+Argument `T.tot` allows one to specify the end of the observation period, i.e. the last possible date of an event to still be included in the event log. If `T.tot` is not provided, then the date of the last recorded event will be assumed to coincide with the end of the observation period. If `T.tot` is provided, then any event that occurs after that date is discarded.
+
+Argument `T.cal` allows one to split the summary statistics into a calibration and a holdout period. This can be useful for evaluating forecasting accuracy for a given dataset. If `T.cal` is not provided, then the whole observation period is considered, and is then subsequently used for for estimating model parameters. If it is provided, then the returned `data.frame` contains two additional fields, with `x.star` representing the number of repeat transactions during the holdout period of length `T.star`. And only those customers are contained, who have had at least one event during the calibration period.
 
 ```{r}
-# split event log into calibration and holdout period, to validate model performance
+data("groceryElog")
 range(groceryElog$date)
-cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 head(cbs, 5)
 ```
+
 
 ### Convert Event Log to Weekly Transactions
 
