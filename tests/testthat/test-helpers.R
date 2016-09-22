@@ -41,12 +41,15 @@ test_that("elog2cum", {
 })
 
 
-test_that("plotSampledTimingPatterns", {
+test_that("plotTimingPatterns", {
 
   data("groceryElog")
-  expect_silent(plotSampledTimingPatterns(groceryElog))
-  expect_silent(plotSampledTimingPatterns(groceryElog, T.cal = "2006-12-31"))
-  expect_silent(plotSampledTimingPatterns(groceryElog, n = 100))
-  expect_silent(plotSampledTimingPatterns(head(groceryElog, 5), T.cal = "2006-12-31"))
+  expect_silent(plotTimingPatterns(groceryElog))
+  expect_silent(plotTimingPatterns(groceryElog, headers = c("X", "Y")))
+  expect_silent(plotTimingPatterns(groceryElog, T.cal = "2006-12-31"))
+  expect_silent(plotTimingPatterns(groceryElog, T.cal = "2006-12-31", T.tot = "2007-06-30", headers = c("Past", "Future")))
+  expect_silent(plotTimingPatterns(groceryElog, T.cal = as.Date("2006-12-31")))
+  expect_silent(plotTimingPatterns(groceryElog, n = 100))
+  expect_silent(plotTimingPatterns(head(groceryElog, 10), T.cal = "2006-12-31", T.tot = "2007-12-31"))
 
 })
