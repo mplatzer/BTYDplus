@@ -130,47 +130,62 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE) {
 #'
 #' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}.
-#' @param T.cal End of calibration period, which is visualized as a vertical line.
 #' @param n Number of sampled customers.
+#' @param T.cal End of calibration period, which is visualized as a vertical line.
+#' @param T.tot End of observation period
 #' @param title Plot title.
+#' @param headers Vector of length 2 for adding headers to the plot, e.g. 
+#'   \code{c("Calibration", "Holdout")}.
 #' @export
 #' @examples
 #' data("groceryElog")
-#' plotSampledTimingPatterns(groceryElog, T.cal = "2006-12-31")
-plotSampledTimingPatterns <- function(elog, T.cal = NULL, n = 30, title = "Sampled Timing Patterns") {
+#' plotTimingPatterns(groceryElog, T.tot = "2008-12-31")
+#' plotTimingPatterns(groceryElog, T.cal = "2006-12-31", headers = c("Calibration", "Holdout"))
+plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL, 
+                               title = "Sampled Timing Patterns", headers = NULL) {
 
   cust <- first <- t <- V1 <- NULL  # suppress checkUsage warnings
   elog_dt <- setDT(copy(elog))
   custs <- sample(unique(elog_dt$cust), size = min(n, uniqueN(elog_dt$cust)), replace = FALSE)
   n <- length(custs)
   if (!"t" %in% names(elog_dt)) elog_dt[, `:=`(t, as.numeric(date))]
-  rg <- range(elog_dt$t)
-  elog_dt <- elog_dt[cust %in% custs]
+  T.0 <- min(elog_dt$t)
+  if (is.null(T.cal)) {
+    T.cal <- max(elog_dt$t)
+  } else if (!is.numeric(T.cal)) {
+    T.cal <- as.numeric(as.Date(T.cal))
+  }
+  if (is.null(T.tot)) {
+    T.tot <- max(elog_dt$t)
+  } else if (!is.numeric(T.tot)) {
+    T.tot <- as.numeric(as.Date(T.tot))
+  }
+  elog_dt <- elog_dt[cust %in% custs & t <= T.tot]
   elog_dt[, `:=`(first, min(t)), by = "cust"]
   if (!is.character(elog_dt$cust)) elog_dt[, `:=`(cust, as.character(cust))]
   custs <- elog_dt[, min(date), by = "cust"][order(V1), cust]
   setkeyv(elog_dt, "cust")
   op <- par(mar = c(0.5,0.5,2.5,0.5))
-  ymax <- ifelse(is.null(T.cal), n, ceiling(n * 1.05))
-  plot(1, xlim = rg, ylim = c(1, ymax), typ = "n",
+  ymax <- ifelse(is.character(headers), ceiling(n * 1.03), n)
+  plot(1, xlim = c(T.0, T.tot), ylim = c(1, ymax), typ = "n",
        axes = FALSE, frame = FALSE,
        xlab = "", ylab = "",
        main = title)
   for (i in 1:n) {
     ts <- unique(elog_dt[custs[i], t])
-    segments(min(ts), i, rg[2], i, col = "#efefef", lty = 1, lwd = 1)
-    points(min(ts), i, pch = 16, col = "#454545")
-    points(ts[ts>min(ts)], rep(i, length(ts)-1), pch = 1, col = "#454545")
+    segments(min(ts), i, T.tot, i, col = "#efefef", lty = 1, lwd = 1)
+    points(min(ts), i, pch = 21, col = "#454545", bg = "#454545", cex = 0.8)
+    ts.cal <- ts[ts > min(ts) & ts <= as.numeric(T.cal)]
+    ts.val <- ts[ts > as.numeric(T.cal)]
+    points(ts.cal, rep(i, length(ts.cal)), pch = 21, col = "#454545", bg = "#454545", cex = 0.7)
+    points(ts.val, rep(i, length(ts.val)), pch = 21, col = "#454545", bg = "#999999", cex = 0.7)
   }
   par(op)
-  if (!is.null(T.cal)) {
-    if ("date" %in% names(elog_dt)) T.cal <- as.Date(T.cal)
-    T.cal <- as.numeric(T.cal)
-    abline(v = T.cal)
-    text("Calibration",  x = T.cal - (T.cal - rg[1]) / 2, y = ymax, col = "#454545")
-    text("Holdout",  x = T.cal + (rg[2] - T.cal) / 2, y = ymax, col = "#454545")
+  if (T.cal < T.tot) abline(v = T.cal, lwd = 1.5, col = "#454545")
+  if (is.character(headers)) {
+    text(headers[1],  x = T.cal - (T.cal - T.0) / 2, y = ymax, col = "#454545", cex = 0.8)
+    if (T.cal < T.tot) text(headers[2], x = T.cal + (T.tot - T.cal) / 2, y = ymax, col = "#454545", cex = 0.8)
   }
-
 }
 
 
