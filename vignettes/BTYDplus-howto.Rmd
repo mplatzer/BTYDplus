@@ -134,10 +134,31 @@ estimateRegularity(groceryElog, method = "mle", plot = TRUE, title = "Maximum Li
 
 The Wheat & Morrison [-@wheat1990epr] estimator reports a `k` of close to 2, suggesting that a Erlang-2 might be more appropriate than the exponential distribution for modelling intertransaction times for the online grocery dataset. The peak in the plotted distribution additionally hints at a subset of customers which are exhibiting an even stronger degree of regularity. 
 
-The MLE estimation method fits a separate gamma distribution to the intertransaction times of each customer with more than 10 events. The reported median estimate of `k=3.25` also hints at stronger degrees of regularity for these highly active customers. The boxplot then gives a deeper understanding of the distribution of `k` estimates.
-
+The MLE estimation method fits a separate gamma distribution to the intertransaction times of each customer with more than 10 events. The reported median estimate of `k=3.25` also hints at stronger degrees of regularity for these highly active customers. The boxplot then gives a deeper understanding of the distribution of `k` estimates, revealing the heterogeneity within regularity across the cohort, thus making it a good candidate for the Pareto/GGG model.
 
 ## Maximum Likelihood Estimated Models
+
+### NBD
+
+The NBD model by @ehrenberg1959pattern assumes a heterogenous, yet constant purchasing process, with its purchase rate $\lambda$ being $Gamma(r, \alpha)$-distributed across customers.
+
+```{r}
+data("groceryElog")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-31")
+(params.nbd <- nbd.EstimateParameters(cbs))
+```
+
+With the mean of the Gamma distribution being $r / \alpha$, this yields a mean estimate for $\lambda$ of `r round(params.nbd[1] / params.nbd[2], 2)`, and thus a mean intertransaction time $1 / \lambda$ of `r round(params.nbd[2] / params.nbd[1], 2)` weeks.
+
+Let's next estimate the number of transactions for the year 2007, and compare it to the 
+
+
+```{r}
+cbs$xstar.nbd <- nbd.ConditionalExpectedTransactions(params.nbd, T.star = 52, cbs$x, cbs$T.cal)
+c(`Actual` = sum(cbs$x.star), `NBD Estimate` = sum(cbs$xstar.nbd))
+head(cbs[rev(order(cbs$xstar.nbd)), ], 5) # 5 most valuable customers
+```
+
 
 ### (M)BG/CNBD-k
 
