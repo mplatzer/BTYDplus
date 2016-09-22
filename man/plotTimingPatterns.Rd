@@ -19,7 +19,7 @@ transaction time \code{t} or \code{date}.}
 
 \item{title}{Plot title.}
 
-\item{headers}{Vector of length 2 for adding headers to the plot, e.g. 
+\item{headers}{Vector of length 2 for adding headers to the plot, e.g.
 \code{c("Calibration", "Holdout")}.}
 }
 \description{
