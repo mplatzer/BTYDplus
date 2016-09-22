@@ -14,7 +14,6 @@ bibliography: bibliography.bib
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(BTYDplus)
 ```
 
 
@@ -24,15 +23,23 @@ The BTYDplus package provides advanced statistical methods to describe and predi
 
 The challenge of this task is threefold: For one, the churn event in a non-contractual customer relationship is not directly observable, but needs to be infered indirectly based on observed periods of inactivity. Second, with customers behaving differently, yet having oftentimes only few transactions recorded so far, we require statistical methods that can utilize cohort-level patterns as priors for estimating customer-level quantities. And third, we attempt to predict the (unseen) future, thus need assumptions regarding the future dynamics.
 
-```{r, fig.show='hold', fig.width = 7, fig.height = 3,fig.cap="Caption"}
-set.seed(123)
+Figure 1 displays the complete transaction records of 30 sampled customers of an online grocery store. Each horizontal line represents a customer, and each circle a purchase event. The typical questions that arise are:
+
+* How many customers does the firm still have?
+* How many customers will still be active in one year from now?
+* How many transactions can be expected in next X weeks?
+* Which particular customers can still be considered active?
+* Which customers will provide the most value to the company going forward?
+
+```{r, fig.show='hold', fig.width = 7, fig.height = 3, fig.cap = "Figure 1: Timing Patterns for Sampled Grocery Customers"}
+library(BTYDplus)
 data("groceryElog")
-plotTimingPatterns(groceryElog, n = 30, T.cal = "2007-04-30", headers = c("Past", "Future"))
+set.seed(123)
+# plot timing patterns of 30 sampled customers
+plotTimingPatterns(groceryElog, n=30, T.cal="2007-05-15", headers=c("Past", "Future"), title="")
 ```
 
-Fitting a buy-till-you-die model allows analysts to describe a customer cohort then in terms of its heterogeneous distribution of purchase patterns and dropout probabilities. More importantly, it allows to estimate the total number of future transactions, a business-critical information for capacity and production planning. Further, it is possible to assess the total (expected) value of a cohort, which, if put in relationship to its acquisition costs, provides quantified support for making decisions on the customer acquisition channels.
-
-All of the implemented models provide us also with estimates at a customer level. Thus, the customer database can be easily enriched with individual level estimates on a customer's status, future activity and future value. These customer scores can be then utilized to adapt services, messages and offers with respect to customers' state and value. Given the accessibility and speed of the provided models, practitioners can consider scoring their customer base with these advanced statistical techniques on a continuous base.
+Fitting a buy-till-you-die model to a particular customer cohort not just allows analysts to describe it in terms of its heterogeneous distribution of purchase patterns and dropout probabilities, but also provides answers for all of the above stated questions. On aggregated level the estimated number of future transactions can then be, for example, used for capacity and production planning. The estimated future value of the cohort for assessing the return on investment for customer acquistion spends. On individual level the customer database can be enriched with estimates on a customer's status, future activity and future value. Such customer scores can be then utilized to adapt services, messages and offers with respect to customers' state and value. Given the accessibility and speed of the provided models, practitioners can score their customer base with these advanced statistical techniques on a continuous base.
 
 ### Models
 
@@ -49,21 +56,26 @@ The models provided as part of [BTYDplus](https://github.com/mplatzer/BTYDplus#r
 
 The number of implemented models raises the question, which one to use, and which one works best in a particular case. There is no simple answer to that, but analysts might want to try out all of these, assess data fit as well as forecast accuracy based on an artificially withheld time period and then make a tradeoff between calculation speed, data fit and accuracy.
 
-The implementation of the original *NBD* model from 1959 serves mainly as a basic benchmark. It assumes a heterogenous purchase process, but doesn't account for the possibility of customers churning. The *Pareto/NBD* model, introduced in 1987, then combined the NBD model for transactions of active customers with a heterogeneuos dropout process, and to this date still serves as a gold standard for buy-till-you-die models. The *BG/NBD* model then modified the assumptions regarding the dropout process in order to speed up computation, while retaining a similar level of data fit and forecast accuracy. However, the BG/NBD model makes the particular assumption that every customer without a repeat transaction has *not* churned yet, independent of the elapsed time of inactivity. This seems counterintuitive, particular when compared to customers with repeat transactions, and thus the *MBG/NBD* has been developed to eliminate this inconsistency. It allows for customers without any activity to be dropped out for good. Data fit and forecast accuracy are comparable to BG/NBD, yet it results in more plausible estimates for the dropout process. The recently developed *BG/CNBD-k* and *MBG/CNBD-k* model classes allow for regularity within the transaction timings. If such regularity is present (even in a mild form), these models can yield significant improvements in terms of data fit and forecasting accuracy, while remaining at a similar order of computational costs.
+The implementation of the original *NBD* model from 1959 serves mainly as a basic benchmark. It assumes a heterogenous purchase process, but doesn't account for the possibility of customers churning. The *Pareto/NBD* model, introduced in 1987, combines the NBD model for transactions of active customers with a heterogeneuos dropout process, and to this date still serves as a gold standard for buy-till-you-die models. The *BG/NBD* model adjusts the Pareto/NBD assumptions regarding the dropout process in order to speed up computation. It is able to retain a similar level of data fit and forecast accuracy, but also improves the robustness of the parameter search. However, the BG/NBD model particularly assumes that every customer without a repeat transaction has *not* churned yet, independent of the elapsed time of inactivity. This seems counterintuitive, particular when compared to customers with repeat transactions. Thus the *MBG/NBD* has been developed to eliminate this inconsistency by allowing customers without any activity to also remain inactive. Data fit and forecast accuracy are comparable to BG/NBD, yet it results in more plausible estimates for the dropout process. The more recently developed *BG/CNBD-k* and *MBG/CNBD-k* model classes extend BG/NBD and MBG/NBD each but allow for regularity within the transaction timings. If such regularity is present (even in a mild form), these models can yield significant improvements in terms of customer level forecasting accuracy, while the computational costs remain at a similar order of magnitude.
 
-All aforementioned models benefit from closed-form solutions for key expressions and thus can be efficiently estimated via means of maximum likelihood estimation (MLE). However, the necessity of deriving closed-form expressions restricts the model builder from relaxing the underlying behavioral assumptions. Thus, an alternative estimation method is via Markov-Chain-Monte-Carlo (MCMC) simulation. MCMC comes at significantly higher costs in terms of implementation complexity and computation time, but it allows for more flexible assumptions and we simultaneously gain the benefits of (1) estimated marginal posterior distributions rather than point estimates, (2) individual-level parameter estimates, and thus (3) straightforward simulations of customer-level metrics of managerial interest. The hierarchical bayes variant of Pareto/NBD (i.e., *Pareto/NBD (HB)*) served as a proof-of-concept for the MCMC approach, but doesn't yet take advantage of the gained flexibility, as it sticks to the original Pareto/NBD assumptions. In contrast, *Pareto/NBD (Abe)* relaxes the independence of purchase and dropout process, plus is capable of incorporating customer covariates. Particularly the latter can turn out to be very powerful, if any of such known covariates helps in explaining the heterogeneity within the customer cohort. Finally, the *Pareto/GGG* is also a generalization of Pareto/NBD, but allows for a varying degree of regularity within the transaction timings. Analog to (M)BG/CNBD-k, incorporating regularity can yield significant improvements in forecast accuracy, if such regularity is present in the data.
+All of the aforementioned models benefit from closed-form solutions for key expressions and thus can be efficiently estimated via means of maximum likelihood estimation (MLE). However, the necessity of deriving closed-form expressions restricts the model builder from relaxing the underlying behavioral assumptions. An alternative estimation method for probabilistic models is via Markov-Chain-Monte-Carlo (MCMC) simulation. MCMC comes at significantly higher costs in terms of implementation complexity and computation time, but it allows for more flexible assumptions. Additionally one gains the benefits of (1) estimated marginal posterior distributions rather than point estimates, (2) individual-level parameter estimates, and thus (3) straightforward simulations of customer-level metrics of managerial interest. The hierarchical bayes variant of Pareto/NBD (i.e., *Pareto/NBD (HB)*) served as a proof-of-concept for the MCMC approach, but doesn't yet take advantage of the gained flexibility, as it sticks to the original Pareto/NBD assumptions. In contrast, *Pareto/NBD (Abe)* relaxes the independence of purchase and dropout process, plus is capable of incorporating customer covariates. Particularly the latter can turn out to be very powerful, if any of such known covariates helps in explaining the heterogeneity within the customer cohort. Finally, the *Pareto/GGG* is also a generalization of Pareto/NBD, but allows for a varying degree of regularity within the transaction timings. Analogous to (M)BG/CNBD-k, incorporating regularity can yield significant improvements in forecast accuracy, if such regularity is present in the data.
 
-### Workflow
+## Workflow
 
-The typical analysis process starts out by reading in a complete log of all events or transactions of an existing customer cohort. It is up to the analyst to define how a customer base is split into cohorts, but typically these are defined based on customers' first transaction date and/or the acquisition channel. The data requirements for such an event log are minimal, and only consist of a customer ID field (`cust`) and a date or timestamp field (`date`). If the analysis should also cover the monetary component, the event log needs to contain a corresponding field `sales`. In order to get started quickly, BTYDplus provides an event log for customers of an online grocery store (`data("groceryElog")`).
+The typical analysis process starts out by reading in a complete log of all events or transactions of an existing customer cohort. It is up to the analyst to define how a customer base is split into cohorts, but typically these are defined based on customers' first transaction date and/or the acquisition channel. The data requirements for such an event log are minimal, and only consist of a customer ID field (`cust`) and a date or timestamp field (`date`). If the analysis should also cover the monetary component, the event log needs to contain a corresponding field `sales`. In order to get started quickly, BTYDplus provides an event log for customers of an online grocery store (`data("groceryElog")`). Further, for each BTYDplus model a data generating method is available (`*.GenerateData`), in order to simulate transaction logs, that follow the corresponding model assumptions.
 
 ```{r, echo=FALSE, results='asis'}
 cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"), 
                       stringsAsFactors = FALSE, 
                       col.names = c("cust", "sampleid", "date", "cds", "sales"))
 cdnowElog$date <- as.Date(as.character(cdnowElog$date), format = "%Y%m%d")
-knitr::kable(head(cdnowElog[, c("cust", "date", "sales")], 6), caption = "First Entries of CDNow Event Log")
+knitr::kable(head(cdnowElog[, c("cust", "date", "sales")], 6), caption = "Transaction Log")
 ```
+
+Once the transaction log has been obtained, it needs to be converted into a customer-by-sufficient-statistic summary table (via the `elog2cbs` method), so that the data can be consumed by model-specific parameter estimation methods (`*.EstimateParameters` for MLE- and `*.DrawParameters` for MCMC-models). For MLE-models we can further report the maximized log-likelihood (via `*.cbs.LL`) to benchmark these in terms of their data fitting capabilities for the given dataset. Based on the estimated parameters we can then compute conditional and unconditional expectations for number of transactions (`*.pmf`, `*.Expectation`, `*.ConditionalExpectedTransactions`), as well as make inferences on the unobservable activity status of a customer (`*.PAlive`). These estimates can then be analyzed on individual level, or summarized at cohort level.
+
+## Helper Methods
+
 
 The BTYDplus package provides various helper methods for dealing with such transaction logs. For one, we can convert the logs into weekly and/or daily incremental number of repeat transactions, and have these plotted. Further, we can plot the transaction dates of some randomly sampled customers, to get a feeling for the various timing patterns.
 
@@ -93,9 +105,6 @@ range(groceryElog$date)
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 head(cbs, 5)
 ```
-
-## Helper Methods
-
 ### Convert Event Log to CBS format
 
 ### Convert Event Log to Weekly Transactions
