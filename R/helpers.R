@@ -165,8 +165,9 @@ plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
   if (!is.character(elog_dt$cust)) elog_dt[, `:=`(cust, as.character(cust))]
   custs <- elog_dt[, min(date), by = "cust"][order(V1), cust]
   setkeyv(elog_dt, "cust")
-  op <- par(mar = c(0.5,0.5,2.5,0.5))
-  ymax <- ifelse(is.character(headers), ceiling(n * 1.03), n)
+  mar_top <- ifelse(is.null(title) || title == "", 0.5, 2.5)
+  op <- par(mar = c(0.5, 0.5, mar_top, 0.5))
+  ymax <- ifelse(is.character(headers), ceiling(n * 1.05), n)
   plot(1, xlim = c(T.0, T.tot), ylim = c(1, ymax), typ = "n",
        axes = FALSE, frame = FALSE,
        xlab = "", ylab = "",
