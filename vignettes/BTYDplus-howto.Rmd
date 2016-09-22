@@ -2,7 +2,9 @@
 title: "Customer Scoring with BTYDplus"
 #author: "Michael Platzer"
 #date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    fig_caption: yes
 vignette: >
   %\VignetteIndexEntry{Customer Scoring with BTYDplus}
   %\VignetteEngine{knitr::rmarkdown}
@@ -22,12 +24,10 @@ The BTYDplus package provides advanced statistical methods to describe and predi
 
 The challenge of this task is threefold: For one, the churn event in a non-contractual customer relationship is not directly observable, but needs to be infered indirectly based on observed periods of inactivity. Second, with customers behaving differently, yet having oftentimes only few transactions recorded so far, we require statistical methods that can utilize cohort-level patterns as priors for estimating customer-level quantities. And third, we attempt to predict the (unseen) future, thus need assumptions regarding the future dynamics.
 
-```{r, fig.show='hold'}
+```{r, fig.show='hold', fig.width = 7, fig.height = 3,fig.cap="Caption"}
 set.seed(123)
 data("groceryElog")
-grocerySubset <- groceryElog[groceryElog$cust %in% sample(unique(groceryElog$cust), 20), ]
-grocerySubset <- grocerySubset[grocerySubset$date <= "2006-12-31", ]
-plotSampledTimingPatterns(grocerySubset, T.cal = "2006-12-31")
+plotTimingPatterns(groceryElog, n = 30, T.cal = "2007-04-30", headers = c("Past", "Future"))
 ```
 
 Fitting a buy-till-you-die model allows analysts to describe a customer cohort then in terms of its heterogeneous distribution of purchase patterns and dropout probabilities. More importantly, it allows to estimate the total number of future transactions, a business-critical information for capacity and production planning. Further, it is possible to assess the total (expected) value of a cohort, which, if put in relationship to its acquisition costs, provides quantified support for making decisions on the customer acquisition channels.
@@ -75,7 +75,7 @@ plot(weekly_inc_all, typ = "l", frame = FALSE,
      ylab = "", xlab = "", main = "Weekly Transactions")
 lines(weekly_inc_repeat, col = "red")
 
-plotSampledTimingPatterns(groceryElog, n = 20)
+plotTimingPatterns(groceryElog, n = 20)
 ```
 
 The BTYDplus package also provides with `elog2cbs` a fast implementation for converting the event log into a customer-by-sufficient-statistic summary table, which is the required format for applying the buy-till-you-die models. Note, that compared to BTYD::dc.ElogToCbsCbt this also adds a summary statistic for estimating regularity (`litt`), and summarizes sales, if these are present in the event log. By specifying an end date for the calibration period (`T.cal`), we can easily generate summary statistics split into calibration and holdout period, which can then be used to evaluate forecasting accuracy of our models.
