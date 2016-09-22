@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{elog2cbs}
 \alias{elog2cbs}
-\title{Convernt Event Log to customer-level summary statistic}
+\title{Convert Event Log to customer-level summary statistic}
 \usage{
 elog2cbs(elog, per = "week", T.cal = NULL, T.tot = NULL)
 }
@@ -32,8 +32,8 @@ data.frame with fields
 \item{\code{sales.star}}{sum of sales within holdout period; only if \code{T.cal} and \code{elog$sales} are provided}
 }
 \description{
-Takes the event log of a customer cohort, and returns a sufficient summary
-statistic for applying common BTYD models.
+Takes the transaction log of a customer cohort, and returns a sufficient
+summary statistic for applying common BTYD models.
 }
 \details{
 Note: compared to \code{\link[BTYD]{dc.ElogToCbsCbt}} this also adds a

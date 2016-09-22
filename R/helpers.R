@@ -190,10 +190,10 @@ plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
 }
 
 
-#' Convernt Event Log to customer-level summary statistic
+#' Convert Event Log to customer-level summary statistic
 #' 
-#' Takes the event log of a customer cohort, and returns a sufficient summary
-#' statistic for applying common BTYD models.
+#' Takes the transaction log of a customer cohort, and returns a sufficient
+#' summary statistic for applying common BTYD models.
 #' 
 #' Note: compared to \code{\link[BTYD]{dc.ElogToCbsCbt}} this also adds a
 #' summary statistic for estimating regularity.
