@@ -18,9 +18,17 @@ library(BTYDplus)
 
 ## Introduction
 
-The BTYDplus package provides advanced statistical methods to describe and predict customers' purchase behavior in noncontractual setting. It fits probabilistic models to historic transaction records, which then allows to compute quantities of managerial interest.
+The BTYDplus package provides advanced statistical methods to describe and predict customers' purchase behavior in noncontractual setting. It fits probabilistic models to historic transaction records for computing customer-centric metrics of managerial interest.
 
 The challenge of this task is threefold: For one, the churn event in a non-contractual customer relationship is not directly observable, but needs to be infered indirectly based on observed periods of inactivity. Second, with customers behaving differently, yet having oftentimes only few transactions recorded so far, we require statistical methods that can utilize cohort-level patterns as priors for estimating customer-level quantities. And third, we attempt to predict the (unseen) future, thus need assumptions regarding the future dynamics.
+
+```{r, fig.show='hold'}
+set.seed(123)
+data("groceryElog")
+grocerySubset <- groceryElog[groceryElog$cust %in% sample(unique(groceryElog$cust), 20), ]
+grocerySubset <- grocerySubset[grocerySubset$date <= "2006-12-31", ]
+plotSampledTimingPatterns(grocerySubset, T.cal = "2006-12-31")
+```
 
 Fitting a buy-till-you-die model allows analysts to describe a customer cohort then in terms of its heterogeneous distribution of purchase patterns and dropout probabilities. More importantly, it allows to estimate the total number of future transactions, a business-critical information for capacity and production planning. Further, it is possible to assess the total (expected) value of a cohort, which, if put in relationship to its acquisition costs, provides quantified support for making decisions on the customer acquisition channels.
 
