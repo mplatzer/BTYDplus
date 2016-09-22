@@ -51,6 +51,10 @@ test_that("elog2cbs", {
   # check that T.cal and T.tot also accept characters
   cbs <- elog2cbs(elog_s, T.cal = as.character(T.cal), T.tot = as.character(T.tot))
 
+  # check that T.tot can be in the future
+  cbs <- elog2cbs(elog_s, T.tot = max(elog_s$date) + 70)
+  expect_equal(unique(cbs$T.star), 70/7)
+  
   # check for `units`
   expect_equal(elog2cbs(elog, units = "days")$T.cal / 7, elog2cbs(elog)$T.cal)
   expect_equal(elog2cbs(elog, units = "hours")$t.x / (7*24), elog2cbs(elog)$t.x)
