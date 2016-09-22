@@ -31,7 +31,7 @@ Figure 1 displays the complete transaction records of 30 sampled customers of an
 * Which particular customers can still be considered active?
 * Which customers will provide the most value to the company going forward?
 
-```{r, fig.show='hold', fig.width = 7, fig.height = 3, fig.cap = "Figure 1: Timing Patterns for Sampled Grocery Customers"}
+```{r, fig.show="hold", fig.width=7, fig.height=3, fig.cap="Figure 1: Timing Patterns for Sampled Grocery Customers"}
 library(BTYDplus)
 data("groceryElog")
 set.seed(123)
@@ -64,7 +64,7 @@ All of the aforementioned models benefit from closed-form solutions for key expr
 
 The typical analysis process starts out by reading in a complete log of all events or transactions of an existing customer cohort. It is up to the analyst to define how a customer base is split into cohorts, but typically these are defined based on customers' first transaction date and/or the acquisition channel. The data requirements for such an event log are minimal, and only consist of a customer ID field `cust` and a `date` field of class `Date` or `POSIXt`. If the analysis should also cover the monetary component, the event log needs to contain a corresponding field `sales`. In order to get started quickly, BTYDplus provides an event log for customers of an online grocery store (`data("groceryElog")`). Further, for each BTYDplus model a data generating method is available (`*.GenerateData`), in order to simulate transaction logs, that follow the corresponding model assumptions.
 
-```{r, echo=FALSE, results='asis'}
+```{r, echo=FALSE, results="asis"}
 cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"), 
                       stringsAsFactors = FALSE, 
                       col.names = c("cust", "sampleid", "date", "cds", "sales"))
@@ -82,7 +82,7 @@ BTYDplus provides various model-independent helper methods for handling and desc
 
 Before starting to fit probabilistic models, an analyst might be interested in reporting the total number of transactions over time, to gain a first understanding of the dynamics at a cohort level. For this purpose the methods `elog2cum` and `elog2inc` are provided. These take an event log as a first argument, and count for each time unit the cumulated or incremental number of transactions. If argument `first` is set to TRUE, then a customer's initial transaction will be included, otherwise not.
 
-```{r, fig.show='hold'}
+```{r, fig.show="hold"}
 data("groceryElog")
 weekly_inc_total  <- elog2inc(groceryElog, by = 7, first = TRUE)
 weekly_inc_repeat <- elog2inc(groceryElog, by = 7, first = FALSE)
@@ -96,6 +96,7 @@ plot(weekly_cum_total, typ = "l", frame = FALSE,
      ylab = "", xlab = "", main = "Weekly Cumulative")
 lines(weekly_cum_repeat, col = "red")
 ```
+
 
 ### Convert Transaction Log to CBS format
 
@@ -126,7 +127,7 @@ head(cbs, 5)
 
 The models (M)BG/CNBD-k and Pareto/GGG are capable of leveraging regularity within transaction timings for improving forecast accuracy. The method `estimateRegularity` provides a quick check for the degree of regularity in the event timings. A return value of close to 1 supports the assumption of exponentially distributed intertransaction times, whereas values significantly larger than 1 reveal the presence of regularity. Estimation is either done by 1) assuming a same degree of regularity across all customers (`method = "wheat"`), or 2) by estimating regularity for each customer seperately, as the shape parameter of a fitted gamma distribution, and then return the median across estimates. The latter methods, though, require sufficient (>=10) transactions per customer.
 
-```{r, fig.show='hold'}
+```{r, fig.show="hold"}
 data("groceryElog")
 estimateRegularity(groceryElog, method = "wheat", plot = TRUE, title = "Wheat & Morrison")
 estimateRegularity(groceryElog, method = "mle", plot = TRUE, title = "Maximum Likelihood")
@@ -150,44 +151,27 @@ cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-31")
 
 With the mean of the Gamma distribution being $r / \alpha$, this yields a mean estimate for $\lambda$ of `r round(params.nbd[1] / params.nbd[2], 2)`, and thus a mean intertransaction time $1 / \lambda$ of `r round(params.nbd[2] / params.nbd[1], 2)` weeks.
 
-Let's next estimate the number of transactions for the year 2007, and compare it to the 
-
+Let's next estimate the number of transactions for the year 2007, and compare it to the actual observed transactions.
 
 ```{r}
-cbs$xstar.nbd <- nbd.ConditionalExpectedTransactions(params.nbd, T.star = 52, cbs$x, cbs$T.cal)
-c(`Actual` = sum(cbs$x.star), `NBD Estimate` = sum(cbs$xstar.nbd))
-head(cbs[rev(order(cbs$xstar.nbd)), ], 5) # 5 most valuable customers
+cbs$x.star.nbd <- nbd.ConditionalExpectedTransactions(params.nbd, T.star = 52, cbs$x, cbs$T.cal)
+c(`Actual` = sum(cbs$x.star), `NBD Estimate` = sum(cbs$x.star.nbd))
 ```
+
+The NBD model overforecasts in this case the actual number of transaction by `r paste0(round(100 * sum(cbs$x.star.nbd) / sum(cbs$x.star) - 100, 1), "%")`, which can be explained by the lack of a dropout process. All customers are assumed to remain as active in 2007 as they have been in 2006, whereas in reality the weekly incremental transaction counts show a clear downward trend.
 
 
 ### (M)BG/CNBD-k
 
-The BG/CNBD-k and MBG/CNBD-k models share 
-
-A typical workflow for applying the MBG/CNBD-k a model could thus be:
-
-1. read event log into Rh
-2. convert event log into cbs format (via `elog2cbs`)
-3. estimate model parameters - this is done with `*.EstimateParameters` or `*.DrawParameters` methods
-4. analyze estimated parameters
-5. estimate future transactions
-6. 
-
+The BG/CNBD-k and MBG/CNBD-k models share ...
 
 ```{r}
-#' Load transaction records of 1525 grocery customers.
-data("groceryElog", envir = environment())
-head(groceryElog)
-
-#' Convert from event log to customer-by-sufficient-statistic summary.
-#' Split into 52 weeks calibration, and 52 weeks holdout period.
-cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
-head(cbs)
+#head(cbs[rev(order(cbs$x.star.nbd)), c("T.cal", "x", "T.star", "x.star", "x.star.nbd")], 5) # 5 most valuable customers
 ```
 
 ### MBG/NBD
 
-The MBG/NBD model is contained with the class of MBG/CNBD-k. Even though a 
+The MBG/NBD model is contained with the class of MBG/CNBD-k. Even though a ...
 
 
 ## MCMC Estimated Models
