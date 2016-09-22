@@ -76,11 +76,11 @@ Once the transaction log has been obtained, it needs to be converted into a cust
 
 ## Helper Methods
 
-The BTYDplus package provides various model-independent helper methods for handling and describing customers' transaction logs.
+BTYDplus provides various model-independent helper methods for handling and describing customers' transaction logs.
 
 ### Convert Transaction Log to CBS format
 
-The `elog2cbs` method is a fast implementation for converting the event log into a customer-by-sufficient-statistic summary table, which is the required format for applying the buy-till-you-die models. Note, that compared to BTYD::dc.ElogToCbsCbt this also adds a summary statistic for estimating regularity (`litt`), and summarizes sales, if these are present in the event log. By specifying an end date for the calibration period (`T.cal`), we can easily generate summary statistics split into calibration and holdout period, which can then be used to evaluate forecasting accuracy of our models.
+The `elog2cbs` method is a fast implementation for converting the event log into a customer-by-sufficient-statistic summary table, which is the required format for applying BTYD and BTYDplus models. Note, that compared to `BTYD::dc.ElogToCbsCbt` this implementation also adds a summary statistic for estimating regularity (`litt`), plus aggregates sales, if these are present in the event log (`sales`). 
 
 ```{r}
 # convert from event log to customer-by-sufficient-statistic format
@@ -89,6 +89,8 @@ cbs <- elog2cbs(groceryElog)
 head(cbs, 5)
 ```
 
+By specifying an end date for the calibration period (`T.cal`), it is possible to generate summary statistics split into calibration and holdout period, which can be useful for evaluating forecasting accuracy for a given dataset.
+
 ```{r}
 # split event log into calibration and holdout period, to validate model performance
 range(groceryElog$date)
@@ -96,8 +98,9 @@ cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 head(cbs, 5)
 ```
 
+### Convert Event Log to Weekly Transactions
 
-For one, we can convert the logs into weekly and/or daily incremental number of repeat transactions, and have these plotted. Further, we can plot the transaction dates of some randomly sampled customers, to get a feeling for the various timing patterns.
+FIXME For one, we can convert the logs into weekly and/or daily incremental number of repeat transactions, and have these plotted. Further, we can plot the transaction dates of some randomly sampled customers, to get a feeling for the various timing patterns.
 
 ```{r, fig.show='hold'}
 data("groceryElog")
@@ -109,9 +112,6 @@ lines(weekly_inc_repeat, col = "red")
 
 plotTimingPatterns(groceryElog, n = 20)
 ```
-
-
-### Convert Event Log to Weekly Transactions
 
 ### Estimate Regularity
 
