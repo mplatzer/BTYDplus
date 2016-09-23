@@ -10,23 +10,23 @@ mbgcnbd.pmf(params, t, x)
 bgcnbd.pmf(params, t, x)
 }
 \arguments{
-\item{params}{A vector with model parameters \code{k}, \code{r}, 
+\item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
-\item{t}{Length end of time period for which probability is being computed. 
+\item{t}{Length end of time period for which probability is being computed.
 May also be a vector.}
 
 \item{x}{Number of repeat transactions for which probability is calculated.
 May also be a vector.}
 }
 \value{
-\eqn{P(X(t)=x|r,alpha,a,b)}. If either \code{t} or \code{x} is a 
-  vector, then the output will be a vector as well. If both are vectors, the 
+\eqn{P(X(t)=x|r,alpha,a,b)}. If either \code{t} or \code{x} is a
+  vector, then the output will be a vector as well. If both are vectors, the
   output will be a matrix.
 }
 \description{
-Uses (M)BG/CNBD-k model parameters to return the probability distribution of 
-purchase frequencies for a random customer in a given time period, i.e. 
+Uses (M)BG/CNBD-k model parameters to return the probability distribution of
+purchase frequencies for a random customer in a given time period, i.e.
 \eqn{P(X(t)=x|r,alpha,a,b)}.
 }
 \examples{

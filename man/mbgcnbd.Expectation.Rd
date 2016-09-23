@@ -10,7 +10,7 @@ mbgcnbd.Expectation(params, t)
 bgcnbd.Expectation(params, t)
 }
 \arguments{
-\item{params}{A vector with model parameters \code{k}, \code{r}, 
+\item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
 \item{t}{Length of time for which we are calculating the expected number of repeat transactions.}

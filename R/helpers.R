@@ -318,24 +318,29 @@ elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
 }
 
 
-#' Aggregate Event Log to cumulative number of (repeat) transactions
+#' Convert Event Log to Transaction Counts
 #'
-#' Duplicate transactions with identical `cust` and `date` (or `t`) field are
-#' counted only once.
-#'
+#' Aggregates an event log to either incremental or cumulative number of
+#' transactions. If \code{first=TRUE} then the initial transactions of each
+#' customer are included in the count as well.
+#' 
+#' Duplicate transactions with identical \code{cust} and \code{date} (or
+#' \code{t}) field are counted only once.
+#' 
 #' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}.
-#' @param by Only return every \code{}-th number. Defaults to 7, and thus
+#' @param by Only return every \code{by}-th count Defaults to 7, and thus
 #'   returns weekly numbers.
 #' @param first If TRUE, then the first transaction for each customer is being
 #'   counted as well
-#' @return Numeric vector of cumulative repeat transactions.
+#' @return Numeric vector of transaction counts.
 #' @export
-#' @seealso \code{\link{elog2inc}}
 #' @examples
 #' data("groceryElog")
 #' cum <- elog2cum(groceryElog)
 #' plot(cum, typ="l", frame = FALSE)
+#' inc <- elog2inc(groceryElog)
+#' plot(inc, typ="l", frame = FALSE)
 elog2cum <- function(elog, by = 7, first = FALSE) {
   t0 <- sales <- N <- cust <- NULL  # suppress checkUsage warnings
   stopifnot("cust" %in% names(elog))
@@ -362,21 +367,8 @@ elog2cum <- function(elog, by = 7, first = FALSE) {
 }
 
 
-#' Aggregate Event Log to incremental number of (repeat) transactions
-#'
-#' @param elog Event log, a \code{data.frame} with columns \code{cust} and
-#'   transaction time \code{t} or \code{date}.
-#' @param by Only return every \code{}-th number. Defaults to 7, and thus
-#'   returns weekly numbers.
-#' @param first If TRUE, then the first transaction for each customer is being
-#'   counted as well
-#' @return Numeric vector of repeat transactions.
+#' @rdname elog2cum
 #' @export
-#' @seealso \code{\link{elog2cum}}
-#' @examples
-#' data("groceryElog")
-#' inc <- elog2inc(groceryElog)
-#' plot(inc, typ="l", frame = FALSE)
 elog2inc <- function(elog, by = 7, first = FALSE) {
   cum <- elog2cum(elog = elog, by = by, first = first)
   return(diff(cum))
@@ -391,7 +383,7 @@ elog2inc <- function(elog, by = 7, first = FALSE) {
 #' @keywords internal
 dc.check.model.params.safe <- function(printnames, params, func) {
   # first do basic checks
-  dc.check.model.params(printnames, params, func)
+  BTYD::dc.check.model.params(printnames, params, func)
   # then check for names, if these are present
   if (!is.null(names(params))) {
     idx <- names(params) != ""

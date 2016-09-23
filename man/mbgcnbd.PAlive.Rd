@@ -10,25 +10,25 @@ mbgcnbd.PAlive(params, x, t.x, T.cal)
 bgcnbd.PAlive(params, x, t.x, T.cal)
 }
 \arguments{
-\item{params}{A vector with model parameters \code{k}, \code{r}, 
+\item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
-\item{x}{Number of repeat transactions in the calibration period T.cal, or a 
+\item{x}{Number of repeat transactions in the calibration period T.cal, or a
 vector of calibration period frequencies.}
 
-\item{t.x}{Recency, i.e. length between first and last transaction during 
+\item{t.x}{Recency, i.e. length between first and last transaction during
 calibration period.}
 
-\item{T.cal}{Length of calibration period, or a vector of calibration period 
+\item{T.cal}{Length of calibration period, or a vector of calibration period
 lengths.}
 }
 \value{
-Probability that the customer is still alive at the end of the 
+Probability that the customer is still alive at the end of the
   calibration period.
 }
 \description{
-Uses (M)BG/CNBD-k model parameters and a customer's past transaction behavior 
-to return the probability that they are still alive at the end of the 
+Uses (M)BG/CNBD-k model parameters and a customer's past transaction behavior
+to return the probability that they are still alive at the end of the
 calibration period.
 }
 \examples{

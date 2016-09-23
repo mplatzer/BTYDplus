@@ -10,30 +10,30 @@ mbgcnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal)
 bgcnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal)
 }
 \arguments{
-\item{params}{A vector with model parameters \code{k}, \code{r}, 
+\item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
 \item{T.star}{Length of time for which we are calculating the expected number
 of transactions.}
 
-\item{x}{Number of repeat transactions in the calibration period T.cal, or a 
+\item{x}{Number of repeat transactions in the calibration period T.cal, or a
 vector of calibration period frequencies.}
 
-\item{t.x}{Recency, i.e. length between first and last transaction during 
+\item{t.x}{Recency, i.e. length between first and last transaction during
 calibration period.}
 
-\item{T.cal}{Length of calibration period, or a vector of calibration period 
+\item{T.cal}{Length of calibration period, or a vector of calibration period
 lengths.}
 }
 \value{
-Number of transactions a customer is expected to make in a time 
+Number of transactions a customer is expected to make in a time
   period of length t, conditional on their past behavior. If any of the input
-  parameters has a length greater than 1, this will be a vector of expected 
+  parameters has a length greater than 1, this will be a vector of expected
   number of transactions.
 }
 \description{
-Uses (M)BG/CNBD-k model parameters and a customer's past transaction behavior 
-to return the number of transactions they are expected to make in a given 
+Uses (M)BG/CNBD-k model parameters and a customer's past transaction behavior
+to return the number of transactions they are expected to make in a given
 time period.
 }
 \examples{
@@ -41,7 +41,7 @@ data("groceryElog")
 cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 # estimate transactions for next 12 weeks
-xstar.est <- mbgcnbd.ConditionalExpectedTransactions(params, 
+xstar.est <- mbgcnbd.ConditionalExpectedTransactions(params,
   T.star = 12, cbs$x, cbs$t.x, cbs$T.cal)
 head(xstar.est) # expected number of transactions for first 6 customers
 sum(xstar.est) # expected total number of transactions during holdout
