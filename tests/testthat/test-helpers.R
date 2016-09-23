@@ -20,8 +20,8 @@ test_that("dc.check.model.params.safe", {
 
 test_that("elog2cum", {
 
-  cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"), 
-                        stringsAsFactors = FALSE, 
+  cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"),
+                        stringsAsFactors = FALSE,
                         col.names = c("cust", "sampleid", "date", "cds", "sales"))
   cdnowElog$date <- as.Date(as.character(cdnowElog$date), format = "%Y%m%d")
   cum <- elog2cum(cdnowElog)
@@ -31,12 +31,14 @@ test_that("elog2cum", {
   inc <- elog2inc(cdnowElog)
   expect_equal(diff(cum), inc)
 
-  elog <- data.frame(cust = c(1, 1, 1, 3, 3), t = c(0, 9, 18, 4, 6))
+  elog <- data.frame(cust = c(1, 1, 1, 3, 3), t = c(0, 9, 20, 4, 6))
   expect_equal(elog2cum(elog, by = 7), c(1, 2, 3))
   expect_equal(elog2cum(elog, by = 7, first = TRUE), c(3, 4, 5))
   expect_equal(diff(elog2cum(elog, by = 7, first = TRUE)), elog2inc(elog, by = 7, first = TRUE))
+  expect_equal(tail(elog2cum(elog, by = 1, first = TRUE), 1), nrow(elog))
+  expect_equal(tail(elog2cum(elog, by = 1, first = FALSE), 1), nrow(elog) - uniqueN(elog$cust))
 
-  elog <- data.table(cust = c(1, 1, 1, 1, 3, 3), t = c(0, 9, 9, 18, 4, 6))
+  elog <- data.table(cust = c(1, 1, 1, 1, 1, 3, 3), t = c(0, 9, 9, 20, 22, 4, 6))
   expect_equal(elog2cum(elog, by = 7), c(1, 2, 3))
 })
 
@@ -51,6 +53,6 @@ test_that("plotTimingPatterns", {
   expect_silent(plotTimingPatterns(groceryElog, T.cal = "2006-12-31", T.tot = "2007-06-30", headers = c("Past", "Future")))
   expect_silent(plotTimingPatterns(groceryElog, T.cal = as.Date("2006-12-31")))
   expect_silent(plotTimingPatterns(groceryElog, n = 100))
-  expect_silent(plotTimingPatterns(head(groceryElog, 10), T.cal = "2006-12-31", T.tot = "2007-12-31"))
+  expect_silent(plotTimingPatterns(head(groceryElog, 10), T.cal = "2006-12-31", T.tot = "2007-12-30"))
 
 })
