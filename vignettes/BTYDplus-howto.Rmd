@@ -60,7 +60,7 @@ The implementation of the original *NBD* model from 1959 serves mainly as a basi
 
 All of the aforementioned models benefit from closed-form solutions for key expressions and thus can be efficiently estimated via means of maximum likelihood estimation (MLE). However, the necessity of deriving closed-form expressions restricts the model builder from relaxing the underlying behavioral assumptions. An alternative estimation method for probabilistic models is via Markov-Chain-Monte-Carlo (MCMC) simulation. MCMC comes at significantly higher costs in terms of implementation complexity and computation time, but it allows for more flexible assumptions. Additionally one gains the benefits of (1) estimated marginal posterior distributions rather than point estimates, (2) individual-level parameter estimates, and thus (3) straightforward simulations of customer-level metrics of managerial interest. The hierarchical bayes variant of Pareto/NBD (i.e., *Pareto/NBD (HB)*) served as a proof-of-concept for the MCMC approach, but doesn't yet take advantage of the gained flexibility, as it sticks to the original Pareto/NBD assumptions. In contrast, *Pareto/NBD (Abe)* relaxes the independence of purchase and dropout process, plus is capable of incorporating customer covariates. Particularly the latter can turn out to be very powerful, if any of such known covariates helps in explaining the heterogeneity within the customer cohort. Finally, the *Pareto/GGG* is also a generalization of Pareto/NBD, but allows for a varying degree of regularity within the transaction timings. Analogous to (M)BG/CNBD-k, incorporating regularity can yield significant improvements in forecast accuracy, if such regularity is present in the data.
 
-## Workflow
+## Analytical Workflow
 
 The typical analysis process starts out by reading in a complete log of all events or transactions of an existing customer cohort. It is up to the analyst to define how a customer base is split into cohorts, but typically these are defined based on customers' first transaction date and/or the acquisition channel. The data requirements for such an event log are minimal, and only consist of a customer ID field `cust` and a `date` field of class `Date` or `POSIXt`. If the analysis should also cover the monetary component, the event log needs to contain a corresponding field `sales`. In order to get started quickly, BTYDplus provides an event log for customers of an online grocery store (`data("groceryElog")`). Further, for each BTYDplus model a data generating method is available (`*.GenerateData`), in order to simulate transaction logs, that follow the corresponding model assumptions.
 
@@ -74,6 +74,7 @@ knitr::kable(head(cdnowElog[, c("cust", "date", "sales")], 6), caption = "Transa
 
 Once the transaction log has been obtained, it needs to be converted into a customer-by-sufficient-statistic summary table (via the `elog2cbs` method), so that the data can be consumed by model-specific parameter estimation methods (`*.EstimateParameters` for MLE- and `*.DrawParameters` for MCMC-models). The estimated parameters already allow descriptive statements regarding the purchase and dropout process, e.g. mean purchase frequency, mean lifetime, variation in dropout probability, etc. For MLE-estimated models we can further report the maximized log-likelihood (via `*.cbs.LL`) to benchmark the models in terms of their data fitting capabilities for a given dataset. Further, estimates for the conditional and unconditional expected number of transactions (`*.pmf`, `*.Expectation`, `*.ConditionalExpectedTransactions`), as well as for the (unobservable) status of a customer (`*.PAlive`) can be computed based on the parameters. Such estimates can then be analyzed either on individual level, or aggregated on to cohort level.
 
+
 ## Helper Methods
 
 BTYDplus provides various model-independent helper methods for handling and describing customers' transaction logs.
@@ -82,19 +83,22 @@ BTYDplus provides various model-independent helper methods for handling and desc
 
 Before starting to fit probabilistic models, an analyst might be interested in reporting the total number of transactions over time, to gain a first understanding of the dynamics at a cohort level. For this purpose the methods `elog2cum` and `elog2inc` are provided. These take an event log as a first argument, and count for each time unit the cumulated or incremental number of transactions. If argument `first` is set to TRUE, then a customer's initial transaction will be included, otherwise not.
 
-```{r, fig.show="hold"}
+```{r, fig.show="hold", fig.show="hold", fig.width=7, fig.height=2.5, fig.cap="Figure 2: Weekly Trends"}
 data("groceryElog")
+op <- par(mfrow = c(1, 2), mar = c(2.5, 2.5, 2.5, 2.5))
+
 weekly_inc_total  <- elog2inc(groceryElog, by = 7, first = TRUE)
 weekly_inc_repeat <- elog2inc(groceryElog, by = 7, first = FALSE)
 plot(weekly_inc_total, typ = "l", frame = FALSE,
-     ylab = "", xlab = "", main = "Weekly Incremental")
+     ylab = "", xlab = "", main = "Incremental Transactions")
 lines(weekly_inc_repeat, col = "red")
 
 weekly_cum_total  <- elog2cum(groceryElog, by = 7, first = TRUE)
 weekly_cum_repeat <- elog2cum(groceryElog, by = 7, first = FALSE)
 plot(weekly_cum_total, typ = "l", frame = FALSE,
-     ylab = "", xlab = "", main = "Weekly Cumulative")
+     ylab = "", xlab = "", main = "Cumulative Transactions")
 lines(weekly_cum_repeat, col = "red")
+par(op)
 ```
 
 
@@ -127,10 +131,12 @@ head(cbs, 5)
 
 The models (M)BG/CNBD-k and Pareto/GGG are capable of leveraging regularity within transaction timings for improving forecast accuracy. The method `estimateRegularity` provides a quick check for the degree of regularity in the event timings. A return value of close to 1 supports the assumption of exponentially distributed intertransaction times, whereas values significantly larger than 1 reveal the presence of regularity. Estimation is either done by 1) assuming a same degree of regularity across all customers (`method = "wheat"`), or 2) by estimating regularity for each customer seperately, as the shape parameter of a fitted gamma distribution, and then return the median across estimates. The latter methods, though, require sufficient (>=10) transactions per customer.
 
-```{r, fig.show="hold"}
+```{r, fig.show="hold", fig.show="hold", fig.width=7, fig.height=2.5, fig.cap="Figure 3: Diagnostic Plots for Estimating Regularity"}
 data("groceryElog")
+op <- par(mfrow = c(1, 2))
 estimateRegularity(groceryElog, method = "wheat", plot = TRUE, title = "Wheat & Morrison")
 estimateRegularity(groceryElog, method = "mle", plot = TRUE, title = "Maximum Likelihood")
+par(op)
 ```
 
 The Wheat & Morrison [-@wheat1990epr] estimator reports a `k` of close to 2, suggesting that a Erlang-2 might be more appropriate than the exponential distribution for modelling intertransaction times for the online grocery dataset. The peak in the plotted distribution additionally hints at a subset of customers which are exhibiting an even stronger degree of regularity. 
@@ -145,7 +151,7 @@ The NBD model by @ehrenberg1959pattern assumes a heterogenous, yet constant purc
 
 ```{r}
 data("groceryElog")
-cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-31")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 (params.nbd <- nbd.EstimateParameters(cbs))
 ```
 
