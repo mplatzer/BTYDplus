@@ -167,6 +167,7 @@ The expected number of (future) transactions for a customer, conditional on her 
 est <- nbd.ConditionalExpectedTransactions(params.nbd, T.star = 52, x = 1:5, T.cal = 52)
 names(est) <- 1:5
 round(est, 2)
+
 # estimates for whole customer cohort
 cbs$x.star.nbd <- nbd.ConditionalExpectedTransactions(params.nbd, T.star = 52, cbs$x, cbs$T.cal)
 # compare estimates with actuals at aggregated level
@@ -194,11 +195,16 @@ Let's now again compute the conditional expected transactions for six customers 
 
 ```{r}
 # estimates for customers with 40 weeks inactivity, and 1 to 5 repeat transactions in first 12 weeks
-est <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, T.star = 52, x = 1:5, t.x = 12, T.cal = 52)
+est <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, 
+         T.star = 52, x = 1:5, t.x = 12, T.cal = 52)
 names(est) <- 1:5
 round(est, 2)
+```
+
+```{r}
 # estimates for whole customer cohort
-cbs$x.star.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, T.star = 52, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$x.star.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, 
+                     T.star = 52, cbs$x, cbs$t.x, cbs$T.cal)
 # compare estimates with actuals at aggregated level
 c(`Actuals` = sum(cbs$x.star), `Pareto/NBD` = sum(cbs$x.star.pnbd))
 ```
@@ -229,22 +235,30 @@ The MLE method searches across a five dimensional parameter space $(k, r, \alpha
 
 ```{r}
 # estimates for customers with 40 weeks inactivity, and 1 to 5 repeat transactions in first 12 weeks
-est <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, T.star = 52, x = 1:5, t.x = 12, T.cal = 52)
+est <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, 
+         T.star = 52, x = 1:5, t.x = 12, T.cal = 52)
 names(est) <- 1:5
 round(est, 2)
+```
+
+```{r}
 # P(alive) for customers with 40 weeks inactivity, and 1 to 5 repeat transactions in first 12 weeks
 palive <- mbgcnbd.PAlive(params.mbgcnbd, x = 1:5, t.x = 12, T.cal = 52)
 names(palive) <- 1:5
 round(palive, 3)
+```
 
+```{r}
 # estimates for whole customer cohort
-cbs$x.star.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, T.star = 52, cbs$x, cbs$t.x, cbs$T.cal)
+cbs$x.star.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, 
+                        T.star = 52, cbs$x, cbs$t.x, cbs$T.cal)
 # compare estimates with actuals at aggregated level
 c(`Actuals` = sum(cbs$x.star), `MBG/CNBD-k` = sum(cbs$x.star.mbgcnbd))
 ```
+
 ```{r}
-head(cbs[rev(order(cbs$x.star.mbgcnbd)), c("T.cal", "x", "T.star", "x.star", "x.star.nbd", "x.star.pnbd", "x.star.mbgcnbd")], 5) # 5 most valuable customers
-head(cbs[, c("T.cal", "x", "T.star", "x.star", "x.star.nbd", "x.star.pnbd", "x.star.mbgcnbd")], 5) # 5 most valuable customers
+#head(cbs[rev(order(cbs$x.star.mbgcnbd)), c("T.cal", "x", "T.star", "x.star", "x.star.nbd", "x.star.pnbd", "x.star.mbgcnbd")], 5) # 5 most valuable customers
+#head(cbs[, c("T.cal", "x", "T.star", "x.star", "x.star.nbd", "x.star.pnbd", "x.star.mbgcnbd")], 5) # 5 most valuable customers
 ```
 
 ### MBG/NBD
