@@ -15,7 +15,7 @@ nbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 
 \item{params}{NBD parameters - a vector with \code{r} and \code{alpha} in that order.}
 
-\item{return.elog}{If \code{TRUE} then the event log is returned in addition 
+\item{return.elog}{If \code{TRUE} then the event log is returned in addition
 to the CBS summary.}
 }
 \value{

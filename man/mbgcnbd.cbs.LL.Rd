@@ -16,13 +16,13 @@ bgcnbd.cbs.LL(params, cal.cbs)
 bgcnbd.LL(params, x, t.x, T.cal, litt)
 }
 \arguments{
-\item{params}{A vector with model parameters \code{k}, \code{r}, 
+\item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
-\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS) 
-data.frame. It must contain a row for each customer, and columns \code{x} 
-for frequency, \code{t.x} for recency , \code{T.cal} for the total time 
-observed, as well as the sum over logarithmic intertransaction times 
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)
+data.frame. It must contain a row for each customer, and columns \code{x}
+for frequency, \code{t.x} for recency , \code{T.cal} for the total time
+observed, as well as the sum over logarithmic intertransaction times
 \code{litt}. A correct format can be easily generated based on the complete
 event log of a customer cohort with \code{\link{elog2cbs}}.}
 

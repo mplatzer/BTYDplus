@@ -10,7 +10,7 @@ mbgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, n.periods.final)
 bgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, n.periods.final)
 }
 \arguments{
-\item{params}{A vector with model parameters \code{k}, \code{r}, 
+\item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
 \item{T.cal}{A vector to represent customers' calibration period lengths.}
@@ -34,7 +34,7 @@ cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 # Returns a vector containing expected cumulative repeat transactions for 104
 # weeks, with every eigth week being reported.
-mbgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal, 
+mbgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal,
   T.tot = 104, n.periods.final = 104/8)
 }
 

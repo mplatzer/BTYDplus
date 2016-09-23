@@ -18,7 +18,7 @@ is assumed that customers have different 'birth' dates, i.e.
 
 \item{T.star}{Length of holdout period. This may be a vector.}
 
-\item{params}{A vector with model parameters \code{k}, \code{r}, 
+\item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
 \item{return.elog}{If \code{TRUE} then the event log is returned in addition
@@ -36,7 +36,7 @@ Simulate data according to (M)BG/CNBD-k model assumptions
 }
 \examples{
 params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32, 
+data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32,
   params, return.elog = TRUE)
 
 # customer by sufficient summary statistic - one row per customer

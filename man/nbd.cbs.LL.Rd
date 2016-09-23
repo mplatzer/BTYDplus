@@ -10,7 +10,7 @@ nbd.cbs.LL(params, cal.cbs)
 \item{params}{NBD parameters - a vector with r and alpha, in that
 order.}
 
-\item{cal.cbs}{Calibration period CBS. It must contain columns for frequency 
+\item{cal.cbs}{Calibration period CBS. It must contain columns for frequency
 \code{x} and total time observed \code{T.cal}.}
 }
 \value{

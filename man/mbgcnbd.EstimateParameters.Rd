@@ -16,26 +16,26 @@ mbgnbd.EstimateParameters(cal.cbs, par.start = c(1, 3, 1, 3),
   max.param.value = 10000, trace = 0)
 }
 \arguments{
-\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS) 
-data.frame. It must contain a row for each customer, and columns \code{x} 
-for frequency, \code{t.x} for recency , \code{T.cal} for the total time 
-observed, as well as the sum over logarithmic intertransaction times 
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)
+data.frame. It must contain a row for each customer, and columns \code{x}
+for frequency, \code{t.x} for recency , \code{T.cal} for the total time
+observed, as well as the sum over logarithmic intertransaction times
 \code{litt}, in case that \code{k} is not provided. A correct format can be
-easily generated based on the complete event log of a customer cohort with 
+easily generated based on the complete event log of a customer cohort with
 \code{\link{elog2cbs}}.}
 
-\item{k}{Integer-valued degree of regularity for Erlang-k distributed 
-interpurchase times. By default this \code{k} is not provdied, and a grid 
-search from 1 to 12 is performed in order to determine the best-fitting 
+\item{k}{Integer-valued degree of regularity for Erlang-k distributed
+interpurchase times. By default this \code{k} is not provdied, and a grid
+search from 1 to 12 is performed in order to determine the best-fitting
 \code{k}. The grid search is stopped early, if the log-likelihood doesn't
 increase anymore when increasing k beyond 4.}
 
-\item{par.start}{Initial (M)BG/CNBD-k parameters. A vector with \code{r}, 
+\item{par.start}{Initial (M)BG/CNBD-k parameters. A vector with \code{r},
 \code{alpha}, \code{a} and \code{b} in that order.}
 
 \item{max.param.value}{Upper bound on parameters.}
 
-\item{trace}{If larger than 0, then the parameter values are is printed every 
+\item{trace}{If larger than 0, then the parameter values are is printed every
 \code{trace}-step of the maximum likelihood estimation search.}
 }
 \value{

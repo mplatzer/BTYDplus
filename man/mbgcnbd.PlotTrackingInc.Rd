@@ -14,7 +14,7 @@ bgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data,
   title = "Tracking Weekly Transactions", ymax = NULL)
 }
 \arguments{
-\item{params}{A vector with model parameters \code{k}, \code{r}, 
+\item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
 \item{T.cal}{A vector to represent customers' calibration period lengths.}
@@ -49,7 +49,7 @@ groceryElog <- groceryElog[groceryElog$date < "2006-06-30", ]
 cbs <- elog2cbs(groceryElog, T.cal = "2006-04-30")
 inc <- elog2inc(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs, k = 2)
-mbgcnbd.PlotTrackingInc(params, cbs$T.cal, 
+mbgcnbd.PlotTrackingInc(params, cbs$T.cal,
   T.tot = max(cbs$T.cal + cbs$T.star), inc)
 }
 \seealso{
