@@ -1,11 +1,11 @@
 
 #' Parameter Estimation for the NBD model
-#' 
+#'
 #' Estimates parameters for the NBD model via Maximum Likelihood Estimation.
-#' 
-#' @param cal.cbs Calibration period CBS. It must contain columns for frequency 
+#'
+#' @param cal.cbs Calibration period CBS. It must contain columns for frequency
 #'   \code{x} and total time observed \code{T.cal}.
-#' @param par.start Initial NBD parameters - a vector with \code{r} and \code{alpha} in 
+#' @param par.start Initial NBD parameters - a vector with \code{r} and \code{alpha} in
 #'   that order.
 #' @param max.param.value Upper bound on parameters.
 #' @return List of estimated parameters.
@@ -33,10 +33,10 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
 
 
 #' Calculate the log-likelihood of the NBD model
-#' 
+#'
 #' @param params NBD parameters - a vector with r and alpha, in that
 #'   order.
-#' @param cal.cbs Calibration period CBS. It must contain columns for frequency 
+#' @param cal.cbs Calibration period CBS. It must contain columns for frequency
 #'   \code{x} and total time observed \code{T.cal}.
 #' @return The total log-likelihood for the provided data.
 #' @export
@@ -54,7 +54,7 @@ nbd.cbs.LL <- function(params, cal.cbs) {
 
 
 #' Calculate the log-likelihood of the NBD model
-#' 
+#'
 #' @param params NBD parameters - a vector with \code{r} and \code{alpha}, in that
 #'   order.
 #' @param x Frequency, i.e. number of re-purchases.
@@ -64,14 +64,14 @@ nbd.cbs.LL <- function(params, cal.cbs) {
 #' @seealso \code{\link{nbd.cbs.LL}}
 nbd.LL <- function(params, x, T.cal) {
   max.length <- max(length(x), length(T.cal))
-  if (max.length%%length(x)) 
+  if (max.length%%length(x))
     warning("Maximum vector length not a multiple of the length of x")
-  if (max.length%%length(T.cal)) 
+  if (max.length%%length(T.cal))
     warning("Maximum vector length not a multiple of the length of T.cal")
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.LL")
-  if (any(x < 0) || !is.numeric(x)) 
+  if (any(x < 0) || !is.numeric(x))
     stop("x must be numeric and may not contain negative numbers.")
-  if (any(T.cal < 0) || !is.numeric(T.cal)) 
+  if (any(T.cal < 0) || !is.numeric(T.cal))
     stop("T.cal must be numeric and may not contain negative numbers.")
   x <- rep(x, length.out = max.length)
   T.cal <- rep(T.cal, length.out = max.length)
@@ -85,11 +85,11 @@ nbd.LL <- function(params, x, T.cal) {
 
 
 #' NBD Conditional Expected Transactions
-#' 
+#'
 #' Uses NBD model parameters and a customer's past transaction behavior to
 #' return the number of transactions they are expected to make in a given time
 #' period.
-#' 
+#'
 #' @param params NBD parameters - a vector with \code{r} and \code{alpha}, in that order.
 #' @param T.star Length of time for which we are calculating the expected number
 #'   of transactions.
@@ -110,35 +110,35 @@ nbd.LL <- function(params, x, T.cal) {
 #' sum(xstar.est) # expected total number of transactions during holdout
 nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
   max.length <- max(length(T.star), length(x), length(T.cal))
-  if (max.length%%length(T.star)) 
+  if (max.length%%length(T.star))
     warning("Maximum vector length not a multiple of the length of T.star")
-  if (max.length%%length(x)) 
+  if (max.length%%length(x))
     warning("Maximum vector length not a multiple of the length of x")
-  if (max.length%%length(T.cal)) 
+  if (max.length%%length(T.cal))
     warning("Maximum vector length not a multiple of the length of T.cal")
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.ConditionalExpectedTransactions")
-  if (any(T.star < 0) || !is.numeric(T.star)) 
+  if (any(T.star < 0) || !is.numeric(T.star))
     stop("T.star must be numeric and may not contain negative numbers.")
-  if (any(x < 0) || !is.numeric(x)) 
+  if (any(x < 0) || !is.numeric(x))
     stop("x must be numeric and may not contain negative numbers.")
-  if (any(T.cal < 0) || !is.numeric(T.cal)) 
+  if (any(T.cal < 0) || !is.numeric(T.cal))
     stop("T.cal must be numeric and may not contain negative numbers.")
   T.star <- rep(T.star, length.out = max.length)
   x <- rep(x, length.out = max.length)
   T.cal <- rep(T.cal, length.out = max.length)
   r <- params[1]
   alpha <- params[2]
-  return(T.star * (r + x)/(alpha + T.cal))
+  return(unname(T.star * (r + x)/(alpha + T.cal)))
 }
 
 
 #' Simulate data according to NBD model assumptions
-#' 
+#'
 #' @param n Number of customers.
 #' @param T.cal Length of calibration period.
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params NBD parameters - a vector with \code{r} and \code{alpha} in that order.
-#' @param return.elog If \code{TRUE} then the event log is returned in addition 
+#' @param return.elog If \code{TRUE} then the event log is returned in addition
 #'   to the CBS summary.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
@@ -155,16 +155,16 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   # check model parameters
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.GenerateData")
-  
+
   r <- params[1]
   alpha <- params[2]
-  
-  if (length(T.cal) == 1) 
+
+  if (length(T.cal) == 1)
     T.cal <- rep(T.cal, n)
-  
+
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape = r, rate = alpha)
-  
+
   # sample intertransaction timings, and generate CBS data frame
   cbs_list <- list()
   elog_list <- list()
@@ -172,7 +172,7 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     lambda <- lambdas[i]
     # sample transaction times
     times <- cumsum(c(0, rexp(10 * (T.cal[i] + max(T.star)) * lambda, rate = lambda)))
-    if (return.elog) 
+    if (return.elog)
       elog_list[[i]] <- data.table(cust = i, t = times[times <= (T.cal[i] + max(T.star))])
     # determine frequency, recency, etc.
     ts.cal <- times[times <= T.cal[i]]
@@ -185,7 +185,7 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   cbs <- setDF(rbindlist(cbs_list))
   cbs$lambda <- lambdas
   cbs$T.cal <- T.cal
-  if (length(T.star) == 1) 
+  if (length(T.star) == 1)
     cbs$T.star <- T.star
   rownames(cbs) <- NULL
   out <- list(cbs = cbs)
