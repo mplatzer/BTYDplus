@@ -512,9 +512,11 @@ xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
   P2 <- G(r + x, k * alpha + T.cal, a, b + x - 1 + ifelse(dropout_at_zero, 1, 0))
   P3 <- xbgcnbd.PAlive(params = params, x = x, t.x = t.x, T.cal = T.cal, dropout_at_zero = dropout_at_zero)
   exp <- P1 * P2 * P3
-  # adjust bias BG/NBD-based approximation by scaling via the Unconditional
-  # Expectations (for wich we have exact expression)
-  if (k > 1) {
+  # Adjust bias BG/NBD-based approximation by scaling via the Unconditional
+  # Expectations (for wich we have exact expression). Only do so, if we can 
+  # safely assume that the full customer cohort is passed.
+  do.bias.corr <- k > 1 && length(x) == length(t.x) && length(x) == length(T.cal) && length(x) >= 100
+  if (do.bias.corr) {
     sum.cal <- sum(xbgcnbd.Expectation(params = params, t = T.cal, dropout_at_zero = dropout_at_zero))
     sum.tot <- sum(xbgcnbd.Expectation(params = params, t = T.cal + T.star, dropout_at_zero = dropout_at_zero))
     bias.corr <- (sum.tot - sum.cal)/sum(exp)

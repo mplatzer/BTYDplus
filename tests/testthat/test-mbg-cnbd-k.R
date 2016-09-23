@@ -46,4 +46,18 @@ test_that("MBG/CNBD-k", {
   expect_silent(mbgcnbd.PlotTrackingCum(params, cbs$T.cal, max(cbs$T.cal+cbs$T.star), elog2cum(elog, by = 14)))
   mat <- mbgcnbd.PlotFrequencyInCalibration(params, cbs, 7)
   expect_equal(mat[1,], mat[2,], tolerance = 0.1)
-}) 
+  
+  # check that bias correction doesn't screw up single estimates
+  expect_lt(mbgcnbd.ConditionalExpectedTransactions(params, T.star = 32, x = c(0, 1), t.x = c(0, 12), T.cal = 32)[2], 1)
+  expect_true(mbgcnbd.ConditionalExpectedTransactions(params, T.star = 32, x = 3, t.x = 12, T.cal = 32) !=
+                mbgcnbd.ConditionalExpectedTransactions(params, T.star = 32, x = 2, t.x = 12, T.cal = 32))
+  
+  # check that bias correction actually results in unbiased estimates
+  skip_on_cran()
+  bias <- replicate(40, {
+    cbs <- mbgcnbd.GenerateData(n = n, T.cal = round(runif(n, 12, 96)/12)*12, T.star = 32, params = params, return.elog = FALSE)$cbs
+    cbs$x.est <- mbgcnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
+    sum(cbs$x.est) / sum(cbs$x.star)
+  })
+  expect_lt(abs(mean(bias)-1), 0.01)
+})
