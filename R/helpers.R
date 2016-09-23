@@ -383,7 +383,7 @@ elog2inc <- function(elog, by = 7, first = FALSE) {
 #' @keywords internal
 dc.check.model.params.safe <- function(printnames, params, func) {
   # first do basic checks
-  dc.check.model.params(printnames, params, func)
+  BTYD::dc.check.model.params(printnames, params, func)
   # then check for names, if these are present
   if (!is.null(names(params))) {
     idx <- names(params) != ""
