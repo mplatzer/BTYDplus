@@ -2,33 +2,40 @@
 % Please edit documentation in R/helpers.R
 \name{elog2cum}
 \alias{elog2cum}
-\title{Aggregate Event Log to cumulative number of (repeat) transactions}
+\alias{elog2inc}
+\title{Convert Event Log to Transaction Counts}
 \usage{
 elog2cum(elog, by = 7, first = FALSE)
+
+elog2inc(elog, by = 7, first = FALSE)
 }
 \arguments{
 \item{elog}{Event log, a \code{data.frame} with columns \code{cust} and
 transaction time \code{t} or \code{date}.}
 
-\item{by}{Only return every \code{}-th number. Defaults to 7, and thus
+\item{by}{Only return every \code{by}-th count Defaults to 7, and thus
 returns weekly numbers.}
 
 \item{first}{If TRUE, then the first transaction for each customer is being
 counted as well}
 }
 \value{
-Numeric vector of cumulative repeat transactions.
+Numeric vector of transaction counts.
 }
 \description{
-Duplicate transactions with identical `cust` and `date` (or `t`) field are
-counted only once.
+Aggregates an event log to either incremental or cumulative number of
+transactions. If \code{first=TRUE} then the initial transactions of each
+customer are included in the count as well.
+}
+\details{
+Duplicate transactions with identical \code{cust} and \code{date} (or
+\code{t}) field are counted only once.
 }
 \examples{
 data("groceryElog")
 cum <- elog2cum(groceryElog)
 plot(cum, typ="l", frame = FALSE)
-}
-\seealso{
-\code{\link{elog2inc}}
+inc <- elog2inc(groceryElog)
+plot(inc, typ="l", frame = FALSE)
 }
 
