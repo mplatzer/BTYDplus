@@ -355,8 +355,9 @@ elog2cum <- function(elog, by = 7, first = FALSE) {
   elog[, `:=`(t0, min(t)), by = "cust"]
   grid <- data.table(t = 0 : ceiling(max(elog$t)))
   grid <- merge(grid, elog[first | t > t0, .N, keyby = list(t = ceiling(t))], all.x = TRUE, by = "t")
-  inc <- grid[is.na(N), N := 0L]$N
-  cum <- c(cumsum(inc)[seq(by, length(inc) - 1, by = by)], sum(inc))
+  grid <- grid[is.na(N), N := 0L]
+  cum <- cumsum(grid$N)
+  cum <- cum[seq(by, length(cum), by = by)]
   return(cum)
 }
 

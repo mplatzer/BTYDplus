@@ -1,6 +1,7 @@
 #' Load transaction records of 1525 grocery customers.
 data("groceryElog", envir = environment())
 head(groceryElog)
+range(groceryElog$date)
 
 #' Convert from event log to customer-by-sufficient-statistic summary.
 #' Split into 52 weeks calibration, and 52 weeks holdout period.
@@ -53,7 +54,7 @@ cbs$pactive.pnbd <- mcmc.PActive(xstar.pnbd.draws)
 cbs$pactive.pggg <- mcmc.PActive(xstar.pggg.draws)
 
 #' compare forecast accuracy to Pareto/NBD
-(mae <- c(`Pareto/GGG` = mean(abs(cbs$x.star - cbs$xstar.pggg)), 
+(mae <- c(`Pareto/GGG` = mean(abs(cbs$x.star - cbs$xstar.pggg)),
           `Pareto/NBD` = mean(abs(cbs$x.star - cbs$xstar.pnbd))))
 (lift <- 1 - mae[1]/mae[2])
 #' -> 9% lift in customer-level accuracy when taking regularity into account

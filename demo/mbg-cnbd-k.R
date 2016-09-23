@@ -1,6 +1,7 @@
 #' Load transaction records of 1525 grocery customers.
 data("groceryElog", envir = environment())
 head(groceryElog)
+range(groceryElog$date)
 
 #' Convert from event log to customer-by-sufficient-statistic summary.
 #' Split into 52 weeks calibration, and 52 weeks holdout period.
@@ -26,9 +27,9 @@ x <- readline("Estimate MBG/CNBD-k model (press Enter)")
 # Predict transactions at customer level with MBG/CNBD-k model.
 cbs$xstar.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(
   params = params.mbgcnbd,
-  T.star = cbs$T.star, 
-  x      = cbs$x, 
-  t.x    = cbs$t.x, 
+  T.star = cbs$T.star,
+  x      = cbs$x,
+  t.x    = cbs$t.x,
   T.cal  = cbs$T.cal)
 
 # Estimate total transactions during holdout, based on MBG/CNBD-k model.
@@ -54,8 +55,8 @@ params.mbgnbd <- mbgnbd.EstimateParameters(cbs)      # estimate MBG/NBD
 
 (ll <- c(`NBD`        = nbd.cbs.LL(params.nbd, cbs),
          `Pareto/NBD` = BTYD::pnbd.cbs.LL(params.pnbd, cbs),
-         `BG/NBD`     = BTYD::bgnbd.cbs.LL(params.bgnbd, cbs), 
-         `MBG/NBD`    = mbgcnbd.cbs.LL(params.mbgnbd, cbs), 
+         `BG/NBD`     = BTYD::bgnbd.cbs.LL(params.bgnbd, cbs),
+         `MBG/NBD`    = mbgcnbd.cbs.LL(params.mbgnbd, cbs),
          `MBG/CNBD-k` = mbgcnbd.cbs.LL(params.mbgcnbd, cbs)))
 names(which.max(ll))
 # -> MBG/CNBD-k provides best data fit according to log-likelihood

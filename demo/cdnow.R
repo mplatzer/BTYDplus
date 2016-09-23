@@ -1,15 +1,19 @@
 
 #' Load transaction records of 2357 CDNow customers.
-cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"), 
-                      stringsAsFactors = FALSE, 
+cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"),
+                      stringsAsFactors = FALSE,
                       col.names = c("cust", "sampleid", "date", "cds", "sales"))
 cdnowElog$date <- as.Date(as.character(cdnowElog$date), format = "%Y%m%d")
 head(cdnowElog)
+range(cdnowElog$date)
 
 #' Convert from event log to customer-by-sufficient-statistic summary.
 #' Split into 39 weeks calibration, and 39 weeks holdout period.
 cbs <- elog2cbs(cdnowElog, T.cal = "1997-09-30", T.tot = "1998-06-30")
 head(cbs)
+
+#' Report some basic summary stats for calibration and holdout period.
+summary(cbs[, c("x", "sales", "x.star", "sales.star")])
 
 
 x <- readline("Estimate NBD model (press Enter)")
@@ -19,13 +23,13 @@ x <- readline("Estimate NBD model (press Enter)")
 
 # Predict transactions at customer level with NBD model.
 cbs$xstar.nbd <- nbd.ConditionalExpectedTransactions(
-                   params = params.nbd, 
-                   T.star = cbs$T.star, 
-                   x      = cbs$x, 
+                   params = params.nbd,
+                   T.star = cbs$T.star,
+                   x      = cbs$x,
                    T.cal  = cbs$T.cal)
 
 # Estimate total transactions during holdout, based on NBD model.
-sum(cbs$xstar.nbd) 
+sum(cbs$xstar.nbd)
 
 
 x <- readline("Estimate MBG/CNBD-k model (press Enter)")
@@ -37,9 +41,9 @@ x <- readline("Estimate MBG/CNBD-k model (press Enter)")
 # Predict transactions at customer level with MBG/CNBD-k model.
 cbs$xstar.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(
                        params = params.mbgcnbd,
-                       T.star = cbs$T.star, 
-                       x      = cbs$x, 
-                       t.x    = cbs$t.x, 
+                       T.star = cbs$T.star,
+                       x      = cbs$x,
+                       t.x    = cbs$t.x,
                        T.cal  = cbs$T.cal)
 
 # Estimate total transactions during holdout, based on MBG/CNBD-k model.
@@ -62,8 +66,8 @@ params.pnbd <- BTYD::pnbd.EstimateParameters(cbs) # estimate Pareto/NBD
 params.bgcnbd <- bgcnbd.EstimateParameters(cbs)  # estimate BG/CNBD-k
 
 (ll <- c(`NBD`        = nbd.cbs.LL(params.nbd, cbs),
-        `Pareto/NBD` = BTYD::pnbd.cbs.LL(params.pnbd, cbs), 
-        `BG/CNBD-k`  = bgcnbd.cbs.LL(params.bgcnbd, cbs), 
+        `Pareto/NBD` = BTYD::pnbd.cbs.LL(params.pnbd, cbs),
+        `BG/CNBD-k`  = bgcnbd.cbs.LL(params.bgcnbd, cbs),
         `MBG/CNBD-k` = mbgcnbd.cbs.LL(params.mbgcnbd, cbs)))
 names(which.max(ll))
 # -> MBG/CNBD-k provides best fit according to log-likelihood
