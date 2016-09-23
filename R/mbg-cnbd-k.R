@@ -837,8 +837,7 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
   a <- params[4]
   b <- params[5]
 
-  if (length(T.cal) == 1)
-    T.cal <- rep(T.cal, n)
+  T.cal <- rep(T.cal, length.out = n)
 
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape = r, rate = alpha)
