@@ -8,10 +8,10 @@ pggg.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
   chains = 2, mc.cores = NULL, param_init = NULL, trace = 100)
 }
 \arguments{
-\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS) 
-data.frame. It must contain a row for each customer, and columns \code{x} 
-for frequency, \code{t.x} for recency , \code{T.cal} for the total time 
-observed, as well as the sum over logarithmic intertransaction times 
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)
+data.frame. It must contain a row for each customer, and columns \code{x}
+for frequency, \code{t.x} for recency , \code{T.cal} for the total time
+observed, as well as the sum over logarithmic intertransaction times
 \code{litt}. A correct format can be easily generated based on the complete
 event log of a customer cohort with \code{\link{elog2cbs}}.}
 
@@ -44,7 +44,7 @@ See \code{demo('pareto-ggg')} for how to apply this model.
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
-param.draws <- pggg.mcmc.DrawParameters(cbs, 
+param.draws <- pggg.mcmc.DrawParameters(cbs,
   mcmc = 20, burnin = 10, thin = 2, chains = 1) # short MCMC to run demo fast
 
 # cohort-level parameter draws
