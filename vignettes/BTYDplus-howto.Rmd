@@ -153,7 +153,7 @@ data("groceryElog")
 
 ```{r}
 data("groceryElog")
-cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 (params.nbd <- nbd.EstimateParameters(cbs))
 nbd.cbs.LL(params.nbd, cbs)
 ```
@@ -184,7 +184,7 @@ c(`Actuals` = sum(cbs$x.star), `NBD` = sum(cbs$x.star.nbd))
 
 ```{r}
 data("groceryElog")
-cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 (params.pnbd <- BTYD::pnbd.EstimateParameters(cbs)) # r, alpha s, beta
 BTYD::pnbd.cbs.LL(params.pnbd, cbs)
 ```
@@ -226,7 +226,7 @@ round(palive, 3)
 
 <!-- ```{r} -->
 <!-- data("groceryElog") -->
-<!-- cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30") -->
+<!-- cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31") -->
 <!-- params.mbgnbd  <- mbgnbd.EstimateParameters(cbs)   # MBG/NBD -->
 <!-- params.mbgcnbd <- mbgcnbd.EstimateParameters(cbs)  # MBG/CNBD-k -->
 <!-- rbind(`MBG/NBD`    = c(round(params.mbgnbd, 3),  LL = mbgcnbd.cbs.LL(params.mbgnbd, cbs)), -->
@@ -296,22 +296,22 @@ Let's apply the Pareto/NBD (HB), with the default MCMC settings in place, for th
 
 ```{r}
 data("groceryElog")
-cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 # generate parameter draws
-pnbd.draws <- pnbd.mcmc.DrawParameters(cbs) # runs for ~13secs on a MacBook Pro
+pnbd.draws <- pnbd.mcmc.DrawParameters(cbs) # runs for ~13secs on a 2015 MacBook Pro
 # generate draws for holdout period
-xstar.draws <- mcmc.DrawFutureTransactions(cbs, pnbd.draws)
+pnbd.xstar.draws <- mcmc.DrawFutureTransactions(cbs, pnbd.draws)
 # create point estimates by taking average across samples
-cbs$x.star.pnbd <- apply(xstar.draws, 2, mean)
-cbs$pactive     <- mcmc.PActive(xstar.draws)
-cbs$palive      <- mcmc.PAlive(pnbd.draws)
+cbs$x.star.pnbd  <- apply(pnbd.xstar.draws, 2, mean)
+cbs$pactive.pnbd <- mcmc.PActive(pnbd.xstar.draws)
+cbs$palive.pnbd  <- mcmc.PAlive(pnbd.draws)
 # show estimates for first five customers
 head(cbs[, -c(4:5)], 5)
 ```
 
 As can be seen, the basic application of an MCMC-estimated model is not any more complicated than MLE-based models. However, the return object of `pnbd.mcmc.DrawParameters` allows for further analysis. Its return object is a 2-element list: `level_1` is a list of `coda::mcmc.list`s, one for each customer, with draws for customer-level parameters ($\lambda, \tau, z, \mu$), and `level_2` a `coda::mcmc.lis` with draws for cohort-level parameters ($r, \alpha, s, \beta$). In total we have 100 samples for `nrow(cbs) * 4 + 4` = `r nrow(cbs) * 4 + 4` parameters, and for each we can inspect the MCMC traces, the estimated distributions and calculate summary statistics.
 
-```{r, fig.show="hang", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure 4: MCMC traces and parameter distributions of cohort-level parameters"}
+```{r, fig.show="hang", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure X: MCMC traces and parameter distributions of cohort-level parameters"}
 coda::is.mcmc.list(pnbd.draws$level_2)
 # convert cohort-level draws from coda::mcmc.list to matrix, with each parameter
 # becoming a column, and each draw a row
@@ -328,7 +328,7 @@ coda::densplot(pnbd.draws$level_2, frame = FALSE)
 par(op)
 ```
 
-```{r, fig.show="hang", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure 5: MCMC traces and parameter distributions of individual-level parameters for customer 1"}
+```{r, fig.show="hang", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure X: MCMC traces and parameter distributions of individual-level parameters for customer 1"}
 is.list(pnbd.draws$level_1)
 length(pnbd.draws$level_1)
 customer1 <- "1"
@@ -345,7 +345,7 @@ par(op)
 
 And analogous to MLE-based model implementation we can of course plot weekly transaction counts, as well as frequency plots at an aggregated level. These methods can be applied to all provided MCMC-based models in the same way.
 
-```{r, fig.show="hang", fig.width=7, fig.height=3, fig.cap="Figure 6: Diagnostic Plots"}
+```{r, fig.show="hang", fig.width=7, fig.height=3, fig.cap="Figure X: Diagnostic Plots"}
 op <- par(mfrow = c(1, 2))
 nil <- mcmc.PlotFrequencyInCalibration(pnbd.draws, cbs)
 nil <- mcmc.PlotTrackingInc(pnbd.draws,
@@ -369,54 +369,57 @@ cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"),
                       col.names = c("cust", "sampleid", "date", "cds", "sales"))
 cdnowElog$date <- as.Date(as.character(cdnowElog$date), format = "%Y%m%d")
 #' convert to CBS, and split into 39 weeks calibration, and 39 weeks holdout
-cbs <- elog2cbs(cdnowElog, T.cal = "1997-09-30", T.tot = "1998-06-30")
+cdnowCbs <- elog2cbs(cdnowElog, T.cal = "1997-09-30", T.tot = "1998-06-30")
 
 # estimate Pareto/NBD (Abe) without covariates; see model M1 in Abe (2009)
-draws.m1 <- abe.mcmc.DrawParameters(cbs, 
-                                    mcmc = 5000, burnin = 5000, chains = 4)
+draws.m1 <- abe.mcmc.DrawParameters(cdnowCbs, 
+              mcmc = 5000, burnin = 5000, chains = 4) # runs for ~2mins on a 2015 MacBook Pro
 quant <- function(x) round(quantile(x, c(0.025, 0.5, 0.975)), 2)
 t(apply(as.matrix(draws.m1$level_2), 2, quant))
 
 #' Append dollar amount of first purchase to use as covariate
 first <- aggregate(sales ~ cust, cdnowElog, function(x) x[1] * 10^-3)
 names(first) <- c("cust", "first.sales")
-cbs <- merge(cbs, first, by = "cust")
+cdnowCbs <- merge(cdnowCbs, first, by = "cust")
 
 #' estimate with first purchase spend as covariate; see model M2 in Abe (2009)
-draws.m2 <- abe.mcmc.DrawParameters(cbs, covariates = c("first.sales"),
-                                    mcmc = 5000, burnin = 5000, chains = 4)
+draws.m2 <- abe.mcmc.DrawParameters(cdnowCbs, covariates = c("first.sales"),
+              mcmc = 5000, burnin = 5000, chains = 4) # runs for ~2mins on a 2015 MacBook Pro
 t(apply(as.matrix(draws.m2$level_2), 2, quant))
 ```
 
 The parameter estimates for model M1 and M2 match about those numbers reported in Table 3 of @abe2009counting. There are some discrepancies for the parameters `log_lambda_first.sales` and `log_mu_first.sales`, but the result remains unaltered: The dollar amount of a customer's initial purchase correlates positively with purchase frequency, but doesn't influence the dropout process. Further, the BTYDplus package can establish via simulations that its provided implementation is indeed correctly able to re-identify the underlying data generating parameters, also for the covariates.
 
-sapply(draws.m2$level_1, function(customer.draws) {
-  mat <- as.matrix(customer.draws)
-  round(quantile(mat[, "lambda"], c(0.025, 0.5, 0.975)), 3)
-
-  c(quant(mat[, c("lambda")]), quant(mat[, c("mu")]))
-}
-customer.draws <- draws.m2$level_1[[1]]
-quant(as.matrixcustomer.draws)
-
-```{r}
-#' 1) draw future transaction
-xstar.m1.draws <- mcmc.DrawFutureTransactions(cbs, draws.m1)
-xstar.m2.draws <- mcmc.DrawFutureTransactions(cbs, draws.m2)
-#' 2) calculate mean over future transaction draws for each customer
-cbs$xstar.m1 <- apply(xstar.m1.draws, 2, mean)
-cbs$xstar.m2 <- apply(xstar.m2.draws, 2, mean)
-#' 3) compare mean absolute error at individual level
-round(c(`MAE without covariates` = mean(abs(cbs$x.star - cbs$xstar.m1)),
-        `MAE with covariates`    = mean(abs(cbs$x.star - cbs$xstar.m2))), 4)
-```
-
-For this particular dataset and covariate, the lift in forecasting accuracy is only minimal. Hence, the dollar amount of the initial purchase doesn't seem to help explain a difference in purchase and dropout process across customers.
-
--> TODO: reproduce Table 4 of Abe
-
 
 ### Pareto/GGG
 
+@platzer2016pggg developed with the Pareto/GGG yet another extension of Pareto/NBD. This one generalizes the distribution for the intertransaction times from the exponential to the Gamma distribution, whereas its shape parameter $k$ is also allowed to vary across customers following a $\text{Gamma}(t, \gamma)$ distribution. Hence, the purchase process follows a Gamma-Gamma-Gamma (GGG) mixture distribution, that is capable of capturing a varying degree of regularity across customers. For datasets which exhibit regularity in their timing patterns, leveraging that information can yield significant improvements in terms of forecasting accuracy. This is because the regularity helps in making inferences about the customer's latent activity state.
+
+```{r, fig.caption = "Figure X: Distribution of regularity parameter k"}
+# generate parameter draws
+pggg.draws <- pggg.mcmc.DrawParameters(cbs) # runs for ~2.5mins on a 2015 MacBook Pro
+# generate draws for holdout period
+pggg.xstar.draws <- mcmc.DrawFutureTransactions(cbs, pggg.draws)
+# create point estimates by taking average across samples
+cbs$x.star.pggg  <- apply(pggg.xstar.draws, 2, mean)
+cbs$pactive.pggg <- mcmc.PActive(pggg.xstar.draws)
+cbs$palive.pggg  <- mcmc.PAlive(pggg.draws)
+# show estimates for first five customers
+head(cbs[, -c(4:7)], 5)
+```
+
+```{r, fig.caption = "Figure X: Distribution of regularity parameter k"}
+apply(as.matrix(pggg.draws$level_2), 2, mean)
+pggg.plotRegularityRateHeterogeneity(pggg.draws, title = "")
+```
+
+When checking the estimated heterogeneity parameters, we see that k is clearly estimated larger than 1, indicating the regularity is present. The above plot furhter shows that there is significant variation in the regularity across customers.
+
+```{r}
+(mae <- c(`Pareto/GGG` = mean(abs(cbs$x.star - cbs$x.star.pggg)),
+          `Pareto/NBD` = mean(abs(cbs$x.star - cbs$x.star.pnbd))))
+```
+
+When comparing forecasting accuracy at individual level, we can see a lift of `r paste0(round(100*unname(lift <- 1 - mae[1]/mae[2]), 1), "%")` for the given dataset, due to the detected regularity.
 
 ## References
