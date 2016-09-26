@@ -143,13 +143,13 @@ data("groceryElog")
 
 <!-- The MLE estimation method fits a separate gamma distribution to the intertransaction times of each customer with more than 10 events. The reported median estimate of `k=3.25` also hints at stronger degrees of regularity for these highly active customers. The boxplot then gives a deeper understanding of the distribution of `k` estimates, revealing the heterogeneity within regularity across the cohort, thus making it a good candidate for the Pareto/GGG model. -->
 
-## Maximum Likelihood Estimated Models
+<!-- ## Maximum Likelihood Estimated Models -->
 
-### NBD
+<!-- ### NBD -->
 
-The NBD model by @ehrenberg1959pattern assumes a heterogenous, yet constant purchasing process, with expontentially distributed intertransaction times $\Delta{t}_{ij}$, whereas its purchase rate $\lambda_i$ is $Gamma(r, \alpha)$-distributed across customers $i = 1...N$.
+<!-- The NBD model by @ehrenberg1959pattern assumes a heterogenous, yet constant purchasing process, with expontentially distributed intertransaction times $\Delta{t}_{ij}$, whereas its purchase rate $\lambda_i$ is $Gamma(r, \alpha)$-distributed across customers $i = 1...N$. -->
 
-Fitting the model requires converting the event log first to a CBS format and passing the dataset to `nbd.EstimateParameters`. The method searches (by using `stats::optim`) for that pair of $(r, \alpha)$ heterogeneity parameters, that maximizes the log-likelihood function (`nbd.cbs.LL`) given the data.
+<!-- Fitting the model requires converting the event log first to a CBS format and passing the dataset to `nbd.EstimateParameters`. The method searches (by using `stats::optim`) for that pair of $(r, \alpha)$ heterogeneity parameters, that maximizes the log-likelihood function (`nbd.cbs.LL`) given the data. -->
 
 ```{r}
 data("groceryElog")
@@ -158,9 +158,9 @@ cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 nbd.cbs.LL(params.nbd, cbs)
 ```
 
-With the mean of the Gamma distribution being $r / \alpha$, the mean estimate for $\lambda$ is `r round(params.nbd[1] / params.nbd[2], 2)`, which translates to a mean intertransaction time of $1 / \lambda$ of `r round(params.nbd[2] / params.nbd[1], 2)` weeks.
+<!-- With the mean of the Gamma distribution being $r / \alpha$, the mean estimate for $\lambda$ is `r round(params.nbd[1] / params.nbd[2], 2)`, which translates to a mean intertransaction time of $1 / \lambda$ of `r round(params.nbd[2] / params.nbd[1], 2)` weeks. -->
 
-The expected number of (future) transactions for a customer, conditional on her past (`x` and `T.cal`), can be computed with `nbd.ConditionalExpectedTransactions`. By passing the whole CBS we can easily generate estimates for all customers in the cohort.
+<!-- The expected number of (future) transactions for a customer, conditional on her past (`x` and `T.cal`), can be computed with `nbd.ConditionalExpectedTransactions`. By passing the whole CBS we can easily generate estimates for all customers in the cohort. -->
 
 ```{r}
 # estimates for customers with 1 to 5 transactions in first 52 weeks
@@ -174,13 +174,13 @@ cbs$x.star.nbd <- nbd.ConditionalExpectedTransactions(params.nbd, T.star = 52, c
 c(`Actuals` = sum(cbs$x.star), `NBD` = sum(cbs$x.star.nbd))
 ```
 
-As can be seen, the NBD model heavily overforecasts the actual number of transactions (by `r paste0(round(100 * sum(cbs$x.star.nbd) / sum(cbs$x.star) - 100, 1), "%")`), which is due to the lack of a dropout process in the model assumptions. All customers are assumed to remain just as active in the second year, as they have been in their first year. However, figure 2 shows clearly a downward trend in the incremental transaction counts.
+<!-- As can be seen, the NBD model heavily overforecasts the actual number of transactions (by `r paste0(round(100 * sum(cbs$x.star.nbd) / sum(cbs$x.star) - 100, 1), "%")`), which is due to the lack of a dropout process in the model assumptions. All customers are assumed to remain just as active in the second year, as they have been in their first year. However, figure 2 shows clearly a downward trend in the incremental transaction counts. -->
 
-### Pareto/NBD
+<!-- ### Pareto/NBD -->
 
-The Pareto/NBD model [@schmittlein1987cyc] combines the NBD model with the possibility of customers transitioning from an active to an inactive state. A customer's state, however, is not directly observable, and the model needs to draw inferences based on the observed elapsed time since a customer's last activity, i.e., `T.cal - t.x`. Pareto/NBD in particular assumes a customer's "lifetime" $\tau_i$ to be exponential distributed (with parameter $\mu_i$), whereas $\mu_i$ is $\text{Gamma}(s, \beta)$-distributed across customers $i = 1...N$.
+<!-- The Pareto/NBD model [@schmittlein1987cyc] combines the NBD model with the possibility of customers transitioning from an active to an inactive state. A customer's state, however, is not directly observable, and the model needs to draw inferences based on the observed elapsed time since a customer's last activity, i.e., `T.cal - t.x`. Pareto/NBD in particular assumes a customer's "lifetime" $\tau_i$ to be exponential distributed (with parameter $\mu_i$), whereas $\mu_i$ is $\text{Gamma}(s, \beta)$-distributed across customers $i = 1...N$. -->
 
-The Pareto/NBD implementation is part of the BTYD package, but the workflow of fitting the model and making predictions is analogous to BTYDplus (respectively vice versa).
+<!-- The Pareto/NBD implementation is part of the BTYD package, but the workflow of fitting the model and making predictions is analogous to BTYDplus (respectively vice versa). -->
 
 ```{r}
 data("groceryElog")
@@ -189,13 +189,13 @@ cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 BTYD::pnbd.cbs.LL(params.pnbd, cbs)
 ```
 
-For one, we can note, that the maximized log-likelihood of Pareto/NBD is higher than for the NBD model, implying that its data fit is better for the given online grocery dataset. And second, by estimating a mean lifetime $1/(\beta/s)$ of `r round(1/(params.pnbd[3]/params.pnbd[4]), 2)` weeks, the estimated mean intertransaction times change from `r round(params.nbd[2] / params.nbd[1], 2)` to `r round(1/(params.pnbd[1]/params.pnbd[2]), 2)` weeks, when compared to NBD.
+<!-- For one, we can note, that the maximized log-likelihood of Pareto/NBD is higher than for the NBD model, implying that its data fit is better for the given online grocery dataset. And second, by estimating a mean lifetime $1/(\beta/s)$ of `r round(1/(params.pnbd[3]/params.pnbd[4]), 2)` weeks, the estimated mean intertransaction times change from `r round(params.nbd[2] / params.nbd[1], 2)` to `r round(1/(params.pnbd[1]/params.pnbd[2]), 2)` weeks, when compared to NBD. -->
 
-Let's now again compute the conditional expected transactions for six customers with an increasing number of observed transactions, but all with an observed overly long period of recent inactivity.
+<!-- Let's now again compute the conditional expected transactions for six customers with an increasing number of observed transactions, but all with an observed overly long period of recent inactivity. -->
 
 ```{r}
 # estimates for customers with 40 weeks inactivity, and 1 to 5 repeat transactions in first 12 weeks
-est <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, 
+est <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd,
          T.star = 52, x = 1:5, t.x = 12, T.cal = 52)
 names(est) <- 1:5
 round(est, 2)
@@ -203,13 +203,13 @@ round(est, 2)
 
 ```{r}
 # estimates for whole customer cohort
-cbs$x.star.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, 
+cbs$x.star.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd,
                      T.star = 52, cbs$x, cbs$t.x, cbs$T.cal)
 # compare estimates with actuals at aggregated level
 c(`Actuals` = sum(cbs$x.star), `Pareto/NBD` = sum(cbs$x.star.pnbd))
 ```
 
-As expected, the Pareto/NBD yields lower and thus more realistic estimates than the NBD. However, the results also reveal an interesting pattern, which might seem at first sight counter intuitive. Customers with a very active purchase history receive lower estimates than customers which have been less active in the past. @fader2005rfm discuss this apparent paradox in more detail, yet the underlying mechanism can be easily explained by looking at the model's assessment of the latent activity state.
+<!-- As expected, the Pareto/NBD yields lower and thus more realistic estimates than the NBD. However, the results also reveal an interesting pattern, which might seem at first sight counter intuitive. Customers with a very active purchase history receive lower estimates than customers which have been less active in the past. @fader2005rfm discuss this apparent paradox in more detail, yet the underlying mechanism can be easily explained by looking at the model's assessment of the latent activity state. -->
 
 ```{r}
 # P(alive) for customers with 40 weeks inactivity, and 1 to 5 repeat transactions in first 12 weeks
@@ -218,74 +218,196 @@ names(palive) <- 1:5
 round(palive, 3)
 ```
 
-The probability of still being alive after a 40 week purchase hiatus drops from `r paste0(round(100*palive[1], 1), "%")` for the one-time-repeating customer to `r paste0(round(100*palive[5], 1), "%")` for the customer which has had already 5 transactions. The elapsed time of inactivity is a stronger indication of churn for the highly frequent than for the less frequent purchasing customer, as a low purchase frequency also allows for the possibility of such long intertransaction times as the observed 40 weeks.
+<!-- The probability of still being alive after a 40 week purchase hiatus drops from `r paste0(round(100*palive[1], 1), "%")` for the one-time-repeating customer to `r paste0(round(100*palive[5], 1), "%")` for the customer which has had already 5 transactions. The elapsed time of inactivity is a stronger indication of churn for the highly frequent than for the less frequent purchasing customer, as a low purchase frequency also allows for the possibility of such long intertransaction times as the observed 40 weeks. -->
 
-### (M)BG/CNBD-k
+<!-- ### (M)BG/CNBD-k -->
 
-The BG/NBD [@fader2005cyc] and the MBG/NBD [@batislam2007empirical] models are contained in the larger class of (M)BG/CNBD-k models [@platzer2017mbgcnbd], and thus presented here together in this section. The MBG/CNBD-k model assumptions are as follows: A customer's intertransaction times, while being active, are Erlang-k distributed, with purchase rate $\lambda_i$ being $\text{Gamma}(r, \alpha)$-distributed across customers. A customer's state can after each transaction switch from active to inactive with a constant dropout probability of $p_i$, whereas $p_i$ is $\text{Beta}(a, b)$-distributed across customers. The BG/CNBD-k only differs in that way, that the customer is not allowed to drop out at the initial transaction, but only at repeat transactions.
+<!-- The BG/NBD [@fader2005cyc] and the MBG/NBD [@batislam2007empirical] models are contained in the larger class of (M)BG/CNBD-k models [@platzer2017mbgcnbd], and thus presented here together in this section. The MBG/CNBD-k model assumptions are as follows: A customer's intertransaction times, while being active, are Erlang-k distributed, with purchase rate $\lambda_i$ being $\text{Gamma}(r, \alpha)$-distributed across customers. A customer's state can after each transaction switch from active to inactive with a constant dropout probability of $p_i$, whereas $p_i$ is $\text{Beta}(a, b)$-distributed across customers. The BG/CNBD-k only differs in that way, that the customer is not allowed to drop out at the initial transaction, but only at repeat transactions. -->
 
-```{r}
-data("groceryElog")
-cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
-params.mbgnbd  <- mbgnbd.EstimateParameters(cbs)   # MBG/NBD
-params.mbgcnbd <- mbgcnbd.EstimateParameters(cbs) # MBG/CNBD-k
-rbind(`MBG/NBD`    = c(round(params.mbgnbd, 3),  LL = mbgcnbd.cbs.LL(params.mbgnbd, cbs)),
-      `MBG/CNBD-k` = c(round(params.mbgcnbd, 3), LL = mbgcnbd.cbs.LL(params.mbgcnbd, cbs)))
-```
+<!-- ```{r} -->
+<!-- data("groceryElog") -->
+<!-- cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30") -->
+<!-- params.mbgnbd  <- mbgnbd.EstimateParameters(cbs)   # MBG/NBD -->
+<!-- params.mbgcnbd <- mbgcnbd.EstimateParameters(cbs)  # MBG/CNBD-k -->
+<!-- rbind(`MBG/NBD`    = c(round(params.mbgnbd, 3),  LL = mbgcnbd.cbs.LL(params.mbgnbd, cbs)), -->
+<!--       `MBG/CNBD-k` = c(round(params.mbgcnbd, 3), LL = mbgcnbd.cbs.LL(params.mbgcnbd, cbs))) -->
+<!-- ``` -->
 
-The MLE method searches across a five dimensional parameter space $(k, r, \alpha, a, b)$ to find the optimum of the log-likelihood function. For the given dataset the MBG/CNBD-k is able to provide a better fit than NBD, Pareto/NBD and MBG/NBD. The estimate for regularity parameter $k$ is 2 and implies that regularity is present, and that Erlang-2 is deemed more suitable for the intertransaction times than the exponential distribution ($k=1$).
+<!-- The MLE method searches across a five dimensional parameter space $(k, r, \alpha, a, b)$ to find the optimum of the log-likelihood function. As can be seen from the reported log-likelihood values, the MBG/CNBD-k is able to provide a better fit than NBD, Pareto/NBD and MBG/NBD for the given dataset. Further, the estimate for regularity parameter $k$ is 2 and implies that regularity is present, and that Erlang-2 is deemed more suitable for the intertransaction times than the exponential distribution ($k=1$). -->
 
-```{r}
-# estimates for customers with 40 weeks inactivity, and 1 to 5 repeat transactions in first 12 weeks
-est <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, 
-         T.star = 52, x = 1:5, t.x = 12, T.cal = 52)
-names(est) <- 1:5
-round(est, 2)
+<!-- ```{r} -->
+<!-- # estimates for customers with 40 weeks inactivity, and 1 to 5 repeat transactions in first 12 weeks -->
+<!-- est <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd,  -->
+<!--          T.star = 52, x = 1:5, t.x = 12, T.cal = 52) -->
+<!-- names(est) <- 1:5 -->
+<!-- round(est, 2) -->
 
-# P(alive) for customers with 40 weeks inactivity, and 1 to 5 repeat transactions in first 12 weeks
-palive <- mbgcnbd.PAlive(params.mbgcnbd, x = 1:5, t.x = 12, T.cal = 52)
-names(palive) <- 1:5
-round(palive, 3)
-```
+<!-- # P(alive) for customers with 40 weeks inactivity, and 1 to 5 repeat transactions in first 12 weeks -->
+<!-- palive <- mbgcnbd.PAlive(params.mbgcnbd, x = 1:5, t.x = 12, T.cal = 52) -->
+<!-- names(palive) <- 1:5 -->
+<!-- round(palive, 3) -->
+<!-- ``` -->
 
-When we make again predictions for 5 customers with the same long purchase hiatus but with varying number of past transactions, we see the same pattern as for Pareto/NBD, except that the predicted numbers are even lower. This results from the long period of inactivity being now in the presence of regularity an even stronger indiciation for churn, as the Erlang-2 allows for less variation in the intertransaction times.
+<!-- When we make again predictions for 5 customers with the same long purchase hiatus but with varying number of past transactions, we see the same pattern as for Pareto/NBD, except that the predicted numbers are even lower. This results from the long period of inactivity being now in the presence of regularity an even stronger indiciation for churn, as the Erlang-2 allows for less variation in the intertransaction times. -->
 
-```{r}
-# estimates for whole customer cohort
-cbs$x.star.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd, 
-                        T.star = 52, cbs$x, cbs$t.x, cbs$T.cal)
-# compare estimates with actuals at aggregated level
-c(`Actuals` = sum(cbs$x.star),
-  `MBG/CNBD-k` = sum(cbs$x.star.mbgcnbd), 
-  `Pareto/NBD` = sum(cbs$x.star.pnbd))
-```
+<!-- ```{r} -->
+<!-- # estimates for whole customer cohort -->
+<!-- cbs$x.star.mbgcnbd <- mbgcnbd.ConditionalExpectedTransactions(params.mbgcnbd,  -->
+<!--                         T.star = 52, cbs$x, cbs$t.x, cbs$T.cal) -->
+<!-- # compare estimates with actuals at aggregated level -->
+<!-- c(`Actuals` = sum(cbs$x.star), -->
+<!--   `MBG/CNBD-k` = sum(cbs$x.star.mbgcnbd)) -->
+<!-- ``` -->
 
-Comparing the predictions at an aggregate level, we see that also the MBG/CNBD-k remains overly optimistic for the online grocery dataset. This can also be visualized with the help of `mbgcnbd.PlotTrackingInc`.
+<!-- Comparing the predictions at an aggregate level, we see that also the MBG/CNBD-k remains overly optimistic for the online grocery dataset. This can also be visualized with the help of `mbgcnbd.PlotTrackingInc`. -->
 
-```{r, fig.show="hold"}
-#mbgcnbd.PlotTrackingInc(params.mbgcnbd, T.cal = cbs$T.cal,
-#  T.tot = max(cbs$T.cal + cbs$T.star), 
-#  actual.inc.tracking = elog2inc(groceryElog))
-```
+<!-- ```{r, fig.show="hold", fig.width=6, fig.height=3} -->
+<!-- nil <- mbgcnbd.PlotTrackingInc(params.mbgcnbd,  -->
+<!--          T.cal = cbs$T.cal, -->
+<!--          T.tot = max(cbs$T.cal + cbs$T.star), -->
+<!--          actual.inc.tracking = elog2inc(groceryElog)) -->
+<!-- ``` -->
 
-However, when assessing the error we make at individual level, we see a significant improvement in forecast accuracy, in particular when considering that the data requirements have not increased, and still only leverage the historic event log.
+<!-- However, when assessing the error we make at individual level by calculating mean absolute error (MAE) of our predictions, we see a significant improvement in forecast accuracy, in particular considering that the data requirements have not increased, and still only leverage the historic event log. -->
 
-```{r}
-cbs$x.star.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions(params.pnbd, 
-                     T.star = 52, cbs$x, cbs$t.x, cbs$T.cal)
-mae <- function(act, est) sum(abs(act-est))/sum(act)
-head(cbs[, c("x", "t.x", "x.star", "x.star.pnbd", "x.star.mbgcnbd")])
-c(`MAE Pareto/NBD` = mae(cbs$x.star, cbs$x.star.pnbd),
-  `MAE MBG/CNBD-k` = mae(cbs$x.star, cbs$x.star.mbgcnbd))
-cat("Lift in MAE:", round(100 - 100*mae(cbs$x.star, cbs$x.star.mbgcnbd) / mae(cbs$x.star, cbs$x.star.pnbd), 1), "%")
-```
+<!-- ```{r} -->
+<!-- cbs$x.star.pnbd <- BTYD::pnbd.ConditionalExpectedTransactions( -->
+<!--                      params = BTYD::pnbd.EstimateParameters(cbs),  -->
+<!--                      T.star = 52, cbs$x, cbs$t.x, cbs$T.cal) -->
+<!-- mae <- function(act, est) sum(abs(act-est))/sum(act) # mean absolute error -->
+<!-- c(`MAE Pareto/NBD` = mae(cbs$x.star, cbs$x.star.pnbd), -->
+<!--   `MAE MBG/CNBD-k` = mae(cbs$x.star, cbs$x.star.mbgcnbd)) -->
+<!-- lift <- 1 - mae(cbs$x.star, cbs$x.star.mbgcnbd) / mae(cbs$x.star, cbs$x.star.pnbd) -->
+<!-- cat("Lift in MAE:", round(100*lift, 1), "%") -->
+<!-- ``` -->
 
 
 ## MCMC Estimated Models
 
+This chapter presents three buy-till-you-die model variants which rely on Markov-Chain-Monte-Carlo simulation for parameter estimation. Implementation complexity as well as computational costs are significantly higher, and despite an efficient MCMC implementation in C++ applying these model requires much longer compute time when compared to the before presented ML-estimated models. On the upside, we gain flexibility in our model assumptions, and get estimated distributions, even for the individual-level parameters. Thus, the return object for parameter estimation (`param.draws <- *.mcmc.DrawParameters(...)`) not only returns the point estimates of the heterogeneity parameters (like the `params <- *.EstimateParameters(...)` did), but provides samples from the marginal posterior distributions, both at cohort- (`param.draws$level_1`) as well as on customer-level (`param.draws$level_2`). Based on these parameter draws, we can then easily draw the posterior distributions of any derived quantity, like the number of transactions (`mcmc.DrawFutureTransactions`) or the probability of being active in a given period.
+
+Generally speaking, MCMC works by constructing a Markov chain which has the desired target (posterior) distribution as its equilibrium distribution. The algorithm then performs of random walks on that Markov chain and will eventually (after some "burnin" phase) get draws from the posterior. In order to assess MCMC convergence one can run multiple MCMC chains (in parallel) and check whether these provide similar distributions. Due to the high auto-correlation between subsequent iteration steps in the MCMC chains, it is also advisable to keep only x-th step. The MCMC default settings for parameter draws (`*.mcmc.DrawParameters(..., mcmc = 2500, burnin = 500, thin = 50, chains = 2`) should work well in most situations. Depending on your platform, this will either use a single core (on Windows OS), or multiple cores in parallel (on Unix/MacOS) to run the MCMC chains. To speed up convergence, the MCMC chains will be automatically initialized with the maximum likelihood estimates of Pareto/NBD. The sampled draws are wrapped as `coda::mcmc.list` object, and the `coda` package provides various helper methods (e.g. `as.matrix.mcmc.list`, `HPDinterval`) for performing output analysis and diagnostics for MCMC (see `help(package="coda")`).
+
 ### Pareto/NBD (HB)
 
+The Pareto/NBD (HB) is identical to Pareto/NBD with respect to its model assumptions, but differs in its estimation method. @rossi2003bayesian provided a blueprint for applying a full Bayes approach (in contrast to an empirical Bayes approach) to hierarchical models such as Pareto/NBD. @ma2007mcmc then published a specific MCMC scheme, comprised of Gibbs sampling with slice sampling to draw from the conditional distributions. Later @abe2009counting suggested then in their technical appendix to augment the parameter space with the unobserved lifetime $\tau$ and activity status $z$ in order to decouple the sampling of the transaction process from the dropout process. This allows the sampling scheme to take advantage of conjugate priors for drawing $\lambda$ and $\mu$, and speeds up parameter estimation by a factor of 10. Both methods are available, yet the latter (available via `use_data_augmentation=TRUE`) should be the preferred choice.
+
+Let's apply the Pareto/NBD (HB), with the default MCMC settings in place, for the online grocery dataset. First we draw parameters with `pnbd.mcmc.DrawParameters`, and then pass these forward to the model-independent methods `mcmc.DrawFutureTransactions`, `mcmc.PActive` and `mcmc.PAlive`.
+
+```{r}
+data("groceryElog")
+cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
+# generate parameter draws
+pnbd.draws <- pnbd.mcmc.DrawParameters(cbs) # runs for ~13secs on a MacBook Pro
+# generate draws for holdout period
+xstar.draws <- mcmc.DrawFutureTransactions(cbs, pnbd.draws)
+# create point estimates by taking average across samples
+cbs$x.star.pnbd <- apply(xstar.draws, 2, mean)
+cbs$pactive     <- mcmc.PActive(xstar.draws)
+cbs$palive      <- mcmc.PAlive(pnbd.draws)
+# show estimates for first five customers
+head(cbs[, -c(4:5)], 5)
+```
+
+As can be seen, the basic application of an MCMC-estimated model is not any more complicated than MLE-based models. However, the return object of `pnbd.mcmc.DrawParameters` allows for further analysis. Its return object is a 2-element list: `level_1` is a list of `coda::mcmc.list`s, one for each customer, with draws for customer-level parameters ($\lambda, \tau, z, \mu$), and `level_2` a `coda::mcmc.lis` with draws for cohort-level parameters ($r, \alpha, s, \beta$). In total we have 100 samples for `nrow(cbs) * 4 + 4` = `r nrow(cbs) * 4 + 4` parameters, and for each we can inspect the MCMC traces, the estimated distributions and calculate summary statistics.
+
+```{r, fig.show="hang", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure 4: MCMC traces and parameter distributions of cohort-level parameters"}
+coda::is.mcmc.list(pnbd.draws$level_2)
+# convert cohort-level draws from coda::mcmc.list to matrix, with each parameter
+# becoming a column, and each draw a row
+cohort.draws <- pnbd.draws$level_2
+head(as.matrix(cohort.draws), 5)
+# compute median across draws, and compare to ML estimates
+rbind('Pareto/NBD (HB)' = apply(as.matrix(cohort.draws), 2, median),
+      'Pareto/NBD'      = BTYD::pnbd.EstimateParameters(cbs))
+
+# plot trace- and density-plots for heterogeneity parameters
+op <- par(mfrow = c(2, 4), mar = c(2.5, 2.5, 2.5, 2.5))
+coda::traceplot(pnbd.draws$level_2, frame = FALSE)
+coda::densplot(pnbd.draws$level_2, frame = FALSE)
+par(op)
+```
+
+```{r, fig.show="hang", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure 5: MCMC traces and parameter distributions of individual-level parameters for customer 1"}
+is.list(pnbd.draws$level_1)
+length(pnbd.draws$level_1)
+customer1 <- "1"
+customer1.draws <- pnbd.draws$level_1[[customer1]]
+head(as.matrix(customer1.draws), 5)
+round(apply(as.matrix(customer1.draws), 2, median), 3)
+
+# plot trace- and density-plots for customer 1 parameters
+op <- par(mfrow = c(2, 4), mar = c(2.5, 2.5, 2.5, 2.5))
+coda::traceplot(pnbd.draws$level_1[[customer1]], frame = FALSE)
+coda::densplot(pnbd.draws$level_1[[customer1]], frame = FALSE)
+par(op)
+```
+
+And analogous to MLE-based model implementation we can of course plot weekly transaction counts, as well as frequency plots at an aggregated level. These methods can be applied to all provided MCMC-based models in the same way.
+
+```{r, fig.show="hang", fig.width=7, fig.height=3, fig.cap="Figure 6: Diagnostic Plots"}
+op <- par(mfrow = c(1, 2))
+nil <- mcmc.PlotFrequencyInCalibration(pnbd.draws, cbs)
+nil <- mcmc.PlotTrackingInc(pnbd.draws,
+         T.cal = cbs$T.cal,
+         T.tot = max(cbs$T.cal + cbs$T.star),
+         actual.inc.tracking.data = elog2inc(groceryElog))
+par(op)
+```
+
+
 ### Pareto/NBD (Abe)
+
+@abe2009counting introduced a variant of Pareto/NBD by replacing the two independent gamma distributions for individuals' purchase rates $\lambda$ and dropout rates $\mu$ with a multivariate lognormal distribution. The BTYDplus package refers to this model variant as Pareto/NBD (Abe). The multivariate lognormal distribution permits a correlation between purchase and dropout processes, but even more importantly, can be easily extended to a linear regression model to incorporate customer-level covariates. This flexibility can significantly boost inference, if any of the captured covariates indeed helps in explaining the heterogeneity within the customer cohort.
+
+The online grocery dataset doesn't contain any additional covariates, but for demonstration purposes we will apply Pareto/NBD (Abe) to the CDNow dataset and reproduce the findings from the original paper. First we estimate a model without covariates (M1), and then, we incorporate the dollar amount of the first purchase as a customer-level covariate (M2).
+
+```{r}
+# load CDNow event log from BTYD package
+cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"),
+                      stringsAsFactors = FALSE,
+                      col.names = c("cust", "sampleid", "date", "cds", "sales"))
+cdnowElog$date <- as.Date(as.character(cdnowElog$date), format = "%Y%m%d")
+#' convert to CBS, and split into 39 weeks calibration, and 39 weeks holdout
+cbs <- elog2cbs(cdnowElog, T.cal = "1997-09-30", T.tot = "1998-06-30")
+
+# estimate Pareto/NBD (Abe) without covariates; see model M1 in Abe (2009)
+draws.m1 <- abe.mcmc.DrawParameters(cbs, 
+                                    mcmc = 5000, burnin = 5000, chains = 4)
+quant <- function(x) round(quantile(x, c(0.025, 0.5, 0.975)), 2)
+t(apply(as.matrix(draws.m1$level_2), 2, quant))
+
+#' Append dollar amount of first purchase to use as covariate
+first <- aggregate(sales ~ cust, cdnowElog, function(x) x[1] * 10^-3)
+names(first) <- c("cust", "first.sales")
+cbs <- merge(cbs, first, by = "cust")
+
+#' estimate with first purchase spend as covariate; see model M2 in Abe (2009)
+draws.m2 <- abe.mcmc.DrawParameters(cbs, covariates = c("first.sales"),
+                                    mcmc = 5000, burnin = 5000, chains = 4)
+t(apply(as.matrix(draws.m2$level_2), 2, quant))
+```
+
+The parameter estimates for model M1 match roughly Table 3 in @abe2009counting. The same is true for model M2, but with the exception of `log_lambda_first.sales` and `log_mu_first.sales`. Note, however, that the BTYDplus package can establish via simulations that its implementation is indeed correctly able to re-identify the underlying data generating parameters, also for the covariates, correctly.
+
+Let's finally compare forecasting accuracy of M1 versus M2 on a customer level.
+
+```{r}
+#' 1) draw future transaction
+xstar.m1.draws <- mcmc.DrawFutureTransactions(cbs, draws.m1)
+xstar.m2.draws <- mcmc.DrawFutureTransactions(cbs, draws.m2)
+#' 2) calculate mean over future transaction draws for each customer
+cbs$xstar.m1 <- apply(xstar.m1.draws, 2, mean)
+cbs$xstar.m2 <- apply(xstar.m2.draws, 2, mean)
+#' 3) compare mean absolute error at individual level
+round(c(`MAE without covariates` = mean(abs(cbs$x.star - cbs$xstar.m1)),
+        `MAE with covariates`    = mean(abs(cbs$x.star - cbs$xstar.m2))), 4)
+```
+
+For this particular dataset and covariate, the lift in forecasting accuracy is only minimal. Hence, the dollar amount of the initial purchase doesn't seem to help explain a difference in purchase and dropout process across customers.
+
+-> TODO: reproduce Table 4 of Abe
+
 
 ### Pareto/GGG
 
