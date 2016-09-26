@@ -388,9 +388,16 @@ draws.m2 <- abe.mcmc.DrawParameters(cbs, covariates = c("first.sales"),
 t(apply(as.matrix(draws.m2$level_2), 2, quant))
 ```
 
-The parameter estimates for model M1 match roughly Table 3 in @abe2009counting. The same is true for model M2, but with the exception of `log_lambda_first.sales` and `log_mu_first.sales`. Note, however, that the BTYDplus package can establish via simulations that its implementation is indeed correctly able to re-identify the underlying data generating parameters, also for the covariates, correctly.
+The parameter estimates for model M1 and M2 match about those numbers reported in Table 3 of @abe2009counting. There are some discrepancies for the parameters `log_lambda_first.sales` and `log_mu_first.sales`, but the result remains unaltered: The dollar amount of a customer's initial purchase correlates positively with purchase frequency, but doesn't influence the dropout process. Further, the BTYDplus package can establish via simulations that its provided implementation is indeed correctly able to re-identify the underlying data generating parameters, also for the covariates.
 
-Let's finally compare forecasting accuracy of M1 versus M2 on a customer level.
+sapply(draws.m2$level_1, function(customer.draws) {
+  mat <- as.matrix(customer.draws)
+  round(quantile(mat[, "lambda"], c(0.025, 0.5, 0.975)), 3)
+
+  c(quant(mat[, c("lambda")]), quant(mat[, c("mu")]))
+}
+customer.draws <- draws.m2$level_1[[1]]
+quant(as.matrixcustomer.draws)
 
 ```{r}
 #' 1) draw future transaction
