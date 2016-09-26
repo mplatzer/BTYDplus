@@ -85,7 +85,7 @@ BTYDplus provides various model-independent helper methods for handling and desc
 
 Before starting to fit probabilistic models, an analyst might be interested in reporting the total number of transactions over time, to gain a first understanding of the dynamics at a cohort level. For this purpose the methods `elog2cum` and `elog2inc` are provided. These take an event log as a first argument, and count for each time unit the cumulated or incremental number of transactions. If argument `first` is set to TRUE, then a customer's initial transaction will be included, otherwise not.
 
-```{r, fig.show="hold", fig.show="hold", fig.width=7, fig.height=2.5, fig.cap="Figure 2: Weekly Trends"}
+```{r, fig.show="hold", fig.width=7, fig.height=2.5, fig.cap="Figure 2: Weekly Trends"}
 data("groceryElog")
 op <- par(mfrow = c(1, 2), mar = c(2.5, 2.5, 2.5, 2.5))
 # incremental
@@ -131,7 +131,7 @@ head(cbs, 5)
 
 The models (M)BG/CNBD-k and Pareto/GGG are capable of leveraging regularity within transaction timings for improving forecast accuracy. The method `estimateRegularity` provides a quick check for the degree of regularity in the event timings. A return value of close to 1 supports the assumption of exponentially distributed intertransaction times, whereas values significantly larger than 1 reveal the presence of regularity. Estimation is either done by 1) assuming a same degree of regularity across all customers (`method = "wheat"`), or 2) by estimating regularity for each customer seperately, as the shape parameter of a fitted gamma distribution, and then return the median across estimates. The latter methods, though, require sufficient (>=10) transactions per customer.
 
-```{r, fig.show="hold", fig.show="hold", fig.width=7, fig.height=2.5, fig.cap="Figure 3: Diagnostic Plots for Estimating Regularity"}
+```{r, fig.show="hold", fig.width=7, fig.height=2.5, fig.cap="Figure 3: Diagnostic Plots for Estimating Regularity"}
 data("groceryElog")
 op <- par(mfrow = c(1, 2))
 estimateRegularity(groceryElog, method = "wheat", plot = TRUE, title = "Wheat & Morrison")
@@ -311,7 +311,7 @@ head(cbs[, -c(4:5)], 5)
 
 As can be seen, the basic application of an MCMC-estimated model is not any more complicated than MLE-based models. However, the return object of `pnbd.mcmc.DrawParameters` allows for further analysis. Its return object is a 2-element list: `level_1` is a list of `coda::mcmc.list`s, one for each customer, with draws for customer-level parameters ($\lambda, \tau, z, \mu$), and `level_2` a `coda::mcmc.lis` with draws for cohort-level parameters ($r, \alpha, s, \beta$). In total we have 100 samples for `nrow(cbs) * 4 + 4` = `r nrow(cbs) * 4 + 4` parameters, and for each we can inspect the MCMC traces, the estimated distributions and calculate summary statistics.
 
-```{r, fig.show="hang", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure X: MCMC traces and parameter distributions of cohort-level parameters"}
+```{r, fig.show="hold", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure X: MCMC traces and parameter distributions of cohort-level parameters"}
 coda::is.mcmc.list(pnbd.draws$level_2)
 # convert cohort-level draws from coda::mcmc.list to matrix, with each parameter
 # becoming a column, and each draw a row
@@ -328,7 +328,7 @@ coda::densplot(pnbd.draws$level_2, frame = FALSE)
 par(op)
 ```
 
-```{r, fig.show="hang", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure X: MCMC traces and parameter distributions of individual-level parameters for customer 1"}
+```{r, fig.show="hold", warning=FALSE, fig.width=7, fig.height=3, fig.cap="Figure X: MCMC traces and parameter distributions of individual-level parameters for customer 1"}
 is.list(pnbd.draws$level_1)
 length(pnbd.draws$level_1)
 customer1 <- "1"
@@ -345,7 +345,7 @@ par(op)
 
 And analogous to MLE-based model implementation we can of course plot weekly transaction counts, as well as frequency plots at an aggregated level. These methods can be applied to all provided MCMC-based models in the same way.
 
-```{r, fig.show="hang", fig.width=7, fig.height=3, fig.cap="Figure X: Diagnostic Plots"}
+```{r, fig.show="hold", fig.width=7, fig.height=3, fig.cap="Figure X: Diagnostic Plots"}
 op <- par(mfrow = c(1, 2))
 nil <- mcmc.PlotFrequencyInCalibration(pnbd.draws, cbs)
 nil <- mcmc.PlotTrackingInc(pnbd.draws,
