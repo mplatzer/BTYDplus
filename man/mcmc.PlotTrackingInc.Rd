@@ -2,7 +2,7 @@
 % Please edit documentation in R/mcmc.R
 \name{mcmc.PlotTrackingInc}
 \alias{mcmc.PlotTrackingInc}
-\title{Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and 
+\title{Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and
 Pareto/NBD (Abe)}
 \usage{
 mcmc.PlotTrackingInc(draws, T.cal, T.tot, actual.inc.tracking.data,
@@ -11,20 +11,17 @@ mcmc.PlotTrackingInc(draws, T.cal, T.tot, actual.inc.tracking.data,
   sample_size = 10000)
 }
 \arguments{
-\item{draws}{MCMC draws as returned by 
-\code{\link{pnbd.mcmc.DrawParameters}}, 
-\code{\link{pggg.mcmc.DrawParameters}} or 
-\code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
 
-\item{T.cal}{A vector to represent customers' calibration period lengths (in 
-other words, the \code{T.cal} column from a 
-customer-by-sufficient-statistic matrix). Considering rounding in order to 
+\item{T.cal}{A vector to represent customers' calibration period lengths (in
+other words, the \code{T.cal} column from a
+customer-by-sufficient-statistic matrix). Considering rounding in order to
 speed up calculations.}
 
 \item{T.tot}{End of holdout period. Must be a single value, not a vector.}
 
 \item{actual.inc.tracking.data}{A vector containing the incremental number of
-repeat transactions made by customers for each period in the total time 
+repeat transactions made by customers for each period in the total time
 period (both calibration and holdout periods).}
 
 \item{xlab}{Descriptive label for the x axis.}
@@ -41,12 +38,12 @@ period (both calibration and holdout periods).}
 See \code{\link{mcmc.ExpectedCumulativeTransactions}}.}
 }
 \value{
-Matrix containing actual and expected incremental repeat 
+Matrix containing actual and expected incremental repeat
   transactions.
 }
 \description{
-Plots the actual and expected incremental total repeat transactions by all 
-customers for the calibration and holdout periods, and returns this 
+Plots the actual and expected incremental total repeat transactions by all
+customers for the calibration and holdout periods, and returns this
 comparison in a matrix.
 }
 \details{
@@ -58,8 +55,8 @@ return result varies from one call to another. Larger values of
 data("groceryElog")
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 inc <- elog2inc(groceryElog)
-param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
+param.draws <- pnbd.mcmc.DrawParameters(cbs,
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 104, inc,
   sample_size = 400)
 }

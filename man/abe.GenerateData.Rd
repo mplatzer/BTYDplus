@@ -17,7 +17,7 @@ is assumed that customers have different 'birth' dates, i.e.
 
 \item{params}{A list of model parameters: \code{beta} and \code{gamma}.}
 
-\item{return.elog}{If \code{TRUE} then the event log is returned in addition 
+\item{return.elog}{If \code{TRUE} then the event log is returned in addition
 to the CBS summary.}
 }
 \value{
@@ -29,7 +29,7 @@ List of length 2:
 Simulate data according to Pareto/NBD (Abe) model assumptions
 }
 \examples{
-# generate artificial Pareto/NBD Abe with 2 covariates
+# generate artificial Pareto/NBD (Abe) with 2 covariates
 params <- list()
 params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
 params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)

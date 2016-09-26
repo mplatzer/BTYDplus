@@ -7,12 +7,9 @@
 mcmc.Expectation(draws, t, sample_size = 10000)
 }
 \arguments{
-\item{draws}{MCMC draws as returned by
-\code{\link{pnbd.mcmc.DrawParameters}}, 
-\code{\link{pggg.mcmc.DrawParameters}} or
-\code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
 
-\item{t}{Length of time for which we are calculating the expected number of 
+\item{t}{Length of time for which we are calculating the expected number of
 transactions. May also be a vector.}
 
 \item{sample_size}{Sample size for estimating the probability distribution.}

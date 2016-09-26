@@ -12,7 +12,7 @@ range(cdnowElog$date)
 cbs <- elog2cbs(cdnowElog, T.cal = "1997-09-30", T.tot = "1998-06-30")
 
 
-x <- readline("Estimate Pareto/NBD Abe without covariates (press Enter)")
+x <- readline("Estimate Pareto/NBD (Abe) without covariates (press Enter)")
 
 #' Estimate with no covariates; see model M1 in Abe (2009)
 draws.m1 <- abe.mcmc.DrawParameters(
@@ -23,10 +23,10 @@ round(summary(draws.m1$level_2)$quantiles[, c("2.5%", "50%", "97.5%")], 2)
 #' -> Parameter Estimates match Table 3 in Abe (2009);
 
 
-x <- readline("Estimate Pareto/NBD Abe with covariates (press Enter)")
+x <- readline("Estimate Pareto/NBD (Abe) with covariates (press Enter)")
 
 #' Append dollar amount of first purchase to use as covariate
-first <- aggregate(sales ~ cust, cdnowElog, head, n = 1)
+first <- aggregate(sales ~ cust, cdnowElog, function(x) x[1] * 10^-3)
 names(first) <- c("cust", "first.sales")
 cbs <- merge(cbs, first, by = "cust")
 
@@ -38,9 +38,10 @@ draws.m2 <- abe.mcmc.DrawParameters(
               mc.cores = 1)
 round(summary(draws.m2$level_2)$quantiles[, c("2.5%", "50%", "97.5%")], 4)
 #' -> Parameter Estimates match Table 3 in Abe (2009), except for
-#' `log_lambda_first` and `log_mu_first`; note however, that via simulation we
-#' can establish that our implementation is able to re-identify the underlying
-#' parameters correctly; see `tests/testthat/test-pareto-nbd-abe.R`
+#' `log_lambda_first.sales` and `log_mu_first.sales`; note however, that via
+#' simulation we can establish that our implementation is able to re-identify
+#' the underlying parameters correctly; see
+#' `tests/testthat/test-pareto-nbd-abe.R`
 
 
 x <- readline("Compare predictive performance of the two models (press Enter)")

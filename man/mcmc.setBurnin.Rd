@@ -7,10 +7,7 @@
 mcmc.setBurnin(draws, burnin)
 }
 \arguments{
-\item{draws}{MCMC draws as returned by
-\code{\link{pnbd.mcmc.DrawParameters}}, 
-\code{\link{pggg.mcmc.DrawParameters}} or 
-\code{\link{abe.mcmc.DrawParameters}}.}
+\item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
 
 \item{burnin}{New start index.}
 }
@@ -23,7 +20,7 @@ mcmc.setBurnin(draws, burnin)
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
-param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+param.draws <- pnbd.mcmc.DrawParameters(cbs,
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 param.draws.stable <- mcmc.setBurnin(param.draws, burnin = 200)
 }
