@@ -9,12 +9,9 @@ mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, n.periods.final,
   sample_size = 10000)
 }
 \arguments{
-\item{draws}{MCMC draws as returned by
-\code{\link{pnbd.mcmc.DrawParameters}}, 
-\code{\link{pggg.mcmc.DrawParameters}} or
-\code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
 
-\item{T.cal}{A vector to represent customers' calibration period lengths (in 
+\item{T.cal}{A vector to represent customers' calibration period lengths (in
 other words, the \code{T.cal} column from a
 customer-by-sufficient-statistic matrix). Considering rounding in order to
 speed up calculations.}
@@ -43,11 +40,11 @@ return result varies from one call to another. Larger values of
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
-param.draws <- pnbd.mcmc.DrawParameters(cbs, 
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast 
+param.draws <- pnbd.mcmc.DrawParameters(cbs,
+  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 # Returns a vector containing expected cumulative repeat transactions for 104
 # weeks, with every eigth week being reported.
-mcmc.ExpectedCumulativeTransactions(param.draws, 
+mcmc.ExpectedCumulativeTransactions(param.draws,
   T.cal = cbs$T.cal, T.tot = 104, n.periods.final = 104/8, sample_size = 1000)
 }
 

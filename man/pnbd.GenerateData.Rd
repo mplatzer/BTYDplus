@@ -15,10 +15,10 @@ is assumed that customers have different 'birth' dates, i.e.
 
 \item{T.star}{Length of holdout period. This may be a vector.}
 
-\item{params}{A list of model parameters \code{r}, 
+\item{params}{A list of model parameters \code{r},
 \code{alpha}, \code{s}, \code{beta}.}
 
-\item{return.elog}{If \code{TRUE} then the event log is returned in addition 
+\item{return.elog}{If \code{TRUE} then the event log is returned in addition
 to the CBS summary.}
 }
 \value{

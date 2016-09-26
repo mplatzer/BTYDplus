@@ -7,10 +7,7 @@
 mcmc.PAlive(draws)
 }
 \arguments{
-\item{draws}{MCMC parameter draws as returned by 
-\code{\link{pnbd.mcmc.DrawParameters}}, 
-\code{\link{pggg.mcmc.DrawParameters}} or 
-\code{\link{abe.mcmc.DrawParameters}}.}
+\item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
 }
 \value{
 Numeric vector with the customers' probabilities of being still alive
@@ -22,7 +19,7 @@ Calculates P(alive) based on MCMC parameter draws
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
-param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+param.draws <- pnbd.mcmc.DrawParameters(cbs,
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 mcmc.PAlive(param.draws)
 }

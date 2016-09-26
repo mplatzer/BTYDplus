@@ -9,12 +9,9 @@ mcmc.PlotFrequencyInCalibration(draws, cal.cbs, censor = 7,
   title = "Frequency of Repeat Transactions", sample_size = 1000)
 }
 \arguments{
-\item{draws}{MCMC draws as returned by
-\code{\link{pnbd.mcmc.DrawParameters}}, 
-\code{\link{pggg.mcmc.DrawParameters}} or
-\code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
 
-\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS) 
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)
 data.frame. It must contain columns for frequency ('x') and total time
 observed ('T.cal').}
 
@@ -45,7 +42,7 @@ based on the corresponding model.
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
-param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+param.draws <- pnbd.mcmc.DrawParameters(cbs,
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 mcmc.PlotFrequencyInCalibration(param.draws, cbs, sample_size = 100)
 }

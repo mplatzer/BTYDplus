@@ -2,7 +2,7 @@
 % Please edit documentation in R/mcmc.R
 \name{mcmc.DrawFutureTransactions}
 \alias{mcmc.DrawFutureTransactions}
-\title{Samples number of future transactions based on MCMC parameter draws}
+\title{Draws number of future transactions based on MCMC parameter draws}
 \usage{
 mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star,
   sample_size = NULL)
@@ -11,30 +11,27 @@ mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star,
 \item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)
 data.frame.}
 
-\item{draws}{MCMC draws as returned by
-\code{\link{pnbd.mcmc.DrawParameters}}, 
-\code{\link{pggg.mcmc.DrawParameters}} or 
-\code{\link{abe.mcmc.DrawParameters}}.}
+\item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
 
 \item{T.star}{Length of period for which future transactions are counted.}
 
-\item{sample_size}{Number of samples to draw. Defaults to the same number of 
+\item{sample_size}{Number of samples to draw. Defaults to the same number of
 parameter draws that are passed to \code{draws}.}
 }
 \value{
 2-dim matrix [draw x cust] with sampled future transactions.
 }
 \description{
-For each customer and each provided MCMC parameter draw this method will 
+For each customer and each provided MCMC parameter draw this method will
 sample the number of transactions during the holdout period \code{T.star}. If
-argument \code{size} is provided then it returns a flexible number of draws, 
-whereas for each customer and each draw it will first make a draw from the 
+argument \code{size} is provided then it returns a flexible number of draws,
+whereas for each customer and each draw it will first make a draw from the
 parameter draws.
 }
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
-param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+param.draws <- pnbd.mcmc.DrawParameters(cbs,
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 cbs$xstar.est <- apply(xstar.draws, 2, mean)

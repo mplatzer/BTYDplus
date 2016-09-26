@@ -9,9 +9,9 @@ pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
   param_init = NULL, trace = 100)
 }
 \arguments{
-\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS) 
-data.frame. It must contain a row for each customer, and columns \code{x} 
-for frequency, \code{t.x} for recency and \code{T.cal} for the total time 
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)
+data.frame. It must contain a row for each customer, and columns \code{x}
+for frequency, \code{t.x} for recency and \code{T.cal} for the total time
 observed. A correct format can be easily generated based on the complete
 event log of a customer cohort with \code{\link{elog2cbs}}.}
 
@@ -45,26 +45,21 @@ parameters, on cohort as well as on customer level.
 \details{
 See \code{demo('pareto-ggg')} for how to apply this model.
 
-method 1) If \code{use_data_augmentation==TRUE} MCMC scheme takes advantage of 
-conjugate priors for drawing lambda and mu, by augmentating the parameter space 
-with unobserved lifetime 'tau' and activity status 'z'. See technical appendix 
+method 1) If \code{use_data_augmentation==TRUE} MCMC scheme takes advantage of
+conjugate priors for drawing lambda and mu, by augmentating the parameter space
+with unobserved lifetime 'tau' and activity status 'z'. See technical appendix
 to (Abe 2009).
 
 method 2) If \code{use_data_augmentation==FALSE} then implementation follows
-Shao-Hui Ma & Jin-Lan Liu paper 
+Shao-Hui Ma & Jin-Lan Liu paper
 \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}, i.e. no data
 augmentation and draws on individual level need to be done via slice
 sampling. As such it is 10x slower than method 1)
-
-Estimating parameters via Pareto/NBD MCMC can be 10x slower than Pareto/NBD
-MLE, which itself can be 10x slower than BG/NBD. Both methods exhibit highly
-autocorrelated draws of {r, alpha, s, beta} and hence need to be run long, to
-generate 'enough' draws
 }
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
-param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+param.draws <- pnbd.mcmc.DrawParameters(cbs,
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 
 # cohort-level parameter draws

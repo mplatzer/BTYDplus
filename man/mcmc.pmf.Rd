@@ -7,12 +7,9 @@
 mcmc.pmf(draws, t, x, sample_size = 10000)
 }
 \arguments{
-\item{draws}{MCMC draws as returned by
-\code{\link{pnbd.mcmc.DrawParameters}}, 
-\code{\link{pggg.mcmc.DrawParameters}} or
-\code{\link{abe.mcmc.DrawParameters}}}
+\item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
 
-\item{t}{Length of time for which we are calculating the expected number of 
+\item{t}{Length of time for which we are calculating the expected number of
 transactions. May also be a vector.}
 
 \item{x}{Number of transactions for which probability is calculated. May also
@@ -22,7 +19,7 @@ be a vector.}
 }
 \value{
 \eqn{P(X(t)=x)}. If either \code{t} or \code{x} is a vector, then the
-  output will be a vector as well. If both are vectors, the output will be a 
+  output will be a vector as well. If both are vectors, the output will be a
   matrix.
 }
 \description{
@@ -35,7 +32,7 @@ one call to another.
 \examples{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
-param.draws <- pnbd.mcmc.DrawParameters(cbs, 
+param.draws <- pnbd.mcmc.DrawParameters(cbs,
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 mcmc.pmf(param.draws, t = 52, x = 0:6)
 mcmc.pmf(param.draws, t = c(26, 52), x = 0:6)

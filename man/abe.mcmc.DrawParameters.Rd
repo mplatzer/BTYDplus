@@ -8,9 +8,9 @@ abe.mcmc.DrawParameters(cal.cbs, covariates = c(), mcmc = 1500,
   burnin = 500, thin = 50, chains = 2, mc.cores = NULL, trace = 100)
 }
 \arguments{
-\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS) 
-data.frame. It must contain a row for each customer, and columns \code{x} 
-for frequency, \code{t.x} for recency and \code{T.cal} for the total time 
+\item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)
+data.frame. It must contain a row for each customer, and columns \code{x}
+for frequency, \code{t.x} for recency and \code{T.cal} for the total time
 observed. A correct format can be easily generated based on the complete
 event log of a customer cohort with \code{\link{elog2cbs}}.}
 
@@ -44,7 +44,7 @@ See \code{demo('pareto-abe')} for how to apply this model.
 data("groceryElog")
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 cbs$cov1 <- as.integer(cbs$cust) \%\% 2 # create dummy covariate
-param.draws <- abe.mcmc.DrawParameters(cbs, c("cov1"), 
+param.draws <- abe.mcmc.DrawParameters(cbs, c("cov1"),
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 
 # cohort-level parameter draws
