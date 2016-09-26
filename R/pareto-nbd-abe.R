@@ -220,7 +220,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burn
   cal.cbs[, "intercept"] <- 1
   covariates <- c("intercept", covariates)
   K <- length(covariates)  # number of covars
-  covars <- as.matrix(cal.cbs[, covariates])
+  covars <- as.matrix(subset(cal.cbs, select = covariates))
 
   # set hyper priors
   beta_0 <- matrix(0, nrow = K, ncol = 2, dimnames = list(NULL, c("log_lambda", "log_mu")))
