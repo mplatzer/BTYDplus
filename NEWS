@@ -1,3 +1,6 @@
+0.10.9999
+- ...
+
 0.10.0
 - add a package vignette
 - add AppVeyor for automated build tests on Windows
