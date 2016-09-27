@@ -236,7 +236,7 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #' pggg.plotRegularityRateHeterogeneity(param.draws)
 pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
                                                  title = "Distribution of Regularity Rate k") {
-  stopifnot("t" %in% coda::varnames(draws$level_2))
+  stopifnot("k" %in% colnames(as.matrix(pggg.draws$level_1[[1]])))
   ks <- sapply(draws$level_1, function(draw) as.matrix(draw[, "k"]))
   if (!is.null(fn))
     ks <- apply(ks, 2, fn)
@@ -244,7 +244,7 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
     xmax <- min(10, quantile(ks, 0.95) * 1.5)
   mar_top <- ifelse(title != "", 2.5, 1)
   op <- par(mar = c(2.5, 2.5, mar_top, 2.5))
-  plot(density(ks), xlim = c(0, xmax), main = title, xlab = "", ylab = "", frame = FALSE)
+  plot(density(ks, from = 0), xlim = c(0, xmax), main = title, xlab = "", ylab = "", frame = FALSE)
   abline(v = 1, lty = 3)
   abline(v = median(ks), col = "red")
   par(op)
