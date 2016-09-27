@@ -306,7 +306,7 @@ cbs$x.star.pnbd  <- apply(pnbd.xstar.draws, 2, mean)
 cbs$pactive.pnbd <- mcmc.PActive(pnbd.xstar.draws)
 cbs$palive.pnbd  <- mcmc.PAlive(pnbd.draws)
 # show estimates for first five customers
-head(cbs[, -c(4:5)], 5)
+head(cbs[, c("cust", "x", "x.star", "x.star.pnbd", "pactive.pnbd", "palive.pnbd")])
 ```
 
 As can be seen, the basic application of an MCMC-estimated model is not any more complicated than MLE-based models. However, the return object of `pnbd.mcmc.DrawParameters` allows for further analysis. Its return object is a 2-element list: `level_1` is a list of `coda::mcmc.list`s, one for each customer, with draws for customer-level parameters ($\lambda, \tau, z, \mu$), and `level_2` a `coda::mcmc.lis` with draws for cohort-level parameters ($r, \alpha, s, \beta$). In total we have 100 samples for `nrow(cbs) * 4 + 4` = `r nrow(cbs) * 4 + 4` parameters, and for each we can inspect the MCMC traces, the estimated distributions and calculate summary statistics.
@@ -323,8 +323,8 @@ rbind('Pareto/NBD (HB)' = apply(as.matrix(cohort.draws), 2, median),
 
 # plot trace- and density-plots for heterogeneity parameters
 op <- par(mfrow = c(2, 4), mar = c(2.5, 2.5, 2.5, 2.5))
-coda::traceplot(pnbd.draws$level_2, frame = FALSE)
-coda::densplot(pnbd.draws$level_2, frame = FALSE)
+coda::traceplot(pnbd.draws$level_2)
+coda::densplot(pnbd.draws$level_2)
 par(op)
 ```
 
@@ -338,8 +338,8 @@ round(apply(as.matrix(customer1.draws), 2, median), 3)
 
 # plot trace- and density-plots for customer 1 parameters
 op <- par(mfrow = c(2, 4), mar = c(2.5, 2.5, 2.5, 2.5))
-coda::traceplot(pnbd.draws$level_1[[customer1]], frame = FALSE)
-coda::densplot(pnbd.draws$level_1[[customer1]], frame = FALSE)
+coda::traceplot(pnbd.draws$level_1[[customer1]])
+coda::densplot(pnbd.draws$level_1[[customer1]])
 par(op)
 ```
 
@@ -362,7 +362,9 @@ par(op)
 
 The online grocery dataset doesn't contain any additional covariates, but for demonstration purposes we will apply Pareto/NBD (Abe) to the CDNow dataset and reproduce the findings from the original paper. First we estimate a model without covariates (M1), and then, we incorporate the dollar amount of the first purchase as a customer-level covariate (M2).
 
-```{r}
+<!-- Note: we do not evaluate the Pareto/GGG and Pareto/NBD (Abe) example code here, in order to speed up vignette build. -->
+
+```{r, eval = FALSE}
 # load CDNow event log from BTYD package
 cdnowElog <- read.csv(system.file("data/cdnowElog.csv", package = "BTYD"),
                       stringsAsFactors = FALSE,
@@ -373,9 +375,15 @@ cdnowCbs <- elog2cbs(cdnowElog, T.cal = "1997-09-30", T.tot = "1998-06-30")
 
 # estimate Pareto/NBD (Abe) without covariates; see model M1 in Abe (2009)
 draws.m1 <- abe.mcmc.DrawParameters(cdnowCbs, 
-              mcmc = 5000, burnin = 5000, chains = 4) # runs for ~2mins on a 2015 MacBook Pro
+              mcmc = 7500, burnin = 2500) # runs for ~33secs on a 2015 MacBook Pro
 quant <- function(x) round(quantile(x, c(0.025, 0.5, 0.975)), 2)
 t(apply(as.matrix(draws.m1$level_2), 2, quant))
+#>                        2.5%   50% 97.5%
+#> log_lambda            -3.70 -3.54 -3.32
+#> log_mu                -3.96 -3.59 -3.26
+#> var_log_lambda         1.10  1.34  1.65
+#> cov_log_lambda_log_mu -0.20  0.13  0.74
+#> var_log_mu             1.44  2.62  5.05
 
 #' Append dollar amount of first purchase to use as covariate
 first <- aggregate(sales ~ cust, cdnowElog, function(x) x[1] * 10^-3)
@@ -384,8 +392,16 @@ cdnowCbs <- merge(cdnowCbs, first, by = "cust")
 
 #' estimate with first purchase spend as covariate; see model M2 in Abe (2009)
 draws.m2 <- abe.mcmc.DrawParameters(cdnowCbs, covariates = c("first.sales"),
-              mcmc = 5000, burnin = 5000, chains = 4) # runs for ~2mins on a 2015 MacBook Pro
+              mcmc = 7500, burnin = 2500) # runs for ~33secs on a 2015 MacBook Pro
 t(apply(as.matrix(draws.m2$level_2), 2, quant))
+#>                         2.5%   50% 97.5%
+#> log_lambda_intercept   -4.02 -3.77 -3.19
+#> log_mu_intercept       -4.37 -3.73 -2.69
+#> log_lambda_first.sales  0.04  6.04  9.39
+#> log_mu_first.sales     -9.02  1.73  7.90
+#> var_log_lambda          0.01  1.35  1.79
+#> cov_log_lambda_log_mu  -0.35  0.22  0.76
+#> var_log_mu              0.55  2.59  4.97
 ```
 
 The parameter estimates for model M1 and M2 match about those numbers reported in Table 3 of @abe2009counting. There are some discrepancies for the parameters `log_lambda_first.sales` and `log_mu_first.sales`, but the result remains unaltered: The dollar amount of a customer's initial purchase correlates positively with purchase frequency, but doesn't influence the dropout process. Further, the BTYDplus package can establish via simulations that its provided implementation is indeed correctly able to re-identify the underlying data generating parameters, also for the covariates.
@@ -395,9 +411,9 @@ The parameter estimates for model M1 and M2 match about those numbers reported i
 
 @platzer2016pggg developed with the Pareto/GGG yet another extension of Pareto/NBD. This one generalizes the distribution for the intertransaction times from the exponential to the Gamma distribution, whereas its shape parameter $k$ is also allowed to vary across customers following a $\text{Gamma}(t, \gamma)$ distribution. Hence, the purchase process follows a Gamma-Gamma-Gamma (GGG) mixture distribution, that is capable of capturing a varying degree of regularity across customers. For datasets which exhibit regularity in their timing patterns, leveraging that information can yield significant improvements in terms of forecasting accuracy. This is because the regularity helps in making inferences about the customer's latent activity state.
 
-```{r, fig.caption = "Figure X: Distribution of regularity parameter k"}
+```{r, eval=FALSE, fig.caption = "Figure X: Distribution of regularity parameter k"}
 # generate parameter draws
-pggg.draws <- pggg.mcmc.DrawParameters(cbs) # runs for ~2.5mins on a 2015 MacBook Pro
+pggg.draws <- pggg.mcmc.DrawParameters(cbs) # runs for ~2.2mins on a 2015 MacBook Pro
 # generate draws for holdout period
 pggg.xstar.draws <- mcmc.DrawFutureTransactions(cbs, pggg.draws)
 # create point estimates by taking average across samples
@@ -405,21 +421,36 @@ cbs$x.star.pggg  <- apply(pggg.xstar.draws, 2, mean)
 cbs$pactive.pggg <- mcmc.PActive(pggg.xstar.draws)
 cbs$palive.pggg  <- mcmc.PAlive(pggg.draws)
 # show estimates for first five customers
-head(cbs[, -c(4:7)], 5)
+head(cbs[, c("cust", "x", "x.star", "x.star.pggg", "pactive.pggg", "palive.pggg")])
+#>    cust  x x.star x.star.pggg pactive.pggg palive.pggg
+#>  1    1  0      0        0.04         0.02        0.10
+#>  2    2  1      0        0.96         0.63        1.00
+#>  3    3 19     14       14.76         0.88        0.88
+#>  4    4  0      0        0.05         0.04        0.08
+#>  5    5  2      3        1.95         0.80        0.92
+#>  6    6  5      6        4.57         0.93        0.96
+
+# report median parameter estimates
+round(apply(as.matrix(pggg.draws$level_2), 2, median), 2)
+#>    t gamma     r alpha     s  beta 
+#> 1.70  0.38  0.94  5.18  0.43  4.36 
+median.est <- sapply(pggg.draws$level_1, function(draw) {
+  apply(as.matrix(draw), 2, median)
+})
+round(apply(median.est, 1, mean), 2)
+#>    k lambda     mu    tau      z 
+#> 3.86   0.16   0.07  71.78   0.32 
 ```
 
-```{r, fig.caption = "Figure X: Distribution of regularity parameter k"}
-apply(as.matrix(pggg.draws$level_2), 2, mean)
-pggg.plotRegularityRateHeterogeneity(pggg.draws, title = "")
-```
+Summarizing the estimated parameter distributions shows that regularity parameter `k` is estimated significantly larger than 1, and that it varies substantially across customers.
 
-When checking the estimated heterogeneity parameters, we see that k is clearly estimated larger than 1, indicating the regularity is present. The above plot furhter shows that there is significant variation in the regularity across customers.
-
-```{r}
+```{r, eval = FALSE}
 (mae <- c(`Pareto/GGG` = mean(abs(cbs$x.star - cbs$x.star.pggg)),
           `Pareto/NBD` = mean(abs(cbs$x.star - cbs$x.star.pnbd))))
+#> Pareto/GGG Pareto/NBD 
+#>   1.389548   1.513515 
 ```
 
-When comparing forecasting accuracy at individual level, we can see a lift of `r paste0(round(100*unname(lift <- 1 - mae[1]/mae[2]), 1), "%")` for the given dataset, due to the detected regularity.
+When comparing forecasting accuracy at individual level, we can see a lift of 8.2% for the given dataset. This demonstrates the ability of the Pareto/GGG to leverage the detected regularity within the online grocery dataset to improve forecasting accuracy.
 
 ## References
