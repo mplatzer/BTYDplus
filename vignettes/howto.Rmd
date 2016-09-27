@@ -276,7 +276,7 @@ c(`Actuals`    = sum(cbs$x.star),
 
 Comparing the predictions at an aggregate level, we see that also the MBG/CNBD-k remains overly optimistic for the online grocery dataset. This can also be visualized with the help of `mbgcnbd.PlotTrackingInc`.
 
-```{r, fig.show="hold", fig.width=5, fig.height=3}
+```{r, fig.show="hold"}
 nil <- mbgcnbd.PlotTrackingInc(params.mbgcnbd,
          T.cal = cbs$T.cal,
          T.tot = max(cbs$T.cal + cbs$T.star),
