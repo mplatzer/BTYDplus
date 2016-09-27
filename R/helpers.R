@@ -323,10 +323,10 @@ elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
 #' Aggregates an event log to either incremental or cumulative number of
 #' transactions. If \code{first=TRUE} then the initial transactions of each
 #' customer are included in the count as well.
-#' 
+#'
 #' Duplicate transactions with identical \code{cust} and \code{date} (or
 #' \code{t}) field are counted only once.
-#' 
+#'
 #' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}.
 #' @param by Only return every \code{by}-th count Defaults to 7, and thus
