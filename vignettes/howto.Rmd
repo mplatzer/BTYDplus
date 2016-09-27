@@ -33,7 +33,7 @@ Figure 1 displays the complete transaction records of 30 sampled customers of an
 * Which particular customers can still be considered active?
 * Which customers will provide the most value to the company going forward?
 
-```{r, fig.show="hold", fig.width=7, fig.height=3, fig.cap="Timing Patterns for Sampled Grocery Customers"}
+```{r, fig.show="hold", fig.width=7, fig.height=2.8, fig.cap="Timing Patterns for Sampled Grocery Customers"}
 library(BTYDplus)
 data("groceryElog")
 set.seed(123)
