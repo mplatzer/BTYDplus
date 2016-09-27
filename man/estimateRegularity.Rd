@@ -47,7 +47,7 @@ Wheat & Morrison (1990)'s method calculates for each customer a statistic
 \code{Beta(k, k)} distribution, and \code{k} can be estimated as
 \code{(1-4*Var(M))/(8*Var(M))}. The corresponding diagnostic plot (\code{plot
 = TRUE}) shows the actual distribution of \code{M} vs. the theoretical
-distribution for \code{k = 1}, \code{k = 2} and \code{k = 3}.
+distribution for \code{k = 1} and \code{k = 2}.
 }
 \examples{
 data("groceryElog")

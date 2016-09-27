@@ -21,7 +21,7 @@
 #' \code{Beta(k, k)} distribution, and \code{k} can be estimated as
 #' \code{(1-4*Var(M))/(8*Var(M))}. The corresponding diagnostic plot (\code{plot
 #' = TRUE}) shows the actual distribution of \code{M} vs. the theoretical
-#' distribution for \code{k = 1}, \code{k = 2} and \code{k = 3}.
+#' distribution for \code{k = 1} and \code{k = 2}.
 #'
 #' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}
@@ -86,7 +86,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
       mar_top <- ifelse(title != "", 2.5, 1)
       op <- par(mar = c(1, 2, mar_top, 2))
       M_density <- density(M, from = 0, to = 1)
-      ymax <- max(M_density$y, 1.8)
+      ymax <- max(M_density$y, 1.5)
       plot(M_density, xlim = c(0, 1), ylim = c(0, ymax),
            main = title, sub = "", xlab = "", ylab = "",
            lwd = 2, frame = FALSE, axes = FALSE)
@@ -94,13 +94,8 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
               col = "lightgray", border = 1)
       fn1 <- function(x) dbeta(x, 1, 1)
       fn2 <- function(x) dbeta(x, 2, 2)
-      fn3 <- function(x) dbeta(x, 3, 3)
       curve(fn1, add = TRUE, lty = 2, lwd = 1, col = "gray12")
       curve(fn2, add = TRUE, lty = 3, lwd = 1, col = "gray12")
-      curve(fn3, add = TRUE, lty = 4, lwd = 1, col = "gray12")
-      legend(0.75, 1.8,
-             c("Exponential", "Erlang-2", "Erlang-3"),
-             lty = 2:4, lwd = 1)
       par(op)
     }
     return(r)
