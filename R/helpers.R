@@ -78,16 +78,16 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
     # with two interpurchase times.' Journal of Marketing Research (1990):
     # 87-93.
     setkeyv(elog_dt, c("cust", "t"))
-    calc_M <- function(itts) tail(itts, 1) / sum(tail(itts, 2))
+    calc_M <- function(itts) sample(tail(itts, 2), 1) / sum(tail(itts, 2))
     M <- elog_dt[, calc_M(diff(t)), by = "cust"]$V1
     if (var(M) == 0) stop("No customers with sufficient number of transactions.")
     r <- (1 - 4 * var(M)) / (8 * var(M))
     if (plot) {
       mar_top <- ifelse(title != "", 2.5, 1)
-      op <- par(mar = c(1, 2, mar_top, 2))
-      M_density <- density(M, from = 0, to = 1)
+      op <- par(mar = c(1, 1, mar_top, 1))
+      M_density <- density(M)
       ymax <- max(M_density$y, 1.5)
-      plot(M_density, xlim = c(0, 1), ylim = c(0, ymax),
+      plot(M_density, xlim = c(-0.05, 1.05), ylim = c(0, ymax),
            main = title, sub = "", xlab = "", ylab = "",
            lwd = 2, frame = FALSE, axes = FALSE)
       polygon(M_density,
