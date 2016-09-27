@@ -14,20 +14,18 @@ test_that("estimateRegularity", {
 
   # Estimate regularity parameter k
   k.est.1 <- estimateRegularity(elog)
-  k.est.1 <- estimateRegularity(elog, plot = TRUE)
+  k.est.1 <- estimateRegularity(elog, plot = TRUE, min = 2)
+  expect_error(k.est.1 <- estimateRegularity(elog, plot = TRUE, min = 60), "sufficient")
   k.est.1 <- estimateRegularity(elog, plot = TRUE, title = "Plot Title")
   k.est.1 <- estimateRegularity(elog, plot = TRUE, title = "")
   k.est.2 <- estimateRegularity(elog, method = "mle", plot = TRUE)
   k.est.3 <- estimateRegularity(elog, method = "mle-minka", plot = TRUE, title = "Plot Title")
   k.est.4 <- estimateRegularity(elog, method = "mle-thom", plot = TRUE, title = "")
   k.est.5 <- estimateRegularity(elog, method = "cv", plot = TRUE)
-
-  # require less than 5% deviation in estimated parameters
-  ape <- function(act, est) abs(act - est)/act
-  expect_true(ape(k, k.est.1) < 0.05)
-  expect_true(ape(k, k.est.2) < 0.05)
-  expect_true(ape(k, k.est.3) < 0.05)
-  expect_true(ape(k, k.est.4) < 0.05)
-  expect_true(ape(k, k.est.5) < 0.05)
+  expect_equal(k, k.est.1, tolerance = 0.1)
+  expect_equal(k, k.est.2, tolerance = 0.1)
+  expect_equal(k, k.est.3, tolerance = 0.1)
+  expect_equal(k, k.est.4, tolerance = 0.1)
+  expect_equal(k, k.est.5, tolerance = 0.1)
 
 })

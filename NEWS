@@ -5,6 +5,7 @@
 - fix `elog2inc` and `elog2cum` to not report last week, if that is not complete
 - only do bias correction for `mbgcnbd.ConditionalExpectedTransactions` when we can safely assume that the whole customer cohort is passed
 - `abe.mcmc.DrawParameters` can now handle data.table's
+- add ability to determine minimum number of transactions per customers to `estimateRegularity`
 
 0.9.0
 - add argument `first` to `elog2cum` and `elog2inc`

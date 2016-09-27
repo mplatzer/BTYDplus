@@ -6,22 +6,36 @@
 #' provides a quick check for the degree of regularity in the event timings. A
 #' return value of close to 1 supports the assumption of exponentially
 #' distributed intertransaction times, whereas values significantly larger than
-#' 1 reveal the presence of regularity. Estimation is either done by 1) assuming
-#' a same degree of regularity across all customers (\code{method = "wheat"}), or 2) by
+#' 1 reveal the presence of regularity.
+#'
+#' Estimation is either done by 1) assuming the same degree of regularity across
+#' all customers (Wheat & Morrison (1990) via \code{method = "wheat"}), or 2) by
 #' estimating regularity for each customer seperately, as the shape parameter of
 #' a fitted gamma distribution, and then return the median across estimates. The
-#' latter methods, though, require sufficient (>=10) transactions per customer.
+#' latter methods, though, require sufficient (>=\code{min}) transactions per
+#' customer.
+#'
+#' Wheat & Morrison (1990)'s method calculates for each customer a statistic
+#' \code{M} based on her last two number of intertransaction times as
+#' \code{ITT_1 / (ITT_1 + ITT_2)}. That measure is known to follow a
+#' \code{Beta(k, k)} distribution, and \code{k} can be estimated as
+#' \code{(1-4*Var(M))/(8*Var(M))}. The corresponding diagnostic plot (\code{plot
+#' = TRUE}) shows the actual distribution of \code{M} vs. the theoretical
+#' distribution for \code{k = 1}, \code{k = 2} and \code{k = 3}.
 #'
 #' @param elog Event log, a \code{data.frame} with columns \code{cust} and
 #'   transaction time \code{t} or \code{date}
 #' @param method Either \code{wheat}, \code{mle}, \code{mle-minka}, \code{mle-thom} or
 #'   \code{cv}.
-#' @param plot If \code{TRUE} then distribution of estimated regularity will be
-#'   plotted.
+#' @param plot If \code{TRUE} then an additional diagnostic plot is provided.
 #' @param title Plot title.
+#' @param min Minimum number of intertransaction times per customer. Customers
+#'   with less than \code{min} intertransactions are not considered. Defaults to 2
+#'   for method `wheat`, and to 10 otherwise.
 #' @return Estimated real-valued regularity parameter.
-#' @references Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase
-#'   regularity with two interpurchase times.'
+#' @references Wheat, Rita D., and Donald G. Morrison. "Estimating purchase
+#'   regularity with two interpurchase times." Journal of Marketing Research
+#'   (1990): 87-93.
 #' @references Dunn, Richard, Steven Reader, and Neil Wrigley. 'An investigation
 #'   of the assumptions of the NBD model' Applied Statistics (1983): 249-259.
 #' @references Wu, Couchen, and H-L. Chen. 'A consumer purchasing model with
@@ -37,96 +51,110 @@
 #' estimateRegularity(groceryElog, plot = TRUE, method = 'mle-minka')
 #' estimateRegularity(groceryElog, plot = TRUE, method = 'mle-thom')
 #' estimateRegularity(groceryElog, plot = TRUE, method = 'cv')
-estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "") {
+estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "", min = NULL) {
+  N <- t <- NULL # suppress checkUsage warnings
   if (!"cust" %in% names(elog))
     stop("Error in estimateRegularity: elog must have a column labelled \"cust\"")
   if (!"date" %in% names(elog) & !"t" %in% names(elog))
     stop("Error in estimateRegularity: elog must have a column labelled \"t\" or \"date\"")
   if (!"t" %in% names(elog))
     elog$t <- as.numeric(elog$date)
-  trans <- split(elog, elog$cust)
+  elog_dt <- subset(setDT(copy(elog)), select = c("cust", "t"))
+  setkey(elog_dt)
+  elog_dt <- unique(elog_dt)
+  # discard customers with less than `min` ITTs
+  if (is.null(min)) {
+    min <- ifelse(method == "wheat", 2, 10)
+  } else {
+    stopifnot(is.numeric(min))
+    stopifnot(min >= 2)
+  }
+  elog_dt[, N := .N, by = "cust"]
+  elog_dt <- elog_dt[N > min]
+  if (nrow(elog_dt) == 0) stop("No customers with sufficient number of transactions.")
+  # calculate method specific estimate
   if (method == "wheat") {
-    # Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase regularity with two interpurchase times.'
-    # Journal of Marketing Research (1990): 87-93.
-    M <- unlist(lapply(trans, function(df) {
-      itt <- diff(sort(unique(df$t)))
-      if (length(itt) > 1) {
-        # take last two itt's to capture most recent regularity
-        itt2 <- rev(itt)[1:2]
-        return(sample(itt2)[1]/sum(itt2))
-      }
-    }))
-    r <- (1 - 4 * var(M))/(8 * var(M))
+    # Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase regularity
+    # with two interpurchase times.' Journal of Marketing Research (1990):
+    # 87-93.
+    setkeyv(elog_dt, c("cust", "t"))
+    calc_M <- function(itts) tail(itts, 1) / sum(tail(itts, 2))
+    M <- elog_dt[, calc_M(diff(t)), by = "cust"]$V1
+    if (var(M) == 0) stop("No customers with sufficient number of transactions.")
+    r <- (1 - 4 * var(M)) / (8 * var(M))
     if (plot) {
       mar_top <- ifelse(title != "", 2.5, 1)
       op <- par(mar = c(1, 2, mar_top, 2))
-      plot(density(M), main = title, sub = "", xlab = "", ylab = "", lwd = 2, frame = FALSE, axes = FALSE)
-      polygon(density(M), col = "lightgray", border = 1)
+      M_density <- density(M, from = 0, to = 1)
+      ymax <- max(M_density$y, 1.8)
+      plot(M_density, xlim = c(0, 1), ylim = c(0, ymax),
+           main = title, sub = "", xlab = "", ylab = "",
+           lwd = 2, frame = FALSE, axes = FALSE)
+      polygon(M_density,
+              col = "lightgray", border = 1)
       fn1 <- function(x) dbeta(x, 1, 1)
-      fnr <- function(x) dbeta(x, round(r), round(r))
-      curve(fn1, add = TRUE, lty = 2, lwd = 2)
-      curve(fnr, add = TRUE, lty = 2, lwd = 2)
+      fn2 <- function(x) dbeta(x, 2, 2)
+      fn3 <- function(x) dbeta(x, 3, 3)
+      curve(fn1, add = TRUE, lty = 2, lwd = 1, col = "gray12")
+      curve(fn2, add = TRUE, lty = 3, lwd = 1, col = "gray12")
+      curve(fn3, add = TRUE, lty = 4, lwd = 1, col = "gray12")
+      legend(0.75, 1.8,
+             c("Exponential", "Erlang-2", "Erlang-3"),
+             lty = 2:4, lwd = 1)
       par(op)
     }
     return(r)
 
   } else {
-    if (method == "mle" | method == "mle-minka") {
-      # Maximum Likelihood Estimator http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation
-      # Approximation for MLE by Minka http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf
-      ks <- unlist(lapply(trans, function(df) {
-        itt <- diff(sort(unique(df$t)))
-        if (length(itt) >= 9) {
-          s <- log(sum(itt)/length(itt)) - sum(log(itt))/length(itt)
-          if (method == "mle") {
-          fn <- function(v) {
-            return((log(v) - digamma(v) - s)^2)
-          }
-          k <- optimize(fn, lower = 0.1, upper = 50)$min
-          } else if (method == "mle-minka") {
-          k <- (3 - s + sqrt((s - 3)^2 + 24 * s))/(12 * s)
-          }
-          return(k)
-        }
-      }))
-
+    if (method == "mle") {
+      # Maximum Likelihood Estimator
+      # http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation
+      est_k <- function(itts) {
+        s <- log(sum(itts)/length(itts)) - sum(log(itts))/length(itts)
+        fn <- function(v) return((log(v) - digamma(v) - s)^2)
+        k <- optimize(fn, lower = 0.1, upper = 50)$min
+        return(k)
+      }
+    } else if (method == "mle-minka") {
+      # Approximation for MLE by Minka
+      # http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf
+      est_k <- function(itts) {
+        s <- log(sum(itts)/length(itts)) - sum(log(itts))/length(itts)
+        k <- (3 - s + sqrt((s - 3)^2 + 24 * s))/(12 * s)
+        return(k)
+      }
     } else if (method == "mle-thom") {
-      # Approximation for ML estimator Thom (1968); see Dunn, Richard, Steven Reader, and Neil Wrigley.  'An
-      # investigation of the assumptions of the NBD model' Applied Statistics (1983): 249-259.
-      ks <- unlist(lapply(trans, function(df) {
-        itt <- diff(sort(unique(df$t)))
-        if (length(itt) >= 9) {
-          hm <- function(v) exp(sum(log(v))/length(v))
-          mu <- log(mean(itt)/hm(itt))
-          d <- (1/(4 * mu)) * (1 + sqrt(1 + 4 * mu/3))
-          return(d)
-        }
-      }))
-
+      # Approximation for ML estimator Thom (1968); see Dunn, Richard, Steven
+      # Reader, and Neil Wrigley. 'An investigation of the assumptions of the
+      # NBD model' Applied Statistics (1983): 249-259.
+      est_k <- function(itts) {
+        hm <- function(v) exp(sum(log(v))/length(v))
+        mu <- log(mean(itts) / hm(itts))
+        k <- (1/(4 * mu)) * (1 + sqrt(1 + 4 * mu/3))
+        return(k)
+      }
     } else if (method == "cv") {
-      # Estimate regularity by analyzing coefficient of variation Wu, Couchen, and H-L. Chen. 'A consumer purchasing
-      # model with learning and departure behaviour.'  Journal of the Operational Research Society (2000): 583-591.
-      ks <- unlist(lapply(trans, function(df) {
-        itt <- diff(sort(unique(df$t)))
-        if (length(itt) >= 9) {
-          cv <- sd(itt)/mean(itt)
-          k <- 1/cv^2
-          return(k)
-        }
-      }))
+      # Estimate regularity by analyzing coefficient of variation Wu, Couchen,
+      # and H-L. Chen. 'A consumer purchasing model with learning and departure
+      # behaviour.'  Journal of the Operational Research Society (2000):
+      # 583-591.
+      est_k <- function(itts) {
+        cv <- sd(itts) / mean(itts)
+        k <- 1 / cv^2
+        return(k)
+      }
     }
-    if (length(ks) == 0)
-      stop("No customers with 10 or more transactions.")
-
+    ks <- elog_dt[, est_k(diff(t)), by = "cust"]$V1
     if (plot) {
       ymax <- median(ks) * 3
-      suppressWarnings(boxplot(ks, horizontal = TRUE, ylim = c(0, ymax), frame = FALSE, axes = FALSE, main = title))
+      suppressWarnings(boxplot(ks, horizontal = TRUE, ylim = c(0, ymax),
+                               frame = FALSE, axes = FALSE, main = title))
       axis(1, at = 0:ymax)
       axis(3, at = 0:ymax, labels = rep("", 1 + ymax))
       abline(v = 1:ymax, lty = "dotted", col = "lightgray")
-      suppressWarnings(boxplot(ks, horizontal = TRUE, add = TRUE, col = "gray", frame = FALSE, axes = FALSE))
+      suppressWarnings(boxplot(ks, horizontal = TRUE, add = TRUE,
+                               col = "gray", frame = FALSE, axes = FALSE))
     }
-
     return(median(ks))
   }
 }
