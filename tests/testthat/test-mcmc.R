@@ -76,13 +76,12 @@ test_that("MCMC Helpers", {
   expect_equal(length(mcmc.Expectation(abe.draws, 56)), 1)
 
   # test against P/NBD simulation
-  skip_on_cran()
   set.seed(1)
   pnbd.params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
   pnbd.sim <- pnbd.GenerateData(n = 1000, 28, 28, pnbd.params, return.elog = TRUE)
   pnbd.elog <- pnbd.sim$elog
   pnbd.cbs <- pnbd.sim$cbs
-  pnbd.draws <- pnbd.mcmc.DrawParameters(pnbd.cbs)
+  pnbd.draws <- pnbd.mcmc.DrawParameters(pnbd.cbs, mcmc = 5000, chains = 1)
   expect_equal(mcmc.Expectation(pnbd.draws, 28), mean(pnbd.cbs$x), tolerance = 0.1)
   x <- mcmc.ExpectedCumulativeTransactions(pnbd.draws, T.cal = pnbd.cbs$T.cal, T.tot = 56, n.periods.final = 56)
   expect_equal(length(x), 56)
