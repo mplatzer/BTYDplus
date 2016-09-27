@@ -40,7 +40,7 @@
 #' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws, cbs$T.star)
 #' xstar.est <- apply(xstar.draws, 2, mean)
 #' head(xstar.est)
-abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 1500, burnin = 500, thin = 50, chains = 2,
+abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burnin = 500, thin = 50, chains = 2,
   mc.cores = NULL, trace = 100) {
 
   ## methods to sample heterogeneity parameters {beta, gamma} ##

@@ -4,7 +4,7 @@
 \alias{abe.mcmc.DrawParameters}
 \title{Pareto/NBD (Abe) Parameter Draws}
 \usage{
-abe.mcmc.DrawParameters(cal.cbs, covariates = c(), mcmc = 1500,
+abe.mcmc.DrawParameters(cal.cbs, covariates = c(), mcmc = 2500,
   burnin = 500, thin = 50, chains = 2, mc.cores = NULL, trace = 100)
 }
 \arguments{
