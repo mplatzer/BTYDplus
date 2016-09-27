@@ -1,9 +1,10 @@
 ---
 title: "Customer Scoring with BTYDplus"
+author: "Michael Platzer"
+date: "`r Sys.Date()`"
 output: 
   pdf_document: 
     fig_caption: yes
-    highlight: pygments
 bibliography: bibliography.bib
 vignette: |
   %\VignetteIndexEntry{Customer Scoring with BTYDplus} 
