@@ -1,7 +1,7 @@
 context("mcmc")
 
 test_that("Pareto/NBD (Abe) MCMC", {
-  cat('test Pareto/NBD (Abe)\n')
+  cat("test Pareto/NBD (Abe)\n")
   skip_on_cran()
 
   # generate artificial Pareto/NBD (Abe) with 2 covariates
@@ -30,11 +30,11 @@ test_that("Pareto/NBD (Abe) MCMC", {
   est <- round(summary(draws$level_2)$quantiles[, "50%"], 3)
   # require less than 20% deviation in estimated location parameter beta
   est.beta <- matrix(est[1:6], ncol = 2, byrow = T)
-  expect_lt(max(abs((est.beta - params$beta)/params$beta)), 0.2)
+  expect_lt(max(abs((est.beta - params$beta) / params$beta)), 0.2)
   # variance parameter gamma is difficult to identify, particularly for mu; hence we relax our checks
-  expect_lt((est["var_log_lambda"] - params$gamma[1, 1])/params$gamma[1, 1], 0.3)
+  expect_lt((est["var_log_lambda"] - params$gamma[1, 1]) / params$gamma[1, 1], 0.3)
   expect_lt(abs(est["cov_log_lambda_log_mu"] - params$gamma[1, 2]), 0.05)
-  # expect_lt((est['var_log_mu'] - params$gamma[2,2]) / params$gamma[2,2], 0.30)
+  # disabled test: expect_lt((est['var_log_mu'] - params$gamma[2,2]) / params$gamma[2,2], 0.30)
 
   # estimate future transactions & P(alive)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
@@ -43,7 +43,7 @@ test_that("Pareto/NBD (Abe) MCMC", {
   cbs$palive <- mcmc.PAlive(draws)
 
   # require less than 10% deviation in aggregated future transactions
-  ape <- function(act, est) abs(act - est)/act
+  ape <- function(act, est) abs(act - est) / act
   expect_lt(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.1)
   expect_lt(ape(sum(cbs$palive), sum(cbs$alive)), 0.1)
   expect_lt(ape(sum(cbs$x.star > 0), sum(cbs$pactive)), 0.1)

@@ -43,16 +43,20 @@
 abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burnin = 500, thin = 50, chains = 2,
   mc.cores = NULL, trace = 100) {
 
-  ## methods to sample heterogeneity parameters {beta, gamma} ##
+  # ** methods to sample heterogeneity parameters {beta, gamma} **
 
   draw_level_2 <- function(covars, level_1, hyper_prior) {
     # standard multi-variate normal regression update
-    draw <- bayesm::rmultireg(Y = log(t(level_1[c("lambda", "mu"), ])), X = covars, Bbar = hyper_prior$beta_0,
-      A = hyper_prior$A_0, nu = hyper_prior$nu_00, V = hyper_prior$gamma_00)
+    draw <- bayesm::rmultireg(Y = log(t(level_1[c("lambda", "mu"), ])),
+                              X = covars,
+                              Bbar = hyper_prior$beta_0,
+                              A = hyper_prior$A_0,
+                              nu = hyper_prior$nu_00,
+                              V = hyper_prior$gamma_00)
     return(list(beta = t(draw$B), gamma = draw$Sigma))
   }
 
-  ## methods to sample individual-level parameters ##
+  # ** methods to sample individual-level parameters **
 
   draw_z <- function(data, level_1) {
     tx <- data$t.x
@@ -63,7 +67,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
     mu_lam <- mu + lambda
     t_diff <- Tcal - tx
 
-    prob <- 1/(1 + (mu/mu_lam) * (exp(mu_lam * t_diff) - 1))
+    prob <- 1 / (1 + (mu / mu_lam) * (exp(mu_lam * t_diff) - 1))
     z <- as.numeric(runif(length(prob)) < prob)
     return(z)
   }
@@ -90,7 +94,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
       mu_lam_tx <- pmin(700, mu_lam[!alive] * tx[!alive])
       mu_lam_Tcal <- pmin(700, mu_lam[!alive] * Tcal[!alive])
       rand <- runif(n = sum(!alive))
-      tau[!alive] <- -log((1 - rand) * exp(-mu_lam_tx) + rand * exp(-mu_lam_Tcal))/mu_lam[!alive]
+      tau[!alive] <- -log( (1 - rand) * exp(-mu_lam_tx) + rand * exp(-mu_lam_Tcal)) / mu_lam[!alive]
     }
     return(tau)
   }
@@ -99,7 +103,6 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
     # sample (lambda, mu) given (z, tau, beta, gamma)
     N <- nrow(data)
     x <- data$x
-    tx <- data$t.x
     Tcal <- data$T.cal
     z <- level_1["z", ]
     tau <- level_1["tau", ]
@@ -117,8 +120,9 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
       diff_mu <- log_mu - mvmean[, 2]
       likel <- x * log_lambda + (1 - z) * log_mu - (exp(log_lambda) + exp(log_mu)) * (z * Tcal + (1 - z) *
         tau)
-      prior <- -0.5 * (diff_lambda^2 * inv_gamma[1, 1] + 2 * diff_lambda * diff_mu * inv_gamma[1, 2] + diff_mu^2 *
-        inv_gamma[2, 2])
+      prior <- -0.5 * (diff_lambda ^ 2 * inv_gamma[1, 1] +
+                         2 * diff_lambda * diff_mu * inv_gamma[1, 2] +
+                         diff_mu ^ 2 * inv_gamma[2, 2])
       post <- likel + prior
       post[log_mu > 5] <- -Inf  # cap !!
       return(post)
@@ -157,11 +161,11 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
   }
 
 
-  run_single_chain <- function(chain_id, data) {
+  run_single_chain <- function(chain_id, data, hyper_prior) {
 
     ## initialize arrays for storing draws ##
     nr_of_cust <- nrow(data)
-    nr_of_draws <- (mcmc - 1)%/%thin + 1
+    nr_of_draws <- (mcmc - 1) %/% thin + 1
 
     level_1_draws <- array(NA_real_, dim = c(nr_of_draws, 4, nr_of_cust))
     dimnames(level_1_draws)[[2]] <- c("lambda", "mu", "tau", "z")
@@ -174,9 +178,9 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
 
     ## initialize parameters ##
 
-    level_1 <- level_1_draws[1, , ]
-    level_1["lambda", ] <- mean(data$x)/mean(ifelse(data$t.x == 0, data$T.cal, data$t.x))
-    level_1["mu", ] <- 1/(data$t.x + 0.5/level_1["lambda", ])
+    level_1 <- level_1_draws[1, , ] # nolint
+    level_1["lambda", ] <- mean(data$x) / mean(ifelse(data$t.x == 0, data$T.cal, data$t.x))
+    level_1["mu", ] <- 1 / (data$t.x + 0.5 / level_1["lambda", ])
 
     ## run MCMC chain ##
 
@@ -184,7 +188,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
     hyper_prior$beta_0[1, "log_mu"] <- log(mean(level_1["mu", ]))
 
     for (step in 1:(burnin + mcmc)) {
-      if (step%%trace == 0)
+      if (step %% trace == 0)
         cat("chain:", chain_id, "step:", step, "of", (burnin + mcmc), "\n")
 
       # draw individual-level parameters
@@ -198,17 +202,19 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
       level_1["mu", ] <- draw$mu
 
       # store
-      if ((step - burnin) > 0 & (step - 1 - burnin)%%thin == 0) {
-        idx <- (step - 1 - burnin)%/%thin + 1
-        level_1_draws[idx, , ] <- level_1
+      if ( (step - burnin) > 0 & (step - 1 - burnin) %% thin == 0) {
+        idx <- (step - 1 - burnin) %/% thin + 1
+        level_1_draws[idx, , ] <- level_1 # nolint
         level_2_draws[idx, ] <- c(level_2$beta, level_2$gamma[1, 1], level_2$gamma[1, 2], level_2$gamma[2,
           2])
       }
     }
 
     # convert MCMC draws into coda::mcmc objects
-    return(list(level_1 = lapply(1:nr_of_cust, function(i) mcmc(level_1_draws[, , i], start = burnin, thin = thin)),
-      level_2 = mcmc(level_2_draws, start = burnin, thin = thin)))
+    return(list(
+      "level_1" = lapply(1:nr_of_cust,
+                         function(i) mcmc(level_1_draws[, , i], start = burnin, thin = thin)), # nolint
+      "level_2" = mcmc(level_2_draws, start = burnin, thin = thin)))
   }
 
   # check whether input data meets requirements
@@ -235,7 +241,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
     detectCores())))
   if (ncores > 1)
     cat("running in parallel on", ncores, "cores\n")
-  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores = ncores)
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs, hyper_prior = hyper_prior), mc.cores = ncores)
 
   # merge chains into code::mcmc.list objects
   out <- list(level_1 = lapply(1:nrow(cal.cbs), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
@@ -276,12 +282,12 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
     params$beta <- matrix(params$beta, nrow = 1, ncol = 2)
 
   nr_covars <- nrow(params$beta)
-  covars <- matrix(c(rep(1, n), runif((nr_covars - 1) * n, -1, 1)), nrow = n, ncol = nr_covars)
+  covars <- matrix(c(rep(1, n), runif( (nr_covars - 1) * n, -1, 1)), nrow = n, ncol = nr_covars)
   colnames(covars) <- paste("covariate", 0:(nr_covars - 1), sep = "_")
   colnames(covars)[1] <- "intercept"
 
   # sample log-normal distributed parameters lambda/mu for each customer
-  thetas <- exp((covars %*% params$beta) + mvtnorm::rmvnorm(n, mean = c(0, 0), sigma = params$gamma))
+  thetas <- exp( (covars %*% params$beta) + mvtnorm::rmvnorm(n, mean = c(0, 0), sigma = params$gamma))
   lambdas <- thetas[, 1]
   mus <- thetas[, 2]
 
@@ -293,7 +299,6 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   elog_list <- list()
   for (i in 1:n) {
     lambda <- lambdas[i]
-    mu <- mus[i]
     tau <- taus[i]
     # sample 'sufficiently' large amount of inter-transaction times
     minT <- min(T.cal[i] + max(T.star), tau)

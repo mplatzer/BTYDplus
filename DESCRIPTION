@@ -29,7 +29,8 @@ Suggests:
     gsl,
     covr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    lintr (>= 1.0.0)
 Roxygen: list(wrap = FALSE)
 RoxygenNote: 5.0.1
 LazyData: true

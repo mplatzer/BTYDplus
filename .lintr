@@ -1,0 +1,9 @@
+linters: with_defaults(
+    line_length_linter = line_length_linter(120),
+    multiple_dots_linter = NULL,
+    camel_case_linter = NULL,
+    spaces_left_parentheses_linter = NULL)
+exclusions: list("R/RcppExports.R")
+exclude: "# nolint"
+exclude_start: "# nolint start"
+exclude_end: "# nolint end"

@@ -1,7 +1,7 @@
 context("mcmc")
 
 test_that("Pareto/GGG MCMC", {
-  cat('test Pareto/GGG\n')
+  cat("test Pareto/GGG\n")
 
   # generate artificial Pareto/GGG data
   params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 10, s = 0.8, beta = 12)
@@ -11,7 +11,8 @@ test_that("Pareto/GGG MCMC", {
 
   # estimate parameters
   draws <- pggg.mcmc.DrawParameters(as.data.table(cbs),
-                                    mcmc = 10, burnin = 0, thin = 1, mc.cores = 1, param_init = list(r = 1, alpha = 1, s = 1, beta = 1, t = 1, gamma = 1))
+                                    mcmc = 10, burnin = 0, thin = 1, mc.cores = 1,
+                                    param_init = list(r = 1, alpha = 1, s = 1, beta = 1, t = 1, gamma = 1))
   draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 100, burnin = 20, thin = 10, chains = 2, mc.cores = 1)
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
   expect_equal(length(draws$level_1), n)
@@ -38,7 +39,7 @@ test_that("Pareto/GGG MCMC", {
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
 
   # require less than 10% deviation in estimated parameters
-  ape <- function(act, est) abs(act - est)/act
+  ape <- function(act, est) abs(act - est) / act
   expect_lt(ape(params$r, est$r), 0.1)
   expect_lt(ape(params$alpha, est$alpha), 0.1)
   expect_lt(ape(params$s, est$s), 0.2)  # s hard to estimate

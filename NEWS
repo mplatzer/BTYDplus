@@ -1,5 +1,5 @@
 0.10.9999
-- ...
+- add lintr checks for adhering to consistent code style
 
 0.10.0
 - add a package vignette

@@ -175,7 +175,6 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
   def.par <- par(no.readonly = TRUE)
   pactive <- mcmc.PActive(xstar)
   x.star <- cbs$x.star
-  nf <- layout(mat = matrix(c(1, 2), 2, 1), heights = c(1, 4), TRUE)
   par(mar = c(0, 4, 3, 1))
   xhist <- hist(pactive, plot = F, breaks = seq(0, 1, 0.05))
   barplot(xhist$counts, axes = F, main = "", space = 0, xlab = "", ylab = "")
@@ -191,7 +190,6 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
   abline(0, 1)
   abline(h = seq(0, 1, 0.1), col = "lightgray", lty = "dotted")
   abline(v = seq(0, 1, 0.1), col = "lightgray", lty = "dotted")
-  # abline(h=mean(x.star>0), col='red', lty=4)
   points(mean(pactive[cbs$x == 0]), mean(x.star[cbs$x == 0] > 0), col = "red", pch = "0")
   par(def.par)
   return(NULL)
@@ -233,19 +231,23 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
     n <- unname(draw_idx_cnt[idx])
     if (model == "pggg") {
       params <- as.list(cohort_draws[as.integer(idx), ])
-      cbs <- pggg.GenerateData(n = n, T.cal = 0, T.star = unique(t), params = params)$cbs
+      pggg.GenerateData(n = n, T.cal = 0, T.star = unique(t), params = params)$cbs
     } else if (model == "abe") {
       p <- cohort_draws[as.integer(idx), ]
       params <- list()
       params$beta  <- matrix(p[grepl("^log\\_", names(p))], byrow = TRUE, ncol = 2)
-      params$gamma <- matrix(c(p["var_log_lambda"], p["cov_log_lambda_log_mu"], p["cov_log_lambda_log_mu"], p["var_log_mu"]), ncol = 2)
-      cbs <- abe.GenerateData(n = n, T.cal = 0, T.star = unique(t), params = params)$cbs
+      params$gamma <- matrix(c(p["var_log_lambda"],
+                               p["cov_log_lambda_log_mu"],
+                               p["cov_log_lambda_log_mu"],
+                               p["var_log_mu"]),
+                             ncol = 2)
+      abe.GenerateData(n = n, T.cal = 0, T.star = unique(t), params = params)$cbs
     }
   }))
   pmf <- sapply(1:length(t), function(idx) {
     col <- ifelse(uniqueN(t) == 1, "x.star", paste0("x.star", t[idx]))
     stopifnot(col %in% names(cbs))
-    sapply(x, function(x) sum(cbs[[col]]==x) / sample_size)
+    sapply(x, function(x) sum(cbs[[col]] == x) / sample_size)
   })
   if (length(x) == 1) pmf <- t(pmf)
   rownames(pmf) <- x
@@ -279,7 +281,7 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
 #' mcmc.Expectation(param.draws, t = c(26, 52))
 mcmc.Expectation <- function(draws, t, sample_size = 10000) {
   pmf <- mcmc.pmf(draws, t, 0:100, sample_size = sample_size)
-  apply(pmf * matrix(rep(0:100, length(t)), ncol=length(t)), 2, sum)
+  apply(pmf * matrix(rep(0:100, length(t)), ncol = length(t)), 2, sum)
 }
 
 
@@ -323,12 +325,11 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
   if (length(n.periods.final) > 1 || n.periods.final < 0 || !is.numeric(n.periods.final))
     stop("n.periods.final must be a single numeric value and may not be negative.")
 
-  nr_of_cust <- length(T.cal)
   cohort_draws <- as.matrix(draws$level_2)
   nr_of_draws <- nrow(cohort_draws)
   model <- ifelse(all(c("r", "alpha") %in% colnames(cohort_draws)), "pggg", "abe")
   elog <- rbindlist(lapply(1:nr_of_draws, function(i) {
-    n <- ceiling(sample_size/nr_of_draws)
+    n <- ceiling(sample_size / nr_of_draws)
     if (model == "pggg") {
       params <- as.list(cohort_draws[i, ])
       elog <- pggg.GenerateData(n = n, T.cal = T.tot, T.star = 0, params = params, return.elog = TRUE)$elog
@@ -336,7 +337,11 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
       p <- as.list(cohort_draws[i, ])
       params <- list()
       params$beta  <- matrix(p[grepl("^log\\_", names(p))], byrow = TRUE, ncol = 2)
-      params$gamma <- matrix(c(p["var_log_lambda"], p["cov_log_lambda_log_mu"], p["cov_log_lambda_log_mu"], p["var_log_mu"]), ncol = 2)
+      params$gamma <- matrix(c(p["var_log_lambda"],
+                               p["cov_log_lambda_log_mu"],
+                               p["cov_log_lambda_log_mu"],
+                               p["var_log_mu"]),
+                             ncol = 2)
       elog <- abe.GenerateData(n = n, T.cal = T.tot, T.star = 0, params = params, return.elog = TRUE)$elog
     }
     setDT(elog)
@@ -346,13 +351,12 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
   }))
   setkey(elog, t)
 
-  intervals <- seq(T.tot/n.periods.final, T.tot, length.out = n.periods.final)
+  intervals <- seq(T.tot / n.periods.final, T.tot, length.out = n.periods.final)
   cust.birth.periods <- max(T.cal) - T.cal
   expected.transactions <- sapply(intervals, function(interval) {
     if (interval <= min(cust.birth.periods))
       return(0)
     t <- interval - cust.birth.periods[cust.birth.periods < interval]
-    uts <- unique(t)
     uEs <- sapply(unique(t), function(ut) elog[t < ut, .N] / sample_size)
     names(uEs) <- unique(t)
     sum(uEs[as.character(t)])
@@ -512,15 +516,15 @@ mcmc.PlotFrequencyInCalibration <- function(draws, cal.cbs, censor = 7,
   # expected
   x_est <- sapply(unique(cal.cbs$T.cal), function(tcal) {
     n <- sum(cal.cbs$T.cal == tcal)
-    prop <- mcmc.pmf(draws, t = tcal, x=0:(censor-1), sample_size = sample_size)
-    prop <- c(prop, 1-sum(prop))
+    prop <- mcmc.pmf(draws, t = tcal, x = 0:(censor - 1), sample_size = sample_size)
+    prop <- c(prop, 1 - sum(prop))
     prop * (n / nrow(cal.cbs))
   })
   x_est <- apply(x_est, 1, sum) * nrow(cal.cbs)
 
   mat <- matrix(c(x_act, x_est), nrow = 2, ncol = censor + 1, byrow = TRUE)
   rownames(mat) <- c("n.x.actual", "n.x.expected")
-  colnames(mat) <- c(0:(censor-1), paste0(censor, "+"))
+  colnames(mat) <- c(0:(censor - 1), paste0(censor, "+"))
 
   barplot(mat, beside = TRUE, col = 1:2, main = title, xlab = xlab, ylab = ylab, ylim = c(0, max(x_act) * 1.1))
   legend("topright", legend = c("Actual", "Model"), col = 1:2, lty = 1:2, lwd = 1, xjust = 1)

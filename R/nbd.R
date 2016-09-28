@@ -47,9 +47,12 @@ nbd.EstimateParameters <- function(cal.cbs, par.start = c(1, 1), max.param.value
 #' nbd.cbs.LL(params, cbs)
 nbd.cbs.LL <- function(params, cal.cbs) {
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.cbs.LL")
-  tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
-  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in nbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
-  return(sum(nbd.LL(params, x, T.cal)))
+  tryCatch(x <- cal.cbs$x,
+    error = function(e) stop("cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(T.cal <- cal.cbs$T.cal,
+    error = function(e) stop("cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  ll <- nbd.LL(params, x, T.cal)
+  return(sum(ll))
 }
 
 
@@ -64,9 +67,9 @@ nbd.cbs.LL <- function(params, cal.cbs) {
 #' @seealso \code{\link{nbd.cbs.LL}}
 nbd.LL <- function(params, x, T.cal) {
   max.length <- max(length(x), length(T.cal))
-  if (max.length%%length(x))
+  if (max.length %% length(x))
     warning("Maximum vector length not a multiple of the length of x")
-  if (max.length%%length(T.cal))
+  if (max.length %% length(T.cal))
     warning("Maximum vector length not a multiple of the length of T.cal")
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.LL")
   if (any(x < 0) || !is.numeric(x))
@@ -110,11 +113,11 @@ nbd.LL <- function(params, x, T.cal) {
 #' sum(xstar.est) # expected total number of transactions during holdout
 nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
   max.length <- max(length(T.star), length(x), length(T.cal))
-  if (max.length%%length(T.star))
+  if (max.length %% length(T.star))
     warning("Maximum vector length not a multiple of the length of T.star")
-  if (max.length%%length(x))
+  if (max.length %% length(x))
     warning("Maximum vector length not a multiple of the length of x")
-  if (max.length%%length(T.cal))
+  if (max.length %% length(T.cal))
     warning("Maximum vector length not a multiple of the length of T.cal")
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.ConditionalExpectedTransactions")
   if (any(T.star < 0) || !is.numeric(T.star))
@@ -128,7 +131,7 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
   T.cal <- rep(T.cal, length.out = max.length)
   r <- params[1]
   alpha <- params[2]
-  return(unname(T.star * (r + x)/(alpha + T.cal)))
+  return(unname(T.star * (r + x) / (alpha + T.cal)))
 }
 
 

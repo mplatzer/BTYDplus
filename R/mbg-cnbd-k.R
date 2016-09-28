@@ -70,17 +70,19 @@ xbgcnbd.EstimateParameters <- function(cal.cbs, k = NULL,
 
   # either `k` or `litt` need to be present
   if (is.null(k) & !"litt" %in% colnames(cal.cbs))
-    stop("Either regularity parameter k need to be specified, or a column with logarithmic interpurchase times litt need to be present in cal.cbs")
+    stop("Either regularity parameter k need to be specified, or a ",
+         "column with logarithmic interpurchase times litt need to be present in cal.cbs")
 
   # if `k` is not specified we do grid search for `k`
   if (is.null(k)) {
     params <- list()
     LL <- c()
     for (k in 1:12) {
-      params[[k]] <- tryCatch(xbgcnbd.EstimateParameters(cal.cbs = cal.cbs, k = k, par.start = par.start, max.param.value = max.param.value,
-                                                         trace = trace, dropout_at_zero = dropout_at_zero), error = function(e) {
-                                                           e
-                                                         })
+      params[[k]] <- tryCatch(
+        xbgcnbd.EstimateParameters(
+          cal.cbs = cal.cbs, k = k, par.start = par.start,
+          max.param.value = max.param.value, trace = trace, dropout_at_zero = dropout_at_zero),
+        error = function(e) return(e))
       if (inherits(params[[k]], "error")) {
         params[[k]] <- NULL
         break  # stop if parameters could not be estimated, e.g. if xbgcnbd.LL returns Inf
@@ -105,14 +107,17 @@ xbgcnbd.EstimateParameters <- function(cal.cbs, k = NULL,
     params <- c(k, params)
     loglik <- xbgcnbd.cbs.LL(params = params, cal.cbs = cal.cbs, dropout_at_zero = dropout_at_zero)
     count <<- count + 1
-    if (trace > 0 & count%%trace == 0)
-      cat("xbgcnbd.EstimateParameters - k:", sprintf("%2.0f", k)," step:", sprintf("%4.0f", count), " - ", sprintf("%12.1f", loglik), ":", sprintf("%10.4f",
-                                                                                                                                                   params), "\n")
+    if (trace > 0 & count %% trace == 0) {
+      cat("xbgcnbd.EstimateParameters - k:", sprintf("%2.0f", k),
+          " step:", sprintf("%4.0f", count), " - ",
+          sprintf("%12.1f", loglik), ":", sprintf("%10.4f", params), "\n")
+    }
     return(-1 * loglik)
   }
 
   logparams <- log(par.start)
-  results <- optim(logparams, xbgcnbd.eLL, cal.cbs = cal.cbs, k = k, max.param.value = max.param.value, dropout_at_zero = dropout_at_zero,
+  results <- optim(logparams, xbgcnbd.eLL,
+                   cal.cbs = cal.cbs, k = k, max.param.value = max.param.value, dropout_at_zero = dropout_at_zero,
                    method = "L-BFGS-B")
   estimated.params <- exp(results$par)
   estimated.params[estimated.params > max.param.value] <- max.param.value
@@ -170,24 +175,31 @@ bgcnbd.LL <- function(params, x, t.x, T.cal, litt) {
 xbgcnbd.cbs.LL <- function(params, cal.cbs, dropout_at_zero = NULL) {
   stopifnot(!is.null(dropout_at_zero))
   dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.cbs.LL")
-  tryCatch(x <- cal.cbs$x, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a frequency column labelled \"x\""))
-  tryCatch(t.x <- cal.cbs$t.x, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a recency column labelled \"t.x\""))
-  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
-  tryCatch(litt <- cal.cbs$litt, error = function(e) stop("Error in xbgcnbd.cbs.LL: cal.cbs must have a column for sum over logarithmic inter-transaction-times labelled \"litt\""))
-  return(sum(xbgcnbd.LL(params = params, x = x, t.x = t.x, T.cal = T.cal, litt = litt, dropout_at_zero = dropout_at_zero)))
+  tryCatch(x <- cal.cbs$x,
+    error = function(e) stop("cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(t.x <- cal.cbs$t.x,
+    error = function(e) stop("cal.cbs must have a recency column labelled \"t.x\""))
+  tryCatch(T.cal <- cal.cbs$T.cal,
+    error = function(e) stop("cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  tryCatch(litt <- cal.cbs$litt,
+    error = function(e) stop("cal.cbs must have a column for ",
+                             "sum over logarithmic inter-transaction-times labelled \"litt\""))
+  ll <- xbgcnbd.LL(params = params, x = x, t.x = t.x, T.cal = T.cal,
+                   litt = litt, dropout_at_zero = dropout_at_zero)
+  return(sum(ll))
 }
 
 #' @keywords internal
 xbgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = NULL) {
   stopifnot(!is.null(dropout_at_zero))
   max.length <- max(length(x), length(t.x), length(T.cal))
-  if (max.length%%length(x))
+  if (max.length %% length(x))
     warning("Maximum vector length not a multiple of the length of x")
-  if (max.length%%length(t.x))
+  if (max.length %% length(t.x))
     warning("Maximum vector length not a multiple of the length of t.x")
-  if (max.length%%length(T.cal))
+  if (max.length %% length(T.cal))
     warning("Maximum vector length not a multiple of the length of T.cal")
-  if (max.length%%length(litt))
+  if (max.length %% length(litt))
     warning("Maximum vector length not a multiple of the length of litt")
   dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.LL")
   if (params[1] != floor(params[1]) | params[1] < 1)
@@ -212,14 +224,14 @@ xbgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = NULL) {
   P3 <- lgamma(r + k * x) - lgamma(r) + r * log(alpha)
   P4 <- -1 * (r + k * x) * log(alpha + T.cal)
   S1 <- as.numeric(dropout_at_zero | x > 0) *
-    a/(b + x - 1 + ifelse(dropout_at_zero, 1, 0)) *
-    ((alpha + T.cal)/(alpha + t.x))^(r + k * x)
+    a / (b + x - 1 + ifelse(dropout_at_zero, 1, 0)) *
+    ( (alpha + T.cal) / (alpha + t.x)) ^ (r + k * x)
   S2 <- 1
   if (k > 1) {
     for (j in 1:(k - 1)) {
       S2a <- 1
       for (i in 0:(j - 1)) S2a <- S2a * (r + k * x + i)
-      S2 <- S2 + (S2a * (T.cal - t.x)^j)/(factorial(j) * (alpha + T.cal)^j)
+      S2 <- S2 + (S2a * (T.cal - t.x) ^ j) / (factorial(j) * (alpha + T.cal) ^ j)
     }
   }
   return(P1 + P2 + P3 + P4 + log(S1 + S2))
@@ -318,7 +330,7 @@ xbgcnbd.Expectation <- function(params, t, dropout_at_zero = NULL) {
   if (uniqueN(t) > 100) {
     estimated_time <- system.time(xbgcnbd.Expectation(params, max(t), dropout_at_zero))["elapsed"]
     if (uniqueN(t) * estimated_time > 60) {
-      cat("note: computation will take long for many unique time values (`t`, `T.cal`, `T.star`,...) - consider rounding!")
+      cat("note: computation will take long for many unique time values (`t`, `T.cal`, `T.star`) - consider rounding!")
     }
   }
 
@@ -371,11 +383,11 @@ bgcnbd.PAlive <- function(params, x, t.x, T.cal) {
 xbgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = NULL) {
   stopifnot(!is.null(dropout_at_zero))
   max.length <- max(length(x), length(t.x), length(T.cal))
-  if (max.length%%length(x))
+  if (max.length %% length(x))
     warning("Maximum vector length not a multiple of the length of x")
-  if (max.length%%length(t.x))
+  if (max.length %% length(t.x))
     warning("Maximum vector length not a multiple of the length of t.x")
-  if (max.length%%length(T.cal))
+  if (max.length %% length(T.cal))
     warning("Maximum vector length not a multiple of the length of T.cal")
   dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.PAlive")
   if (params[1] != floor(params[1]) | params[1] < 1)
@@ -394,16 +406,16 @@ xbgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = NULL) {
   alpha <- params[3]
   a <- params[4]
   b <- params[5]
-  P1 <- (a/(b + x - 1 + ifelse(dropout_at_zero, 1, 0))) * ((alpha + T.cal)/(alpha + t.x))^(r + k * x)
+  P1 <- (a / (b + x - 1 + ifelse(dropout_at_zero, 1, 0))) * ( (alpha + T.cal) / (alpha + t.x)) ^ (r + k * x)
   P2 <- 1
   if (k > 1) {
     for (j in 1:(k - 1)) {
       P2a <- 1
       for (i in 0:(j - 1)) P2a <- P2a * (r + k * x + i)
-      P2 <- P2 + ((P2a * (T.cal - t.x)^j)/(factorial(j) * (alpha + T.cal)^j))
+      P2 <- P2 + ( (P2a * (T.cal - t.x) ^ j) / (factorial(j) * (alpha + T.cal) ^ j))
     }
   }
-  palive <- (1/(1 + P1/P2))
+  palive <- (1 / (1 + P1 / P2))
   if (dropout_at_zero == FALSE)
     palive[x == 0] <- 1
   return(palive)
@@ -455,13 +467,13 @@ bgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal
 xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal, dropout_at_zero = NULL) {
   stopifnot(!is.null(dropout_at_zero))
   max.length <- max(length(T.star), length(x), length(t.x), length(T.cal))
-  if (max.length%%length(T.star))
+  if (max.length %% length(T.star))
     warning("Maximum vector length not a multiple of the length of T.star")
-  if (max.length%%length(x))
+  if (max.length %% length(x))
     warning("Maximum vector length not a multiple of the length of x")
-  if (max.length%%length(t.x))
+  if (max.length %% length(t.x))
     warning("Maximum vector length not a multiple of the length of t.x")
-  if (max.length%%length(T.cal))
+  if (max.length %% length(T.cal))
     warning("Maximum vector length not a multiple of the length of T.cal")
   dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.ConditionalExpectedTransactions")
   if (params[1] != floor(params[1]) | params[1] < 1)
@@ -488,17 +500,18 @@ xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
   if (requireNamespace("gsl", quietly = TRUE)) {
     h2f1 <- gsl::hyperg_2F1
   } else {
+    # custom R implementation of h2f1 taken from BTYD source code
     h2f1 <- function(a, b, c, z) {
       lenz <- length(z)
       j <- 0
       uj <- 1:lenz
-      uj <- uj/uj
+      uj <- uj / uj
       y <- uj
       lteps <- 0
       while (lteps < lenz) {
         lasty <- y
         j <- j + 1
-        uj <- uj * (a + j - 1) * (b + j - 1)/(c + j - 1) * z/j
+        uj <- uj * (a + j - 1) * (b + j - 1) / (c + j - 1) * z / j
         y <- y + uj
         lteps <- sum(y == lasty)
       }
@@ -507,19 +520,19 @@ xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
   }
   # approximate via expression for conditional expected transactions for BG/NBD
   # model, but adjust scale parameter by k
-  G <- function(r, alpha, a, b) 1 - (alpha/(alpha + T.star))^r * h2f1(r, b + 1, a + b, T.star/(alpha + T.star))
-  P1 <- (a + b + x - 1 + ifelse(dropout_at_zero, 1, 0))/(a - 1)
+  G <- function(r, alpha, a, b) 1 - (alpha / (alpha + T.star)) ^ r * h2f1(r, b + 1, a + b, T.star / (alpha + T.star))
+  P1 <- (a + b + x - 1 + ifelse(dropout_at_zero, 1, 0)) / (a - 1)
   P2 <- G(r + x, k * alpha + T.cal, a, b + x - 1 + ifelse(dropout_at_zero, 1, 0))
   P3 <- xbgcnbd.PAlive(params = params, x = x, t.x = t.x, T.cal = T.cal, dropout_at_zero = dropout_at_zero)
   exp <- P1 * P2 * P3
   # Adjust bias BG/NBD-based approximation by scaling via the Unconditional
-  # Expectations (for wich we have exact expression). Only do so, if we can 
+  # Expectations (for wich we have exact expression). Only do so, if we can
   # safely assume that the full customer cohort is passed.
   do.bias.corr <- k > 1 && length(x) == length(t.x) && length(x) == length(T.cal) && length(x) >= 100
   if (do.bias.corr) {
     sum.cal <- sum(xbgcnbd.Expectation(params = params, t = T.cal, dropout_at_zero = dropout_at_zero))
     sum.tot <- sum(xbgcnbd.Expectation(params = params, t = T.cal + T.star, dropout_at_zero = dropout_at_zero))
-    bias.corr <- (sum.tot - sum.cal)/sum(exp)
+    bias.corr <- (sum.tot - sum.cal) / sum(exp)
     exp <- exp * bias.corr
   }
   return(unname(exp))
@@ -573,8 +586,10 @@ xbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
                                                title = "Frequency of Repeat Transactions",
                                                dropout_at_zero = NULL) {
   stopifnot(!is.null(dropout_at_zero))
-  tryCatch(x_act <- cal.cbs$x, error = function(e) stop("Error in xbgcnbd.PlotFrequencyInCalibration: cal.cbs must have a frequency column labelled \"x\""))
-  tryCatch(T.cal <- cal.cbs$T.cal, error = function(e) stop("Error in xbgcnbd.PlotFrequencyInCalibration: cal.cbs must have a column for length of time observed labelled \"T.cal\""))
+  tryCatch(x_act <- cal.cbs$x,
+    error = function(e) stop("cal.cbs must have a frequency column labelled \"x\""))
+  tryCatch(T.cal <- cal.cbs$T.cal,
+    error = function(e) stop("cal.cbs must have a column for length of time observed labelled \"T.cal\""))
   dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.PlotFrequencyInCalibration")
 
   # actual
@@ -584,15 +599,15 @@ xbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
   # expected
   x_est <- sapply(unique(T.cal), function(tcal) {
     n <- sum(cal.cbs$T.cal == tcal)
-    prop <- xbgcnbd.pmf(params, t = tcal, x=0:(censor-1), dropout_at_zero = dropout_at_zero)
-    prop <- c(prop, 1-sum(prop))
+    prop <- xbgcnbd.pmf(params, t = tcal, x = 0:(censor - 1), dropout_at_zero = dropout_at_zero)
+    prop <- c(prop, 1 - sum(prop))
     prop * (n / nrow(cal.cbs))
   })
   x_est <- apply(x_est, 1, sum) * nrow(cal.cbs)
 
   mat <- matrix(c(x_act, x_est), nrow = 2, ncol = censor + 1, byrow = TRUE)
   rownames(mat) <- c("n.x.actual", "n.x.expected")
-  colnames(mat) <- c(0:(censor-1), paste0(censor, "+"))
+  colnames(mat) <- c(0:(censor - 1), paste0(censor, "+"))
 
   barplot(mat, beside = TRUE, col = 1:2, main = title, xlab = xlab, ylab = ylab, ylim = c(0, max(mat) * 1.1))
   legend("topright", legend = c("Actual", "Model"), col = 1:2, lty = 1, lwd = 2)
@@ -618,13 +633,15 @@ xbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
 #'   total repeat transactions by all customers.
 #' @export
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog)
 #' params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 #' # Returns a vector containing expected cumulative repeat transactions for 104
 #' # weeks, with every eigth week being reported.
 #' mbgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal,
-#'   T.tot = 104, n.periods.final = 104/8)
+#'   T.tot = 104, n.periods.final = 104 / 8)
+#' }
 mbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final) {
   xbgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, n.periods.final, dropout_at_zero = TRUE)
 }
@@ -646,7 +663,7 @@ xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.perio
   if (length(n.periods.final) > 1 || n.periods.final < 0 || !is.numeric(n.periods.final))
     stop("n.periods.final must be a single numeric value and may not be negative.")
 
-  intervals <- seq(T.tot/n.periods.final, T.tot, length.out = n.periods.final)
+  intervals <- seq(T.tot / n.periods.final, T.tot, length.out = n.periods.final)
   cust.birth.periods <- max(T.cal) - T.cal
   expected.transactions <- sapply(intervals, function(interval) {
     if (interval <= min(cust.birth.periods))
@@ -800,10 +817,10 @@ xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
 #' @param return.elog If \code{TRUE} then the event log is returned in addition
 #'   to the CBS summary.
 #' @return List of length 2:
-##' \itemize{
-##'  \item{\code{cbs }}{A data.frame with a row for each customer and the summary statistic as columns.}
-##'  \item{\code{elog }}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
-##' }
+#' \itemize{
+#'  \item{\code{cbs }}{A data.frame with a row for each customer and the summary statistic as columns.}
+#'  \item{\code{elog }}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
+#' }
 #' @export
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples
@@ -854,7 +871,7 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
     p <- ps[i]
     lambda <- lambdas[i]
     # sample no. of transactions until churn
-    coins <- rbinom(min(10000, 10/p), 1, p)
+    coins <- rbinom(min(10000, 10 / p), 1, p)
     churn <- ifelse(any(coins == 1), min(which(coins == 1)), 10000)
     if (dropout_at_zero)
       churn <- churn - 1
@@ -864,8 +881,12 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
       elog_list[[i]] <- data.table(cust = i, t = times[times <= (max(T.cal) + max(T.star))])
     # determine frequency, recency, etc.
     ts.cal <- times[times <= max(T.cal)]
-    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal) - (max(T.cal) - T.cal[i]), litt = sum(log(diff(ts.cal))),
-                          churn = churn, alive = churn > (length(ts.cal) - 1))
+    cbs_list[[i]] <- list(cust  = i,
+                          x     = length(ts.cal) - 1,
+                          t.x   = max(ts.cal) - (max(T.cal) - T.cal[i]),
+                          litt  = sum(log(diff(ts.cal))),
+                          churn = churn,
+                          alive = churn > (length(ts.cal) - 1))
     for (tstar in T.star) {
       colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
       cbs_list[[i]][[colname]] <- length(times[times > max(T.cal) & times <= (max(T.cal) + tstar)])

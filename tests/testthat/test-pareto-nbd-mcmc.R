@@ -1,7 +1,7 @@
 context("mcmc")
 
 test_that("Pareto/NBD MCMC", {
-  cat('test Pareto/NBD MCMC\n')
+  cat("test Pareto/NBD MCMC\n")
   skip_on_cran()
 
   # generate artificial Pareto/NBD data
@@ -12,7 +12,8 @@ test_that("Pareto/NBD MCMC", {
 
   # estimate parameters
   draws <- pnbd.mcmc.DrawParameters(as.data.table(cbs),
-                                    mcmc = 10, burnin = 0, thin = 1, mc.cores = 1, param_init = list(r = 1, alpha = 1, s = 1, beta = 1))
+                                    mcmc = 10, burnin = 0, thin = 1, mc.cores = 1,
+                                    param_init = list(r = 1, alpha = 1, s = 1, beta = 1))
   draws <- pnbd.mcmc.DrawParameters(cbs, mc.cores = 1)
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
 
@@ -22,7 +23,7 @@ test_that("Pareto/NBD MCMC", {
   expect_true(is.mcmc.list(draws$level_2))
 
   # require less than 20% deviation in estimated parameters
-  ape <- function(act, est) abs(act - est)/act
+  ape <- function(act, est) abs(act - est) / act
   expect_lt(ape(params$r, est$r), 0.2)
   expect_lt(ape(params$alpha, est$alpha), 0.2)
   expect_lt(ape(params$s, est$s), 0.2)

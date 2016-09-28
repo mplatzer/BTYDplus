@@ -54,14 +54,14 @@
 estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "", min = NULL) {
   N <- t <- NULL # suppress checkUsage warnings
   if (!"cust" %in% names(elog))
-    stop("Error in estimateRegularity: elog must have a column labelled \"cust\"")
+    stop("elog must have a column labelled \"cust\"")
   if (!"date" %in% names(elog) & !"t" %in% names(elog))
-    stop("Error in estimateRegularity: elog must have a column labelled \"t\" or \"date\"")
+    stop("elog must have a column labelled \"t\" or \"date\"")
   if (!"t" %in% names(elog))
     elog$t <- as.numeric(elog$date)
   elog_dt <- subset(setDT(copy(elog)), select = c("cust", "t"))
   setkey(elog_dt)
-  elog_dt <- unique(elog_dt)
+  elog_dt <- unique(elog_dt) # nolint
   # discard customers with less than `min` ITTs
   if (is.null(min)) {
     min <- ifelse(method == "wheat", 2, 10)
@@ -75,8 +75,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
   # calculate method specific estimate
   if (method == "wheat") {
     # Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase regularity
-    # with two interpurchase times.' Journal of Marketing Research (1990):
-    # 87-93.
+    # with two interpurchase times.' Journal of Marketing Research (1990): 87-93.
     setkeyv(elog_dt, c("cust", "t"))
     calc_M <- function(itts) sample(tail(itts, 2), 1) / sum(tail(itts, 2))
     M <- elog_dt[, calc_M(diff(t)), by = "cust"]$V1
@@ -105,8 +104,8 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
       # Maximum Likelihood Estimator
       # http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation
       est_k <- function(itts) {
-        s <- log(sum(itts)/length(itts)) - sum(log(itts))/length(itts)
-        fn <- function(v) return((log(v) - digamma(v) - s)^2)
+        s <- log(sum(itts) / length(itts)) - sum(log(itts)) / length(itts)
+        fn <- function(v) return( (log(v) - digamma(v) - s) ^ 2)
         k <- optimize(fn, lower = 0.1, upper = 50)$min
         return(k)
       }
@@ -114,8 +113,8 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
       # Approximation for MLE by Minka
       # http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf
       est_k <- function(itts) {
-        s <- log(sum(itts)/length(itts)) - sum(log(itts))/length(itts)
-        k <- (3 - s + sqrt((s - 3)^2 + 24 * s))/(12 * s)
+        s <- log(sum(itts) / length(itts)) - sum(log(itts)) / length(itts)
+        k <- (3 - s + sqrt( (s - 3) ^ 2 + 24 * s)) / (12 * s)
         return(k)
       }
     } else if (method == "mle-thom") {
@@ -123,20 +122,19 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
       # Reader, and Neil Wrigley. 'An investigation of the assumptions of the
       # NBD model' Applied Statistics (1983): 249-259.
       est_k <- function(itts) {
-        hm <- function(v) exp(sum(log(v))/length(v))
+        hm <- function(v) exp(sum(log(v)) / length(v))
         mu <- log(mean(itts) / hm(itts))
-        k <- (1/(4 * mu)) * (1 + sqrt(1 + 4 * mu/3))
+        k <- (1 / (4 * mu)) * (1 + sqrt(1 + 4 * mu / 3))
         return(k)
       }
     } else if (method == "cv") {
       # Estimate regularity by analyzing coefficient of variation Wu, Couchen,
       # and H-L. Chen. 'A consumer purchasing model with learning and departure
-      # behaviour.'  Journal of the Operational Research Society (2000):
-      # 583-591.
+      # behaviour.'  Journal of the Operational Research Society (2000): 583-591.
       est_k <- function(itts) {
         cv <- sd(itts) / mean(itts)
-        k <- 1 / cv^2
-        return(k)
+        k <- 1 / cv ^ 2
+        return (k)
       }
     }
     ks <- elog_dt[, est_k(diff(t)), by = "cust"]$V1
@@ -365,7 +363,7 @@ elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
 #' inc <- elog2inc(groceryElog)
 #' plot(inc, typ="l", frame = FALSE)
 elog2cum <- function(elog, by = 7, first = FALSE) {
-  t0 <- sales <- N <- cust <- NULL  # suppress checkUsage warnings
+  t0 <- N <- cust <- NULL  # suppress checkUsage warnings
   stopifnot("cust" %in% names(elog))
   stopifnot(is.logical(first) & length(first) == 1)
   is.dt <- is.data.table(elog)
@@ -411,7 +409,7 @@ dc.check.model.params.safe <- function(printnames, params, func) {
   if (!is.null(names(params))) {
     idx <- names(params) != ""
     if (any(printnames[idx] != names(params)[idx])) {
-      stop("Error in ", func, ": Parameter names do not match - ", paste0(printnames, collapse = ","), " != ",
+      stop("Parameter names do not match - ", paste0(printnames, collapse = ","), " != ",
         paste0(names(params), collapse = ","), call. = FALSE)
     }
   }

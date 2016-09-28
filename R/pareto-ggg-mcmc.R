@@ -43,7 +43,7 @@
 pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 50, chains = 2, mc.cores = NULL,
   param_init = NULL, trace = 100) {
 
-  ## methods to sample heterogeneity parameters {r, alpha, s, beta, t, gamma} ##
+  # ** methods to sample heterogeneity parameters {r, alpha, s, beta, t, gamma} **
 
   draw_gamma_params <- function(type, level_1, level_2, hyper_prior) {
     if (type == "lambda") {
@@ -62,18 +62,26 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     slice_sample_gamma_parameters(x, cur_params, hyper, steps = 200, w = 0.1)
   }
 
-  ## methods to sample individual-level parameters ##
+  # ** methods to sample individual-level parameters **
 
   draw_k <- function(data, level_1, level_2) {
-    pggg_slice_sample("k", x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt, k = level_1["k",
-      ], lambda = level_1["lambda", ], mu = level_1["mu", ], tau = level_1["tau", ], t = level_2["t"], gamma = level_2["gamma"],
-      r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
+    pggg_slice_sample("k",
+                      x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt,
+                      k = level_1["k", ], lambda = level_1["lambda", ],
+                      mu = level_1["mu", ], tau = level_1["tau", ],
+                      t = level_2["t"], gamma = level_2["gamma"],
+                      r = level_2["r"], alpha = level_2["alpha"],
+                      s = level_2["s"], beta = level_2["beta"])
   }
 
   draw_lambda <- function(data, level_1, level_2) {
-    pggg_slice_sample("lambda", x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt, k = level_1["k",
-      ], lambda = level_1["lambda", ], mu = level_1["mu", ], tau = level_1["tau", ], t = level_2["t"], gamma = level_2["gamma"],
-      r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
+    pggg_slice_sample("lambda",
+                      x = data$x, tx = data$t.x, Tcal = data$T.cal, litt = data$litt,
+                      k = level_1["k", ], lambda = level_1["lambda", ],
+                      mu = level_1["mu", ], tau = level_1["tau", ],
+                      t = level_2["t"], gamma = level_2["gamma"],
+                      r = level_2["r"], alpha = level_2["alpha"],
+                      s = level_2["s"], beta = level_2["beta"])
   }
 
   draw_mu <- function(data, level_1, level_2) {
@@ -119,12 +127,12 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     return(tau)
   }
 
-  run_single_chain <- function(chain_id, data) {
+  run_single_chain <- function(chain_id, data, hyper_prior) {
 
     ## initialize arrays for storing draws ##
 
     nr_of_cust <- nrow(data)
-    nr_of_draws <- (mcmc - 1)%/%thin + 1
+    nr_of_draws <- (mcmc - 1) %/% thin + 1
     level_2_draws <- array(NA_real_, dim = c(nr_of_draws, 6))
     dimnames(level_2_draws)[[2]] <- c("t", "gamma", "r", "alpha", "s", "beta")
     level_1_draws <- array(NA_real_, dim = c(nr_of_draws, 5, nr_of_cust))
@@ -140,23 +148,23 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     level_2["s"] <- param_init$s
     level_2["beta"] <- param_init$beta
 
-    level_1 <- level_1_draws[1, , ]
+    level_1 <- level_1_draws[1, , ] # nolint
     level_1["k", ] <- 1
-    level_1["lambda", ] <- mean(data$x)/mean(ifelse(data$t.x == 0, data$T.cal, data$t.x))
-    level_1["tau", ] <- data$t.x + 0.5/level_1["lambda", ]
+    level_1["lambda", ] <- mean(data$x) / mean(ifelse(data$t.x == 0, data$T.cal, data$t.x))
+    level_1["tau", ] <- data$t.x + 0.5 / level_1["lambda", ]
     level_1["z", ] <- as.numeric(level_1["tau", ] > data$T.cal)
-    level_1["mu", ] <- 1/level_1["tau", ]
+    level_1["mu", ] <- 1 / level_1["tau", ]
 
     ## run MCMC chain ##
 
     for (step in 1:(burnin + mcmc)) {
-      if (step%%trace == 0)
+      if (step %% trace == 0)
         cat("chain:", chain_id, "step:", step, "of", (burnin + mcmc), "\n")
 
       # store
-      if ((step - burnin) > 0 & (step - 1 - burnin)%%thin == 0) {
-        idx <- (step - 1 - burnin)%/%thin + 1
-        level_1_draws[idx, , ] <- level_1
+      if ( (step - burnin) > 0 & (step - 1 - burnin) %% thin == 0) {
+        idx <- (step - 1 - burnin) %/% thin + 1
+        level_1_draws[idx, , ] <- level_1 # nolint
         level_2_draws[idx, ] <- level_2
       }
 
@@ -174,22 +182,29 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     }
 
     # convert MCMC draws into coda::mcmc objects
-    return(list(level_1 = lapply(1:nr_of_cust, function(i) mcmc(level_1_draws[, , i], start = burnin, thin = thin)),
-      level_2 = mcmc(level_2_draws, start = burnin, thin = thin)))
+    return(list(
+      "level_1" = lapply(1:nr_of_cust,
+                         function(i) mcmc(level_1_draws[, , i], start = burnin, thin = thin)), # nolint
+      "level_2" = mcmc(level_2_draws, start = burnin, thin = thin)))
   }
 
   # set hyper priors
-  hyper_prior <- list(r_1 = 0.001, r_2 = 0.001, alpha_1 = 0.001, alpha_2 = 0.001, s_1 = 0.001, s_2 = 0.001, beta_1 = 0.001,
-    beta_2 = 0.001, t_1 = 0.001, t_2 = 0.001, gamma_1 = 0.001, gamma_2 = 0.001)
+  hyper_prior <- list(r_1 = 0.001, r_2 = 0.001,
+                      alpha_1 = 0.001, alpha_2 = 0.001,
+                      s_1 = 0.001, s_2 = 0.001,
+                      beta_1 = 0.001, beta_2 = 0.001,
+                      t_1 = 0.001, t_2 = 0.001,
+                      gamma_1 = 0.001, gamma_2 = 0.001)
 
   # set param_init (if not passed as argument)
   if (is.null(param_init)) {
     try({
-      df <- cal.cbs[sample(nrow(cal.cbs), min(nrow(cal.cbs), 1000)), ]
-      param_init <- c(1, 1, BTYD::pnbd.EstimateParameters(df))
-      names(param_init) <- c("t", "gamma", "r", "alpha", "s", "beta")
-      param_init <- as.list(param_init)
-    }, silent = TRUE)
+        df <- cal.cbs[sample(nrow(cal.cbs), min(nrow(cal.cbs), 1000)), ]
+        param_init <- c(1, 1, BTYD::pnbd.EstimateParameters(df))
+        names(param_init) <- c("t", "gamma", "r", "alpha", "s", "beta")
+        param_init <- as.list(param_init)
+      },
+      silent = TRUE)
     if (is.null(param_init))
       param_init <- list(t = 1, gamma = 1, r = 1, alpha = 1, s = 1, beta = 1)
     cat("set param_init:", paste(round(unlist(param_init), 4), collapse = ", "), "\n")
@@ -205,7 +220,7 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     detectCores())))
   if (ncores > 1)
     cat("running in parallel on", ncores, "cores\n")
-  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores = ncores)
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs, hyper_prior), mc.cores = ncores)
 
   # merge chains into code::mcmc.list objects
   out <- list(level_1 = lapply(1:nrow(cal.cbs), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
@@ -305,7 +320,6 @@ pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   for (i in 1:n) {
     k <- ks[i]
     lambda <- lambdas[i]
-    mu <- mus[i]
     tau <- taus[i]
     # sample 'sufficiently' large amount of inter-transaction times
     minT <- min(T.cal[i] + max(T.star), tau)

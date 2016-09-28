@@ -22,12 +22,12 @@ test_that("MCMC Helpers", {
   # generate small Pareto/GGG cohort
   pggg.params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12, t = 4, gamma = 2)
   pggg.cbs <- pggg.GenerateData(n = 100, 28, 28, pggg.params, FALSE)$cbs
-  pggg.draws <- pggg.mcmc.DrawParameters(pggg.cbs, mcmc/10, burnin/10, thin/10, chains)
+  pggg.draws <- pggg.mcmc.DrawParameters(pggg.cbs, mcmc / 10, burnin / 10, thin / 10, chains)
 
   # draw future transactions
   pnbd.xstar.draws <- mcmc.DrawFutureTransactions(pnbd.cbs, pnbd.draws)
   expect_is(pnbd.xstar.draws, "matrix")
-  expect_equal(dim(pnbd.xstar.draws), c(mcmc*chains/thin, nrow(pnbd.cbs)))
+  expect_equal(dim(pnbd.xstar.draws), c(mcmc * chains / thin, nrow(pnbd.cbs)))
   size <- 1
   pnbd.xstar.draws1 <- mcmc.DrawFutureTransactions(pnbd.cbs, pnbd.draws, sample_size = size)
   expect_equal(dim(pnbd.xstar.draws1), c(size, nrow(pnbd.cbs)))
@@ -43,7 +43,7 @@ test_that("MCMC Helpers", {
   expect_equal(start(pnbd.draws2$level_2), burnin2)
   expect_equal(start(pnbd.draws2$level_1[[1]]), burnin2)
   pnbd.xstar.draws3 <- mcmc.DrawFutureTransactions(pnbd.cbs, pnbd.draws2)
-  expect_equal(dim(pnbd.xstar.draws3), c((mcmc+burnin-burnin2)*chains/thin, nrow(pnbd.cbs)))
+  expect_equal(dim(pnbd.xstar.draws3), c((mcmc + burnin - burnin2) * chains / thin, nrow(pnbd.cbs)))
 
   # test Palive
   palive <- mcmc.PAlive(pnbd.draws)

@@ -31,10 +31,10 @@
 #' @param param_init List of start values for cohort-level parameters.
 #' @param trace Print logging statement every \code{trace}-th iteration. Not available for \code{mc.cores > 1}.
 #' @return 2-element list:
-##' \itemize{
-##'  \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{lambda}, \code{tau}, \code{z}, \code{mu}}
-##'  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}}
-##' }
+#' \itemize{
+#'  \item{\code{level_1 }}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{lambda}, \code{tau}, \code{z}, \code{mu}}
+#'  \item{\code{level_2 }}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}}
+#' }
 #' @export
 #' @seealso \code{\link{pnbd.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }
 #' @references Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD model and possible extensions.' Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}
@@ -57,7 +57,7 @@
 pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 50, chains = 2, mc.cores = NULL,
   use_data_augmentation = TRUE, param_init = NULL, trace = 100) {
 
-  ## methods to sample heterogeneity parameters {r, alpha, s, beta} ##
+  # ** methods to sample heterogeneity parameters {r, alpha, s, beta} **
 
   draw_gamma_params <- function(type, level_1, level_2, hyper_prior) {
     if (type == "lambda") {
@@ -72,7 +72,7 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     slice_sample_gamma_parameters(x, cur_params, hyper, steps = 50, w = 0.1)
   }
 
-  ## methods to sample individual-level parameters (with data augmentation) ##
+  # ** methods to sample individual-level parameters (with data augmentation) **
 
   draw_lambda <- function(data, level_1, level_2) {
     N <- nrow(data)
@@ -109,7 +109,7 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     t_diff <- Tcal - tx
 
     # sample z
-    p_alive <- 1/(1 + (mu/mu_lam) * (exp(mu_lam * t_diff) - 1))
+    p_alive <- 1 / (1 + (mu / mu_lam) * (exp(mu_lam * t_diff) - 1))
     alive <- p_alive > runif(n = N)
 
     # sample tau
@@ -126,30 +126,36 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
       mu_lam_Tcal <- pmin(700, mu_lam[!alive] * Tcal[!alive])
       # sample with http://en.wikipedia.org/wiki/Inverse_transform_sampling
       rand <- runif(n = sum(!alive))
-      tau[!alive] <- -log((1 - rand) * exp(-mu_lam_tx) + rand * exp(-mu_lam_Tcal))/mu_lam[!alive]
+      tau[!alive] <- -log((1 - rand) * exp(-mu_lam_tx) + rand * exp(-mu_lam_Tcal)) / mu_lam[!alive] # nolint
     }
 
     return(tau)
   }
 
-  ## methods to sample individual-level parameters (without data augmentation) ##
+  # ** methods to sample individual-level parameters (without data augmentation) **
 
   draw_lambda_ma_liu <- function(data, level_1, level_2) {
-    slice_sample_ma_liu("lambda", x = data$x, tx = data$t.x, Tcal = data$T.cal, lambda = level_1["lambda", ],
-      mu = level_1["mu", ], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
+    slice_sample_ma_liu("lambda",
+                        x = data$x, tx = data$t.x, Tcal = data$T.cal,
+                        lambda = level_1["lambda", ], mu = level_1["mu", ],
+                        r = level_2["r"], alpha = level_2["alpha"],
+                        s = level_2["s"], beta = level_2["beta"])
   }
 
   draw_mu_ma_liu <- function(data, level_1, level_2) {
-    slice_sample_ma_liu("mu", x = data$x, tx = data$t.x, Tcal = data$T.cal, lambda = level_1["lambda", ], mu = level_1["mu",
-      ], r = level_2["r"], alpha = level_2["alpha"], s = level_2["s"], beta = level_2["beta"])
+    slice_sample_ma_liu("mu",
+                        x = data$x, tx = data$t.x, Tcal = data$T.cal,
+                        lambda = level_1["lambda", ], mu = level_1["mu", ],
+                        r = level_2["r"], alpha = level_2["alpha"],
+                        s = level_2["s"], beta = level_2["beta"])
   }
 
-  run_single_chain <- function(chain_id = 1, data) {
+  run_single_chain <- function(chain_id = 1, data, hyper_prior) {
 
     ## initialize arrays for storing draws ##
 
     nr_of_cust <- nrow(data)
-    nr_of_draws <- (mcmc - 1)%/%thin + 1
+    nr_of_draws <- (mcmc - 1) %/% thin + 1
     level_2_draws <- array(NA_real_, dim = c(nr_of_draws, 4))
     dimnames(level_2_draws)[[2]] <- c("r", "alpha", "s", "beta")
     level_1_draws <- array(NA_real_, dim = c(nr_of_draws, 4, nr_of_cust))
@@ -163,22 +169,22 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     level_2["s"] <- param_init$s
     level_2["beta"] <- param_init$beta
 
-    level_1 <- level_1_draws[1, , ]
-    level_1["lambda", ] <- mean(data$x)/mean(ifelse(data$t.x == 0, data$T.cal, data$t.x))
-    level_1["tau", ] <- data$t.x + 0.5/level_1["lambda", ]
+    level_1 <- level_1_draws[1, , ] # nolint
+    level_1["lambda", ] <- mean(data$x) / mean(ifelse(data$t.x == 0, data$T.cal, data$t.x))
+    level_1["tau", ] <- data$t.x + 0.5 / level_1["lambda", ]
     level_1["z", ] <- as.numeric(level_1["tau", ] > data$T.cal)
-    level_1["mu", ] <- 1/level_1["tau", ]
+    level_1["mu", ] <- 1 / level_1["tau", ]
 
     ## run MCMC chain ##
 
     for (step in 1:(burnin + mcmc)) {
-      if (step%%trace == 0)
+      if (step %% trace == 0)
         cat("chain:", chain_id, "step:", step, "of", (burnin + mcmc), "\n")
 
       # store
-      if ((step - burnin) > 0 & (step - 1 - burnin)%%thin == 0) {
-        idx <- (step - 1 - burnin)%/%thin + 1
-        level_1_draws[idx, , ] <- level_1
+      if ( (step - burnin) > 0 & (step - 1 - burnin) %% thin == 0) {
+        idx <- (step - 1 - burnin) %/% thin + 1
+        level_1_draws[idx, , ] <- level_1 # nolint
         level_2_draws[idx, ] <- level_2
       }
 
@@ -198,22 +204,27 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     }
 
     # convert MCMC draws into coda::mcmc objects
-    return(list(level_1 = lapply(1:nr_of_cust, function(i) mcmc(level_1_draws[, , i], start = burnin, thin = thin)),
-      level_2 = mcmc(level_2_draws, start = burnin, thin = thin)))
+    return(list(
+      "level_1" = lapply(1:nr_of_cust,
+                         function(i) mcmc(level_1_draws[, , i], start = burnin, thin = thin)), # nolint
+      "level_2" = mcmc(level_2_draws, start = burnin, thin = thin)))
   }
 
   # set hyper priors
-  hyper_prior <- list(r_1 = 0.001, r_2 = 0.001, alpha_1 = 0.001, alpha_2 = 0.001, s_1 = 0.001, s_2 = 0.001, beta_1 = 0.001,
-    beta_2 = 0.001)
+  hyper_prior <- list(r_1 = 0.001, r_2 = 0.001,
+                      alpha_1 = 0.001, alpha_2 = 0.001,
+                      s_1 = 0.001, s_2 = 0.001,
+                      beta_1 = 0.001, beta_2 = 0.001)
 
   # set param_init (if not passed as argument)
   if (is.null(param_init)) {
     try({
-      df <- cal.cbs[sample(nrow(cal.cbs), min(nrow(cal.cbs), 1000)), ]
-      param_init <- BTYD::pnbd.EstimateParameters(df)
-      names(param_init) <- c("r", "alpha", "s", "beta")
-      param_init <- as.list(param_init)
-    }, silent = TRUE)
+        df <- cal.cbs[sample(nrow(cal.cbs), min(nrow(cal.cbs), 1000)), ]
+        param_init <- BTYD::pnbd.EstimateParameters(df)
+        names(param_init) <- c("r", "alpha", "s", "beta")
+        param_init <- as.list(param_init)
+      },
+      silent = TRUE)
     if (is.null(param_init))
       param_init <- list(r = 1, alpha = 1, s = 1, beta = 1)
     cat("set param_init:", paste(round(unlist(param_init), 4), collapse = ", "), "\n")
@@ -229,7 +240,7 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     detectCores())))
   if (ncores > 1)
     cat("running in parallel on", ncores, "cores\n")
-  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs), mc.cores = ncores)
+  draws <- mclapply(1:chains, function(i) run_single_chain(i, cal.cbs, hyper_prior), mc.cores = ncores)
 
   # merge chains into code::mcmc.list objects
   out <- list(level_1 = lapply(1:nrow(cal.cbs), function(i) mcmc.list(lapply(draws, function(draw) draw$level_1[[i]]))),
