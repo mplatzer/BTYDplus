@@ -36,7 +36,7 @@ distributed intertransaction times, whereas values significantly larger than
 \details{
 Estimation is either done by 1) assuming the same degree of regularity across
 all customers (Wheat & Morrison (1990) via \code{method = "wheat"}), or 2) by
-estimating regularity for each customer seperately, as the shape parameter of
+estimating regularity for each customer separately, as the shape parameter of
 a fitted gamma distribution, and then return the median across estimates. The
 latter methods, though, require sufficient (>=\code{min}) transactions per
 customer.

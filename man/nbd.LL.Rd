@@ -15,7 +15,7 @@ order.}
 \item{T.cal}{Total time of observation period.}
 }
 \value{
-A numberic vector of log-likelihoods.
+A numeric vector of log-likelihoods.
 }
 \description{
 Calculate the log-likelihood of the NBD model

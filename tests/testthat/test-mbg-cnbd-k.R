@@ -51,7 +51,7 @@ test_that("MBG/CNBD-k", {
   mat <- mbgcnbd.PlotFrequencyInCalibration(params, cbs, 7)
   expect_equal(mat[1, ], mat[2, ], tolerance = 0.1)
 
-  # check that bias correction doesn't screw up single estimates
+  # check that bias correction does not screw up single estimates
   expect_lt(mbgcnbd.ConditionalExpectedTransactions(params, T.star = 32, x = c(0, 1), t.x = c(0, 12), T.cal = 32)[2], 1)
   expect_true(mbgcnbd.ConditionalExpectedTransactions(params, T.star = 32, x = 3, t.x = 12, T.cal = 32) !=
                 mbgcnbd.ConditionalExpectedTransactions(params, T.star = 32, x = 2, t.x = 12, T.cal = 32))

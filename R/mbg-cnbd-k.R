@@ -12,9 +12,9 @@
 #'   easily generated based on the complete event log of a customer cohort with
 #'   \code{\link{elog2cbs}}.
 #' @param k Integer-valued degree of regularity for Erlang-k distributed
-#'   interpurchase times. By default this \code{k} is not provdied, and a grid
+#'   interpurchase times. By default this \code{k} is not provided, and a grid
 #'   search from 1 to 12 is performed in order to determine the best-fitting
-#'   \code{k}. The grid search is stopped early, if the log-likelihood doesn't
+#'   \code{k}. The grid search is stopped early, if the log-likelihood does not
 #'   increase anymore when increasing k beyond 4.
 #' @param par.start Initial (M)BG/CNBD-k parameters. A vector with \code{r},
 #'   \code{alpha}, \code{a} and \code{b} in that order.

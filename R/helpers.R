@@ -10,7 +10,7 @@
 #'
 #' Estimation is either done by 1) assuming the same degree of regularity across
 #' all customers (Wheat & Morrison (1990) via \code{method = "wheat"}), or 2) by
-#' estimating regularity for each customer seperately, as the shape parameter of
+#' estimating regularity for each customer separately, as the shape parameter of
 #' a fitted gamma distribution, and then return the median across estimates. The
 #' latter methods, though, require sufficient (>=\code{min}) transactions per
 #' customer.
@@ -77,8 +77,8 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
     # Wheat, Rita D., and Donald G. Morrison.  'Estimating purchase regularity
     # with two interpurchase times.' Journal of Marketing Research (1990): 87-93.
     setkeyv(elog_dt, c("cust", "t"))
-    calc_M <- function(itts) sample(tail(itts, 2), 1) / sum(tail(itts, 2))
-    M <- elog_dt[, calc_M(diff(t)), by = "cust"]$V1
+    calcM <- function(itts) sample(utils::tail(itts, 2), 1) / sum(utils::tail(itts, 2))
+    M <- elog_dt[, calcM(diff(t)), by = "cust"]$V1
     if (var(M) == 0) stop("No customers with sufficient number of transactions.")
     r <- (1 - 4 * var(M)) / (8 * var(M))
     if (plot) {
@@ -223,28 +223,28 @@ plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
 #' customer-by-sufficient-statistic (CBS) \code{data.frame}, with a row for each
 #' customer, which is the required data format for estimating model parameters.
 #'
-#' The time unit for expressing `t.x`, `T.cal` and `litt` are determined via the
-#' argument `units`, which is passed forward to method `difftime`, and defaults
-#' to `weeks`.
+#' The time unit for expressing \code{t.x}, \code{T.cal} and \code{litt} are
+#' determined via the argument \code{units}, which is passed forward to method
+#' \code{difftime}, and defaults to \code{weeks}.
 #'
-#' Argument `T.tot` allows one to specify the end of the observation period,
+#' Argument \code{T.tot} allows one to specify the end of the observation period,
 #' i.e. the last possible date of an event to still be included in the event
-#' log. If `T.tot` is not provided, then the date of the last recorded event
+#' log. If  \code{T.tot} is not provided, then the date of the last recorded event
 #' will be assumed to coincide with the end of the observation period. If
-#' `T.tot` is provided, then any event that occurs after that date is discarded.
+#'  \code{T.tot} is provided, then any event that occurs after that date is discarded.
 #'
-#' Argument `T.cal` allows one to split the summary statistics into a
+#' Argument \code{T.cal} allows one to split the summary statistics into a
 #' calibration and a holdout period. This can be useful for evaluating
-#' forecasting accuracy for a given dataset. If `T.cal` is not provided, then
-#' the whole observation period is considered, and is then subsequently used for
-#' for estimating model parameters. If it is provided, then the returned
-#' `data.frame` contains two additional fields, with `x.star` representing the
-#' number of repeat transactions during the holdout period of length `T.star`.
-#' And only those customers are contained, who have had at least one event
-#' during the calibration period.
+#' forecasting accuracy for a given dataset. If \code{T.cal} is not provided,
+#' then the whole observation period is considered, and is then subsequently
+#' used for for estimating model parameters. If it is provided, then the
+#' returned \code{data.frame} contains two additional fields, with \code{x.star}
+#' representing the number of repeat transactions during the holdout period of
+#' length \code{T.star}. And only those customers are contained, who have had at
+#' least one event during the calibration period.
 #'
 #' Transactions with identical \code{cust} and \code{date} field are treated as
-#' a single transaction, with `sales` being summed up.
+#' a single transaction, with \code{sales} being summed up.
 #'
 #' @param elog Event log, a \code{data.frame} with field \code{cust} for the
 #'   customer ID and field \code{date} for the date/time of the event, which
@@ -260,7 +260,7 @@ plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
 #'  \item{\code{cust}}{Customer id (unique key).}
 #'  \item{\code{x}}{Number of recurring events in calibration period.}
 #'  \item{\code{t.x}}{Time between first and last event in calibration period.}
-#'  \item{\code{litt}}{Sum of logarithmic intertransaction timings durint calibration period.}
+#'  \item{\code{litt}}{Sum of logarithmic intertransaction timings during calibration period.}
 #'  \item{\code{sales}}{Sum of sales in calibration period. Only if \code{elog$sales} is provided.}
 #'  \item{\code{first}}{Date of first transaction in calibration period.}
 #'  \item{\code{T.cal}}{Time between first event and end of calibration period.}

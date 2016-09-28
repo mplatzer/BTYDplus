@@ -32,7 +32,7 @@ mcmc.PAlive <- function(draws) {
 #' @param T.star Length of period for which future transactions are counted.
 #' @param sample_size Number of samples to draw. Defaults to the same number of
 #'   parameter draws that are passed to \code{draws}.
-#' @return 2-dim matrix [draw x cust] with sampled future transactions.
+#' @return 2-dim matrix [draw x customer] with sampled future transactions.
 #' @export
 #' @examples
 #' data("groceryElog")

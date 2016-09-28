@@ -19,7 +19,7 @@ data.frame.}
 parameter draws that are passed to \code{draws}.}
 }
 \value{
-2-dim matrix [draw x cust] with sampled future transactions.
+2-dim matrix [draw x customer] with sampled future transactions.
 }
 \description{
 For each customer and each provided MCMC parameter draw this method will

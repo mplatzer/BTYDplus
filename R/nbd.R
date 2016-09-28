@@ -62,7 +62,7 @@ nbd.cbs.LL <- function(params, cal.cbs) {
 #'   order.
 #' @param x Frequency, i.e. number of re-purchases.
 #' @param T.cal Total time of observation period.
-#' @return A numberic vector of log-likelihoods.
+#' @return A numeric vector of log-likelihoods.
 #' @export
 #' @seealso \code{\link{nbd.cbs.LL}}
 nbd.LL <- function(params, x, T.cal) {

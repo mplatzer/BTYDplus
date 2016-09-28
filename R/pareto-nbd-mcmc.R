@@ -7,7 +7,7 @@
 #' See \code{demo('pareto-ggg')} for how to apply this model.
 #'
 #' method 1) If \code{use_data_augmentation==TRUE} MCMC scheme takes advantage of
-#' conjugate priors for drawing lambda and mu, by augmentating the parameter space
+#' conjugate priors for drawing lambda and mu, by augmenting the parameter space
 #' with unobserved lifetime 'tau' and activity status 'z'. See technical appendix
 #' to (Abe 2009).
 #'
