@@ -11,11 +11,11 @@ r_binary_packages:
   - coda
   - Rcpp
   - gsl
-  - lintr
 
 r_packages:
   - BTYD
   - data.table
+  - lintr
 
 after_success:
   - Rscript -e 'covr::codecov()'
