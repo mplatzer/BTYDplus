@@ -33,16 +33,16 @@ test_that("BG/CNBD-k", {
   inc.tracking <- elog2inc(elog, by = 1)
   expect_equal(BTYD::bgnbd.PlotTrackingInc(params[-1], cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
                bgcnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
-               tolerance = 0.001)
+               tolerance = 0.01)
   expect_silent(bgcnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking,
                                        xticklab = 1:length(inc.tracking)))
   expect_equal(BTYD::bgnbd.ExpectedCumulativeTransactions(params[-1], 11, 39, 12),
                bgcnbd.ExpectedCumulativeTransactions(params, 11, 39, 12),
-               tolerance = 0.001)
+               tolerance = 0.01)
   cu.tracking <- cumsum(inc.tracking)
   expect_equal(BTYD::bgnbd.PlotTrackingCum(params[-1], cbs$T.cal, 32 + 32, cu.tracking),
                bgcnbd.PlotTrackingCum(params, cbs$T.cal, 32 + 32, cu.tracking),
-               tolerance = 0.001)
+               tolerance = 0.01)
 
   # generate artificial BG/CNBD-k data
   set.seed(1)
