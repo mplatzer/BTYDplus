@@ -397,13 +397,16 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 #' @seealso \code{\link{mcmc.PlotTrackingInc}}
 #'   \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2cum}}
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 #' cum <- elog2cum(groceryElog)
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs,
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
-#' mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 104, cum,
-#'   sample_size = 400)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs)
+#' mat <- mcmc.PlotTrackingCum(param.draws,
+#'   T.cal = cbs$T.cal,
+#'   T.tot = max(cbs$T.cal + cbs$T.star),
+#'   actual.cu.tracking.data = cum)
+#' }
 mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
                                  xlab = "Week", ylab = "Cumulative Transactions",
                                  xticklab = NULL, title = "Tracking Cumulative Transactions",
@@ -451,13 +454,16 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 #' @seealso \code{\link{mcmc.PlotTrackingCum}}
 #'   \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}}
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 #' inc <- elog2inc(groceryElog)
-#' param.draws <- pnbd.mcmc.DrawParameters(cbs,
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
-#' mat <- mcmc.PlotTrackingInc(param.draws, cbs$T.cal, T.tot = 104, inc,
-#'   sample_size = 400)
+#' param.draws <- pnbd.mcmc.DrawParameters(cbs)
+#' mat <- mcmc.PlotTrackingInc(param.draws,
+#'   T.cal = cbs$T.cal,
+#'   T.tot = max(cbs$T.cal + cbs$T.star),
+#'   actual.inc.tracking.data = inc)
+#' }
 mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data,
                                  xlab = "Week", ylab = "Transactions",
                                  xticklab = NULL, title = "Tracking Weekly Transactions",

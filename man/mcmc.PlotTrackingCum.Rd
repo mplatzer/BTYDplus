@@ -51,13 +51,16 @@ return result varies from one call to another. Larger values of
 \code{sample_size} will generate more stable results.
 }
 \examples{
+\dontrun{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 cum <- elog2cum(groceryElog)
-param.draws <- pnbd.mcmc.DrawParameters(cbs,
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
-mat <- mcmc.PlotTrackingCum(param.draws, cbs$T.cal, T.tot = 104, cum,
-  sample_size = 400)
+param.draws <- pnbd.mcmc.DrawParameters(cbs)
+mat <- mcmc.PlotTrackingCum(param.draws,
+  T.cal = cbs$T.cal,
+  T.tot = max(cbs$T.cal + cbs$T.star),
+  actual.cu.tracking.data = cum)
+}
 }
 \seealso{
 \code{\link{mcmc.PlotTrackingInc}}
