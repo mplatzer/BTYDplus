@@ -9,7 +9,7 @@ using namespace Rcpp;
 // faster than compared with diversitree::mcmc.
 
 // The algorithm is described in detail in Neal R.M. 2003. Slice sampling.
-// Annals of Statistics 31:705-767. which describes *why* this algorithm works. 
+// Annals of Statistics 31:705-767. which describes *why* this algorithm works.
 // The approach differs from normal Metropolis-Hastings algorithms, and from
 // Gibbs samplers, but shares the Gibbs sampler property of every update being
 // accepted.  Nothing is required except the ability to evaluate the function at
@@ -36,28 +36,28 @@ using namespace Rcpp;
 //   y0 - rexp(1)
 // All other steps remain unmodified.
 
-NumericVector slice_sample_cpp(double (*logfn)(NumericVector, NumericVector), 
+NumericVector slice_sample_cpp(double (*logfn)(NumericVector, NumericVector),
                         NumericVector params,
-                        NumericVector x0, 
-                        int steps = 10, 
+                        NumericVector x0,
+                        int steps = 10,
                         double w = 1,
-                        double lower = -INFINITY, 
+                        double lower = -INFINITY,
                         double upper = INFINITY) {
 
   double u, r0, r1, logy, logz, logys;
   NumericVector x, xs, L, R;
-  
+
   x = clone(x0);
   L = clone(x0);
   R = clone(x0);
   logy = logfn(x, params);
 
   for (int i = 0; i < steps; i++) {
-    
+
     for (int j = 0; j < x0.size(); j++) {
       // draw uniformly from [0, y]
       logz = logy - rexp(1)[0];
-      
+
       // expand search range
       u = runif(1)[0] * w;
       L[j] = x[j] - u;
@@ -66,7 +66,7 @@ NumericVector slice_sample_cpp(double (*logfn)(NumericVector, NumericVector),
         L[j] = L[j] - w;
       while ( R[j] < upper && logfn(R, params) > logz )
         R[j] = R[j] + w;
-      
+
       // sample until draw is within valid range
       r0 = std::max(L[j], lower);
       r1 = std::min(R[j], upper);
@@ -77,7 +77,7 @@ NumericVector slice_sample_cpp(double (*logfn)(NumericVector, NumericVector),
         cnt++;
         xs[j] = runif(1, r0, r1)[0];
         logys = logfn(xs, params);
-        if ( logys > logz ) 
+        if ( logys > logz )
           break;
         if ( xs[j] < x[j] )
           r0 = xs[j];
@@ -85,23 +85,23 @@ NumericVector slice_sample_cpp(double (*logfn)(NumericVector, NumericVector),
           r1 = xs[j];
       } while (cnt<1e4);
       if (cnt==1e4) ::Rf_error("slice_sample_cpp loop did not finish");
-      
+
       x = clone(xs);
       logy = logys;
     }
   }
-  
+
   return x;
 }
 
 // // draw from gamma distribution (for test purposes)
-// 
+//
 // double post_gamma(NumericVector x, NumericVector params) {
 //   double alpha = params[0];
 //   double beta = params[1];
 //   return (alpha - 1) * log(x[0]) - beta * x[0];
 // }
-// 
+//
 // // [[Rcpp::export]]
 // NumericVector slice_sample_gamma(double alpha, double beta, double lower, double upper) {
 //   NumericVector params = NumericVector::create(alpha, beta);
@@ -110,14 +110,14 @@ NumericVector slice_sample_cpp(double (*logfn)(NumericVector, NumericVector),
 //   double w = 3 * sqrt(alpha) / beta; // approx size of (q95-q05)
 //   return slice_sample_cpp(post_gamma, params, x0, steps, w, lower, upper);
 // }
-// 
+//
 // // draw from multivariate normal distribution (for test purposes)
-// 
+//
 // double post_mvnorm(NumericVector x, NumericVector sigma) {
-//   return -log(2*3.141593) -0.5 * log(sigma[0]*sigma[3]-sigma[1]*sigma[2]) -0.5 * (1/(sigma[0]*sigma[3]-sigma[1]*sigma[2])) * 
+//   return -log(2*3.141593) -0.5 * log(sigma[0]*sigma[3]-sigma[1]*sigma[2]) -0.5 * (1/(sigma[0]*sigma[3]-sigma[1]*sigma[2])) *
 //     (x[0]*x[0]*sigma[3] - x[0]*x[1]*sigma[2] - x[0]*x[1]*sigma[1] + x[1]*x[1]*sigma[0]);
 // }
-// 
+//
 // // [[Rcpp::export]]
 // NumericVector slice_sample_mvnorm(NumericVector sigma) {
 //   NumericVector x0 = NumericVector::create(0.2, 0.3);
@@ -137,15 +137,15 @@ double post_gamma_parameters(NumericVector log_data, NumericVector params) {
   double hyper2 = params[4];
   double hyper3 = params[5];
   double hyper4 = params[6];
-  return len_x * (shape * log(rate) - lgamma(shape)) + (shape-1) * sum_log_x - rate * sum_x + 
+  return len_x * (shape * log(rate) - lgamma(shape)) + (shape-1) * sum_log_x - rate * sum_x +
     (hyper1 - 1) * log(shape) - (shape * hyper2) +
     (hyper3 - 1) * log(rate) - (rate * hyper4);
 }
 
 // [[Rcpp::export]]
-NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector init, 
+NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector init,
                                             NumericVector hyper, double steps = 20, double w = 1) {
-  NumericVector params = NumericVector::create(data.size(), sum(data), sum(log(data)), 
+  NumericVector params = NumericVector::create(data.size(), sum(data), sum(log(data)),
                                                 hyper[0], hyper[1], hyper[2], hyper[3]);
   return exp(slice_sample_cpp(post_gamma_parameters, params, log(init), steps, w, -INFINITY, INFINITY));
 }
@@ -179,18 +179,18 @@ NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector in
 */
 
 
-// 
+//
 // working R implementation of slice sampling
 //
 //slice_sample <- function(logfn, x0, steps, w, lower=-Inf, upper=Inf) {
-//  
+//
 //  x <- x0
 //  logy <- logfn(x0)
-//  
+//
 //  for (i in 1:steps) {
 //    # draw uniformly from [0, y]
 //    logz <- logy - rexp(1)
-//    
+//
 //    # expand search range
 //    u <- runif(1) * w
 //    L <- x - u
@@ -199,7 +199,7 @@ NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector in
 //      L <- L - w
 //    while ( R < upper && logfn(R) > logz )
 //      R <- R + w
-//    
+//
 //    # sample until draw is within valid range
 //    r0 <- max(L, lower)
 //    r1 <- min(R, upper)
@@ -213,7 +213,7 @@ NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector in
 //    x <- xs
 //    logy <- logys
 //  }
-//  
+//
 //  return(x)
 //}
 
@@ -242,7 +242,7 @@ double post_lambda_ma_liu(NumericVector data, NumericVector params) {
     return -INFINITY; // avoid numeric underflow
   } else {
     return (r-1) * log(lambda_) - (lambda_*alpha) +
-      x * log(lambda_) - log(lambda_+mu) + 
+      x * log(lambda_) - log(lambda_+mu) +
       log(mu*exp(-tx*(lambda_+mu))+lambda_*exp(-Tcal*(lambda_+mu)));
   }
 }
@@ -258,25 +258,25 @@ double post_mu_ma_liu(NumericVector data, NumericVector params) {
 //  double alpha  = params[6];
   double s      = params[7];
   double beta   = params[8];
-  if ( log(lambda+mu_) - log(lambda) < 1e-10 ) {  
+  if ( log(lambda+mu_) - log(lambda) < 1e-10 ) {
     return -INFINITY; // avoid numeric underflow
   } else {
     return (s-1) * log(mu_) - (mu_*beta) +
-      x * log(lambda) - log(lambda+mu_) + 
+      x * log(lambda) - log(lambda+mu_) +
       log(mu_*exp(-tx*(lambda+mu_))+lambda*exp(-Tcal*(lambda+mu_)));
   }
 }
 
 
 // [[Rcpp::export]]
-NumericVector slice_sample_ma_liu(String what, 
+NumericVector slice_sample_ma_liu(String what,
                                   NumericVector x, NumericVector tx, NumericVector Tcal,
                                   NumericVector lambda, NumericVector mu,
                                   double r, double alpha, double s, double beta) {
   int N = x.size();
   NumericVector out(N);
   for (int i=0; i<N; i++) {
-    // Rcpp::Rcout << i << " x:" << x[i] << " tx:" << tx[i] << " Tcal:" << Tcal[i] << " lambda:" << lambda[i] << " mu:" << mu[i] << " r:" << r << " alpha:" << alpha << " s:" << s << " beta:" << beta << " - " << std::endl;    
+    // Rcpp::Rcout << i << " x:" << x[i] << " tx:" << tx[i] << " Tcal:" << Tcal[i] << " lambda:" << lambda[i] << " mu:" << mu[i] << " r:" << r << " alpha:" << alpha << " s:" << s << " beta:" << beta << " - " << std::endl;
     NumericVector params = NumericVector::create(x[i], tx[i], Tcal[i], lambda[i], mu[i], r, alpha, s, beta);
     if (what == "lambda") {
       out[i] = slice_sample_cpp(post_lambda_ma_liu, params, NumericVector::create(lambda[i]), 3, 3 * sqrt(r) / alpha, 1e-5, 1e+5)[0];
@@ -307,25 +307,25 @@ double pggg_palive_integrand(double x, double params[6]) {
 double simpson38(double (*fn)(double, double[6]), double a, double b, double fn_params[6]) {
   // http://en.wikipedia.org/wiki/Simpson%27s_rule#Simpson.27s_3.2F8_rule_.28for_n_intervals.29
   double n = 12.0;
-  double integral = (3.0/8.0) * ((b-a)/n) * 
-    (fn(a, fn_params) + 
-    3 * fn(a+(1/n)*(b-a), fn_params) + 
-    3 * fn(a+(2/n)*(b-a), fn_params) + 
-    2 * fn(a+(3/n)*(b-a), fn_params) + 
-    3 * fn(a+(4/n)*(b-a), fn_params) + 
-    3 * fn(a+(5/n)*(b-a), fn_params) + 
-    2 * fn(a+(6/n)*(b-a), fn_params) + 
-    3 * fn(a+(7/n)*(b-a), fn_params) + 
-    3 * fn(a+(8/n)*(b-a), fn_params) + 
-    2 * fn(a+(9/n)*(b-a), fn_params) +     
-    3 * fn(a+(10/n)*(b-a), fn_params) + 
-    3 * fn(a+(11/n)*(b-a), fn_params) + 
+  double integral = (3.0/8.0) * ((b-a)/n) *
+    (fn(a, fn_params) +
+    3 * fn(a+(1/n)*(b-a), fn_params) +
+    3 * fn(a+(2/n)*(b-a), fn_params) +
+    2 * fn(a+(3/n)*(b-a), fn_params) +
+    3 * fn(a+(4/n)*(b-a), fn_params) +
+    3 * fn(a+(5/n)*(b-a), fn_params) +
+    2 * fn(a+(6/n)*(b-a), fn_params) +
+    3 * fn(a+(7/n)*(b-a), fn_params) +
+    3 * fn(a+(8/n)*(b-a), fn_params) +
+    2 * fn(a+(9/n)*(b-a), fn_params) +
+    3 * fn(a+(10/n)*(b-a), fn_params) +
+    3 * fn(a+(11/n)*(b-a), fn_params) +
     fn(b, fn_params));
   return(integral);
 }
 
 // [[Rcpp::export]]
-NumericVector pggg_palive(NumericVector x, NumericVector tx, NumericVector Tcal, 
+NumericVector pggg_palive(NumericVector x, NumericVector tx, NumericVector Tcal,
                            NumericVector k, NumericVector lambda, NumericVector mu) {
   int N = x.size();
   NumericVector out(N);
@@ -359,8 +359,8 @@ double pggg_post_tau(NumericVector data, NumericVector params) {
 //  double r      = params[10];
 //  double alpha  = params[11];
 //  double s      = params[12];
-//  double beta   = params[13];  
-  
+//  double beta   = params[13];
+
   return(-mu*tau_ + ::Rf_pgamma(tau_, k, 1/(k*lambda), 0, 1));
 }
 
@@ -381,10 +381,10 @@ double pggg_post_k(NumericVector data, NumericVector params) {
 //  double alpha  = params[11];
 //  double s      = params[12];
 //  double beta   = params[13];
-  
+
   double log_one_minus_F = ::Rf_pgamma(std::min(Tcal, tau) - tx, k_, 1/(k_*lambda), 0, 1);
   return (t-1) * log(k_) - (k_*gamma) +
-    k_ * x * log(k_*lambda) - x * lgamma(k_) - k_ * lambda * tx + (k_-1) * litt + 
+    k_ * x * log(k_*lambda) - x * lgamma(k_) - k_ * lambda * tx + (k_-1) * litt +
     log_one_minus_F;
 }
 
@@ -403,8 +403,8 @@ double pggg_post_lambda(NumericVector data, NumericVector params) {
   double r       = params[10];
   double alpha   = params[11];
 //  double s       = params[12];
-//  double beta    = params[13];  
-  
+//  double beta    = params[13];
+
   double log_one_minus_F = ::Rf_pgamma(std::min(Tcal, tau) - tx, k, 1/(k*lambda_), 0, 1);
   return (r-1) * log(lambda_) - (lambda_*alpha) +
     k * x * log(lambda_) - k * lambda_ * tx +
@@ -413,17 +413,17 @@ double pggg_post_lambda(NumericVector data, NumericVector params) {
 
 
 // [[Rcpp::export]]
-NumericVector pggg_slice_sample(String what, 
+NumericVector pggg_slice_sample(String what,
                                   NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector litt,
                                   NumericVector k, NumericVector lambda, NumericVector mu, NumericVector tau,
                                   double t, double gamma, double r, double alpha, double s, double beta) {
   int N = x.size();
   NumericVector out(N);
-  
+
   for (int i=0; i<N; i++) {
     NumericVector params = NumericVector::create(
-                              x[i], tx[i], Tcal[i], litt[i], 
-                              k[i], lambda[i], mu[i], tau[i], 
+                              x[i], tx[i], Tcal[i], litt[i],
+                              k[i], lambda[i], mu[i], tau[i],
                               t, gamma, r, alpha, s, beta);
     //Rcpp::Rcout << i << " - " << x[i] << " - " << tx[i] << " - " << Tcal[i] << " - " << litt[i] << " - " << k[i] << " - " << lambda[i] << " - " << mu[i] << " - " << tau[i] << " - " << t << " - " << gamma << " - " << r << " - " << alpha << " - " << s << " - " << beta << " - " << std::endl;
     if (what == "k") {
@@ -440,7 +440,7 @@ NumericVector pggg_slice_sample(String what,
 
 
 /*** R
-  # unit-test slice sampling of pggg_post_tau, by comparing results to pareto/nbd (k=1), 
+  # unit-test slice sampling of pggg_post_tau, by comparing results to pareto/nbd (k=1),
   #   where we can draw directly via http://en.wikipedia.org/wiki/Inverse_transform_sampling
   x <- 0
   tx <- 8
@@ -450,8 +450,8 @@ NumericVector pggg_slice_sample(String what,
   lambda <- 1.2
   mu <- 0.01
   n <- 10^4
-  draws1 <- pggg_slice_sample("tau", rep(x, n), rep(tx, n), rep(Tcal, n), rep(litt, n), 
-                               rep(k, n), rep(lambda, n), rep(mu, n), rep(0, n), 
+  draws1 <- pggg_slice_sample("tau", rep(x, n), rep(tx, n), rep(Tcal, n), rep(litt, n),
+                               rep(k, n), rep(lambda, n), rep(mu, n), rep(0, n),
                                1,1,1,1,1,1)
   rand <- runif(n)
   draws2 <- -log( (1-rand)*exp(-(mu+lambda) * tx) + rand*exp(-(mu+lambda) * Tcal)) / (mu+lambda)
@@ -484,7 +484,7 @@ NumericVector pggg_slice_sample(String what,
   res1 <- pggg_palive(x, tx, Tcal, k, lambda, mu)
   # R implementation
   ff <- function(y, tx, k, lambda, mu) (1-pgamma(y-tx, k, k*lambda)) * exp(-mu*y)
-  res2 <- ff(Tcal, tx, k, lambda, mu) / (ff(Tcal, tx, k, lambda, mu) + 
+  res2 <- ff(Tcal, tx, k, lambda, mu) / (ff(Tcal, tx, k, lambda, mu) +
                                    mu * integrate(ff, lower=tx, upper=Tcal, tx=tx, k=k, lambda=lambda, mu=mu)$value)
   # R implementation for k=1
   la_mu <- lambda + mu
@@ -541,7 +541,7 @@ double xbgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_ze
 NumericVector xbgcnbd_exp_cpp(NumericVector params, NumericVector t, bool dropout_at_zero = false) {
   int N = t.size();
   NumericVector res = rep(0.0, N);
-  
+
   // heuristic: stop infinite sum at 99.9% quantile of NBD; but at least 100
   int k        = params[0];
   double r     = params[1];
@@ -555,7 +555,7 @@ NumericVector xbgcnbd_exp_cpp(NumericVector params, NumericVector t, bool dropou
     for (int i=1; i<stop; i++) {
       add = i * xbgcnbd_pmf_cpp(params, t[j], i, dropout_at_zero);
       res[j] += add;
-      if (add < 1e-8 & i >= 100) {
+      if ((add < 1e-8) & (i >= 100)) {
         //Rcpp::Rcout << " break:" << i << std::endl;
         break;
       }
