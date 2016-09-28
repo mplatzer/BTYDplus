@@ -1,5 +1,6 @@
-0.10.9999
+0.10.1
 - add lintr checks for adhering to consistent code style
+- run spellcheck for docs
 
 0.10.0
 - add a package vignette
