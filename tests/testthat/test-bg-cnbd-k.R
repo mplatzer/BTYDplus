@@ -29,7 +29,7 @@ test_that("BG/CNBD-k", {
   expect_equal(unname(BTYD::bgnbd.pmf(params[-1], 32, 0:2)),
                unname(bgcnbd.pmf(params, 32, 0:2)))
   expect_equal(BTYD::bgnbd.PlotFrequencyInCalibration(params[-1], cbs, 7),
-               bgcnbd.PlotFrequencyInCalibration(params, cbs, 7), tolerance = 0.001)
+               bgcnbd.PlotFrequencyInCalibration(params, cbs, 7), tolerance = 0.01)
   inc.tracking <- elog2inc(elog, by = 1)
   expect_equal(BTYD::bgnbd.PlotTrackingInc(params[-1], cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
                bgcnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
