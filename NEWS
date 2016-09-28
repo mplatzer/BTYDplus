@@ -1,3 +1,7 @@
+0.10.2
+- avoid internal C++ compile warning message
+- R CMD CHECK now returns 0 errors and 0 warnings
+
 0.10.1
 - add lintr checks for adhering to consistent code style
 - run spellcheck for docs
