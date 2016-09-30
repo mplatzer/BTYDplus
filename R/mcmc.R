@@ -172,27 +172,22 @@ mcmc.setBurnin <- function(draws, burnin) {
 #' xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 #' mcmc.plotPActiveDiagnostic(cbs, xstar.draws)
 mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for P(active)") {
-  def.par <- par(no.readonly = TRUE)
   pactive <- mcmc.PActive(xstar)
   x.star <- cbs$x.star
-  par(mar = c(0, 4, 3, 1))
-  xhist <- hist(pactive, plot = F, breaks = seq(0, 1, 0.05))
-  barplot(xhist$counts, axes = F, main = "", space = 0, xlab = "", ylab = "")
-  title(title)
-  par(mar = c(4, 4, 0, 2), mgp = c(2.5, 1, 0))
+  op <- par(mar = c(4, 4, 2, 2), mgp = c(2.5, 1, 0))
   cuts <- unique(quantile(c(0, pactive, 1), seq(0, 1, 0.1)))
   spls.y <- sapply(split(x.star > 0, cut(pactive, breaks = cuts, include.lowest = T)), mean)
   spls.x <- sapply(split(pactive, cut(pactive, breaks = cuts, include.lowest = T)), mean)
-  plot(spls.x, spls.y, typ = "b", xlim = c(0, 1), ylim = c(0, 1), frame = 0, axes = F, xlab = "Estimated P(active)",
-    ylab = "Actual Share of Actives")
+  plot(spls.x, spls.y, typ = "b", xlim = c(0, 1), ylim = c(0, 1), frame = 0, axes = F,
+       xlab = "Estimated P(active)", ylab = "Actual Share of Actives", main = title)
   axis(side = 1, at = seq(0, 1, 0.1), pos = 0, labels = paste(100 * seq(0, 1, 0.1), "%"))
   axis(side = 2, at = seq(0, 1, 0.1), pos = 0, labels = paste(100 * seq(0, 1, 0.1), "%"), las = 2)
   abline(0, 1)
   abline(h = seq(0, 1, 0.1), col = "lightgray", lty = "dotted")
   abline(v = seq(0, 1, 0.1), col = "lightgray", lty = "dotted")
   points(mean(pactive[cbs$x == 0]), mean(x.star[cbs$x == 0] > 0), col = "red", pch = "0")
-  par(def.par)
-  return(NULL)
+  par(op)
+  invisible()
 }
 
 
