@@ -214,6 +214,7 @@ plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
     text(headers[1],  x = T.cal - (T.cal - T.0) / 2, y = ymax, col = "#454545", cex = 0.8)
     if (T.cal < T.tot) text(headers[2], x = T.cal + (T.tot - T.cal) / 2, y = ymax, col = "#454545", cex = 0.8)
   }
+  invisible()
 }
 
 
