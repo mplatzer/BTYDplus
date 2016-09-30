@@ -6,7 +6,9 @@ test_that("Pareto/NBD MCMC", {
   # test Pareto/NBD data generator
   params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
   n <- 5
-  sim <- pggg.GenerateData(5, c(26, 26, 28.5, 52, 52), 52, params)
+  T.cal <- c(26, 26, 28.5, 52, 52)
+  T.star <- 52
+  sim <- pggg.GenerateData(5, T.cal, T.star, params)
   expect_equal(names(sim), c("cbs", "elog"))
   expect_is(sim$cbs, "data.frame")
   expect_is(sim$elog, "data.frame")

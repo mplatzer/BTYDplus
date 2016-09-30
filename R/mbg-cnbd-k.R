@@ -871,7 +871,6 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, dropout_at_zer
 
   # sample intertransaction timings & churn
   elog <- rbindlist(lapply(1:n, function(i) {
-    p <- ps[i]
     lambda <- lambdas[i]
     churn <- churns[i]
     # sample transaction times
