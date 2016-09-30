@@ -29,7 +29,7 @@ test_that("Pareto/NBD (Abe) MCMC", {
 
   est <- round(summary(draws$level_2)$quantiles[, "50%"], 3)
   # require less than 5% deviation in estimated location parameter beta
-  expect_equal(est.beta, params$beta, tolerance = 0.05)
+  expect_equal(matrix(est[1:6], ncol = 2, byrow = T), params$beta, tolerance = 0.05)
   # variance parameter gamma is difficult to identify, particularly for mu;
   # hence we increase tolerance to 10%
   expect_equal(unname(est["var_log_lambda"]), params$gamma[1, 1], tolerance = 0.1)

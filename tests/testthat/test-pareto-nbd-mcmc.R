@@ -47,7 +47,9 @@ test_that("Pareto/NBD MCMC", {
   # generate artificial Pareto/NBD data
   set.seed(1)
   params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
-  sim <- pnbd.GenerateData(5000, 52, 52, params)
+  n <- 5000
+  sim <- pnbd.GenerateData(n, 52, 52, params)
+  cbs <- sim$cbs
 
   # test basic parameter estimation
   draws <- pnbd.mcmc.DrawParameters(as.data.table(cbs),
