@@ -327,7 +327,7 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
     n <- ceiling(sample_size / nr_of_draws)
     if (model == "pggg") {
       params <- as.list(cohort_draws[i, ])
-      elog <- pggg.GenerateData(n = n, T.cal = T.tot, T.star = 0, params = params, return.elog = TRUE)$elog
+      elog <- pggg.GenerateData(n = n, T.cal = T.tot, T.star = 0, params = params)$elog
     } else if (model == "abe") {
       p <- as.list(cohort_draws[i, ])
       params <- list()
@@ -337,7 +337,7 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
                                p["cov_log_lambda_log_mu"],
                                p["var_log_mu"]),
                              ncol = 2)
-      elog <- abe.GenerateData(n = n, T.cal = T.tot, T.star = 0, params = params, return.elog = TRUE)$elog
+      elog <- abe.GenerateData(n = n, T.cal = T.tot, T.star = 0, params = params)$elog
     }
     setDT(elog)
     elog$cust <- paste0(elog$cust, "_", i)

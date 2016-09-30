@@ -6,8 +6,8 @@ test_that("Pareto/GGG MCMC", {
   # generate artificial Pareto/GGG data
   params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 10, s = 0.8, beta = 12)
   n <- 100
-  expect_silent(pggg.GenerateData(n, 52, c(26, 52), params, TRUE))
-  cbs <- pggg.GenerateData(n, 52, 52, params, FALSE)$cbs
+  expect_silent(pggg.GenerateData(n, 52, c(26, 52), params))
+  cbs <- pggg.GenerateData(n, 52, 52, params)$cbs
 
   # estimate parameters
   draws <- pggg.mcmc.DrawParameters(as.data.table(cbs),
@@ -16,8 +16,8 @@ test_that("Pareto/GGG MCMC", {
   draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 100, burnin = 20, thin = 10, chains = 2, mc.cores = 1)
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
   expect_equal(length(draws$level_1), n)
-  expect_true(is.mcmc.list(draws$level_1[[1]]))
-  expect_true(is.mcmc.list(draws$level_2))
+  expect_true(coda::is.mcmc.list(draws$level_1[[1]]))
+  expect_true(coda::is.mcmc.list(draws$level_2))
 
   # estimate future transactions
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
@@ -30,22 +30,17 @@ test_that("Pareto/GGG MCMC", {
   skip_on_appveyor()
 
   # generate artificial Pareto/GGG data
+  set.seed(1)
   params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 10, s = 0.8, beta = 12)
   n <- 5000
-  cbs <- pggg.GenerateData(n, 52, 52, params, TRUE)$cbs
+  cbs <- pggg.GenerateData(n, 52, 52, params)$cbs
 
   # estimate parameters
-  draws <- pggg.mcmc.DrawParameters(cbs)
+  draws <- pggg.mcmc.DrawParameters(cbs, mc.cores = 1)
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
 
   # require less than 10% deviation in estimated parameters
-  ape <- function(act, est) abs(act - est) / act
-  expect_lt(ape(params$r, est$r), 0.1)
-  expect_lt(ape(params$alpha, est$alpha), 0.1)
-  expect_lt(ape(params$s, est$s), 0.2)  # s hard to estimate
-  expect_lt(ape(params$beta, est$beta), 0.4)  # beta hard to estimate
-  expect_lt(ape(params$t, est$t), 0.1)
-  expect_lt(ape(params$gamma, est$gamma), 0.1)
+  expect_equal(params, est, tolerance = 0.1)
 
   # estimate future transactions & P(alive) & P(active)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
@@ -54,9 +49,9 @@ test_that("Pareto/GGG MCMC", {
   cbs$palive <- mcmc.PAlive(draws)
 
   # require less than 5% deviation
-  expect_lt(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.05)
-  expect_lt(ape(sum(cbs$palive), sum(cbs$alive)), 0.05)
-  expect_lt(ape(sum(cbs$x.star > 0), sum(cbs$pactive)), 0.05)
+  expect_equal(sum(cbs$x.star), sum(cbs$x.est), tolerance = 0.05)
+  expect_equal(sum(cbs$palive), sum(cbs$alive), tolerance = 0.05)
+  expect_equal(sum(cbs$x.star > 0), sum(cbs$pactive), tolerance = 0.05)
 
   expect_true(min(cbs$x.star) >= 0)
   expect_true(all(cbs$x.star == round(cbs$x.star)))

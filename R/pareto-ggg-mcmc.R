@@ -263,6 +263,7 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
   abline(v = 1, lty = 3)
   abline(v = median(ks), col = "red")
   par(op)
+  invisible()
 }
 
 
@@ -275,22 +276,25 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params A list of model parameters \code{r},
 #'   \code{alpha}, \code{s}, \code{beta}, \code{t} and \code{gamma}.
-#' @param return.elog If \code{TRUE} then the event log is returned in addition
-#'   to the CBS summary.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
-#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
-#' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
+#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 #' @export
+#' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
 #' @examples
 #' params <- list(t = 4.5, gamma = 1.5, r = 5, alpha = 10, s = 0.8, beta = 12)
-#' data <- pggg.GenerateData(n = 1000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
+#' data <- pggg.GenerateData(n = 1000, T.cal = 32, T.star = 32, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
-pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
+pggg.GenerateData <- function(n, T.cal, T.star, params) {
 
-  if (length(T.cal) == 1)
-    T.cal <- rep(T.cal, n)
+  # set start date for each customer, so that they share same T.cal date
+  T.cal <- rep(T.cal, length.out = n)
+  T.zero <- max(T.cal) - rep(T.cal, length.out = n)
+
+  date.zero <- as.POSIXct("2000-01-01 00:00:00 CEST")
+  date.cal <- date.zero + max(T.cal) * 3600 * 24 * 7
+  date.tot <- date.cal + T.star * 3600 * 24 * 7
 
   # sample regularity parameter k for each customer
   if (all(c("t", "gamma") %in% names(params))) {
@@ -315,14 +319,12 @@ pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   taus <- rexp(n, rate = mus)
 
   # sample intertransaction timings & churn
-  cbs_list <- list()
-  elog_list <- list()
-  for (i in 1:n) {
+  elog <- rbindlist(lapply(1:n, function(i) {
     k <- ks[i]
     lambda <- lambdas[i]
     tau <- taus[i]
     # sample 'sufficiently' large amount of inter-transaction times
-    minT <- min(T.cal[i] + max(T.star), tau)
+    minT <- min(T.cal + max(T.star), tau)
     nr_of_itt_draws <- max(10, round(minT * lambda))
     itts <- rgamma(nr_of_itt_draws * 2, shape = k, rate = k * lambda)
     if (sum(itts) < minT)
@@ -331,31 +333,29 @@ pggg.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
       itts <- c(itts, rgamma(nr_of_itt_draws * 800, shape = k, rate = k * lambda))
     if (sum(itts) < minT)
       stop("not enough inter-transaction times sampled: ", sum(itts), " < ", minT)
-    times <- cumsum(c(0, itts))
-    times <- times[times <= tau]
-    if (return.elog)
-      elog_list[[i]] <- data.table(cust = i, t = times[times <= (T.cal[i] + max(T.star))])
-    # determine frequency, recency, etc.
-    ts.cal <- times[times <= T.cal[i]]
-    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), litt = ifelse(length(ts.cal) -
-      1 == 0, 0, sum(log(itts[1:(length(ts.cal) - 1)]))), alive = tau > T.cal[i])
-    for (tstar in T.star) {
-      colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
-      cbs_list[[i]][[colname]] <- length(times[times > max(T.cal) & times <= (max(T.cal) + tstar)])
-    }
+    ts <- cumsum(c(0, itts))
+    ts <- ts[ts <= tau]  # trim to lifetime
+    ts <- ts[ts <= (T.cal[i] + max(T.star))] # trim to observation length
+    ts <- T.zero[i] + ts # shift by T_0
+    dates <- date.zero + ts * 3600 * 24 * 7 # convert to dates
+    data.table(cust = i, t = ts, date = dates)
+  }))
+
+  # convert to CBS
+  cbs <- elog2cbs(elog, T.cal = date.cal, T.tot = date.tot[1])
+  if (length(T.star) > 1) {
+    setnames(cbs, "x.star", paste0("x.star", T.star[1]))
+    set(cbs, j = "T.star", value = NULL)
+    sapply(2:length(T.star), function(j) {
+      set(cbs, j = paste0("x.star", T.star[j]),
+          value = elog2cbs(elog, T.cal = date.cal, T.tot = date.tot[j])$x.star)
+      return()
+    })
   }
-  cbs <- setDF(rbindlist(cbs_list))
-  cbs$k <- ks
-  cbs$lambda <- lambdas
-  cbs$mu <- mus
-  cbs$tau <- taus
-  cbs$T.cal <- T.cal
-  if (length(T.star) == 1)
-    cbs$T.star <- T.star
-  rownames(cbs) <- NULL
-  out <- list(cbs = cbs)
-  if (return.elog) {
-    out$elog <- setDF(rbindlist(elog_list))
-  }
-  return(out)
+  set(cbs, j = "k", value = ks)
+  set(cbs, j = "lambda", value = lambdas)
+  set(cbs, j = "mu", value = mus)
+  set(cbs, j = "tau", value = taus)
+  set(cbs, j = "alive", value = (T.zero + taus) > T.cal)
+  return(list(cbs = setDF(cbs), elog = setDF(elog)))
 }

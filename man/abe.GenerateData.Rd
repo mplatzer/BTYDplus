@@ -4,7 +4,7 @@
 \alias{abe.GenerateData}
 \title{Simulate data according to Pareto/NBD (Abe) model assumptions}
 \usage{
-abe.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
+abe.GenerateData(n, T.cal, T.star, params)
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -16,14 +16,11 @@ is assumed that customers have different 'birth' dates, i.e.
 \item{T.star}{Length of holdout period. This may be a vector.}
 
 \item{params}{A list of model parameters: \code{beta} and \code{gamma}.}
-
-\item{return.elog}{If \code{TRUE} then the event log is returned in addition
-to the CBS summary.}
 }
 \value{
 List of length 2:
 \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
-\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
+\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 }
 \description{
 Simulate data according to Pareto/NBD (Abe) model assumptions
@@ -33,7 +30,7 @@ Simulate data according to Pareto/NBD (Abe) model assumptions
 params <- list()
 params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
 params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
-data <- abe.GenerateData(n = 2000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
+data <- abe.GenerateData(n = 2000, T.cal = 32, T.star = 32, params)
 cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 elog <- data$elog  # Event log - one row per event/purchase
 }

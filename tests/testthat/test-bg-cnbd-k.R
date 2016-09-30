@@ -10,8 +10,7 @@ test_that("BG/CNBD-k", {
   data <- bgcnbd.GenerateData(n = n,
                               T.cal = round(runif(n, 4, 32) / 4) * 4,
                               T.star = 32,
-                              params = params,
-                              return.elog = TRUE)
+                              params = params)
   cbs  <- data$cbs
   elog <- data$elog
   params.est.btyd <- BTYD::bgnbd.EstimateParameters(cbs)
@@ -51,8 +50,7 @@ test_that("BG/CNBD-k", {
   data <- bgcnbd.GenerateData(n = n,
                               T.cal = round(runif(n, 7, 70) / 7) * 7,
                               T.star = c(32, 64),
-                              params = params,
-                              return.elog = TRUE)
+                              params = params)
   cbs <- data$cbs
   elog <- data$elog
 

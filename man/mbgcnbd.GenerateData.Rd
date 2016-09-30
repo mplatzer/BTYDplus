@@ -5,9 +5,9 @@
 \alias{mbgcnbd.GenerateData}
 \title{Simulate data according to (M)BG/CNBD-k model assumptions}
 \usage{
-mbgcnbd.GenerateData(n, T.cal, T.star = NULL, params, return.elog = FALSE)
+mbgcnbd.GenerateData(n, T.cal, T.star = NULL, params)
 
-bgcnbd.GenerateData(n, T.cal, T.star = NULL, params, return.elog = FALSE)
+bgcnbd.GenerateData(n, T.cal, T.star = NULL, params)
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -20,24 +20,18 @@ is assumed that customers have different 'birth' dates, i.e.
 
 \item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
-
-\item{return.elog}{If \code{TRUE} then the event log is returned in addition
-to the CBS summary.}
 }
 \value{
 List of length 2:
-\itemize{
- \item{\code{cbs }}{A data.frame with a row for each customer and the summary statistic as columns.}
- \item{\code{elog }}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
-}
+\item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
+\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 }
 \description{
 Simulate data according to (M)BG/CNBD-k model assumptions
 }
 \examples{
 params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32,
-  params, return.elog = TRUE)
+data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32, params)
 
 # customer by sufficient summary statistic - one row per customer
 head(data$cbs)

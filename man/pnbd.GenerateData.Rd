@@ -4,7 +4,7 @@
 \alias{pnbd.GenerateData}
 \title{Simulate data according to Pareto/NBD model assumptions}
 \usage{
-pnbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
+pnbd.GenerateData(n, T.cal, T.star, params)
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -17,21 +17,18 @@ is assumed that customers have different 'birth' dates, i.e.
 
 \item{params}{A list of model parameters \code{r},
 \code{alpha}, \code{s}, \code{beta}.}
-
-\item{return.elog}{If \code{TRUE} then the event log is returned in addition
-to the CBS summary.}
 }
 \value{
 List of length 2:
 \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
-\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
+\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 }
 \description{
 Simulate data according to Pareto/NBD model assumptions
 }
 \examples{
 params <- list(r = 5, alpha = 10, s = 0.8, beta = 12)
-data <- pnbd.GenerateData(n = 1000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
+data <- pnbd.GenerateData(n = 1000, T.cal = 32, T.star = 32, params)
 cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 elog <- data$elog  # Event log - one row per event/purchase
 }
