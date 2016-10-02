@@ -43,8 +43,7 @@ test_that("Pareto/GGG MCMC", {
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
 
   # require less than 10% deviation in estimated parameters
-  expect_equal(params[1:4], est[1:4], tolerance = 0.1)
-  expect_equal(params[5:6], est[5:6], tolerance = 0.2)
+  expect_equal(params, est, tolerance = 0.1)
 
   # estimate future transactions & P(alive) & P(active)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
