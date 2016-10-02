@@ -639,8 +639,10 @@ xbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
 #' params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 #' # Returns a vector containing expected cumulative repeat transactions for 104
 #' # weeks, with every eigth week being reported.
-#' mbgcnbd.ExpectedCumulativeTransactions(params, T.cal = cbs$T.cal,
-#'   T.tot = 104, n.periods.final = 104 / 8)
+#' mbgcnbd.ExpectedCumulativeTransactions(params,
+#'   T.cal = cbs$T.cal,
+#'   T.tot = 104,
+#'   n.periods.final = 104 / 8)
 #' }
 mbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.periods.final) {
   xbgcnbd.ExpectedCumulativeTransactions(params, T.cal, T.tot, n.periods.final, dropout_at_zero = TRUE)

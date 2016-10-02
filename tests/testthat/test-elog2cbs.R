@@ -4,6 +4,7 @@ test_that("elog2cbs", {
   cat("test elog2cbs")
 
   elog <- data.frame(cust = c(1, 1, 1, 1, 1, 2, 3), date = Sys.Date() + c(0, 14, 14, 28, 35, 7, 24))
+  elog_time <- data.frame(cust = c(1, 1, 1, 1, 1, 2, 3), date = Sys.time() + c(0, 14, 14, 28, 35, 7, 24))
   elog_dt <- as.data.table(elog)
   elog_dt[, first := min(date), by = "cust"]
   elog_s <- copy(elog_dt)
@@ -14,6 +15,10 @@ test_that("elog2cbs", {
   # check that the return type matches the input type
   expect_is(elog2cbs(elog), "data.frame")
   expect_is(elog2cbs(elog_dt), "data.table")
+
+  # check that we can also properly handle POSIXt
+  expect_equal(elog2cbs(elog_time, units = "secs", T.cal = as.character(min(elog_time$date) + 21))[, 1:4],
+               elog2cbs(elog, units = "days", T.cal = as.character(Sys.Date() + 21))[, 1:4])
 
   # check column names
   expect_named(elog2cbs(elog),
