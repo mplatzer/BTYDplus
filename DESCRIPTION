@@ -1,7 +1,7 @@
 Package: BTYDplus
 Type: Package
 Title: Probabilistic Models for Assessing and Predicting your Customer Base
-Version: 0.11.9999
+Version: 0.11.1
 Authors@R: person("Michael", "Platzer", email = "michael.platzer@gmail.com", role = c("aut", "cre"))
 Description: Provides advanced statistical methods to describe and predict customers'
   purchase behavior in a non-contractual setting. It uses historic transaction records to fit a

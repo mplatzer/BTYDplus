@@ -1,5 +1,5 @@
-0.11.9999
-- ...
+0.11.1
+- hot fix for broken `elog2cbs` in `0.11.0` release
 
 0.11.0
 - rewrote `*.GenerateData` methods
