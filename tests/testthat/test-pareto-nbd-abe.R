@@ -9,13 +9,19 @@ test_that("Pareto/NBD (Abe) MCMC", {
   params <- list()
   params$beta <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
   params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
-  expect_silent(abe.GenerateData(n = 100, T.cal = 32, T.star = c(16, 32), params, return.elog = TRUE))
+  expect_silent(abe.GenerateData(n = 100, T.cal = 32, T.star = c(16, 32), params))
   n <- 5000
-  cbs <- abe.GenerateData(n, T.cal = 32, T.star = 32, params, return.elog = FALSE)$cbs
+  sim <- abe.GenerateData(n,
+                          round(runif(n, 36, 96) / 12) * 12,
+                          36,
+                          params)
+  cbs <- sim$cbs
 
-  # estimate parameters
+  # test basic parameter estimation
   draws <- abe.mcmc.DrawParameters(as.data.table(cbs), covariates = c("covariate_1"),
                                    mcmc = 10, burnin = 0, thin = 1, mc.cores = 1)
+
+  # test parameter recovery
   draws <- abe.mcmc.DrawParameters(cbs, covariates = c("covariate_1", "covariate_2"), mc.cores = 1)
 
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
@@ -24,17 +30,17 @@ test_that("Pareto/NBD (Abe) MCMC", {
     "log_lambda_covariate_2", "log_mu_covariate_2", "var_log_lambda", "cov_log_lambda_log_mu", "var_log_mu") %in%
     colnames(as.matrix(draws$level_2))))
   expect_equal(length(draws$level_1), n)
-  expect_true(is.mcmc.list(draws$level_1[[1]]))
-  expect_true(is.mcmc.list(draws$level_2))
+  expect_true(coda::is.mcmc.list(draws$level_1[[1]]))
+  expect_true(coda::is.mcmc.list(draws$level_2))
 
   est <- round(summary(draws$level_2)$quantiles[, "50%"], 3)
-  # require less than 20% deviation in estimated location parameter beta
-  est.beta <- matrix(est[1:6], ncol = 2, byrow = T)
-  expect_lt(max(abs((est.beta - params$beta) / params$beta)), 0.2)
-  # variance parameter gamma is difficult to identify, particularly for mu; hence we relax our checks
-  expect_lt((est["var_log_lambda"] - params$gamma[1, 1]) / params$gamma[1, 1], 0.3)
-  expect_lt(abs(est["cov_log_lambda_log_mu"] - params$gamma[1, 2]), 0.05)
-  # disabled test: expect_lt((est['var_log_mu'] - params$gamma[2,2]) / params$gamma[2,2], 0.30)
+  # require less than 5% deviation in estimated location parameter beta
+  expect_equal(matrix(est[1:6], ncol = 2, byrow = T), params$beta, tolerance = 0.05)
+  # variance parameter gamma is difficult to identify, particularly for mu;
+  # hence we increase tolerance to 10%
+  expect_equal(unname(est["var_log_lambda"]), params$gamma[1, 1], tolerance = 0.1)
+  expect_equal(unname(est["cov_log_lambda_log_mu"]), params$gamma[1, 2], tolerance = 0.1)
+  expect_equal(unname(est["var_log_mu"]), params$gamma[2, 2], tolerance = 0.1)
 
   # estimate future transactions & P(alive)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)
@@ -43,10 +49,9 @@ test_that("Pareto/NBD (Abe) MCMC", {
   cbs$palive <- mcmc.PAlive(draws)
 
   # require less than 10% deviation in aggregated future transactions
-  ape <- function(act, est) abs(act - est) / act
-  expect_lt(ape(sum(cbs$x.star), sum(cbs$x.est)), 0.1)
-  expect_lt(ape(sum(cbs$palive), sum(cbs$alive)), 0.1)
-  expect_lt(ape(sum(cbs$x.star > 0), sum(cbs$pactive)), 0.1)
+  expect_equal(sum(cbs$x.star), sum(cbs$x.est), tolerance = 0.1)
+  expect_equal(sum(cbs$palive), sum(cbs$alive), tolerance = 0.1)
+  expect_equal(sum(cbs$x.star > 0), sum(cbs$pactive), tolerance = 0.1)
 
   expect_true(min(cbs$x.star) >= 0)
   expect_true(all(cbs$x.star == round(cbs$x.star)))

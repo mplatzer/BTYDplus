@@ -260,24 +260,26 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
 #'   \eqn{max(T.cal)-T.cal}.
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params A list of model parameters: \code{beta} and \code{gamma}.
-#' @param return.elog If \code{TRUE} then the event log is returned in addition
-#'   to the CBS summary.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
-#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
+#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 #' @export
 #' @examples
 #' # generate artificial Pareto/NBD (Abe) with 2 covariates
 #' params <- list()
 #' params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
 #' params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
-#' data <- abe.GenerateData(n = 2000, T.cal = 32, T.star = 32, params, return.elog = TRUE)
+#' data <- abe.GenerateData(n = 2000, T.cal = 32, T.star = 32, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
-abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
+abe.GenerateData <- function(n, T.cal, T.star, params) {
 
-  if (length(T.cal) == 1)
-    T.cal <- rep(T.cal, n)
+  # set start date for each customer, so that they share same T.cal date
+  T.cal.fix <- max(T.cal)
+  T.cal <- rep(T.cal, length.out = n)
+  T.zero <- T.cal.fix - T.cal
+  date.zero <- as.POSIXct("2000-01-01 00:00:00 CEST")
+
   if (!is.matrix(params$beta))
     params$beta <- matrix(params$beta, nrow = 1, ncol = 2)
 
@@ -294,47 +296,42 @@ abe.GenerateData <- function(n, T.cal, T.star, params, return.elog = FALSE) {
   # sample lifetime for each customer
   taus <- rexp(n, rate = mus)
 
-  # sample intertransaction timings & churn
-  cbs_list <- list()
-  elog_list <- list()
-  for (i in 1:n) {
-    lambda <- lambdas[i]
-    tau <- taus[i]
+  # sample intertransaction timings
+  elog_list <- lapply(1:n, function(i) {
     # sample 'sufficiently' large amount of inter-transaction times
-    minT <- min(T.cal[i] + max(T.star), tau)
-    nr_of_itt_draws <- max(10, minT * lambda)
-    itts <- rexp(nr_of_itt_draws * 2, rate = lambda)
-    if (sum(itts) < minT)
-      itts <- c(itts, rexp(nr_of_itt_draws * 4, rate = lambda))
-    if (sum(itts) < minT)
-      itts <- c(itts, rexp(nr_of_itt_draws * 800, rate = lambda))
-    if (sum(itts) < minT)
-      stop("not enough inter-transaction times sampled: ", sum(itts), " < ", tau)
-    times <- cumsum(c(0, itts))
-    times <- times[times <= tau]
-    if (return.elog)
-      elog_list[[i]] <- data.table(cust = i, t = times[times <= (T.cal[i] + max(T.star))])
-    # determine frequency, recency, etc.
-    ts.cal <- times[times <= T.cal[i]]
-    cbs_list[[i]] <- list(cust = i, x = length(ts.cal) - 1, t.x = max(ts.cal), litt = ifelse(length(ts.cal) -
-      1 == 0, 0, sum(log(itts[1:(length(ts.cal) - 1)]))), alive = tau > T.cal[i])
-    for (tstar in T.star) {
-      colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
-      cbs_list[[i]][[colname]] <- length(times[times > max(T.cal) & times <= (max(T.cal) + tstar)])
-    }
+    minT <- min(T.cal[i] + max(T.star), taus[i])
+    itt_draws <- max(10, round(minT * lambdas[i] * 1.5))
+    itt_fn <- function(n) rexp(n, rate = lambdas[i])
+    itts <- itt_fn(itt_draws)
+    if (sum(itts) < minT) itts <- c(itts, itt_fn(itt_draws * 4))
+    if (sum(itts) < minT) itts <- c(itts, itt_fn(itt_draws * 800))
+    if (sum(itts) < minT) stop("not enough inter-transaction times sampled: ", sum(itts), " < ", minT)
+    ts <- cumsum(c(0, itts))
+    ts <- ts[ts <= taus[i]] # trim to lifetime
+    ts <- T.zero[i] + ts # shift by T_0
+    ts <- ts[ts <= (T.cal.fix + max(T.star))] # trim to observation length
+    return(ts)
+  })
+
+  # build elog
+  elog <- data.table("cust" = rep(1:n, sapply(elog_list, length)), "t" = unlist(elog_list))
+  elog[["date"]] <- date.zero + elog[["t"]] * 3600 * 24 * 7
+
+  # build cbs
+  date.cal <- date.zero + T.cal.fix * 3600 * 24 * 7
+  date.tot <- date.cal + T.star * 3600 * 24 * 7
+  cbs <- elog2cbs(elog, T.cal = date.cal)
+  if (length(T.star) == 1) set(cbs, j = "T.star", value = T.star[1])
+  xstar.cols <- if (length(T.star) == 1) "x.star" else paste0("x.star", T.star)
+  for (j in 1:length(date.tot)) {
+    set(cbs, j = xstar.cols[j],
+        value = sapply(elog_list, function(t) sum(t > T.cal.fix & t <= T.cal.fix + T.star[j])))
   }
-  cbs <- setDF(rbindlist(cbs_list))
-  cbs$lambda <- lambdas
-  cbs$mu <- mus
-  cbs$tau <- taus
-  cbs$T.cal <- T.cal
-  if (length(T.star) == 1)
-    cbs$T.star <- T.star
-  rownames(cbs) <- NULL
+  set(cbs, j = "lambda", value = lambdas)
+  set(cbs, j = "mu", value = mus)
+  set(cbs, j = "tau", value = taus)
+  set(cbs, j = "alive", value = (T.zero + taus) > T.cal.fix)
   cbs <- cbind(cbs, covars)
-  out <- list(cbs = cbs)
-  if (return.elog) {
-    out$elog <- setDF(rbindlist(elog_list))
-  }
-  return(out)
+
+  return(list("cbs" = setDF(cbs), "elog" = setDF(elog)))
 }

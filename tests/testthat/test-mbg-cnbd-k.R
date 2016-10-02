@@ -5,15 +5,14 @@ test_that("MBG/CNBD-k", {
 
   # generate artificial MBG/CNBD-k data
   set.seed(1)
-  n <- 2000
+  n <- 5000
   params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-  data <- mbgcnbd.GenerateData(n = n,
-                               T.cal = round(runif(n, 12, 96) / 12) * 12,
-                               T.star = 32,
-                               params = params,
-                               return.elog = TRUE)
-  cbs <- data$cbs
-  elog <- data$elog
+  sim <- mbgcnbd.GenerateData(n,
+                             round(runif(n, 36, 96) / 12) * 12,
+                             36,
+                             params)
+  cbs <- sim$cbs
+  elog <- sim$elog
 
   # estimate parameters with fixed k
   est1 <- mbgnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
@@ -30,9 +29,8 @@ test_that("MBG/CNBD-k", {
   cbs$palive <- mbgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
 
   # require less than 5% deviation
-  ape <- function(act, est) abs(act - est) / act
-  expect_true(ape(sum(cbs$x.star), sum(cbs$x.est)) < 0.05)
-  expect_true(ape(sum(cbs$palive), sum(cbs$alive)) < 0.05)
+  expect_equal(sum(cbs$x.star), sum(cbs$x.est), tolerance = 0.05)
+  expect_equal(sum(cbs$palive), sum(cbs$alive), tolerance = 0.05)
 
   expect_true(min(cbs$x.star) >= 0)
   expect_true(all(cbs$x.star == round(cbs$x.star)))
@@ -58,14 +56,16 @@ test_that("MBG/CNBD-k", {
 
   # check that bias correction actually results in unbiased estimates
   skip_on_cran()
+  skip_on_travis()
+  skip_on_appveyor()
+  set.seed(1)
   bias <- replicate(40, {
     cbs <- mbgcnbd.GenerateData(n = n,
                                 T.cal = round(runif(n, 12, 96) / 12) * 12,
                                 T.star = 32,
-                                params = params,
-                                return.elog = FALSE)$cbs
+                                params = params)$cbs
     cbs$x.est <- mbgcnbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$t.x, cbs$T.cal)
     sum(cbs$x.est) / sum(cbs$x.star)
   })
-  expect_lt(abs(mean(bias) - 1), 0.01)
+  expect_equal(mean(bias), 1, 0.01)
 })

@@ -7,13 +7,13 @@ test_that("BG/CNBD-k", {
   set.seed(1)
   params <- c(1, 0.85, 1.45, 0.79, 2.42)
   n <- 2000
-  data <- bgcnbd.GenerateData(n = n,
-                              T.cal = round(runif(n, 4, 32) / 4) * 4,
-                              T.star = 32,
-                              params = params,
-                              return.elog = TRUE)
-  cbs  <- data$cbs
-  elog <- data$elog
+  sim <- bgcnbd.GenerateData(n,
+                             round(runif(n, 36, 96) / 12) * 12,
+                             36,
+                             params)
+  cbs  <- sim$cbs
+  elog <- sim$elog
+
   params.est.btyd <- BTYD::bgnbd.EstimateParameters(cbs)
   params.est.btyd_plus <- bgcnbd.EstimateParameters(cbs, k = 1)[-1]
   expect_equal(unname(round(params.est.btyd, 2)),
@@ -48,13 +48,12 @@ test_that("BG/CNBD-k", {
   set.seed(1)
   n <- 2000
   params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-  data <- bgcnbd.GenerateData(n = n,
-                              T.cal = round(runif(n, 7, 70) / 7) * 7,
-                              T.star = c(32, 64),
-                              params = params,
-                              return.elog = TRUE)
-  cbs <- data$cbs
-  elog <- data$elog
+  sim <- bgcnbd.GenerateData(n,
+                              round(runif(n, 36, 96) / 12) * 12,
+                              c(32, 64),
+                              params = params)
+  cbs <- sim$cbs
+  elog <- sim$elog
 
   # estimate regularity & parameters
   k.est <- estimateRegularity(elog)
@@ -71,10 +70,9 @@ test_that("BG/CNBD-k", {
   cbs$palive <- bgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
 
   # require less than 5% deviation
-  ape <- function(act, est) abs(act - est) / act
-  expect_true(ape(sum(cbs$x.star32), sum(cbs$x.est32)) < 0.05)
-  expect_true(ape(sum(cbs$x.star64), sum(cbs$x.est64)) < 0.05)
-  expect_true(ape(sum(cbs$palive), sum(cbs$alive)) < 0.05)
+  expect_equal(sum(cbs$x.star32), sum(cbs$x.est32), tolerance = 0.05)
+  expect_equal(sum(cbs$x.star64), sum(cbs$x.est64), tolerance = 0.05)
+  expect_equal(sum(cbs$palive), sum(cbs$alive), tolerance = 0.05)
 
   # some basic sanity checks
   expect_true(min(cbs$x.star32) >= 0)

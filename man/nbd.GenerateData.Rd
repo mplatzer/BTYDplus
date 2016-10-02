@@ -4,7 +4,7 @@
 \alias{nbd.GenerateData}
 \title{Simulate data according to NBD model assumptions}
 \usage{
-nbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
+nbd.GenerateData(n, T.cal, T.star, params)
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -14,14 +14,11 @@ nbd.GenerateData(n, T.cal, T.star, params, return.elog = FALSE)
 \item{T.star}{Length of holdout period. This may be a vector.}
 
 \item{params}{NBD parameters - a vector with \code{r} and \code{alpha} in that order.}
-
-\item{return.elog}{If \code{TRUE} then the event log is returned in addition
-to the CBS summary.}
 }
 \value{
 List of length 2:
 \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
-\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
+\item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 }
 \description{
 Simulate data according to NBD model assumptions

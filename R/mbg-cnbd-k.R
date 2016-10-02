@@ -814,37 +814,32 @@ xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params A vector with model parameters \code{k}, \code{r},
 #'   \code{alpha}, \code{a} and \code{b}, in that order.
-#' @param return.elog If \code{TRUE} then the event log is returned in addition
-#'   to the CBS summary.
 #' @return List of length 2:
-#' \itemize{
-#'  \item{\code{cbs }}{A data.frame with a row for each customer and the summary statistic as columns.}
-#'  \item{\code{elog }}{A data.frame with a row for each transaction, and columns \code{cust} and \code{t}.}
-#' }
+#' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
+#' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 #' @export
 #' @references Platzer Michael, and Thomas Reutterer (forthcoming)
 #' @examples
 #' params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-#' data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32,
-#'   params, return.elog = TRUE)
+#' data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32, params)
 #'
 #' # customer by sufficient summary statistic - one row per customer
 #' head(data$cbs)
 #'
 #' # event log - one row per event/transaction
 #' head(data$elog)
-mbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = FALSE) {
-  xbgcnbd.GenerateData(n, T.cal, T.star, params, return.elog, dropout_at_zero = TRUE)
+mbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params) {
+  xbgcnbd.GenerateData(n, T.cal, T.star, params, dropout_at_zero = TRUE)
 }
 
 #' @rdname mbgcnbd.GenerateData
 #' @export
-bgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = FALSE) {
-  xbgcnbd.GenerateData(n, T.cal, T.star, params, return.elog, dropout_at_zero = FALSE)
+bgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params) {
+  xbgcnbd.GenerateData(n, T.cal, T.star, params, dropout_at_zero = FALSE)
 }
 
 #' @keywords internal
-xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = FALSE, dropout_at_zero = NULL) {
+xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, dropout_at_zero = NULL) {
   stopifnot(!is.null(dropout_at_zero))
   dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.GenerateData")
   if (params[1] != floor(params[1]) | params[1] < 1)
@@ -856,7 +851,11 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
   a <- params[4]
   b <- params[5]
 
+  # set start date for each customer, so that they share same T.cal date
+  T.cal.fix <- max(T.cal)
   T.cal <- rep(T.cal, length.out = n)
+  T.zero <- T.cal.fix - T.cal
+  date.zero <- as.POSIXct("2000-01-01 00:00:00 CEST")
 
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape = r, rate = alpha)
@@ -864,45 +863,39 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, return.elog = 
   # sample churn-probability p for each customer
   ps <- rbeta(n, a, b)
 
-  # sample intertransaction timings & churn
-  cbs_list <- list()
-  elog_list <- list()
-  for (i in 1:n) {
-    p <- ps[i]
-    lambda <- lambdas[i]
-    # sample no. of transactions until churn
-    coins <- rbinom(min(10000, 10 / p), 1, p)
-    churn <- ifelse(any(coins == 1), min(which(coins == 1)), 10000)
-    if (dropout_at_zero)
-      churn <- churn - 1
+  # sample number of survivals via geometric distribution
+  churns <- rgeom(n, ps)
+  if (!dropout_at_zero) churns <- churns + 1
+
+  # sample intertransaction timings
+  elog_list <- lapply(1:n, function(i) {
     # sample transaction times
-    times <- cumsum(c(max(T.cal) - T.cal[i], rgamma(churn, shape = k, rate = lambda)))
-    if (return.elog)
-      elog_list[[i]] <- data.table(cust = i, t = times[times <= (max(T.cal) + max(T.star))])
-    # determine frequency, recency, etc.
-    ts.cal <- times[times <= max(T.cal)]
-    cbs_list[[i]] <- list(cust  = i,
-                          x     = length(ts.cal) - 1,
-                          t.x   = max(ts.cal) - (max(T.cal) - T.cal[i]),
-                          litt  = sum(log(diff(ts.cal))),
-                          churn = churn,
-                          alive = churn > (length(ts.cal) - 1))
-    for (tstar in T.star) {
-      colname <- paste0("x.star", ifelse(length(T.star) > 1, tstar, ""))
-      cbs_list[[i]][[colname]] <- length(times[times > max(T.cal) & times <= (max(T.cal) + tstar)])
-    }
+    itts <- rgamma(churns[i], shape = k, rate = lambdas[i])
+    ts <- cumsum(c(0, itts))
+    ts <- T.zero[i] + ts # shift by T_0
+    ts <- ts[ts <= (T.cal.fix + max(T.star))] # trim to observation length
+    return(ts)
+  })
+
+  # build elog
+  elog <- data.table("cust" = rep(1:n, sapply(elog_list, length)), "t" = unlist(elog_list))
+  elog[["date"]] <- date.zero + elog[["t"]] * 3600 * 24 * 7
+
+  # build cbs
+  date.cal <- date.zero + T.cal.fix * 3600 * 24 * 7
+  date.tot <- date.cal + T.star * 3600 * 24 * 7
+  cbs <- elog2cbs(elog, T.cal = date.cal)
+  if (length(T.star) == 1) set(cbs, j = "T.star", value = T.star[1])
+  xstar.cols <- if (length(T.star) == 1) "x.star" else paste0("x.star", T.star)
+  for (j in 1:length(date.tot)) {
+    set(cbs, j = xstar.cols[j],
+        value = sapply(elog_list, function(t) sum(t > T.cal.fix & t <= T.cal.fix + T.star[j])))
   }
-  cbs <- setDF(rbindlist(cbs_list))
-  cbs$lambda <- lambdas
-  cbs$p <- ps
-  cbs$k <- k
-  cbs$T.cal <- T.cal
-  if (length(T.star) == 1)
-    cbs$T.star <- T.star
-  rownames(cbs) <- NULL
-  out <- list(cbs = cbs)
-  if (return.elog) {
-    out$elog <- setDF(rbindlist(elog_list))
-  }
-  return(out)
+  set(cbs, j = "k", value = k)
+  set(cbs, j = "lambda", value = lambdas)
+  set(cbs, j = "p", value = ps)
+  set(cbs, j = "churn", value = churns)
+  set(cbs, j = "alive", value = (churns > cbs$x))
+
+  return(list(cbs = setDF(cbs), elog = setDF(elog)))
 }

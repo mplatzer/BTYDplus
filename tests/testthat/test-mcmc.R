@@ -9,7 +9,7 @@ test_that("MCMC Helpers", {
 
   # generate small Pareto/NBD cohort
   pnbd.params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
-  pnbd.cbs <- pnbd.GenerateData(n = 100, 28, 28, pnbd.params, FALSE)$cbs
+  pnbd.cbs <- pnbd.GenerateData(n = 100, 28, 28, pnbd.params)$cbs
   pnbd.draws <- pnbd.mcmc.DrawParameters(pnbd.cbs, mcmc, burnin, thin, chains)
 
   # generate small Pareto/Abe cohort
@@ -21,7 +21,7 @@ test_that("MCMC Helpers", {
 
   # generate small Pareto/GGG cohort
   pggg.params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12, t = 4, gamma = 2)
-  pggg.cbs <- pggg.GenerateData(n = 100, 28, 28, pggg.params, FALSE)$cbs
+  pggg.cbs <- pggg.GenerateData(n = 100, 28, 28, pggg.params)$cbs
   pggg.draws <- pggg.mcmc.DrawParameters(pggg.cbs, mcmc / 10, burnin / 10, thin / 10, chains)
 
   # draw future transactions
@@ -78,7 +78,7 @@ test_that("MCMC Helpers", {
   # test against P/NBD simulation
   set.seed(1)
   pnbd.params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
-  pnbd.sim <- pnbd.GenerateData(n = 1000, 28, 28, pnbd.params, return.elog = TRUE)
+  pnbd.sim <- pnbd.GenerateData(n = 1000, 28, 28, pnbd.params)
   pnbd.elog <- pnbd.sim$elog
   pnbd.cbs <- pnbd.sim$cbs
   pnbd.draws <- pnbd.mcmc.DrawParameters(pnbd.cbs, mcmc = 5000, chains = 1)
