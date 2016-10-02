@@ -1,4 +1,4 @@
-0.10.9999
+0.11.0
 - rewrote `*.GenerateData` methods
    * generated event log now also contains `date` field
    * if `T.cal` varies, then customer's start date will also vary
