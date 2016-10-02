@@ -40,11 +40,13 @@ The method \code{\link{mcmc.pmf}} is called to calculate the expected numbers
 based on the corresponding model.
 }
 \examples{
+\dontrun{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 param.draws <- pnbd.mcmc.DrawParameters(cbs,
   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 mcmc.PlotFrequencyInCalibration(param.draws, cbs, sample_size = 100)
+}
 }
 \seealso{
 \code{\link{mcmc.pmf}}
