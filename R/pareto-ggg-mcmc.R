@@ -289,12 +289,10 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
 pggg.GenerateData <- function(n, T.cal, T.star, params) {
 
   # set start date for each customer, so that they share same T.cal date
+  T.cal.fix <- max(T.cal)
   T.cal <- rep(T.cal, length.out = n)
-  T.zero <- max(T.cal) - rep(T.cal, length.out = n)
-
+  T.zero <- T.cal.fix - T.cal
   date.zero <- as.POSIXct("2000-01-01 00:00:00 CEST")
-  date.cal <- date.zero + max(T.cal) * 3600 * 24 * 7
-  date.tot <- date.cal + T.star * 3600 * 24 * 7
 
   # sample regularity parameter k for each customer
   if (all(c("t", "gamma") %in% names(params))) {
@@ -318,44 +316,42 @@ pggg.GenerateData <- function(n, T.cal, T.star, params) {
   mus <- rgamma(n, shape = params$s, rate = params$beta)
   taus <- rexp(n, rate = mus)
 
-  # sample intertransaction timings & churn
-  elog <- rbindlist(lapply(1:n, function(i) {
-    k <- ks[i]
-    lambda <- lambdas[i]
-    tau <- taus[i]
+  # sample intertransaction timings
+  elog_list <- lapply(1:n, function(i) {
     # sample 'sufficiently' large amount of inter-transaction times
-    minT <- min(T.cal + max(T.star), tau)
-    nr_of_itt_draws <- max(10, round(minT * lambda))
-    itts <- rgamma(nr_of_itt_draws * 2, shape = k, rate = k * lambda)
-    if (sum(itts) < minT)
-      itts <- c(itts, rgamma(nr_of_itt_draws * 4, shape = k, rate = k * lambda))
-    if (sum(itts) < minT)
-      itts <- c(itts, rgamma(nr_of_itt_draws * 800, shape = k, rate = k * lambda))
-    if (sum(itts) < minT)
-      stop("not enough inter-transaction times sampled: ", sum(itts), " < ", minT)
+    minT <- min(T.cal[i] + max(T.star), taus[i])
+    itt_draws <- max(10, round(minT * lambdas[i] * 1.5))
+    itt_fn <- function(n) rgamma(n, shape = ks[i], rate = ks[i] * lambdas[i])
+    itts <- itt_fn(itt_draws)
+    if (sum(itts) < minT) itts <- c(itts, itt_fn(itt_draws * 4))
+    if (sum(itts) < minT) itts <- c(itts, itt_fn(itt_draws * 800))
+    if (sum(itts) < minT) stop("not enough inter-transaction times sampled: ", sum(itts), " < ", minT)
     ts <- cumsum(c(0, itts))
-    ts <- ts[ts <= tau]  # trim to lifetime
-    ts <- ts[ts <= (T.cal[i] + max(T.star))] # trim to observation length
+    ts <- ts[ts <= taus[i]] # trim to lifetime
     ts <- T.zero[i] + ts # shift by T_0
-    dates <- date.zero + ts * 3600 * 24 * 7 # convert to dates
-    data.table(cust = i, t = ts, date = dates)
-  }))
+    ts <- ts[ts <= (T.cal.fix + max(T.star))] # trim to observation length
+    return(ts)
+  })
 
-  # convert to CBS
-  cbs <- elog2cbs(elog, T.cal = date.cal, T.tot = date.tot[1])
-  if (length(T.star) > 1) {
-    setnames(cbs, "x.star", paste0("x.star", T.star[1]))
-    set(cbs, j = "T.star", value = NULL)
-    sapply(2:length(T.star), function(j) {
-      set(cbs, j = paste0("x.star", T.star[j]),
-          value = elog2cbs(elog, T.cal = date.cal, T.tot = date.tot[j])$x.star)
-      return()
-    })
+  # build elog
+  elog <- data.table("cust" = rep(1:n, sapply(elog_list, length)), "t" = unlist(elog_list))
+  elog[["date"]] <- date.zero + elog[["t"]] * 3600 * 24 * 7
+
+  # build cbs
+  date.cal <- date.zero + T.cal.fix * 3600 * 24 * 7
+  date.tot <- date.cal + T.star * 3600 * 24 * 7
+  cbs <- elog2cbs(elog, T.cal = date.cal)
+  if (length(T.star) == 1) set(cbs, j = "T.star", value = T.star[1])
+  xstar.cols <- if (length(T.star) == 1) "x.star" else paste0("x.star", T.star)
+  for (j in 1:length(date.tot)) {
+    set(cbs, j = xstar.cols[j],
+        value = sapply(elog_list, function(t) sum(t > T.cal.fix & t <= T.cal.fix + T.star[j])))
   }
   set(cbs, j = "k", value = ks)
   set(cbs, j = "lambda", value = lambdas)
   set(cbs, j = "mu", value = mus)
   set(cbs, j = "tau", value = taus)
-  set(cbs, j = "alive", value = (T.zero + taus) > T.cal)
-  return(list(cbs = setDF(cbs), elog = setDF(elog)))
+  set(cbs, j = "alive", value = (T.zero + taus) > T.cal.fix)
+
+  return(list("cbs" = setDF(cbs), "elog" = setDF(elog)))
 }

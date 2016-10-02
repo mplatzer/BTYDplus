@@ -31,16 +31,20 @@ test_that("Pareto/GGG MCMC", {
 
   # generate artificial Pareto/GGG data
   set.seed(1)
-  params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 10, s = 0.8, beta = 12)
+  params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 5, s = 0.8, beta = 12)
   n <- 5000
-  cbs <- pggg.GenerateData(n, 52, 52, params)$cbs
+  cbs <- pggg.GenerateData(n,
+                           round(runif(n, 36, 96) / 12) * 12,
+                           36,
+                           params)$cbs
 
   # estimate parameters
   draws <- pggg.mcmc.DrawParameters(cbs, mc.cores = 1)
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
 
   # require less than 10% deviation in estimated parameters
-  expect_equal(params, est, tolerance = 0.1)
+  expect_equal(params[1:4], est[1:4], tolerance = 0.1)
+  expect_equal(params[5:6], est[5:6], tolerance = 0.2)
 
   # estimate future transactions & P(alive) & P(active)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)

@@ -46,9 +46,12 @@ test_that("Pareto/NBD MCMC", {
 
   # generate artificial Pareto/NBD data
   set.seed(1)
-  params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)
+  params <- list(r = 0.9, alpha = 5, s = 0.8, beta = 12)
   n <- 5000
-  sim <- pnbd.GenerateData(n, 52, 52, params)
+  sim <- pnbd.GenerateData(n,
+                           round(runif(n, 36, 96) / 12) * 12,
+                           36,
+                           params)
   cbs <- sim$cbs
 
   # test basic parameter estimation
@@ -65,8 +68,8 @@ test_that("Pareto/NBD MCMC", {
   expect_true(coda::is.mcmc.list(draws$level_1[[1]]))
   expect_true(coda::is.mcmc.list(draws$level_2))
 
-  # require less than 5% deviation in estimated parameters
-  expect_equal(params, est, tolerance = 0.05)
+  # require less than 10% deviation in estimated parameters
+  expect_equal(params, est, tolerance = 0.10)
 
   # estimate future transactions & P(alive)
   xstar <- mcmc.DrawFutureTransactions(cbs, draws, T.star = cbs$T.star)

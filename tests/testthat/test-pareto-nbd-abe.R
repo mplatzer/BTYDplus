@@ -11,11 +11,17 @@ test_that("Pareto/NBD (Abe) MCMC", {
   params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
   expect_silent(abe.GenerateData(n = 100, T.cal = 32, T.star = c(16, 32), params))
   n <- 5000
-  cbs <- abe.GenerateData(n, T.cal = 32, T.star = 32, params)$cbs
+  sim <- abe.GenerateData(n,
+                          round(runif(n, 36, 96) / 12) * 12,
+                          36,
+                          params)
+  cbs <- sim$cbs
 
-  # estimate parameters
+  # test basic parameter estimation
   draws <- abe.mcmc.DrawParameters(as.data.table(cbs), covariates = c("covariate_1"),
                                    mcmc = 10, burnin = 0, thin = 1, mc.cores = 1)
+
+  # test parameter recovery
   draws <- abe.mcmc.DrawParameters(cbs, covariates = c("covariate_1", "covariate_2"), mc.cores = 1)
 
   expect_true(all(c("level_1", "level_2") %in% names(draws)))

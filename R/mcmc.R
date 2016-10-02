@@ -399,7 +399,7 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs)
 #' mat <- mcmc.PlotTrackingCum(param.draws,
 #'   T.cal = cbs$T.cal,
-#'   T.tot = max(cbs$T.cal + cbs$T.star),
+#'   T.tot = 104,
 #'   actual.cu.tracking.data = cum)
 #' }
 mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
@@ -456,7 +456,7 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs)
 #' mat <- mcmc.PlotTrackingInc(param.draws,
 #'   T.cal = cbs$T.cal,
-#'   T.tot = max(cbs$T.cal + cbs$T.star),
+#'   T.tot = 104,
 #'   actual.inc.tracking.data = inc)
 #' }
 mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data,
