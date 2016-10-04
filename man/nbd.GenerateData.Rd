@@ -4,7 +4,7 @@
 \alias{nbd.GenerateData}
 \title{Simulate data according to NBD model assumptions}
 \usage{
-nbd.GenerateData(n, T.cal, T.star, params)
+nbd.GenerateData(n, T.cal, T.star, params, date.zero = "2000-01-01")
 }
 \arguments{
 \item{n}{Number of customers.}
