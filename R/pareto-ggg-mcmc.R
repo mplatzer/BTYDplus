@@ -276,6 +276,7 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params A list of model parameters \code{r},
 #'   \code{alpha}, \code{s}, \code{beta}, \code{t} and \code{gamma}.
+#' @param date.zero Initial date for cohort start. Can be of class character, Date or POSIXt.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
@@ -286,13 +287,13 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
 #' data <- pggg.GenerateData(n = 1000, T.cal = 32, T.star = 32, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
-pggg.GenerateData <- function(n, T.cal, T.star, params) {
+pggg.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01") {
 
   # set start date for each customer, so that they share same T.cal date
   T.cal.fix <- max(T.cal)
   T.cal <- rep(T.cal, length.out = n)
   T.zero <- T.cal.fix - T.cal
-  date.zero <- as.POSIXct("2000-01-01 00:00:00 CEST")
+  date.zero <- as.POSIXct(date.zero)
 
   # sample regularity parameter k for each customer
   if (all(c("t", "gamma") %in% names(params))) {

@@ -14,6 +14,8 @@ nbd.GenerateData(n, T.cal, T.star, params)
 \item{T.star}{Length of holdout period. This may be a vector.}
 
 \item{params}{NBD parameters - a vector with \code{r} and \code{alpha} in that order.}
+
+\item{date.zero}{Initial date for cohort start. Can be of class character, Date or POSIXt.}
 }
 \value{
 List of length 2:

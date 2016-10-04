@@ -816,6 +816,7 @@ xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params A vector with model parameters \code{k}, \code{r},
 #'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param date.zero Initial date for cohort start. Can be of class character, Date or POSIXt.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
@@ -830,19 +831,19 @@ xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
 #'
 #' # event log - one row per event/transaction
 #' head(data$elog)
-mbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params) {
-  xbgcnbd.GenerateData(n, T.cal, T.star, params, dropout_at_zero = TRUE)
+mbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, date.zero = "2000-01-01") {
+  xbgcnbd.GenerateData(n, T.cal, T.star, params, date.zero, dropout_at_zero = TRUE)
 }
 
 #' @rdname mbgcnbd.GenerateData
 #' @export
-bgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params) {
-  xbgcnbd.GenerateData(n, T.cal, T.star, params, dropout_at_zero = FALSE)
+bgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, date.zero = "2000-01-01") {
+  xbgcnbd.GenerateData(n, T.cal, T.star, params, date.zero, dropout_at_zero = FALSE)
 }
 
 #' @keywords internal
-xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, dropout_at_zero = NULL) {
-  stopifnot(!is.null(dropout_at_zero))
+xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, date.zero = "2000-01-01", dropout_at_zero = NULL) {
+  stopifnot(is.logical(dropout_at_zero))
   dc.check.model.params.safe(c("k", "r", "alpha", "a", "b"), params, "xbgcnbd.GenerateData")
   if (params[1] != floor(params[1]) | params[1] < 1)
     stop("k must be integer being greater or equal to 1.")
@@ -857,7 +858,7 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, dropout_at_zer
   T.cal.fix <- max(T.cal)
   T.cal <- rep(T.cal, length.out = n)
   T.zero <- T.cal.fix - T.cal
-  date.zero <- as.POSIXct("2000-01-01 00:00:00 CEST")
+  date.zero <- as.POSIXct(date.zero)
 
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape = r, rate = alpha)

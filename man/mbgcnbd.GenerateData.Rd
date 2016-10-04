@@ -5,9 +5,11 @@
 \alias{mbgcnbd.GenerateData}
 \title{Simulate data according to (M)BG/CNBD-k model assumptions}
 \usage{
-mbgcnbd.GenerateData(n, T.cal, T.star = NULL, params)
+mbgcnbd.GenerateData(n, T.cal, T.star = NULL, params,
+  date.zero = "2000-01-01")
 
-bgcnbd.GenerateData(n, T.cal, T.star = NULL, params)
+bgcnbd.GenerateData(n, T.cal, T.star = NULL, params,
+  date.zero = "2000-01-01")
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -20,6 +22,8 @@ is assumed that customers have different 'birth' dates, i.e.
 
 \item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
+
+\item{date.zero}{Initial date for cohort start. Can be of class character, Date or POSIXt.}
 }
 \value{
 List of length 2:

@@ -7,12 +7,17 @@ test_that("BG/CNBD-k", {
   set.seed(1)
   params <- c(1, 0.85, 1.45, 0.79, 2.42)
   n <- 2000
+  date.zero <- "2010-01-01"
   sim <- bgcnbd.GenerateData(n,
                              round(runif(n, 36, 96) / 12) * 12,
                              36,
-                             params)
+                             params,
+                             date.zero)
   cbs  <- sim$cbs
   elog <- sim$elog
+  expect_is(elog$date, "POSIXct")
+  expect_is(cbs$first, "POSIXct")
+  expect_equal(min(sim$elog$date), as.POSIXct(date.zero))
 
   params.est.btyd <- BTYD::bgnbd.EstimateParameters(cbs)
   params.est.btyd_plus <- bgcnbd.EstimateParameters(cbs, k = 1)[-1]

@@ -141,6 +141,7 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' @param T.cal Length of calibration period.
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params NBD parameters - a vector with \code{r} and \code{alpha} in that order.
+#' @param date.zero Initial date for cohort start. Can be of class character, Date or POSIXt.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
@@ -161,7 +162,7 @@ nbd.GenerateData <- function(n, T.cal, T.star, params) {
   T.cal.fix <- max(T.cal)
   T.cal <- rep(T.cal, length.out = n)
   T.zero <- T.cal.fix - T.cal
-  date.zero <- as.POSIXct("2000-01-01 00:00:00 CEST")
+  date.zero <- as.POSIXct(date.zero)
 
   r <- params[1]
   alpha <- params[2]

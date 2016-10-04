@@ -1,3 +1,6 @@
+0.11.2
+- add option `date.zero` to specify start date for cohort in `*.GenerateData` methods
+
 0.11.1
 - hot fix for broken `elog2cbs` in `0.11.0` release
 

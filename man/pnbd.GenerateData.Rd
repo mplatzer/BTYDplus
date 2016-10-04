@@ -4,7 +4,7 @@
 \alias{pnbd.GenerateData}
 \title{Simulate data according to Pareto/NBD model assumptions}
 \usage{
-pnbd.GenerateData(n, T.cal, T.star, params)
+pnbd.GenerateData(n, T.cal, T.star, params, date.zero = "2000-01-01")
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -17,6 +17,8 @@ is assumed that customers have different 'birth' dates, i.e.
 
 \item{params}{A list of model parameters \code{r},
 \code{alpha}, \code{s}, \code{beta}.}
+
+\item{date.zero}{Initial date for cohort start. Can be of class character, Date or POSIXt.}
 }
 \value{
 List of length 2:
