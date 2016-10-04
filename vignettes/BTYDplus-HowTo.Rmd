@@ -5,6 +5,9 @@ date: "`r Sys.Date()`"
 output: 
   pdf_document: 
     fig_caption: yes
+fontsize: 11pt
+geometry: margin=1.4in
+linestretch: 1.4
 linkcolor: blue
 bibliography: bibliography.bib
 vignette: |
