@@ -154,7 +154,7 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' data <- nbd.GenerateData(n, T.cal, T.star, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
-nbd.GenerateData <- function(n, T.cal, T.star, params) {
+nbd.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01") {
   # check model parameters
   dc.check.model.params.safe(c("r", "alpha"), params, "nbd.GenerateData")
 
