@@ -4,7 +4,7 @@
 \alias{pggg.GenerateData}
 \title{Simulate data according to Pareto/GGG model assumptions}
 \usage{
-pggg.GenerateData(n, T.cal, T.star, params)
+pggg.GenerateData(n, T.cal, T.star, params, date.zero = "2000-01-01")
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -17,6 +17,8 @@ is assumed that customers have different 'birth' dates, i.e.
 
 \item{params}{A list of model parameters \code{r},
 \code{alpha}, \code{s}, \code{beta}, \code{t} and \code{gamma}.}
+
+\item{date.zero}{Initial date for cohort start. Can be of class character, Date or POSIXt.}
 }
 \value{
 List of length 2:

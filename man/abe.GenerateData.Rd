@@ -4,7 +4,7 @@
 \alias{abe.GenerateData}
 \title{Simulate data according to Pareto/NBD (Abe) model assumptions}
 \usage{
-abe.GenerateData(n, T.cal, T.star, params)
+abe.GenerateData(n, T.cal, T.star, params, date.zero = "2000-01-01")
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -16,6 +16,8 @@ is assumed that customers have different 'birth' dates, i.e.
 \item{T.star}{Length of holdout period. This may be a vector.}
 
 \item{params}{A list of model parameters: \code{beta} and \code{gamma}.}
+
+\item{date.zero}{Initial date for cohort start. Can be of class character, Date or POSIXt.}
 }
 \value{
 List of length 2:

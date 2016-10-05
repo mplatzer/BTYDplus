@@ -4,7 +4,7 @@
 \alias{nbd.GenerateData}
 \title{Simulate data according to NBD model assumptions}
 \usage{
-nbd.GenerateData(n, T.cal, T.star, params)
+nbd.GenerateData(n, T.cal, T.star, params, date.zero = "2000-01-01")
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -14,6 +14,8 @@ nbd.GenerateData(n, T.cal, T.star, params)
 \item{T.star}{Length of holdout period. This may be a vector.}
 
 \item{params}{NBD parameters - a vector with \code{r} and \code{alpha} in that order.}
+
+\item{date.zero}{Initial date for cohort start. Can be of class character, Date or POSIXt.}
 }
 \value{
 List of length 2:

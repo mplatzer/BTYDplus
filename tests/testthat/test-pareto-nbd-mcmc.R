@@ -8,13 +8,17 @@ test_that("Pareto/NBD MCMC", {
   n <- 5
   T.cal <- c(26, 26, 28.5, 52, 52)
   T.star <- 52
-  sim <- pggg.GenerateData(5, T.cal, T.star, params)
+  date.zero <- "2010-01-01"
+  sim <- pggg.GenerateData(5, T.cal, T.star, params, date.zero)
   expect_equal(names(sim), c("cbs", "elog"))
   expect_is(sim$cbs, "data.frame")
   expect_is(sim$elog, "data.frame")
   expect_equal(names(sim$elog), c("cust", "t", "date"))
   expect_equal(nrow(sim$cbs), n)
   expect_equal(uniqueN(sim$elog$cust), n)
+  expect_is(sim$elog$date, "POSIXct")
+  expect_equal(min(sim$elog$date), as.POSIXct(date.zero))
+  expect_equal(min(sim$cbs$first), as.POSIXct(date.zero))
   simElog <- sim$elog
   simCBS <- sim$cbs
   # recreate CBS via `elog2cbs`
@@ -24,7 +28,7 @@ test_that("Pareto/NBD MCMC", {
                       T.tot = date.zero + max(T.cal + T.star) * 3600 * 24 * 7)
   expect_equal(simCBSc, subset(simCBS, select = names(simCBSc)))
   # multiple T.star's
-  sim <- pggg.GenerateData(100, 52, c(26, 104), params)
+  sim <- pggg.GenerateData(100, 52, c(26, 104), params, date.zero = as.Date("2010-01-01"))
   expect_true(all(c("x.star26", "x.star104") %in% names(sim$cbs)))
   expect_true(all(sim$cbs$x.star104 >= sim$cbs$x.star26))
   expect_true(any(sim$cbs$x.star104 > sim$cbs$x.star26))

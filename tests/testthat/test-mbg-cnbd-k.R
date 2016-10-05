@@ -10,7 +10,8 @@ test_that("MBG/CNBD-k", {
   sim <- mbgcnbd.GenerateData(n,
                              round(runif(n, 36, 96) / 12) * 12,
                              36,
-                             params)
+                             params,
+                             "2010-01-01")
   cbs <- sim$cbs
   elog <- sim$elog
 

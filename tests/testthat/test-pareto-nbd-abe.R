@@ -14,7 +14,8 @@ test_that("Pareto/NBD (Abe) MCMC", {
   sim <- abe.GenerateData(n,
                           round(runif(n, 36, 96) / 12) * 12,
                           36,
-                          params)
+                          params,
+                          "2010-01-01")
   cbs <- sim$cbs
 
   # test basic parameter estimation

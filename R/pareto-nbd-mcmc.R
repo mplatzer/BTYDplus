@@ -260,6 +260,7 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params A list of model parameters \code{r},
 #'   \code{alpha}, \code{s}, \code{beta}.
+#' @param date.zero Initial date for cohort start. Can be of class character, Date or POSIXt.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
@@ -269,7 +270,7 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #' data <- pnbd.GenerateData(n = 1000, T.cal = 32, T.star = 32, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
-pnbd.GenerateData <- function(n, T.cal, T.star, params) {
+pnbd.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01") {
   params$k <- 1
-  pggg.GenerateData(n, T.cal, T.star, params)
+  pggg.GenerateData(n, T.cal, T.star, params, date.zero)
 }

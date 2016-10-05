@@ -6,7 +6,7 @@ test_that("NBD", {
   # generate artificial NBD data
   set.seed(1)
   params <- c(r = 0.85, alpha = 4.45)
-  expect_silent(nbd.GenerateData(100, 32, c(16, 32), params))
+  expect_silent(nbd.GenerateData(100, 32, c(16, 32), params, "2010-01-01"))
   cbs <- nbd.GenerateData(5000, 32, 32, params)$cbs
 
   # estimate parameters, and compare to true parameters
