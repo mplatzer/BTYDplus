@@ -42,8 +42,8 @@ xstar.pnbd.draws <- mcmc.DrawFutureTransactions(cbs, pnbd.draws, T.star = cbs$T.
 xstar.pggg.draws <- mcmc.DrawFutureTransactions(cbs, pggg.draws, T.star = cbs$T.star, sample_size = 400)
 
 #' calculate mean over future transaction draws for each customer
-cbs$xstar.pnbd <- apply(pnbd.xstar.draws, 2, mean)
-cbs$xstar.pggg <- apply(pggg.xstar.draws, 2, mean)
+cbs$xstar.pnbd <- apply(xstar.pnbd.draws, 2, mean)
+cbs$xstar.pggg <- apply(xstar.pggg.draws, 2, mean)
 
 #' calculate P(alive)
 cbs$palive.pnbd <- mcmc.PAlive(pnbd.draws)
