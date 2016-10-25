@@ -15,7 +15,7 @@ x <- readline("Estimate regularity via Wheat/Morrison estimator (press Enter)")
 #' -> Wheat-Morrison estimator detects Erlang-2.
 
 #' Plot Timing Patterns of a few sampled customers
-plotSampledTimingPatterns(groceryElog, T.cal = "2006-12-31")
+plotTimingPatterns(groceryElog, T.cal = "2006-12-31")
 
 
 x <- readline("Estimate MBG/CNBD-k model (press Enter)")
