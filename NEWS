@@ -1,3 +1,6 @@
+0.11.x
+- bug fix in Pareto/GGG demo
+
 0.11.3
 - bug fix in MBG/CNBD-k demo which used a deprecated method name
 
