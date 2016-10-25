@@ -60,4 +60,4 @@ cbs$pactive.pggg <- mcmc.PActive(xstar.pggg.draws)
 #' -> 9% lift in customer-level accuracy when taking regularity into account
 
 # P(active) diagnostic plot
-nil <- mcmc.plotPActiveDiagnostic(cbs, pggg.xstar.draws)
+nil <- mcmc.plotPActiveDiagnostic(cbs, xstar.pggg.draws)
