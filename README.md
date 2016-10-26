@@ -31,7 +31,7 @@ demo("pareto-ggg")   # Demonstration of Pareto/NBD (HB) & Pareto/GGG model with 
 
 These R source files extend the functionality of the BTYD package by providing functions for parameter estimation and scoring for NBD, MBG/NBD, BG/CNBD-k, MBG/CNBD-k, Pareto/NBD (HB), Pareto/NBD (Abe) and Pareto/GGG.
 
-* **NBD** Ehrenberg, Asc. "The Pattern of Consumer Purchases." Quantitative techniques in marketing analysis: text and readings (1962): 355.
+* **NBD** Ehrenberg, Andrew SC. "The pattern of consumer purchases." Applied Statistics (1959): 26-41.
 * **MBG/NBD** Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical validation and comparison of models for customer base analysis. International Journal of Research in Marketing 24(3) 201–209.
 * **(M)BG/CNBD-k** Platzer, Michael, and Thomas Reutterer. forthcoming...
 * **Pareto/NBD (HB)** Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007.
