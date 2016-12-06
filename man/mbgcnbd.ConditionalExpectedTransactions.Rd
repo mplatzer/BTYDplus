@@ -47,6 +47,6 @@ head(xstar.est) # expected number of transactions for first 6 customers
 sum(xstar.est) # expected total number of transactions during holdout
 }
 \references{
-Platzer Michael, and Thomas Reutterer (forthcoming)
+Platzer Michael, and Thomas Reutterer (submitted)
 }
 

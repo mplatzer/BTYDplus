@@ -44,6 +44,6 @@ head(data$cbs)
 head(data$elog)
 }
 \references{
-Platzer Michael, and Thomas Reutterer (forthcoming)
+Platzer Michael, and Thomas Reutterer (submitted)
 }
 

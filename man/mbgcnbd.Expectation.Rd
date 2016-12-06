@@ -30,6 +30,6 @@ params <- mbgcnbd.EstimateParameters(cbs)
 mbgcnbd.Expectation(params, t = c(26, 52))
 }
 \references{
-Platzer Michael, and Thomas Reutterer (forthcoming)
+Platzer Michael, and Thomas Reutterer (submitted)
 }
 

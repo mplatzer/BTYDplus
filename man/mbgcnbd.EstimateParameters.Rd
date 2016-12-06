@@ -51,7 +51,7 @@ cbs <- elog2cbs(groceryElog)
 (params <- mbgcnbd.EstimateParameters(cbs))
 }
 \references{
-(M)BG/CNBD-k: Platzer Michael, and Thomas Reutterer (forthcoming)
+(M)BG/CNBD-k: Platzer Michael, and Thomas Reutterer (submitted)
 
 MBG/NBD: Batislam, E.P., M. Denizel, A. Filiztekin. 2007.
   Empirical validation and comparison of models for customer base analysis.

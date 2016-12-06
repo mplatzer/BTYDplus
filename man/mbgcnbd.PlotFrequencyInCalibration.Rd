@@ -44,6 +44,6 @@ params <- mbgcnbd.EstimateParameters(cbs)
 mbgcnbd.PlotFrequencyInCalibration(params, cbs)
 }
 \references{
-Platzer Michael, and Thomas Reutterer (forthcoming)
+Platzer Michael, and Thomas Reutterer (submitted)
 }
 

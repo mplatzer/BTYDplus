@@ -43,6 +43,6 @@ For \code{bgcnbd.cbs.LL}, the total log-likelihood of the provided
 Calculates the log-likelihood of the (M)BG/CNBD-k model.
 }
 \references{
-Platzer Michael, and Thomas Reutterer (forthcoming)
+Platzer Michael, and Thomas Reutterer (submitted)
 }
 

@@ -37,6 +37,6 @@ mbgcnbd.pmf(params, t = 52, x = 0:6)
 mbgcnbd.pmf(params, t = c(26, 52), x = 0:6)
 }
 \references{
-Platzer Michael, and Thomas Reutterer (forthcoming)
+Platzer Michael, and Thomas Reutterer (submitted)
 }
 

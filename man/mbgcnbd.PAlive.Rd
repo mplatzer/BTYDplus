@@ -40,6 +40,6 @@ head(palive) # Probability of being alive for first 6 customers
 mean(palive) # Estimated share of customers to be still alive
 }
 \references{
-Platzer Michael, and Thomas Reutterer (forthcoming)
+Platzer Michael, and Thomas Reutterer (submitted)
 }
 
