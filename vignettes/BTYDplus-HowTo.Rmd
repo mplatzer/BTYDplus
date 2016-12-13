@@ -438,7 +438,7 @@ par(op)
 
 Analogous to MLE-based models, we can also plot weekly transaction counts, as well as frequency plots at an aggregated level. These methods can be applied to all provided MCMC-based models in the following way.
 
-```{r, fig.show="hold", fig.width=7, fig.height=3, fig.cap="Diagnostic plots for model fit in calibration period and actuals vs. model predictions"}
+```{r, eval = FALSE}
 # runs for ~120secs on a MacBook Pro 2015
 op <- par(mfrow = c(1, 2))
 nil <- mcmc.PlotFrequencyInCalibration(pnbd.draws, groceryCBS)
@@ -511,15 +511,7 @@ Note that the BTYDplus package can establish via simulations that its provided i
 
 @platzer2016pggg presented another extension of the Pareto/NBD model. The Pareto/GGG generalizes the distribution for the intertransaction times from the exponential to the Gamma distribution, whereas its shape parameter $k$ is also allowed to vary across customers following a $\text{Gamma}(t, \gamma)$ distribution. Hence, the purchase process follows a Gamma-Gamma-Gamma (GGG) mixture distribution, that is capable of capturing a varying degree of regularity across customers. For datasets which exhibit regularity in their timing patterns, and the degree of regularity varies across the customer cohort, leveraging that information can yield significant improvements in terms of forecasting accuracy. This results from improved inferences about customers' latent state in the presence of regularity.
 
-```{r, echo = FALSE}
-data("groceryElog")
-groceryCBS <- elog2cbs(groceryElog, T.cal = "2006-12-31")
-# estimte Pareto/GGG
-pggg.draws <- pggg.mcmc.DrawParameters(groceryCBS) # ~2mins on 2015 MacBook Pro
-
-```
-
-```{r, eval=FALSE, fig.cap="Distribution of regularity parameter k"}
+```{r, eval=FALSE}
 # load grocery dataset, if it hasn't been done before
 if (!exists("groceryCBS")) {
   data("groceryElog")
