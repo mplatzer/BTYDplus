@@ -5,3 +5,4 @@
 ^appveyor\.yml$
 ^\.lintr$
 ^cran-comments\.md$
+^LICENSE\.md$
