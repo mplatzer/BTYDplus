@@ -5,7 +5,7 @@ test_that("BG/CNBD-k", {
   # validate against BTYD implementation
   set.seed(1)
   params <- c(1, 0.85, 1.45, 0.79, 2.42)
-  n <- 2000
+  n <- 500
   date.zero <- "2010-01-01"
   sim <- bgcnbd.GenerateData(n,
                              round(runif(n, 36, 96) / 12) * 12,
@@ -34,7 +34,7 @@ test_that("BG/CNBD-k", {
                unname(bgcnbd.pmf(params, 32, 0:2)))
   expect_equal(BTYD::bgnbd.PlotFrequencyInCalibration(params[-1], cbs, 7),
                bgcnbd.PlotFrequencyInCalibration(params, cbs, 7), tolerance = 0.01)
-  inc.tracking <- elog2inc(elog, by = 1)
+  inc.tracking <- elog2inc(elog, by = 7)
   expect_equal(BTYD::bgnbd.PlotTrackingInc(params[-1], cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
                bgcnbd.PlotTrackingInc(params, cbs$T.cal, max(cbs$T.cal) + 32, inc.tracking),
                tolerance = 0.01)
@@ -50,7 +50,7 @@ test_that("BG/CNBD-k", {
 
   # generate artificial BG/CNBD-k data
   set.seed(1)
-  n <- 2000
+  n <- 1000
   params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
   sim <- bgcnbd.GenerateData(n,
                               round(runif(n, 36, 96) / 12) * 12,
