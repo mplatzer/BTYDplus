@@ -7,6 +7,9 @@
 \format{A data frame with 10483 rows and 2 variables: \describe{
   \item{cust}{customer ID, factor vector} \item{date}{transaction date,
   Date vector} }}
+\source{
+Thomas Reutterer <thomas.reutterer@wu.ac.at>
+}
 \usage{
 groceryElog
 }
