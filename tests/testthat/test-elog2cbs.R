@@ -1,7 +1,6 @@
 context("elog2cbs")
 
 test_that("elog2cbs", {
-  cat("test elog2cbs")
 
   elog <- data.frame(cust = c(1, 1, 1, 1, 1, 2, 3), date = Sys.Date() + c(0, 14, 14, 28, 35, 7, 24))
   elog_time <- data.frame(cust = c(1, 1, 1, 1, 1, 2, 3), date = Sys.time() + c(0, 14, 14, 28, 35, 7, 24))

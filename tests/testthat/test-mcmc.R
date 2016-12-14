@@ -81,7 +81,7 @@ test_that("MCMC Helpers", {
   pnbd.sim <- pnbd.GenerateData(n = 1000, 28, 28, pnbd.params)
   pnbd.elog <- pnbd.sim$elog
   pnbd.cbs <- pnbd.sim$cbs
-  pnbd.draws <- pnbd.mcmc.DrawParameters(pnbd.cbs, mcmc = 5000, chains = 1)
+  pnbd.draws <- pnbd.mcmc.DrawParameters(pnbd.cbs, mcmc = 1000, chains = 1)
   expect_equal(mcmc.Expectation(pnbd.draws, 28), mean(pnbd.cbs$x), tolerance = 0.1)
   x <- mcmc.ExpectedCumulativeTransactions(pnbd.draws, T.cal = pnbd.cbs$T.cal, T.tot = 56, n.periods.final = 56)
   expect_equal(length(x), 56)

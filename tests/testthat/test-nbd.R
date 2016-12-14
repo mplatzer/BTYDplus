@@ -1,13 +1,12 @@
 context("mle")
 
 test_that("NBD", {
-  cat("test NBD\n")
 
   # generate artificial NBD data
   set.seed(1)
   params <- c(r = 0.85, alpha = 4.45)
   expect_silent(nbd.GenerateData(100, 32, c(16, 32), params, "2010-01-01"))
-  cbs <- nbd.GenerateData(5000, 32, 32, params)$cbs
+  cbs <- nbd.GenerateData(1000, 32, 32, params)$cbs
 
   # estimate parameters, and compare to true parameters
   est <- nbd.EstimateParameters(cbs[, c("x", "T.cal")])

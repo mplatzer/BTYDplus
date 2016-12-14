@@ -29,9 +29,11 @@
 #'   Empirical validation and comparison of models for customer base analysis.
 #'   International Journal of Research in Marketing 24(3) 201-209.
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog)
 #' (params <- mbgcnbd.EstimateParameters(cbs))
+#' }
 #' @export
 mbgcnbd.EstimateParameters <- function(cal.cbs, k = NULL,
                                        par.start = c(1, 3, 1, 3), max.param.value = 10000,
@@ -257,11 +259,13 @@ xbgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = NULL) {
 #' @export
 #' @references Platzer Michael, and Thomas Reutterer (submitted)
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog)
 #' params <- mbgcnbd.EstimateParameters(cbs)
 #' mbgcnbd.pmf(params, t = 52, x = 0:6)
 #' mbgcnbd.pmf(params, t = c(26, 52), x = 0:6)
+#' }
 mbgcnbd.pmf <- function(params, t, x) {
   xbgcnbd.pmf(params, t, x, dropout_at_zero = TRUE)
 }
@@ -305,10 +309,12 @@ xbgcnbd.pmf <- function(params, t, x, dropout_at_zero = NULL) {
 #' @export
 #' @references Platzer Michael, and Thomas Reutterer (submitted)
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog)
 #' params <- mbgcnbd.EstimateParameters(cbs)
 #' mbgcnbd.Expectation(params, t = c(26, 52))
+#' }
 mbgcnbd.Expectation <- function(params, t) {
   xbgcnbd.Expectation(params, t, dropout_at_zero = TRUE)
 }
@@ -363,12 +369,14 @@ xbgcnbd.Expectation <- function(params, t, dropout_at_zero = NULL) {
 #' @export
 #' @references Platzer Michael, and Thomas Reutterer (submitted)
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog)
 #' params <- mbgcnbd.EstimateParameters(cbs)
 #' palive <- mbgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
 #' head(palive) # Probability of being alive for first 6 customers
 #' mean(palive) # Estimated share of customers to be still alive
+#' }
 mbgcnbd.PAlive <- function(params, x, t.x, T.cal) {
   xbgcnbd.PAlive(params, x, t.x, T.cal, dropout_at_zero = TRUE)
 }
@@ -445,6 +453,7 @@ xbgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = NULL) {
 #' @export
 #' @references Platzer Michael, and Thomas Reutterer (submitted)
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog)
 #' params <- mbgcnbd.EstimateParameters(cbs, k = 2)
@@ -453,6 +462,7 @@ xbgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = NULL) {
 #'   T.star = 12, cbs$x, cbs$t.x, cbs$T.cal)
 #' head(xstar.est) # expected number of transactions for first 6 customers
 #' sum(xstar.est) # expected total number of transactions during holdout
+#' }
 mbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.cal) {
   xbgcnbd.ConditionalExpectedTransactions(params, T.star, x, t.x, T.cal, dropout_at_zero = TRUE)
 }
@@ -559,10 +569,12 @@ xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
 #' @export
 #' @references Platzer Michael, and Thomas Reutterer (submitted)
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog)
 #' params <- mbgcnbd.EstimateParameters(cbs)
 #' mbgcnbd.PlotFrequencyInCalibration(params, cbs)
+#' }
 mbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
                                                xlab = "Calibration period transactions",
                                                ylab = "Customers",
@@ -700,6 +712,7 @@ xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.perio
 #' @export
 #' @seealso \code{\link{bgcnbd.PlotTrackingInc}}
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' groceryElog <- groceryElog[groceryElog$date < "2006-06-30", ]
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-04-30")
@@ -707,6 +720,7 @@ xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.perio
 #' params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 #' mbgcnbd.PlotTrackingCum(params, cbs$T.cal,
 #'   T.tot = max(cbs$T.cal + cbs$T.star), cum)
+#' }
 mbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data,
                                     xlab = "Week", ylab = "Cumulative Transactions",
                                     xticklab = NULL, title = "Tracking Cumulative Transactions",
@@ -764,6 +778,7 @@ xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.dat
 #' @export
 #' @seealso \code{\link{bgcnbd.PlotTrackingCum}}
 #' @examples
+#' \dontrun{
 #' data("groceryElog")
 #' groceryElog <- groceryElog[groceryElog$date < "2006-06-30", ]
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-04-30")
@@ -771,6 +786,7 @@ xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.dat
 #' params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 #' mbgcnbd.PlotTrackingInc(params, cbs$T.cal,
 #'   T.tot = max(cbs$T.cal + cbs$T.star), inc)
+#' }
 mbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data,
                                     xlab = "Week", ylab = "Transactions",
                                     xticklab = NULL, title = "Tracking Weekly Transactions",
@@ -824,7 +840,7 @@ xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
 #' @references Platzer Michael, and Thomas Reutterer (submitted)
 #' @examples
 #' params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
-#' data <- mbgcnbd.GenerateData(n = 4000, T.cal = 24, T.star = 32, params)
+#' data <- mbgcnbd.GenerateData(n = 1000, T.cal = 24, T.star = 32, params)
 #'
 #' # customer by sufficient summary statistic - one row per customer
 #' head(data$cbs)

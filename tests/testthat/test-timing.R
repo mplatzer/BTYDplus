@@ -1,7 +1,6 @@
 context("timing")
 
 test_that("estimateRegularity", {
-  cat("test estimateRegularity\n")
 
   # generate Erlang-3 with various lambdas
   set.seed(1)

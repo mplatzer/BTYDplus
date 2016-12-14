@@ -1,7 +1,6 @@
 context("mcmc")
 
 test_that("Pareto/GGG MCMC", {
-  cat("test Pareto/GGG\n")
 
   # generate artificial Pareto/GGG data
   params <- list(t = 4.5, gamma = 1.5, r = 0.9, alpha = 10, s = 0.8, beta = 12)
@@ -13,7 +12,9 @@ test_that("Pareto/GGG MCMC", {
   draws <- pggg.mcmc.DrawParameters(as.data.table(cbs),
                                     mcmc = 10, burnin = 0, thin = 1, mc.cores = 1,
                                     param_init = list(r = 1, alpha = 1, s = 1, beta = 1, t = 1, gamma = 1))
-  draws <- pggg.mcmc.DrawParameters(cbs, mcmc = 100, burnin = 20, thin = 10, chains = 2, mc.cores = 1)
+  draws <- pggg.mcmc.DrawParameters(cbs,
+                                    mcmc = 100, burnin = 20, thin = 10, chains = 2, mc.cores = 1,
+                                    param_init = params)
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
   expect_equal(length(draws$level_1), n)
   expect_true(coda::is.mcmc.list(draws$level_1[[1]]))
@@ -25,9 +26,7 @@ test_that("Pareto/GGG MCMC", {
   # plot regularity rate
   pggg.plotRegularityRateHeterogeneity(draws)
 
-  skip_on_cran()
-  skip_on_travis()
-  skip_on_appveyor()
+  skip("skip long-running test of Pareto/GGG parameter recovery")
 
   # generate artificial Pareto/GGG data
   set.seed(1)

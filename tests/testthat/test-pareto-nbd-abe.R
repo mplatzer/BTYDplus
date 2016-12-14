@@ -1,7 +1,6 @@
 context("mcmc")
 
 test_that("Pareto/NBD (Abe) MCMC", {
-  cat("test Pareto/NBD (Abe)\n")
   skip_on_cran()
 
   # generate artificial Pareto/NBD (Abe) with 2 covariates

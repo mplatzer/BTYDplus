@@ -1,7 +1,6 @@
 context("mle")
 
 test_that("BG/CNBD-k", {
-  cat("test BG/CNBD-k\n")
 
   # validate against BTYD implementation
   set.seed(1)

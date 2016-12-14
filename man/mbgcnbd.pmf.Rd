@@ -30,11 +30,13 @@ purchase frequencies for a random customer in a given time period, i.e.
 \eqn{P(X(t)=x|r,alpha,a,b)}.
 }
 \examples{
+\dontrun{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs)
 mbgcnbd.pmf(params, t = 52, x = 0:6)
 mbgcnbd.pmf(params, t = c(26, 52), x = 0:6)
+}
 }
 \references{
 Platzer Michael, and Thomas Reutterer (submitted)

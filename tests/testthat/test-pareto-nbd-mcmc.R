@@ -1,7 +1,6 @@
 context("mcmc")
 
 test_that("Pareto/NBD MCMC", {
-  cat("test Pareto/NBD MCMC\n")
 
   # test Pareto/NBD data generator
   params <- list(r = 0.9, alpha = 10, s = 0.8, beta = 12)

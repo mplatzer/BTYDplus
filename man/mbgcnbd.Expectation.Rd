@@ -24,10 +24,12 @@ Returns the number of repeat transactions that a randomly chosen customer
 period, i.e. \eqn{E(X(t) | k, r, alpha, a, b)}.
 }
 \examples{
+\dontrun{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs)
 mbgcnbd.Expectation(params, t = c(26, 52))
+}
 }
 \references{
 Platzer Michael, and Thomas Reutterer (submitted)

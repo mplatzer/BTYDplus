@@ -46,9 +46,11 @@ Estimates parameters for the (M)BG/CNBD-k model via Maximum Likelihood
 Estimation.
 }
 \examples{
+\dontrun{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
 (params <- mbgcnbd.EstimateParameters(cbs))
+}
 }
 \references{
 (M)BG/CNBD-k: Platzer Michael, and Thomas Reutterer (submitted)

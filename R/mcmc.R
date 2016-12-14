@@ -10,7 +10,9 @@
 #' cbs <- elog2cbs(groceryElog)
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs,
 #'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
-#' mcmc.PAlive(param.draws)
+#' palive <- mcmc.PAlive(param.draws)
+#' head(palive)
+#' mean(palive)
 mcmc.PAlive <- function(draws) {
   nr_of_cust <- length(draws$level_1)
   p.alives <- sapply(1:nr_of_cust, function(i) mean(as.matrix(draws$level_1[[i]][, "z"])))

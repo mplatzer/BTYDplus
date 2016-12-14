@@ -32,12 +32,14 @@ to return the probability that they are still alive at the end of the
 calibration period.
 }
 \examples{
+\dontrun{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs)
 palive <- mbgcnbd.PAlive(params, cbs$x, cbs$t.x, cbs$T.cal)
 head(palive) # Probability of being alive for first 6 customers
 mean(palive) # Estimated share of customers to be still alive
+}
 }
 \references{
 Platzer Michael, and Thomas Reutterer (submitted)

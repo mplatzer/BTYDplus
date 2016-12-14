@@ -38,10 +38,12 @@ number of customers who made a certain number of repeat transactions in the
 calibration period, binned according to calibration period frequencies.
 }
 \examples{
+\dontrun{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs)
 mbgcnbd.PlotFrequencyInCalibration(params, cbs)
+}
 }
 \references{
 Platzer Michael, and Thomas Reutterer (submitted)

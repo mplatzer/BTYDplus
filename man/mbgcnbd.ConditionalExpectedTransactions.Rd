@@ -37,6 +37,7 @@ to return the number of transactions they are expected to make in a given
 time period.
 }
 \examples{
+\dontrun{
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs, k = 2)
@@ -45,6 +46,7 @@ xstar.est <- mbgcnbd.ConditionalExpectedTransactions(params,
   T.star = 12, cbs$x, cbs$t.x, cbs$T.cal)
 head(xstar.est) # expected number of transactions for first 6 customers
 sum(xstar.est) # expected total number of transactions during holdout
+}
 }
 \references{
 Platzer Michael, and Thomas Reutterer (submitted)

@@ -44,6 +44,7 @@ customers for the calibration and holdout periods, and returns this
 comparison in a matrix.
 }
 \examples{
+\dontrun{
 data("groceryElog")
 groceryElog <- groceryElog[groceryElog$date < "2006-06-30", ]
 cbs <- elog2cbs(groceryElog, T.cal = "2006-04-30")
@@ -51,6 +52,7 @@ inc <- elog2inc(groceryElog)
 params <- mbgcnbd.EstimateParameters(cbs, k = 2)
 mbgcnbd.PlotTrackingInc(params, cbs$T.cal,
   T.tot = max(cbs$T.cal + cbs$T.star), inc)
+}
 }
 \seealso{
 \code{\link{bgcnbd.PlotTrackingCum}}

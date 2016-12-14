@@ -1,11 +1,10 @@
 context("mle")
 
 test_that("MBG/CNBD-k", {
-  cat("test MBG/CNBD-k\n")
 
   # generate artificial MBG/CNBD-k data
   set.seed(1)
-  n <- 5000
+  n <- 2000
   params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
   sim <- mbgcnbd.GenerateData(n,
                              round(runif(n, 36, 96) / 12) * 12,
@@ -56,9 +55,7 @@ test_that("MBG/CNBD-k", {
                 mbgcnbd.ConditionalExpectedTransactions(params, T.star = 32, x = 2, t.x = 12, T.cal = 32))
 
   # check that bias correction actually results in unbiased estimates
-  skip_on_cran()
-  skip_on_travis()
-  skip_on_appveyor()
+  skip("skip long-running test of bias correction")
   set.seed(1)
   bias <- replicate(40, {
     cbs <- mbgcnbd.GenerateData(n = n,
