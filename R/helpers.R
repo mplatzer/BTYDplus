@@ -453,6 +453,7 @@ dc.PlotTracking <- function(actual, expected, T.cal = NULL,
 dc.PlotFreqVsConditionalExpectedFrequency <- function(x, actual, expected, censor,
                                                       xlab, ylab, xticklab, title) {
 
+  bin <- NULL # suppress checkUsage warnings
   if (length(x) != length(actual) | length(x) != length(expected) |
       !is.numeric(x) | !is.numeric(actual) | !is.numeric(expected) |
       any(x < 0) | any(actual < 0) | any(expected < 0))
@@ -465,7 +466,7 @@ dc.PlotFreqVsConditionalExpectedFrequency <- function(x, actual, expected, censo
                transaction.expected = mean(expected),
                bin.size = .N), keyby = bin]
   st <- merge(data.table(bin = 0:censor), st, all.x = TRUE, by = "bin")
-  comparison <- t(st)[-1,]
+  comparison <- t(st)[-1, ]
   col.names <- paste(rep("freq", length(censor + 1)), (0:censor), sep = ".")
   col.names[censor + 1] <- paste0(col.names[censor + 1], "+")
   colnames(comparison) <- col.names
