@@ -558,7 +558,7 @@ xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
 #'
 #' @param params A vector with model parameters \code{k}, \code{r},
 #'   \code{alpha}, \code{a} and \code{b}, in that order.
-#' @param cal.cbs calibration period CBS (customer by sufficient statistic). It
+#' @param cal.cbs Calibration period CBS (customer by sufficient statistic). It
 #'   must contain columns for frequency ('x') and total time observed ('T.cal').
 #' @param censor Cutoff point for number of transactions in plot.
 #' @param xlab Descriptive label for the x axis.
@@ -819,6 +819,58 @@ xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
 
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
                   xlab = xlab, ylab = ylab, title = title, xticklab = xticklab, ymax = ymax)
+}
+
+
+
+#' (M)BG/CNBD-k Plot Frequency vs. Conditional Expected Frequency
+#'
+#' Plots the actual and conditional expected number transactions made by
+#' customers in the holdout period, binned according to calibration period
+#' frequencies, and returns this comparison in a matrix.
+#'
+#' @param params A vector with model parameters \code{k}, \code{r},
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param T.star Length of the holdout period.
+#' @param cal.cbs Calibration period CBS (customer by sufficient statistic). It
+#'   must contain columns for frequency ('x'), recency ('t.x') and total time
+#'   observed ('T.cal').
+#' @param x.star Vector of transactions made by each customer in the holdout period.
+#' @param censor Cutoff point for number of transactions in plot.
+#' @param xlab Descriptive label for the x axis.
+#' @param ylab Descriptive label for the x axis.
+#' @param xticklab A vector containing a label for each tick mark on the x axis.
+#' @param title Title placed on the top-center of the plot.
+#' @return Holdout period transaction frequency comparison matrix (actual vs. expected).
+#' @export
+#' @seealso \code{\link{bgcnbd.PlotFreqVsConditionalExpectedFrequency}}
+#' @examples
+#' \dontrun{
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-09-30")
+#' params <- mbgcnbd.EstimateParameters(cbs, k=2)
+#' mbgcnbd.PlotFreqVsConditionalExpectedFrequency(params, T.star=52, cbs, cbs$x.star, censor=7)
+#' }
+mbgcnbd.PlotFreqVsConditionalExpectedFrequency <- function(params, T.star, cal.cbs, x.star,
+                                                          censor, xlab = "Calibration period transactions",
+                                                          ylab = "Holdout period transactions", xticklab = NULL,
+                                                          title = "Conditional Expectation") {
+  x.star.est <- mbgcnbd.ConditionalExpectedTransactions(params, T.star, cal.cbs$x, cal.cbs$t.x, cal.cbs$T.cal)
+  dc.PlotFreqVsConditionalExpectedFrequency(x = cal.cbs$x, actual = x.star, expected = x.star.est,
+                                            censor = censor, xlab = xlab, ylab = ylab, xticklab = xticklab,
+                                            title = title)
+}
+
+#' @rdname mbgcnbd.PlotFreqVsConditionalExpectedFrequency
+#' @export
+bgcnbd.PlotFreqVsConditionalExpectedFrequency <- function(params, T.star, cal.cbs, x.star,
+                                                          censor, xlab = "Calibration period transactions",
+                                                          ylab = "Holdout period transactions", xticklab = NULL,
+                                                          title = "Conditional Expectation") {
+  x.star.est <- bgcnbd.ConditionalExpectedTransactions(params, T.star, cal.cbs$x, cal.cbs$t.x, cal.cbs$T.cal)
+  dc.PlotFreqVsConditionalExpectedFrequency(x = cal.cbs$x, actual = x.star, expected = x.star.est,
+                                            censor = censor, xlab = xlab, ylab = ylab, xticklab = xticklab,
+                                            title = title)
 }
 
 
