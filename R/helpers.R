@@ -489,3 +489,39 @@ dc.PlotFreqVsConditionalExpectedFrequency <- function(x, actual, expected, censo
   legend("topleft", legend = c("Actual", "Model"), col = 1:2, lty = 1:2, lwd = 1)
   return(comparison)
 }
+
+
+#' Generic Method for Plotting Frequency vs. Conditional Expected Frequency
+#'
+#' @keywords internal
+dc.PlotRecVsConditionalExpectedFrequency <- function(t.x, actual, expected,
+                                                     xlab, ylab, xticklab, title) {
+
+  bin <- NULL # suppress checkUsage warnings
+  if (length(t.x) != length(actual) | length(t.x) != length(expected) |
+      !is.numeric(t.x) | !is.numeric(actual) | !is.numeric(expected) |
+      any(t.x < 0) | any(actual < 0) | any(expected < 0))
+    stop("t.x, actual and expected must be non-negative numeric vectors of same length.")
+
+  dt <- data.table(t.x, actual, expected)
+  dt[, bin := floor(t.x)]
+  st <- dt[, .(actual = mean(actual),
+               expected = mean(expected),
+               bin.size = .N), keyby = bin]
+  st <- merge(data.table(bin = 1:floor(max(t.x))), st[bin > 0], all.x = TRUE, by = "bin")
+  comparison <- t(st)[-1, ]
+  x.labels <- NULL
+  if (is.null(xticklab) == FALSE) {
+    x.labels <- xticklab
+  } else {
+    x.labels <- 1:max(st$bin)
+  }
+  actual <- comparison[1, ]
+  expected <- comparison[2, ]
+  ylim <- c(0, ceiling(max(c(actual, expected), na.rm = TRUE) * 1.1))
+  plot(actual, type = "l", xaxt = "n", col = 1, ylim = ylim, xlab = xlab, ylab = ylab, main = title)
+  lines(expected, lty = 2, col = 2)
+  axis(1, at = 1:ncol(comparison), labels = x.labels)
+  legend("topleft", legend = c("Actual", "Model"), col = 1:2, lty = 1:2, lwd = 1)
+  return(comparison)
+}

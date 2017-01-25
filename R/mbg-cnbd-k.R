@@ -875,6 +875,57 @@ bgcnbd.PlotFreqVsConditionalExpectedFrequency <- function(params, T.star, cal.cb
 
 
 
+#' (M)BG/CNBD-k Plot Actual vs. Conditional Expected Frequency by Recency
+#'
+#' Plots the actual and conditional expected number transactions made by
+#' customers in the holdout period, binned according to calibration period
+#' recencies, and returns this comparison in a matrix.
+#'
+#' @param params A vector with model parameters \code{k}, \code{r},
+#'   \code{alpha}, \code{a} and \code{b}, in that order.
+#' @param cal.cbs Calibration period CBS (customer by sufficient statistic). It
+#'   must contain columns for frequency ('x'), recency ('t.x') and total time
+#'   observed ('T.cal').
+#' @param T.star Length of the holdout period.
+#' @param x.star Vector of transactions made by each customer in the holdout period.
+#' @param xlab Descriptive label for the x axis.
+#' @param ylab Descriptive label for the x axis.
+#' @param xticklab A vector containing a label for each tick mark on the x axis.
+#' @param title Title placed on the top-center of the plot.
+#' @return Matrix comparing actual and conditional expected transactions in the holdout period.
+#' @export
+#' @seealso \code{\link{bgcnbd.PlotFreqVsConditionalExpectedFrequency}}
+#' @examples
+#' \dontrun{
+#' data("groceryElog")
+#' cbs <- elog2cbs(groceryElog, T.cal = "2006-09-30")
+#' params <- mbgcnbd.EstimateParameters(cbs, k=2)
+#' mbgcnbd.PlotRecVsConditionalExpectedFrequency(params, cbs, T.star=52, cbs$x.star)
+#' }
+mbgcnbd.PlotRecVsConditionalExpectedFrequency <- function(params, cal.cbs, T.star, x.star,
+                                                           xlab = "Calibration period recency",
+                                                           ylab = "Holdout period transactions", xticklab = NULL,
+                                                           title = "Actual vs. Conditional Expected Transactions by Recency") {
+  x.star.est <- mbgcnbd.ConditionalExpectedTransactions(params, T.star, cal.cbs$x, cal.cbs$t.x, cal.cbs$T.cal)
+  dc.PlotRecVsConditionalExpectedFrequency(t.x = cal.cbs$t.x, actual = x.star, expected = x.star.est,
+                                            xlab = xlab, ylab = ylab, xticklab = xticklab,
+                                            title = title)
+}
+
+#' @rdname mbgcnbd.PlotRecVsConditionalExpectedFrequency
+#' @export
+bgcnbd.PlotRecVsConditionalExpectedFrequency <- function(params, cal.cbs, T.star, x.star,
+                                                           xlab = "Calibration period recency",
+                                                           ylab = "Holdout period transactions", xticklab = NULL,
+                                                           title = "Actual vs. Conditional Expected Transactions by Recency") {
+  x.star.est <- bgcnbd.ConditionalExpectedTransactions(params, T.star, cal.cbs$x, cal.cbs$t.x, cal.cbs$T.cal)
+  dc.PlotRecVsConditionalExpectedFrequency(t.x = cal.cbs$t.x, actual = x.star, expected = x.star.est,
+                                            xlab = xlab, ylab = ylab, xticklab = xticklab,
+                                            title = title)
+}
+
+
+
 #' Simulate data according to (M)BG/CNBD-k model assumptions
 #'
 #' @param n Number of customers.

@@ -1,5 +1,6 @@
 1.1.0
 - added `(m)bgcnbd.PlotFreqVsConditionalExpectedFrequency` methods
+- added `(m)bgcnbd.PlotRecVsConditionalExpectedFrequency` methods
 
 1.0.2
 - speed up `xbgcnbd.EstimateParameters` by lowering lower bound of early stop to k=3
