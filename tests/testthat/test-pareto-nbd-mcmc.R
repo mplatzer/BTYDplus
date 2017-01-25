@@ -18,14 +18,14 @@ test_that("Pareto/NBD MCMC", {
   expect_is(sim$elog$date, "POSIXct")
   expect_equal(min(sim$elog$date), as.POSIXct(date.zero))
   expect_equal(min(sim$cbs$first), as.POSIXct(date.zero))
-  simElog <- sim$elog
-  simCBS <- sim$cbs
+  sim_elog <- sim$elog
+  sim_cbs <- sim$cbs
   # recreate CBS via `elog2cbs`
-  date.zero <- min(simElog$date)
-  simCBSc <- elog2cbs(simElog,
+  date.zero <- min(sim_elog$date)
+  sim_cbs_c <- elog2cbs(sim_elog,
                       T.cal = date.zero + max(T.cal) * 3600 * 24 * 7,
                       T.tot = date.zero + max(T.cal + T.star) * 3600 * 24 * 7)
-  expect_equal(simCBSc, subset(simCBS, select = names(simCBSc)))
+  expect_equal(sim_cbs_c, subset(sim_cbs, select = names(sim_cbs_c)))
   # multiple T.star's
   sim <- pggg.GenerateData(100, 52, c(26, 104), params, date.zero = as.Date("2010-01-01"))
   expect_true(all(c("x.star26", "x.star104") %in% names(sim$cbs)))
