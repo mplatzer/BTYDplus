@@ -902,10 +902,11 @@ bgcnbd.PlotFreqVsConditionalExpectedFrequency <- function(params, T.star, cal.cb
 #' params <- mbgcnbd.EstimateParameters(cbs, k=2)
 #' mbgcnbd.PlotRecVsConditionalExpectedFrequency(params, cbs, T.star=52, cbs$x.star)
 #' }
-mbgcnbd.PlotRecVsConditionalExpectedFrequency <- function(params, cal.cbs, T.star, x.star,
-                                                           xlab = "Calibration period recency",
-                                                           ylab = "Holdout period transactions", xticklab = NULL,
-                                                           title = "Actual vs. Conditional Expected Transactions by Recency") {
+mbgcnbd.PlotRecVsConditionalExpectedFrequency <- function(
+                                       params, cal.cbs, T.star, x.star,
+                                       xlab = "Calibration period recency",
+                                       ylab = "Holdout period transactions", xticklab = NULL,
+                                       title = "Actual vs. Conditional Expected Transactions by Recency") {
   x.star.est <- mbgcnbd.ConditionalExpectedTransactions(params, T.star, cal.cbs$x, cal.cbs$t.x, cal.cbs$T.cal)
   dc.PlotRecVsConditionalExpectedFrequency(t.x = cal.cbs$t.x, actual = x.star, expected = x.star.est,
                                             xlab = xlab, ylab = ylab, xticklab = xticklab,
@@ -914,10 +915,11 @@ mbgcnbd.PlotRecVsConditionalExpectedFrequency <- function(params, cal.cbs, T.sta
 
 #' @rdname mbgcnbd.PlotRecVsConditionalExpectedFrequency
 #' @export
-bgcnbd.PlotRecVsConditionalExpectedFrequency <- function(params, cal.cbs, T.star, x.star,
-                                                           xlab = "Calibration period recency",
-                                                           ylab = "Holdout period transactions", xticklab = NULL,
-                                                           title = "Actual vs. Conditional Expected Transactions by Recency") {
+bgcnbd.PlotRecVsConditionalExpectedFrequency <- function(
+                                      params, cal.cbs, T.star, x.star,
+                                      xlab = "Calibration period recency",
+                                      ylab = "Holdout period transactions", xticklab = NULL,
+                                      title = "Actual vs. Conditional Expected Transactions by Recency") {
   x.star.est <- bgcnbd.ConditionalExpectedTransactions(params, T.star, cal.cbs$x, cal.cbs$t.x, cal.cbs$T.cal)
   dc.PlotRecVsConditionalExpectedFrequency(t.x = cal.cbs$t.x, actual = x.star, expected = x.star.est,
                                             xlab = xlab, ylab = ylab, xticklab = xticklab,
