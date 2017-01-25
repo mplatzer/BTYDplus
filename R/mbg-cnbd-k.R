@@ -90,7 +90,7 @@ xbgcnbd.EstimateParameters <- function(cal.cbs, k = NULL,
         break  # stop if parameters could not be estimated, e.g. if xbgcnbd.LL returns Inf
       }
       LL[k] <- xbgcnbd.cbs.LL(params = params[[k]], cal.cbs = cal.cbs, dropout_at_zero = dropout_at_zero)
-      if (k > 4 && LL[k] < LL[k - 1] && LL[k - 1] < LL[k - 2])
+      if (k > 2 && LL[k] < LL[k - 1] && LL[k - 1] < LL[k - 2])
         break  # stop if LL gets worse for increasing k
     }
     k <- which.max(LL)

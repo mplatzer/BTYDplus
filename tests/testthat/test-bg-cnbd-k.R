@@ -89,4 +89,14 @@ test_that("BG/CNBD-k", {
   expect_equal(length(bgcnbd.pmf(params, 56, 0)), 1)
   expect_equal(sum(bgcnbd.pmf(params, 2, 0:100)), 1)
 
+  # test k=6
+  set.seed(1)
+  n <- 1000
+  params <- c(k = 6, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
+  cbs <- bgcnbd.GenerateData(n,
+                             round(runif(n, 36, 96) / 12) * 12,
+                             c(32, 64),
+                             params = params)$cbs
+  est <- bgcnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal", "litt")])
+  expect_equal(est[["k"]], params[["k"]])
 })

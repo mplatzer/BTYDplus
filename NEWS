@@ -1,3 +1,6 @@
+1.0.2
+- speed up `xbgcnbd.EstimateParameters` by lowering lower bound of early stop to k=3
+
 1.0.1
 - reduce run time of tests and example code
 - add source info to `groceryElog` dataset
