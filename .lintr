@@ -3,7 +3,7 @@ linters: with_defaults(
     multiple_dots_linter = NULL,
     camel_case_linter = NULL,
     spaces_left_parentheses_linter = NULL)
-exclusions: list("R/RcppExports.R", "doc/*", "tests/testthat/*")
+exclusions: list("R/RcppExports.R" = 1, "inst/doc/BTYDplus-HowTo.R")
 exclude: "# nolint"
 exclude_start: "# nolint start"
 exclude_end: "# nolint end"
