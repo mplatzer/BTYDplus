@@ -17,7 +17,7 @@ bgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = 7,
 \item{params}{A vector with model parameters \code{k}, \code{r},
 \code{alpha}, \code{a} and \code{b}, in that order.}
 
-\item{cal.cbs}{calibration period CBS (customer by sufficient statistic). It
+\item{cal.cbs}{Calibration period CBS (customer by sufficient statistic). It
 must contain columns for frequency ('x') and total time observed ('T.cal').}
 
 \item{censor}{Cutoff point for number of transactions in plot.}
