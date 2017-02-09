@@ -43,6 +43,10 @@ Plots the actual and expected incremental total repeat transactions by all
 customers for the calibration and holdout periods, and returns this
 comparison in a matrix.
 }
+\details{
+Note: Computational time increases with the number of unique values of
+\code{T.cal}.
+}
 \examples{
 \dontrun{
 data("groceryElog")
@@ -55,6 +59,6 @@ mbgcnbd.PlotTrackingInc(params, cbs$T.cal,
 }
 }
 \seealso{
-\code{\link{bgcnbd.PlotTrackingCum}}
+\code{\link{mbgcnbd.ExpectedCumulativeTransactions}}
 }
 

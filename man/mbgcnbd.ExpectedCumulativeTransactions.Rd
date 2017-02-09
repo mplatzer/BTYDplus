@@ -28,6 +28,10 @@ Vector of length \code{n.periods.final} with expected cumulative
 Calculates the expected cumulative total repeat transactions by all customers
 for the calibration and holdout periods.
 }
+\details{
+Note: Computational time increases with the number of unique values of
+\code{T.cal}.
+}
 \examples{
 \dontrun{
 data("groceryElog")

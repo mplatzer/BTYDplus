@@ -23,6 +23,10 @@ Returns the number of repeat transactions that a randomly chosen customer
 (for whom we have no prior information) is expected to make in a given time
 period, i.e. \eqn{E(X(t) | k, r, alpha, a, b)}.
 }
+\details{
+Note: Computational time increases with the number of unique values of
+\code{t}.
+}
 \examples{
 \dontrun{
 data("groceryElog")

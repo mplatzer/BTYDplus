@@ -302,6 +302,9 @@ xbgcnbd.pmf <- function(params, t, x, dropout_at_zero = NULL) {
 #' (for whom we have no prior information) is expected to make in a given time
 #' period, i.e. \eqn{E(X(t) | k, r, alpha, a, b)}.
 #'
+#' Note: Computational time increases with the number of unique values of
+#' \code{t}.
+#'
 #' @param params A vector with model parameters \code{k}, \code{r},
 #'   \code{alpha}, \code{a} and \code{b}, in that order.
 #' @param t Length of time for which we are calculating the expected number of repeat transactions.
@@ -635,6 +638,9 @@ xbgcnbd.PlotFrequencyInCalibration <- function(params, cal.cbs, censor = 7,
 #' Calculates the expected cumulative total repeat transactions by all customers
 #' for the calibration and holdout periods.
 #'
+#' Note: Computational time increases with the number of unique values of
+#' \code{T.cal}.
+#'
 #' @param params A vector with model parameters \code{k}, \code{r},
 #'   \code{alpha}, \code{a} and \code{b}, in that order.
 #' @param T.cal A vector to represent customers' calibration period lengths.
@@ -696,6 +702,9 @@ xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.perio
 #' customers for the calibration and holdout periods, and returns this
 #' comparison in a matrix.
 #'
+#' Note: Computational time increases with the number of unique values of
+#' \code{T.cal}.
+#'
 #' @param params A vector with model parameters \code{k}, \code{r},
 #'   \code{alpha}, \code{a} and \code{b}, in that order.
 #' @param T.cal A vector to represent customers' calibration period lengths.
@@ -710,7 +719,7 @@ xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.perio
 #' @param ymax Upper boundary for y axis.
 #' @return Matrix containing actual and expected cumulative repeat transactions.
 #' @export
-#' @seealso \code{\link{bgcnbd.PlotTrackingInc}}
+#' @seealso \code{\link{mbgcnbd.ExpectedCumulativeTransactions}}
 #' @examples
 #' \dontrun{
 #' data("groceryElog")
@@ -762,6 +771,9 @@ xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.dat
 #' customers for the calibration and holdout periods, and returns this
 #' comparison in a matrix.
 #'
+#' Note: Computational time increases with the number of unique values of
+#' \code{T.cal}.
+#'
 #' @param params A vector with model parameters \code{k}, \code{r},
 #'   \code{alpha}, \code{a} and \code{b}, in that order.
 #' @param T.cal A vector to represent customers' calibration period lengths.
@@ -776,7 +788,7 @@ xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.dat
 #' @param ymax Upper boundary for y axis.
 #' @return Matrix containing actual and expected incremental repeat transactions.
 #' @export
-#' @seealso \code{\link{bgcnbd.PlotTrackingCum}}
+#' @seealso \code{\link{mbgcnbd.ExpectedCumulativeTransactions}}
 #' @examples
 #' \dontrun{
 #' data("groceryElog")
