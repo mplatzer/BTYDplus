@@ -2,7 +2,7 @@
 
 [![Travis-CI Build Status](https://travis-ci.org/mplatzer/BTYDplus.svg?branch=master)](https://travis-ci.org/mplatzer/BTYDplus)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mplatzer/BTYDplus?branch=master&svg=true)](https://ci.appveyor.com/project/mplatzer/BTYDplus)
-[![Coverage Status](https://img.shields.io/codecov/c/github/mplatzer/BTYDplus/master.svg)](https://codecov.io/github/mplatzer/BTYDplus?branch=master)
+<!-- [![Coverage Status](https://img.shields.io/codecov/c/github/mplatzer/BTYDplus/master.svg)](https://codecov.io/github/mplatzer/BTYDplus?branch=master) -->
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/BTYDplus)]( https://CRAN.R-project.org/package=BTYDplus)
 [![](http://cranlogs.r-pkg.org/badges/BTYDplus)](http://cran.rstudio.com/web/packages/BTYDplus/index.html)
