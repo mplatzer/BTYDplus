@@ -38,4 +38,3 @@ plot(cum, typ="l", frame = FALSE)
 inc <- elog2inc(groceryElog)
 plot(inc, typ="l", frame = FALSE)
 }
-

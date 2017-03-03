@@ -26,4 +26,3 @@ xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 cbs$pactive <- mcmc.PActive(xstar.draws)
 head(cbs)
 }
-

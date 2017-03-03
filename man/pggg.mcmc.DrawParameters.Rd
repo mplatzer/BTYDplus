@@ -63,4 +63,3 @@ Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regula
 \seealso{
 \code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 }
-

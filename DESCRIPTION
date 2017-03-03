@@ -1,7 +1,7 @@
 Package: BTYDplus
 Type: Package
 Title: Probabilistic Models for Assessing and Predicting your Customer Base
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: person("Michael", "Platzer", email = "michael.platzer@gmail.com", role = c("aut", "cre"))
 Description: Provides advanced statistical methods to describe and predict customers'
   purchase behavior in a non-contractual setting. It uses historic transaction records to fit a
@@ -32,6 +32,6 @@ Suggests:
     rmarkdown,
     lintr (>= 1.0.0)
 Roxygen: list(wrap = FALSE)
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 LazyData: true
 VignetteBuilder: knitr

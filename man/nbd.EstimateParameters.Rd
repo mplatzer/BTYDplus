@@ -31,4 +31,3 @@ nbd.EstimateParameters(cbs)
 EHRENBERG, ASC. 'The Pattern of Consumer Purchases.' Quantitative
   techniques in marketing analysis: text and readings (1962): 355.
 }
-

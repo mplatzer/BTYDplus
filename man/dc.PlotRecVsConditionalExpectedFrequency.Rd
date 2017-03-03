@@ -11,4 +11,3 @@ dc.PlotRecVsConditionalExpectedFrequency(t.x, actual, expected, xlab, ylab,
 Generic Method for Plotting Frequency vs. Conditional Expected Frequency
 }
 \keyword{internal}
-

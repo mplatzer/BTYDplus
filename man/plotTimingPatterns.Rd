@@ -30,4 +30,3 @@ data("groceryElog")
 plotTimingPatterns(groceryElog, T.tot = "2008-12-31")
 plotTimingPatterns(groceryElog, T.cal = "2006-12-31", headers = c("Calibration", "Holdout"))
 }
-

@@ -25,4 +25,3 @@ cbs <- elog2cbs(groceryElog)
 params <- nbd.EstimateParameters(cbs)
 nbd.cbs.LL(params, cbs)
 }
-
