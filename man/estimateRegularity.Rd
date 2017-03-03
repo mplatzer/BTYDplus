@@ -70,4 +70,3 @@ Wu, Couchen, and H-L. Chen. 'A consumer purchasing model with
 
 \url{http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf}
 }
-

@@ -38,4 +38,3 @@ cbs$xstar.est <- apply(xstar.draws, 2, mean)
 cbs$pactive <- mcmc.PActive(xstar.draws)
 head(cbs)
 }
-

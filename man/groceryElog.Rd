@@ -28,4 +28,3 @@ Platzer, Michael, and Thomas Reutterer. 'Ticking Away the
   Marketing Science (2016).
 }
 \keyword{datasets}
-

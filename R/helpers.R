@@ -275,7 +275,7 @@ plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 #' head(cbs)
 elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
-  cust <- first <- itt <- T.star <- x.star <- sales <- sales.star <- NULL  # suppress checkUsage warnings
+  cust <- first <- itt <- T.star <- x.star <- sales <- sales.star <- sales.x <- NULL  # suppress checkUsage warnings
   stopifnot(inherits(elog, "data.frame"))
   if (!all(c("cust", "date") %in% names(elog))) stop("`elog` must have fields `cust` and `date`")
   if (!any(c("Date", "POSIXt") %in% class(elog$date))) stop("`date` field must be of class `Date` or `POSIXt`")
@@ -324,7 +324,8 @@ elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
     cbs <- merge(cbs, val, all.x = TRUE, by = "cust")
     cbs[is.na(x.star), `:=`(x.star, 0)]
     cbs[is.na(sales.star), `:=`(sales.star, 0)]
-    setcolorder(cbs, c("cust", "x", "t.x", "litt", "sales", "sales.x", "first", "T.cal", "T.star", "x.star", "sales.star"))
+    setcolorder(cbs, c("cust", "x", "t.x", "litt", "sales", "sales.x", "first", "T.cal",
+                       "T.star", "x.star", "sales.star"))
   } else {
     setcolorder(cbs, c("cust", "x", "t.x", "litt", "sales", "sales.x", "first", "T.cal"))
   }

@@ -34,4 +34,3 @@ data <- nbd.GenerateData(n, T.cal, T.star, params)
 cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 elog <- data$elog  # Event log - one row per event/purchase
 }
-
