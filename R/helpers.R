@@ -262,7 +262,8 @@ plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
 #'  \item{\code{x}}{Number of recurring events in calibration period.}
 #'  \item{\code{t.x}}{Time between first and last event in calibration period.}
 #'  \item{\code{litt}}{Sum of logarithmic intertransaction timings during calibration period.}
-#'  \item{\code{sales}}{Sum of sales in calibration period. Only if \code{elog$sales} is provided.}
+#'  \item{\code{sales}}{Sum of sales in calibration period, incl. initial transaction. Only if \code{elog$sales} is provided.}
+#'  \item{\code{sales.x}}{Sum of sales in calibration period, excl. initial transaction. Only if \code{elog$sales} is provided.}
 #'  \item{\code{first}}{Date of first transaction in calibration period.}
 #'  \item{\code{T.cal}}{Time between first event and end of calibration period.}
 #'  \item{\code{T.star}}{Length of holdout period. Only if \code{T.cal} is provided.}
@@ -311,7 +312,8 @@ elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
                  list(x = .N - 1,
                       t.x = max(t),
                       litt = sum(log(itt[itt > 0])),
-                      sales = sum(sales)),
+                      sales = sum(sales),
+                      sales.x = sum(sales[t > 0])),
                  by = "cust,first"]
   cbs[, `:=`(T.cal, as.numeric(difftime(T.cal, first, units = units)))]
   setkey(cbs, cust)
@@ -322,14 +324,15 @@ elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
     cbs <- merge(cbs, val, all.x = TRUE, by = "cust")
     cbs[is.na(x.star), `:=`(x.star, 0)]
     cbs[is.na(sales.star), `:=`(sales.star, 0)]
-    setcolorder(cbs, c("cust", "x", "t.x", "litt", "sales", "first", "T.cal", "T.star", "x.star", "sales.star"))
+    setcolorder(cbs, c("cust", "x", "t.x", "litt", "sales", "sales.x", "first", "T.cal", "T.star", "x.star", "sales.star"))
   } else {
-    setcolorder(cbs, c("cust", "x", "t.x", "litt", "sales", "first", "T.cal"))
+    setcolorder(cbs, c("cust", "x", "t.x", "litt", "sales", "sales.x", "first", "T.cal"))
   }
   # return same object type as was passed
   if (!has.sales) {
     elog_dt[, `:=`(sales, NULL)]
     cbs[, `:=`(sales, NULL)]
+    cbs[, `:=`(sales.x, NULL)]
     if (has.holdout) cbs[, `:=`(sales.star, NULL)]
   }
   if (!is.dt) {
