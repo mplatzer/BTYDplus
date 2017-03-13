@@ -1,3 +1,7 @@
+1.1.2
+- fix `mcmc.ExpectedCumulativeTransactions` for Pareto/NBD (Abe) with covariates (#55)
+- add ability to provide covariates to `abe.generateData`
+
 1.1.1
 - added `sales.x` to `elog2cbs` output, which sums over sales in calibration, but excludes initial transaction (thanks to msinjin for the suggestion)
 

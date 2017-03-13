@@ -8,7 +8,7 @@ Pareto/NBD (Abe)}
 mcmc.PlotTrackingCum(draws, T.cal, T.tot, actual.cu.tracking.data,
   xlab = "Week", ylab = "Cumulative Transactions", xticklab = NULL,
   title = "Tracking Cumulative Transactions", ymax = NULL,
-  sample_size = 10000)
+  sample_size = 10000, covariates = NULL)
 }
 \arguments{
 \item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
@@ -36,6 +36,9 @@ period (both calibration and holdout periods).}
 
 \item{sample_size}{Sample size for estimating the probability distribution.
 See \code{\link{mcmc.ExpectedCumulativeTransactions}}.}
+
+\item{covariates}{(optional) Matrix of covariates, for Pareto/NBD (Abe)
+model, passed to \code{\link{abe.GenerateData}} for simulating data.}
 }
 \value{
 Matrix containing actual and expected cumulative repeat transactions.

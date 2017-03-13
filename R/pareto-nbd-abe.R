@@ -261,6 +261,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
 #' @param T.star Length of holdout period. This may be a vector.
 #' @param params A list of model parameters: \code{beta} and \code{gamma}.
 #' @param date.zero Initial date for cohort start. Can be of class character, Date or POSIXt.
+#' @param covariates Provide matrix of customer covariates. If NULL then random covariate values between [-1,1] are drawn.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
@@ -273,7 +274,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
 #' data <- abe.GenerateData(n = 2000, T.cal = 32, T.star = 32, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
-abe.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01") {
+abe.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01", covariates = NULL) {
 
   # set start date for each customer, so that they share same T.cal date
   T.cal.fix <- max(T.cal)
@@ -285,9 +286,24 @@ abe.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01")
     params$beta <- matrix(params$beta, nrow = 1, ncol = 2)
 
   nr_covars <- nrow(params$beta)
-  covars <- matrix(c(rep(1, n), runif( (nr_covars - 1) * n, -1, 1)), nrow = n, ncol = nr_covars)
-  colnames(covars) <- paste("covariate", 0:(nr_covars - 1), sep = "_")
-  colnames(covars)[1] <- "intercept"
+  if (!is.null(covariates)) {
+    # ensure that provided covariates are in matrix format, with intercept
+    covars <- covariates
+    if (is.data.frame(covars)) covars <- as.matrix(covars)
+    if (!is.matrix(covars)) covars <- matrix(covars, ncol = 1, dimnames = list(NULL, "covariate_1"))
+    if (!all(covars[, 1] == 1)) covars <- cbind("intercept" = rep(1, nrow(covars)), covars)
+    if (is.null(colnames(covars)) & ncol(covars) > 1)
+      colnames(covars)[-1] <- paste("covariate", 1:(nr_covars - 1), sep = "_")
+    if (nr_covars != ncol(covars))
+      stop("provided number of covariate columns does not match implied covariate number by parameter `beta`")
+    if (n != nrow(covars))
+      covars <- covars[sample(1:nrow(covars), n, replace = TRUE), ]
+  } else {
+    # simulate covariates, if not provided
+    covars <- matrix(c(rep(1, n), runif( (nr_covars - 1) * n, -1, 1)), nrow = n, ncol = nr_covars)
+    colnames(covars) <- paste("covariate", 0:(nr_covars - 1), sep = "_")
+    colnames(covars)[1] <- "intercept"
+  }
 
   # sample log-normal distributed parameters lambda/mu for each customer
   thetas <- exp( (covars %*% params$beta) + mvtnorm::rmvnorm(n, mean = c(0, 0), sigma = params$gamma))

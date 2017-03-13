@@ -6,7 +6,7 @@
 Pareto/NBD (Abe)}
 \usage{
 mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, n.periods.final,
-  sample_size = 10000)
+  sample_size = 10000, covariates = NULL)
 }
 \arguments{
 \item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
@@ -22,6 +22,9 @@ speed up calculations.}
 periods.}
 
 \item{sample_size}{Sample size for estimating the probability distribution.}
+
+\item{covariates}{(optional) Matrix of covariates, for Pareto/NBD (Abe)
+model, passed to \code{\link{abe.GenerateData}} for simulating data.}
 }
 \value{
 Numeric vector of expected cumulative total repeat transactions by
