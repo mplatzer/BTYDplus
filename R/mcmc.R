@@ -207,6 +207,8 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
 #' @param x Number of transactions for which probability is calculated. May also
 #'   be a vector.
 #' @param sample_size Sample size for estimating the probability distribution.
+#' @param covariates (optional) Matrix of covariates, for Pareto/NBD (Abe)
+#'   model, passed to \code{\link{abe.GenerateData}} for simulating data.
 #' @return \eqn{P(X(t)=x)}. If either \code{t} or \code{x} is a vector, then the
 #'   output will be a vector as well. If both are vectors, the output will be a
 #'   matrix.
@@ -218,7 +220,7 @@ mcmc.plotPActiveDiagnostic <- function(cbs, xstar, title = "Diagnostic Plot for 
 #'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
 #' mcmc.pmf(param.draws, t = 52, x = 0:6)
 #' mcmc.pmf(param.draws, t = c(26, 52), x = 0:6)
-mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
+mcmc.pmf <- function(draws, t, x, sample_size = 10000, covariates = NULL) {
   cohort_draws <- as.matrix(draws$level_2)
   nr_of_draws <- nrow(cohort_draws)
   # use posterior mean
@@ -238,7 +240,8 @@ mcmc.pmf <- function(draws, t, x, sample_size = 10000) {
                                p["cov_log_lambda_log_mu"],
                                p["var_log_mu"]),
                              ncol = 2)
-      abe.GenerateData(n = n, T.cal = 0, T.star = unique(t), params = params)$cbs
+      abe.GenerateData(n = n, T.cal = 0, T.star = unique(t), params = params,
+                       covariates = covariates)$cbs
     }
   }))
   pmf <- sapply(1:length(t), function(idx) {
@@ -302,6 +305,8 @@ mcmc.Expectation <- function(draws, t, sample_size = 10000) {
 #' @param n.periods.final Number of time periods in the calibration and holdout
 #'   periods.
 #' @param sample_size Sample size for estimating the probability distribution.
+#' @param covariates (optional) Matrix of covariates, for Pareto/NBD (Abe)
+#'   model, passed to \code{\link{abe.GenerateData}} for simulating data.
 #' @return Numeric vector of expected cumulative total repeat transactions by
 #'   all customers.
 #' @export
@@ -314,7 +319,8 @@ mcmc.Expectation <- function(draws, t, sample_size = 10000) {
 #' # weeks, with every eigth week being reported.
 #' mcmc.ExpectedCumulativeTransactions(param.draws,
 #'   T.cal = cbs$T.cal, T.tot = 104, n.periods.final = 104/8, sample_size = 1000)
-mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.final, sample_size = 10000) {
+mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.final,
+                                                sample_size = 10000, covariates = NULL) {
   if (any(T.cal < 0) || !is.numeric(T.cal))
     stop("T.cal must be numeric and may not contain negative numbers.")
   if (length(T.tot) > 1 || T.tot < 0 || !is.numeric(T.tot))
@@ -333,13 +339,14 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
     } else if (model == "abe") {
       p <- as.list(cohort_draws[i, ])
       params <- list()
-      params$beta  <- matrix(p[grepl("^log\\_", names(p))], byrow = TRUE, ncol = 2)
-      params$gamma <- matrix(c(p["var_log_lambda"],
+      params$beta  <- matrix(as.numeric(p[grepl("^log\\_", names(p))]), byrow = TRUE, ncol = 2)
+      params$gamma <- matrix(as.numeric(c(p["var_log_lambda"],
                                p["cov_log_lambda_log_mu"],
                                p["cov_log_lambda_log_mu"],
-                               p["var_log_mu"]),
+                               p["var_log_mu"])),
                              ncol = 2)
-      elog <- abe.GenerateData(n = n, T.cal = T.tot, T.star = 0, params = params)$elog
+      elog <- abe.GenerateData(n = n, T.cal = T.tot, T.star = 0, params = params,
+                               covariates = covariates)$elog
     }
     setDT(elog)
     elog$cust <- paste0(elog$cust, "_", i)
@@ -389,6 +396,8 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 #' @param ymax Upper boundary for y axis.
 #' @param sample_size Sample size for estimating the probability distribution.
 #'   See \code{\link{mcmc.ExpectedCumulativeTransactions}}.
+#' @param covariates (optional) Matrix of covariates, for Pareto/NBD (Abe)
+#'   model, passed to \code{\link{abe.GenerateData}} for simulating data.
 #' @return Matrix containing actual and expected cumulative repeat transactions.
 #' @export
 #' @seealso \code{\link{mcmc.PlotTrackingInc}}
@@ -407,10 +416,11 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
                                  xlab = "Week", ylab = "Cumulative Transactions",
                                  xticklab = NULL, title = "Tracking Cumulative Transactions",
-                                 ymax = NULL, sample_size = 10000) {
+                                 ymax = NULL, sample_size = 10000, covariates = NULL) {
 
   actual <- actual.cu.tracking.data
-  expected <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual), sample_size = sample_size)
+  expected <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual),
+                                                  sample_size = sample_size, covariates = covariates)
 
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
                   xlab = xlab, ylab = ylab, title = title,
@@ -445,6 +455,8 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 #' @param ymax Upper boundary for y axis.
 #' @param sample_size Sample size for estimating the probability distribution.
 #'   See \code{\link{mcmc.ExpectedCumulativeTransactions}}.
+#' @param covariates (optional) Matrix of covariates, for Pareto/NBD (Abe)
+#'   model, passed to \code{\link{abe.GenerateData}} for simulating data.
 #' @return Matrix containing actual and expected incremental repeat
 #'   transactions.
 #' @export
@@ -464,10 +476,11 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data,
                                  xlab = "Week", ylab = "Transactions",
                                  xticklab = NULL, title = "Tracking Weekly Transactions",
-                                 ymax = NULL, sample_size = 10000) {
+                                 ymax = NULL, sample_size = 10000, covariates = NULL) {
 
   actual <- actual.inc.tracking.data
-  expected_cum <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual), sample_size = sample_size)
+  expected_cum <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual),
+                                                      sample_size = sample_size, covariates = covariates)
   expected <- BTYD::dc.CumulativeToIncremental(expected_cum)
 
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,

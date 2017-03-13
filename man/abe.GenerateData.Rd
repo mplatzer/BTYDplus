@@ -4,7 +4,8 @@
 \alias{abe.GenerateData}
 \title{Simulate data according to Pareto/NBD (Abe) model assumptions}
 \usage{
-abe.GenerateData(n, T.cal, T.star, params, date.zero = "2000-01-01")
+abe.GenerateData(n, T.cal, T.star, params, date.zero = "2000-01-01",
+  covariates = NULL)
 }
 \arguments{
 \item{n}{Number of customers.}
@@ -18,6 +19,8 @@ is assumed that customers have different 'birth' dates, i.e.
 \item{params}{A list of model parameters: \code{beta} and \code{gamma}.}
 
 \item{date.zero}{Initial date for cohort start. Can be of class character, Date or POSIXt.}
+
+\item{covariates}{Provide matrix of customer covariates. If NULL then random covariate values between [-1,1] are drawn.}
 }
 \value{
 List of length 2:

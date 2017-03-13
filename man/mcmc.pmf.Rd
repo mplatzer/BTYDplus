@@ -4,7 +4,7 @@
 \alias{mcmc.pmf}
 \title{Probability Mass Function for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)}
 \usage{
-mcmc.pmf(draws, t, x, sample_size = 10000)
+mcmc.pmf(draws, t, x, sample_size = 10000, covariates = NULL)
 }
 \arguments{
 \item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}
@@ -16,6 +16,9 @@ transactions. May also be a vector.}
 be a vector.}
 
 \item{sample_size}{Sample size for estimating the probability distribution.}
+
+\item{covariates}{(optional) Matrix of covariates, for Pareto/NBD (Abe)
+model, passed to \code{\link{abe.GenerateData}} for simulating data.}
 }
 \value{
 \eqn{P(X(t)=x)}. If either \code{t} or \code{x} is a vector, then the
