@@ -291,7 +291,7 @@ abe.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01",
     covars <- covariates
     if (is.data.frame(covars)) covars <- as.matrix(covars)
     if (!is.matrix(covars)) covars <- matrix(covars, ncol = 1, dimnames = list(NULL, "covariate_1"))
-    if (!all(covars[, 1]==1)) covars <- cbind("intercept" = rep(1, nrow(covars)), covars)
+    if (!all(covars[, 1] == 1)) covars <- cbind("intercept" = rep(1, nrow(covars)), covars)
     if (is.null(colnames(covars)) & ncol(covars) > 1)
       colnames(covars)[-1] <- paste("covariate", 1:(nr_covars - 1), sep = "_")
     if (nr_covars != ncol(covars))

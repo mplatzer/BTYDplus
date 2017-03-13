@@ -9,19 +9,19 @@ test_that("Pareto/NBD (Abe) MCMC", {
   params$beta <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
   params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
   expect_silent(abe.GenerateData(n, 36, 36, params,
-                                 covariates = matrix(c(rnorm(n), runif(n)), ncol=2)))
+                                 covariates = matrix(c(rnorm(n), runif(n)), ncol = 2)))
   expect_silent(abe.GenerateData(n, 36, 36, params,
-                                 covariates = matrix(c(rnorm(n), runif(n)), ncol=2,
+                                 covariates = matrix(c(rnorm(n), runif(n)), ncol = 2,
                                                      dimnames = list(NULL, c("x1", "x2")))))
   expect_error(abe.GenerateData(n, 36, 36, params,
-                                covariates = matrix(c(rnorm(n)), ncol=1,
+                                covariates = matrix(c(rnorm(n)), ncol = 1,
                                                     dimnames = list(NULL, c("x1")))),
                "covariate columns")
   expect_error(abe.GenerateData(n, 36, 36, params,
-                                covariates = matrix(c(rnorm(n), runif(n), runif(n)), ncol=3,
+                                covariates = matrix(c(rnorm(n), runif(n), runif(n)), ncol = 3,
                                                     dimnames = list(NULL, c("x1", "x2", "x3")))),
                "covariate columns")
-  params$beta <- params$beta[1:2,]
+  params$beta <- params$beta[1:2, ]
   expect_silent(abe.GenerateData(n, 36, 36, params, covariates = rnorm(n)))
   expect_silent(abe.GenerateData(n, 36, 36, params, covariates = matrix(rnorm(n), ncol = 1,
                                                                   dimnames = list(NULL, "x1"))))
@@ -101,6 +101,6 @@ test_that("Pareto/NBD (Abe) MCMC", {
                               T.tot = max(cbs$T.cal + cbs$T.star),
                               actual.cu.tracking.data = cum,
                               covariates = cbs[, c("covariate_1", "covariate_2")])
-  expect_equal(mat[, ncol(mat)-1], mat[, ncol(mat)-1], tolerance = 0.1)
+  expect_equal(mat[, ncol(mat) - 1], mat[, ncol(mat) - 1], tolerance = 0.1)
 
 })
