@@ -40,4 +40,3 @@ param.draws <- pnbd.mcmc.DrawParameters(cbs,
 mcmc.pmf(param.draws, t = 52, x = 0:6)
 mcmc.pmf(param.draws, t = c(26, 52), x = 0:6)
 }
-

@@ -23,4 +23,3 @@ Calculate the log-likelihood of the NBD model
 \seealso{
 \code{\link{nbd.cbs.LL}}
 }
-

@@ -26,4 +26,3 @@ param.draws <- pnbd.mcmc.DrawParameters(cbs,
 xstar.draws <- mcmc.DrawFutureTransactions(cbs, param.draws)
 mcmc.plotPActiveDiagnostic(cbs, xstar.draws)
 }
-

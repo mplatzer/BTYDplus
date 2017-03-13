@@ -50,4 +50,3 @@ param.draws <- pnbd.mcmc.DrawParameters(cbs,
 mcmc.ExpectedCumulativeTransactions(param.draws,
   T.cal = cbs$T.cal, T.tot = 104, n.periods.final = 104/8, sample_size = 1000)
 }
-

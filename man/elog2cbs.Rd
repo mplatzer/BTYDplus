@@ -27,7 +27,8 @@ present, it will be aggregated as well.}
  \item{\code{x}}{Number of recurring events in calibration period.}
  \item{\code{t.x}}{Time between first and last event in calibration period.}
  \item{\code{litt}}{Sum of logarithmic intertransaction timings during calibration period.}
- \item{\code{sales}}{Sum of sales in calibration period. Only if \code{elog$sales} is provided.}
+ \item{\code{sales}}{Sum of sales in calibration period, incl. initial transaction. Only if \code{elog$sales} is provided.}
+ \item{\code{sales.x}}{Sum of sales in calibration period, excl. initial transaction. Only if \code{elog$sales} is provided.}
  \item{\code{first}}{Date of first transaction in calibration period.}
  \item{\code{T.cal}}{Time between first event and end of calibration period.}
  \item{\code{T.star}}{Length of holdout period. Only if \code{T.cal} is provided.}
@@ -68,4 +69,3 @@ data("groceryElog")
 cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31", T.tot = "2007-12-30")
 head(cbs)
 }
-

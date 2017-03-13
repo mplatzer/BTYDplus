@@ -11,4 +11,3 @@ Wrapper for \code{BTYD::dc.check.model.params} with additional check for
 parameter names if these are present
 }
 \keyword{internal}
-

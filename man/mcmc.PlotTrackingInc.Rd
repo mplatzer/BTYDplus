@@ -70,4 +70,3 @@ mat <- mcmc.PlotTrackingInc(param.draws,
 \code{\link{mcmc.PlotTrackingCum}}
   \code{\link{mcmc.ExpectedCumulativeTransactions}} \code{\link{elog2inc}}
 }
-

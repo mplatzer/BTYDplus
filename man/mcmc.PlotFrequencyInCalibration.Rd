@@ -51,4 +51,3 @@ mcmc.PlotFrequencyInCalibration(param.draws, cbs, sample_size = 100)
 \seealso{
 \code{\link{mcmc.pmf}}
 }
-

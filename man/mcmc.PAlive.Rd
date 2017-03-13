@@ -25,4 +25,3 @@ palive <- mcmc.PAlive(param.draws)
 head(palive)
 mean(palive)
 }
-

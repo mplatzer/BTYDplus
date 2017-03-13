@@ -80,4 +80,3 @@ Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension
 \seealso{
 \code{\link{pnbd.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }
 }
-
