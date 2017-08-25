@@ -998,9 +998,11 @@ xbgcnbd.GenerateData <- function(n, T.cal, T.star = NULL, params, date.zero = "2
 
   # sample churn-probability p for each customer
   ps <- rbeta(n, a, b)
+  ps <- pmax(ps, 1e-5) # avoid `too long` lives
 
   # sample number of survivals via geometric distribution
   churns <- rgeom(n, ps)
+  churns <- pmin(churns, 1e5) # avoid `too long` lives
   if (!dropout_at_zero) churns <- churns + 1
 
   # sample intertransaction timings
