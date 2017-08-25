@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // slice_sample_gamma_parameters
 NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector init, NumericVector hyper, double steps, double w);
-RcppExport SEXP BTYDplus_slice_sample_gamma_parameters(SEXP dataSEXP, SEXP initSEXP, SEXP hyperSEXP, SEXP stepsSEXP, SEXP wSEXP) {
+RcppExport SEXP _BTYDplus_slice_sample_gamma_parameters(SEXP dataSEXP, SEXP initSEXP, SEXP hyperSEXP, SEXP stepsSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -22,7 +22,7 @@ END_RCPP
 }
 // slice_sample_ma_liu
 NumericVector slice_sample_ma_liu(String what, NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector lambda, NumericVector mu, double r, double alpha, double s, double beta);
-RcppExport SEXP BTYDplus_slice_sample_ma_liu(SEXP whatSEXP, SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP rSEXP, SEXP alphaSEXP, SEXP sSEXP, SEXP betaSEXP) {
+RcppExport SEXP _BTYDplus_slice_sample_ma_liu(SEXP whatSEXP, SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP rSEXP, SEXP alphaSEXP, SEXP sSEXP, SEXP betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -42,7 +42,7 @@ END_RCPP
 }
 // pggg_palive
 NumericVector pggg_palive(NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector k, NumericVector lambda, NumericVector mu);
-RcppExport SEXP BTYDplus_pggg_palive(SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP muSEXP) {
+RcppExport SEXP _BTYDplus_pggg_palive(SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP muSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -58,7 +58,7 @@ END_RCPP
 }
 // pggg_slice_sample
 NumericVector pggg_slice_sample(String what, NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector litt, NumericVector k, NumericVector lambda, NumericVector mu, NumericVector tau, double t, double gamma, double r, double alpha, double s, double beta);
-RcppExport SEXP BTYDplus_pggg_slice_sample(SEXP whatSEXP, SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP littSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP tauSEXP, SEXP tSEXP, SEXP gammaSEXP, SEXP rSEXP, SEXP alphaSEXP, SEXP sSEXP, SEXP betaSEXP) {
+RcppExport SEXP _BTYDplus_pggg_slice_sample(SEXP whatSEXP, SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP littSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP tauSEXP, SEXP tSEXP, SEXP gammaSEXP, SEXP rSEXP, SEXP alphaSEXP, SEXP sSEXP, SEXP betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -83,7 +83,7 @@ END_RCPP
 }
 // xbgcnbd_pmf_cpp
 double xbgcnbd_pmf_cpp(NumericVector params, double t, int x, bool dropout_at_zero);
-RcppExport SEXP BTYDplus_xbgcnbd_pmf_cpp(SEXP paramsSEXP, SEXP tSEXP, SEXP xSEXP, SEXP dropout_at_zeroSEXP) {
+RcppExport SEXP _BTYDplus_xbgcnbd_pmf_cpp(SEXP paramsSEXP, SEXP tSEXP, SEXP xSEXP, SEXP dropout_at_zeroSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -97,7 +97,7 @@ END_RCPP
 }
 // xbgcnbd_exp_cpp
 NumericVector xbgcnbd_exp_cpp(NumericVector params, NumericVector t, bool dropout_at_zero);
-RcppExport SEXP BTYDplus_xbgcnbd_exp_cpp(SEXP paramsSEXP, SEXP tSEXP, SEXP dropout_at_zeroSEXP) {
+RcppExport SEXP _BTYDplus_xbgcnbd_exp_cpp(SEXP paramsSEXP, SEXP tSEXP, SEXP dropout_at_zeroSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -107,4 +107,19 @@ BEGIN_RCPP
     rcpp_result_gen = Rcpp::wrap(xbgcnbd_exp_cpp(params, t, dropout_at_zero));
     return rcpp_result_gen;
 END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_BTYDplus_slice_sample_gamma_parameters", (DL_FUNC) &_BTYDplus_slice_sample_gamma_parameters, 5},
+    {"_BTYDplus_slice_sample_ma_liu", (DL_FUNC) &_BTYDplus_slice_sample_ma_liu, 10},
+    {"_BTYDplus_pggg_palive", (DL_FUNC) &_BTYDplus_pggg_palive, 6},
+    {"_BTYDplus_pggg_slice_sample", (DL_FUNC) &_BTYDplus_pggg_slice_sample, 15},
+    {"_BTYDplus_xbgcnbd_pmf_cpp", (DL_FUNC) &_BTYDplus_xbgcnbd_pmf_cpp, 4},
+    {"_BTYDplus_xbgcnbd_exp_cpp", (DL_FUNC) &_BTYDplus_xbgcnbd_exp_cpp, 3},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_BTYDplus(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }
