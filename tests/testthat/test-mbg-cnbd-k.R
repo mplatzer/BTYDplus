@@ -4,7 +4,7 @@ test_that("MBG/CNBD-k", {
 
   # generate artificial MBG/CNBD-k data
   set.seed(1)
-  n <- 2000
+  n <- 8000
   params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
   sim <- mbgcnbd.GenerateData(n,
                              round(runif(n, 36, 96) / 12) * 12,
