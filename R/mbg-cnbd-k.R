@@ -679,7 +679,7 @@ xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.perio
   if (any(T.cal < 0) || !is.numeric(T.cal))
     stop("T.cal must be numeric and may not contain negative numbers.")
   if (length(T.tot) > 1 || T.tot < 0 || !is.numeric(T.tot))
-    stop("T.cal must be a single numeric value and may not be negative.")
+    stop("T.tot must be a single numeric value and may not be negative.")
   if (length(n.periods.final) > 1 || n.periods.final < 0 || !is.numeric(n.periods.final))
     stop("n.periods.final must be a single numeric value and may not be negative.")
 
