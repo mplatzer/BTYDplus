@@ -280,6 +280,7 @@ elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
   if (!all(c("cust", "date") %in% names(elog))) stop("`elog` must have fields `cust` and `date`")
   if (!any(c("Date", "POSIXt") %in% class(elog$date))) stop("`date` field must be of class `Date` or `POSIXt`")
   if ("sales" %in% names(elog) & !is.numeric(elog$sales)) stop("`sales` field must be numeric")
+  if (is.data.frame(elog) && nrow(elog) == 0) stop("data.frame supplied to elog2cbs must not be empty")
   if (is.null(T.cal)) T.cal <- max(elog$date)
   if (is.null(T.tot)) T.tot <- max(elog$date)
   if (is.character(T.cal)) T.cal <- if (class(elog$date)[1] == "Date") as.Date(T.cal) else as.POSIXct(T.cal)
