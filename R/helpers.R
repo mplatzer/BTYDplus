@@ -277,6 +277,17 @@ plotTimingPatterns <- function(elog, n = 40, T.cal = NULL, T.tot = NULL,
 elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
   cust <- first <- itt <- T.star <- x.star <- sales <- sales.star <- sales.x <- NULL  # suppress checkUsage warnings
   stopifnot(inherits(elog, "data.frame"))
+  is.dt <- is.data.table(elog)
+  if (nrow(elog) == 0) {
+    cbs <- data.frame(cust = character(0),
+                      x = numeric(0),
+                      t.x = numeric(0),
+                      litt = numeric(0),
+                      first = as.Date(character(0)),
+                      T.cal = numeric(0))
+    if (is.dt) cbs <- as.data.table(cbs)
+    return(cbs)
+  }
   if (!all(c("cust", "date") %in% names(elog))) stop("`elog` must have fields `cust` and `date`")
   if (!any(c("Date", "POSIXt") %in% class(elog$date))) stop("`date` field must be of class `Date` or `POSIXt`")
   if ("sales" %in% names(elog) & !is.numeric(elog$sales)) stop("`sales` field must be numeric")
@@ -288,7 +299,6 @@ elog2cbs <- function(elog, units = "week", T.cal = NULL, T.tot = NULL) {
   if (T.tot < T.cal) T.tot <- T.cal
   stopifnot(T.tot >= min(elog$date))
 
-  is.dt <- is.data.table(elog)
   has.holdout <- T.cal < T.tot
   has.sales <- "sales" %in% names(elog)
 

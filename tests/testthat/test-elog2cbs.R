@@ -66,6 +66,11 @@ test_that("elog2cbs", {
   elog_time <- data.frame(cust = c(1, 1, 1, 1, 1, 2, 3), date = Sys.time() + c(0, 14, 14, 28, 35, 7, 24))
   expect_equal(elog2cbs(elog, units = "days")[, c(1:4, 6)], elog2cbs(elog_time, units = "secs")[, c(1:4, 6)])
 
+  # check for empty elog
+  empty_elog <- data.frame(cust = character(), date = as.Date(character()))
+  expect_equal(nrow(elog2cbs(empty_elog)), 0)
+  expect_equal(nrow(elog2cbs(as.data.table(empty_elog))), 0)
+
   # check for errors
   expect_error(elog2cbs(), "elog")
   expect_error(elog2cbs(data.frame(cust = 1:3)), "cust")
