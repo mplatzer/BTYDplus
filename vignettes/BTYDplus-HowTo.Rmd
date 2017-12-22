@@ -340,7 +340,7 @@ However, when assessing the error at individual level, by calculating mean absol
 # mean absolute error (MAE)
 mae <- function(act, est) {
   stopifnot(length(act)==length(est))
-  sum(abs(act-est)) / sum(act)
+  sum(abs(act-est)) / length(act)
 }
 mae.nbd <- mae(groceryCBS$x.star, groceryCBS$xstar.nbd)
 mae.pnbd <- mae(groceryCBS$x.star, groceryCBS$xstar.pnbd)
@@ -570,7 +570,7 @@ rbind(`Actuals`    = c(`Holdout` = sum(groceryCBS$x.star)),
 # error on customer level
 mae <- function(act, est) {
   stopifnot(length(act)==length(est))
-  sum(abs(act-est)) / sum(act) 
+  sum(abs(act-est)) / length(act)
 }
 mae.pggg <- mae(groceryCBS$x.star, groceryCBS$xstar.pggg)
 mae.mbgcnbd <- mae(groceryCBS$x.star, groceryCBS$xstar.mbgcnbd)
