@@ -39,17 +39,6 @@ customer cohort with \code{\link{elog2cbs}}.}
 Returns draws from the posterior distributions of the NBD (HB)
 parameters, on cohort as well as on customer level.
 }
-\examples{
-data("groceryElog")
-cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
-param.draws <- mcmc.DrawParameters(cbs,
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
-
-# cohort-level parameter draws
-as.matrix(param.draws$level_2)
-# customer-level parameter draws for customer with ID '4'
-as.matrix(param.draws$level_1[["4"]])
-}
 \seealso{
 \code{\link{nbd.GenerateData} }
 }
