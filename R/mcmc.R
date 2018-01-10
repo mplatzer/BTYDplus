@@ -15,7 +15,11 @@
 #' mean(palive)
 mcmc.PAlive <- function(draws) {
   nr_of_cust <- length(draws$level_1)
-  p.alives <- sapply(1:nr_of_cust, function(i) mean(as.matrix(draws$level_1[[i]][, "z"])))
+  if ('z' %in% varnames(draws$level_1[[1]])) {
+    p.alives <- sapply(1:nr_of_cust, function(i) mean(as.matrix(draws$level_1[[i]][, "z"])))
+  } else {
+    p.alives <- rep(1, nr_of_cust)
+  }
   return(p.alives)
 }
 
@@ -75,13 +79,17 @@ mcmc.DrawFutureTransactions <- function(cal.cbs, draws, T.star = cal.cbs$T.star,
     Tcal <- cal.cbs$T.cal[cust]
     Tstar <- T.star[cust]
     tx <- cal.cbs$t.x[cust]
-    taus <- drop(as.matrix(draws$level_1[[cust]][, "tau"]))
+    lambdas <- drop(as.matrix(draws$level_1[[cust]][, "lambda"]))
     if ("k" %in% parameters) {
       ks <- drop(as.matrix(draws$level_1[[cust]][, "k"]))
     } else {
-      ks <- rep(1, length(taus))
+      ks <- rep(1, length(lambdas))
     }
-    lambdas <- drop(as.matrix(draws$level_1[[cust]][, "lambda"]))
+    if ("tau" %in% parameters) {
+      taus <- drop(as.matrix(draws$level_1[[cust]][, "tau"]))
+    } else {
+      taus <- rep(Inf, length(lambdas))
+    }
     stopifnot(length(taus) == length(ks) && length(taus) == length(lambdas))
     if (!is.null(sample_size)) {
       idx <- sample(length(taus), size = sample_size, replace = TRUE)

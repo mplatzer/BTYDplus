@@ -1,5 +1,6 @@
 1.1.x
 - `elog2cbs` handles now empty elogs gracefully (#58)
+- added `nbd.mcmc.DrawParameters`
 
 1.1.3
 - limit simulated life length to 10k events in `xbgcnbd.GenerateData`

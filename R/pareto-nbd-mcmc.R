@@ -233,7 +233,6 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   # check whether input data meets requirements
   stopifnot(is.data.frame(cal.cbs))
   stopifnot(all(c("x", "t.x", "T.cal") %in% names(cal.cbs)))
-  stopifnot(all(is.finite(cal.cbs$litt)))
 
   # run multiple chains - executed in parallel on Unix
   ncores <- ifelse(!is.null(mc.cores), min(chains, mc.cores), ifelse(.Platform$OS.type == "windows", 1, min(chains,

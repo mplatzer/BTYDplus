@@ -112,6 +112,7 @@ nbd.LL <- function(params, x, T.cal) {
 #' xstar.est <- nbd.ConditionalExpectedTransactions(params, cbs$T.star, cbs$x, cbs$T.cal)
 #' sum(xstar.est) # expected total number of transactions during holdout
 nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
+  if (is.list(params)) params <- unlist(params)
   max.length <- max(length(T.star), length(x), length(T.cal))
   if (max.length %% length(T.star))
     warning("Maximum vector length not a multiple of the length of T.star")
@@ -140,7 +141,7 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' @param n Number of customers.
 #' @param T.cal Length of calibration period.
 #' @param T.star Length of holdout period. This may be a vector.
-#' @param params NBD parameters - a vector with \code{r} and \code{alpha} in that order.
+#' @param params A list of NBD parameters \code{r}, \code{alpha}.
 #' @param date.zero Initial date for cohort start. Can be of class character, Date or POSIXt.
 #' @return List of length 2:
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
@@ -150,13 +151,14 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' n <- 1000  # no. of customers
 #' T.cal <- 32  # length of calibration period
 #' T.star <- 32  # length of hold-out period
-#' params <- c(r = 0.85, alpha = 4.45)  # purchase frequency lambda_i ~ Gamma(r, alpha)
+#' params <- list(r = 0.85, alpha = 4.45)  # purchase frequency lambda_i ~ Gamma(r, alpha)
 #' data <- nbd.GenerateData(n, T.cal, T.star, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
 nbd.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01") {
-  # check model parameters
-  dc.check.model.params.safe(c("r", "alpha"), params, "nbd.GenerateData")
+  if (!is.list(params)) params <- as.list(params)
+  if (is.null(names(params))) names(params) <- c("r", "alpha")
+  stopifnot(c("r", "alpha") %in% names(params))
 
   # set start date for each customer, so that they share same T.cal date
   T.cal.fix <- max(T.cal)
@@ -164,8 +166,8 @@ nbd.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01")
   T.zero <- T.cal.fix - T.cal
   date.zero <- as.POSIXct(date.zero)
 
-  r <- params[1]
-  alpha <- params[2]
+  r <- params[['r']]
+  alpha <- params[['alpha']]
 
   # sample intertransaction timings parameter lambda for each customer
   lambdas <- rgamma(n, shape = r, rate = alpha)
