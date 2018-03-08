@@ -1,4 +1,2 @@
 library(testthat)
-library(BTYDplus)
-
-test_check("BTYDplus")
+test_dir(file.path(base_dir, 'tests', 'testthat'))
