@@ -3,7 +3,8 @@ cache: packages
 sudo: required
 
 apt_packages:
-  - libgsl0-dev
+  - libgsl2
+  #- libgsl0-dev
 
 r_binary_packages:
   - mvtnorm

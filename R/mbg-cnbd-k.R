@@ -717,6 +717,7 @@ xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.perio
 #' @param xticklab A vector containing a label for each tick mark on the x axis.
 #' @param title Title placed on the top-center of the plot.
 #' @param ymax Upper boundary for y axis.
+#' @param legend plot legend, defaults to `Actual` and `Model`.
 #' @return Matrix containing actual and expected cumulative repeat transactions.
 #' @export
 #' @seealso \code{\link{mbgcnbd.ExpectedCumulativeTransactions}}
@@ -733,9 +734,10 @@ xbgcnbd.ExpectedCumulativeTransactions <- function(params, T.cal, T.tot, n.perio
 mbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data,
                                     xlab = "Week", ylab = "Cumulative Transactions",
                                     xticklab = NULL, title = "Tracking Cumulative Transactions",
-                                    ymax = NULL) {
+                                    ymax = NULL, legend = c("Actual", "Model")) {
   xbgcnbd.PlotTrackingCum(params, T.cal, T.tot, actual.cu.tracking.data,
-                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = TRUE)
+                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = TRUE,
+                          legend = legend)
 }
 
 #' @rdname mbgcnbd.PlotTrackingCum
@@ -743,16 +745,18 @@ mbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.dat
 bgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data,
                                     xlab = "Week", ylab = "Cumulative Transactions",
                                     xticklab = NULL, title = "Tracking Cumulative Transactions",
-                                    ymax = NULL) {
+                                    ymax = NULL, legend = c("Actual", "Model")) {
   xbgcnbd.PlotTrackingCum(params, T.cal, T.tot, actual.cu.tracking.data,
-                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = FALSE)
+                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = FALSE,
+                          legend = legend)
 }
 
 #' @keywords internal
 xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.data,
                                     xlab = "Week", ylab = "Cumulative Transactions",
                                     xticklab = NULL, title = "Tracking Cumulative Transactions",
-                                    ymax = NULL, dropout_at_zero = NULL) {
+                                    ymax = NULL, dropout_at_zero = NULL,
+                                    legend = c("Actual", "Model")) {
 
   stopifnot(!is.null(dropout_at_zero))
   actual <- actual.cu.tracking.data
@@ -760,7 +764,8 @@ xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.dat
                                                      dropout_at_zero = dropout_at_zero)
 
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
-                  xlab = xlab, ylab = ylab, title = title, xticklab = xticklab, ymax = ymax)
+                  xlab = xlab, ylab = ylab, title = title, xticklab = xticklab, ymax = ymax,
+                  legend = legend)
 }
 
 
@@ -786,6 +791,7 @@ xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.dat
 #' @param xticklab A vector containing a label for each tick mark on the x axis.
 #' @param title Title placed on the top-center of the plot.
 #' @param ymax Upper boundary for y axis.
+#' @param legend plot legend, defaults to `Actual` and `Model`.
 #' @return Matrix containing actual and expected incremental repeat transactions.
 #' @export
 #' @seealso \code{\link{mbgcnbd.ExpectedCumulativeTransactions}}
@@ -802,9 +808,10 @@ xbgcnbd.PlotTrackingCum <- function(params, T.cal, T.tot, actual.cu.tracking.dat
 mbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data,
                                     xlab = "Week", ylab = "Transactions",
                                     xticklab = NULL, title = "Tracking Weekly Transactions",
-                                    ymax = NULL) {
+                                    ymax = NULL, legend = c("Actual", "Model")) {
   xbgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data,
-                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = TRUE)
+                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = TRUE,
+                          legend = legend)
 }
 
 #' @rdname mbgcnbd.PlotTrackingInc
@@ -812,16 +819,18 @@ mbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
 bgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data,
                                     xlab = "Week", ylab = "Transactions",
                                     xticklab = NULL, title = "Tracking Weekly Transactions",
-                                    ymax = NULL) {
+                                    ymax = NULL, legend = c("Actual", "Model")) {
   xbgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data,
-                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = FALSE)
+                          xlab, ylab, xticklab, title, ymax, dropout_at_zero = FALSE,
+                          legend = legend)
 }
 
 #' @keywords internal
 xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.data,
                                     xlab = "Week", ylab = "Transactions",
                                     xticklab = NULL, title = "Tracking Weekly Transactions",
-                                    ymax = NULL, dropout_at_zero = NULL) {
+                                    ymax = NULL, dropout_at_zero = NULL,
+                                    legend = c("Actual", "Model")) {
 
   stopifnot(!is.null(dropout_at_zero))
   actual <- actual.inc.tracking.data
@@ -830,7 +839,8 @@ xbgcnbd.PlotTrackingInc <- function(params, T.cal, T.tot, actual.inc.tracking.da
   expected <- BTYD::dc.CumulativeToIncremental(expected_cum)
 
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
-                  xlab = xlab, ylab = ylab, title = title, xticklab = xticklab, ymax = ymax)
+                  xlab = xlab, ylab = ylab, title = title, xticklab = xticklab, ymax = ymax,
+                  legend = legend)
 }
 
 
