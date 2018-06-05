@@ -436,7 +436,8 @@ dc.check.model.params.safe <- function(printnames, params, func) {
 #' @keywords internal
 dc.PlotTracking <- function(actual, expected, T.cal = NULL,
                             xlab = "", ylab = "", title = "",
-                            xticklab = NULL, ymax = NULL) {
+                            xticklab = NULL, ymax = NULL,
+                            legend = c("Actual", "Model")) {
 
   stopifnot(is.numeric(actual))
   stopifnot(is.numeric(expected))
@@ -456,8 +457,10 @@ dc.PlotTracking <- function(actual, expected, T.cal = NULL,
     axis(1, at = 1:length(actual), labels = xticklab)
   }
   if (!is.null(T.cal)) abline(v = max(T.cal), lty = 2)
-  pos <- ifelse(which.max(expected) == length(expected), "bottomright", "topright")
-  legend(pos, legend = c("Actual", "Model"), col = 1:2, lty = 1:2, lwd = 1)
+  if (!is.null(legend) & length(legend) == 2) {
+    pos <- ifelse(which.max(expected) == length(expected), "bottomright", "topright")
+    legend(pos, legend = legend, col = 1:2, lty = 1:2, lwd = 1)
+  }
   return(rbind(actual, expected))
 }
 

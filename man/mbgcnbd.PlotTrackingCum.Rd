@@ -7,11 +7,13 @@
 \usage{
 mbgcnbd.PlotTrackingCum(params, T.cal, T.tot, actual.cu.tracking.data,
   xlab = "Week", ylab = "Cumulative Transactions", xticklab = NULL,
-  title = "Tracking Cumulative Transactions", ymax = NULL)
+  title = "Tracking Cumulative Transactions", ymax = NULL,
+  legend = c("Actual", "Model"))
 
 bgcnbd.PlotTrackingCum(params, T.cal, T.tot, actual.cu.tracking.data,
   xlab = "Week", ylab = "Cumulative Transactions", xticklab = NULL,
-  title = "Tracking Cumulative Transactions", ymax = NULL)
+  title = "Tracking Cumulative Transactions", ymax = NULL,
+  legend = c("Actual", "Model"))
 }
 \arguments{
 \item{params}{A vector with model parameters \code{k}, \code{r},
@@ -34,6 +36,8 @@ period (both calibration and holdout periods).}
 \item{title}{Title placed on the top-center of the plot.}
 
 \item{ymax}{Upper boundary for y axis.}
+
+\item{legend}{plot legend, defaults to `Actual` and `Model`.}
 }
 \value{
 Matrix containing actual and expected cumulative repeat transactions.

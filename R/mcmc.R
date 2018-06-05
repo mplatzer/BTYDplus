@@ -398,6 +398,7 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 #'   See \code{\link{mcmc.ExpectedCumulativeTransactions}}.
 #' @param covariates (optional) Matrix of covariates, for Pareto/NBD (Abe)
 #'   model, passed to \code{\link{abe.GenerateData}} for simulating data.
+#' @param legend plot legend, defaults to `Actual` and `Model`.
 #' @return Matrix containing actual and expected cumulative repeat transactions.
 #' @export
 #' @seealso \code{\link{mcmc.PlotTrackingInc}}
@@ -416,7 +417,8 @@ mcmc.ExpectedCumulativeTransactions <- function(draws, T.cal, T.tot, n.periods.f
 mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
                                  xlab = "Week", ylab = "Cumulative Transactions",
                                  xticklab = NULL, title = "Tracking Cumulative Transactions",
-                                 ymax = NULL, sample_size = 10000, covariates = NULL) {
+                                 ymax = NULL, sample_size = 10000, covariates = NULL,
+                                 legend = c("Actual", "Model")) {
 
   actual <- actual.cu.tracking.data
   expected <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual),
@@ -424,7 +426,8 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
                   xlab = xlab, ylab = ylab, title = title,
-                  xticklab = xticklab, ymax = ymax)
+                  xticklab = xticklab, ymax = ymax,
+                  legend = legend)
 }
 
 
@@ -457,6 +460,7 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 #'   See \code{\link{mcmc.ExpectedCumulativeTransactions}}.
 #' @param covariates (optional) Matrix of covariates, for Pareto/NBD (Abe)
 #'   model, passed to \code{\link{abe.GenerateData}} for simulating data.
+#' @param legend plot legend, defaults to `Actual` and `Model`.
 #' @return Matrix containing actual and expected incremental repeat
 #'   transactions.
 #' @export
@@ -476,7 +480,8 @@ mcmc.PlotTrackingCum <- function(draws, T.cal, T.tot, actual.cu.tracking.data,
 mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data,
                                  xlab = "Week", ylab = "Transactions",
                                  xticklab = NULL, title = "Tracking Weekly Transactions",
-                                 ymax = NULL, sample_size = 10000, covariates = NULL) {
+                                 ymax = NULL, sample_size = 10000, covariates = NULL,
+                                 legend = c("Actual", "Model")) {
 
   actual <- actual.inc.tracking.data
   expected_cum <- mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, length(actual),
@@ -485,7 +490,8 @@ mcmc.PlotTrackingInc <- function(draws, T.cal, T.tot, actual.inc.tracking.data,
 
   dc.PlotTracking(actual = actual, expected = expected, T.cal = T.cal,
                   xlab = xlab, ylab = ylab, title = title,
-                  xticklab = xticklab, ymax = ymax)
+                  xticklab = xticklab, ymax = ymax,
+                  legend = legend)
 }
 
 

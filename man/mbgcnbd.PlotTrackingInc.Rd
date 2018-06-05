@@ -7,11 +7,13 @@
 \usage{
 mbgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data,
   xlab = "Week", ylab = "Transactions", xticklab = NULL,
-  title = "Tracking Weekly Transactions", ymax = NULL)
+  title = "Tracking Weekly Transactions", ymax = NULL,
+  legend = c("Actual", "Model"))
 
 bgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data,
   xlab = "Week", ylab = "Transactions", xticklab = NULL,
-  title = "Tracking Weekly Transactions", ymax = NULL)
+  title = "Tracking Weekly Transactions", ymax = NULL,
+  legend = c("Actual", "Model"))
 }
 \arguments{
 \item{params}{A vector with model parameters \code{k}, \code{r},
@@ -34,6 +36,8 @@ period (both calibration and holdout periods).}
 \item{title}{Title placed on the top-center of the plot.}
 
 \item{ymax}{Upper boundary for y axis.}
+
+\item{legend}{plot legend, defaults to `Actual` and `Model`.}
 }
 \value{
 Matrix containing actual and expected incremental repeat transactions.
