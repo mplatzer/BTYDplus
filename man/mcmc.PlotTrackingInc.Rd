@@ -5,10 +5,20 @@
 \title{Tracking Incremental Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and
 Pareto/NBD (Abe)}
 \usage{
-mcmc.PlotTrackingInc(draws, T.cal, T.tot, actual.inc.tracking.data,
-  xlab = "Week", ylab = "Transactions", xticklab = NULL,
-  title = "Tracking Weekly Transactions", ymax = NULL,
-  sample_size = 10000, covariates = NULL, legend = c("Actual", "Model"))
+mcmc.PlotTrackingInc(
+  draws,
+  T.cal,
+  T.tot,
+  actual.inc.tracking.data,
+  xlab = "Week",
+  ylab = "Transactions",
+  xticklab = NULL,
+  title = "Tracking Weekly Transactions",
+  ymax = NULL,
+  sample_size = 10000,
+  covariates = NULL,
+  legend = c("Actual", "Model")
+)
 }
 \arguments{
 \item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}

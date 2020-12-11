@@ -4,8 +4,13 @@
 \alias{estimateRegularity}
 \title{Estimate Regularity in Intertransaction Timings}
 \usage{
-estimateRegularity(elog, method = "wheat", plot = FALSE, title = "",
-  min = NULL)
+estimateRegularity(
+  elog,
+  method = "wheat",
+  plot = FALSE,
+  title = "",
+  min = NULL
+)
 }
 \arguments{
 \item{elog}{Event log, a \code{data.frame} with columns \code{cust} and

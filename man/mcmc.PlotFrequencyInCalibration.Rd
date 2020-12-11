@@ -4,9 +4,15 @@
 \alias{mcmc.PlotFrequencyInCalibration}
 \title{Frequency in Calibration Period for Pareto/GGG, Pareto/NBD (HB) and Pareto/NBD (Abe)}
 \usage{
-mcmc.PlotFrequencyInCalibration(draws, cal.cbs, censor = 7,
-  xlab = "Calibration period transactions", ylab = "Customers",
-  title = "Frequency of Repeat Transactions", sample_size = 1000)
+mcmc.PlotFrequencyInCalibration(
+  draws,
+  cal.cbs,
+  censor = 7,
+  xlab = "Calibration period transactions",
+  ylab = "Customers",
+  title = "Frequency of Repeat Transactions",
+  sample_size = 1000
+)
 }
 \arguments{
 \item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}

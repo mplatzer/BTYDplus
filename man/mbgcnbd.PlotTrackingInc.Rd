@@ -5,15 +5,31 @@
 \alias{bgcnbd.PlotTrackingInc}
 \title{(M)BG/CNBD-k Tracking Incremental Transactions Comparison}
 \usage{
-mbgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data,
-  xlab = "Week", ylab = "Transactions", xticklab = NULL,
-  title = "Tracking Weekly Transactions", ymax = NULL,
-  legend = c("Actual", "Model"))
+mbgcnbd.PlotTrackingInc(
+  params,
+  T.cal,
+  T.tot,
+  actual.inc.tracking.data,
+  xlab = "Week",
+  ylab = "Transactions",
+  xticklab = NULL,
+  title = "Tracking Weekly Transactions",
+  ymax = NULL,
+  legend = c("Actual", "Model")
+)
 
-bgcnbd.PlotTrackingInc(params, T.cal, T.tot, actual.inc.tracking.data,
-  xlab = "Week", ylab = "Transactions", xticklab = NULL,
-  title = "Tracking Weekly Transactions", ymax = NULL,
-  legend = c("Actual", "Model"))
+bgcnbd.PlotTrackingInc(
+  params,
+  T.cal,
+  T.tot,
+  actual.inc.tracking.data,
+  xlab = "Week",
+  ylab = "Transactions",
+  xticklab = NULL,
+  title = "Tracking Weekly Transactions",
+  ymax = NULL,
+  legend = c("Actual", "Model")
+)
 }
 \arguments{
 \item{params}{A vector with model parameters \code{k}, \code{r},

@@ -5,10 +5,20 @@
 \title{Tracking Cumulative Transactions Plot for Pareto/GGG, Pareto/NBD (HB) and
 Pareto/NBD (Abe)}
 \usage{
-mcmc.PlotTrackingCum(draws, T.cal, T.tot, actual.cu.tracking.data,
-  xlab = "Week", ylab = "Cumulative Transactions", xticklab = NULL,
-  title = "Tracking Cumulative Transactions", ymax = NULL,
-  sample_size = 10000, covariates = NULL, legend = c("Actual", "Model"))
+mcmc.PlotTrackingCum(
+  draws,
+  T.cal,
+  T.tot,
+  actual.cu.tracking.data,
+  xlab = "Week",
+  ylab = "Cumulative Transactions",
+  xticklab = NULL,
+  title = "Tracking Cumulative Transactions",
+  ymax = NULL,
+  sample_size = 10000,
+  covariates = NULL,
+  legend = c("Actual", "Model")
+)
 }
 \arguments{
 \item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}

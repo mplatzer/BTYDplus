@@ -6,14 +6,28 @@
 \alias{mbgnbd.EstimateParameters}
 \title{(M)BG/CNBD-k Parameter Estimation}
 \usage{
-mbgcnbd.EstimateParameters(cal.cbs, k = NULL, par.start = c(1, 3, 1, 3),
-  max.param.value = 10000, trace = 0)
+mbgcnbd.EstimateParameters(
+  cal.cbs,
+  k = NULL,
+  par.start = c(1, 3, 1, 3),
+  max.param.value = 10000,
+  trace = 0
+)
 
-bgcnbd.EstimateParameters(cal.cbs, k = NULL, par.start = c(1, 3, 1, 3),
-  max.param.value = 10000, trace = 0)
+bgcnbd.EstimateParameters(
+  cal.cbs,
+  k = NULL,
+  par.start = c(1, 3, 1, 3),
+  max.param.value = 10000,
+  trace = 0
+)
 
-mbgnbd.EstimateParameters(cal.cbs, par.start = c(1, 3, 1, 3),
-  max.param.value = 10000, trace = 0)
+mbgnbd.EstimateParameters(
+  cal.cbs,
+  par.start = c(1, 3, 1, 3),
+  max.param.value = 10000,
+  trace = 0
+)
 }
 \arguments{
 \item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)

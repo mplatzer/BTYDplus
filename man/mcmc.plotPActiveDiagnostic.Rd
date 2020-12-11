@@ -4,8 +4,7 @@
 \alias{mcmc.plotPActiveDiagnostic}
 \title{Draw diagnostic plot to inspect error in P(active).}
 \usage{
-mcmc.plotPActiveDiagnostic(cbs, xstar,
-  title = "Diagnostic Plot for P(active)")
+mcmc.plotPActiveDiagnostic(cbs, xstar, title = "Diagnostic Plot for P(active)")
 }
 \arguments{
 \item{cbs}{A data.frame with column \code{x} and \code{x.star}.}

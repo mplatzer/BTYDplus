@@ -5,15 +5,27 @@
 \alias{bgcnbd.PlotRecVsConditionalExpectedFrequency}
 \title{(M)BG/CNBD-k Plot Actual vs. Conditional Expected Frequency by Recency}
 \usage{
-mbgcnbd.PlotRecVsConditionalExpectedFrequency(params, cal.cbs, T.star, x.star,
-  xlab = "Calibration period recency", ylab = "Holdout period transactions",
+mbgcnbd.PlotRecVsConditionalExpectedFrequency(
+  params,
+  cal.cbs,
+  T.star,
+  x.star,
+  xlab = "Calibration period recency",
+  ylab = "Holdout period transactions",
   xticklab = NULL,
-  title = "Actual vs. Conditional Expected Transactions by Recency")
+  title = "Actual vs. Conditional Expected Transactions by Recency"
+)
 
-bgcnbd.PlotRecVsConditionalExpectedFrequency(params, cal.cbs, T.star, x.star,
-  xlab = "Calibration period recency", ylab = "Holdout period transactions",
+bgcnbd.PlotRecVsConditionalExpectedFrequency(
+  params,
+  cal.cbs,
+  T.star,
+  x.star,
+  xlab = "Calibration period recency",
+  ylab = "Holdout period transactions",
   xticklab = NULL,
-  title = "Actual vs. Conditional Expected Transactions by Recency")
+  title = "Actual vs. Conditional Expected Transactions by Recency"
+)
 }
 \arguments{
 \item{params}{A vector with model parameters \code{k}, \code{r},

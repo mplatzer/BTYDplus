@@ -4,8 +4,15 @@
 \alias{dc.PlotRecVsConditionalExpectedFrequency}
 \title{Generic Method for Plotting Frequency vs. Conditional Expected Frequency}
 \usage{
-dc.PlotRecVsConditionalExpectedFrequency(t.x, actual, expected, xlab, ylab,
-  xticklab, title)
+dc.PlotRecVsConditionalExpectedFrequency(
+  t.x,
+  actual,
+  expected,
+  xlab,
+  ylab,
+  xticklab,
+  title
+)
 }
 \description{
 Generic Method for Plotting Frequency vs. Conditional Expected Frequency

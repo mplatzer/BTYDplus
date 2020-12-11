@@ -4,8 +4,12 @@
 \alias{pggg.plotRegularityRateHeterogeneity}
 \title{Pareto/GGG Plot Regularity Rate Heterogeneity}
 \usage{
-pggg.plotRegularityRateHeterogeneity(draws, xmax = NULL, fn = NULL,
-  title = "Distribution of Regularity Rate k")
+pggg.plotRegularityRateHeterogeneity(
+  draws,
+  xmax = NULL,
+  fn = NULL,
+  title = "Distribution of Regularity Rate k"
+)
 }
 \arguments{
 \item{draws}{MCMC draws as returned by \code{\link{pggg.mcmc.DrawParameters}}.}

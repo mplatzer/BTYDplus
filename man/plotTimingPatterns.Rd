@@ -4,8 +4,14 @@
 \alias{plotTimingPatterns}
 \title{Plot timing patterns of sampled customers}
 \usage{
-plotTimingPatterns(elog, n = 40, T.cal = NULL, T.tot = NULL,
-  title = "Sampled Timing Patterns", headers = NULL)
+plotTimingPatterns(
+  elog,
+  n = 40,
+  T.cal = NULL,
+  T.tot = NULL,
+  title = "Sampled Timing Patterns",
+  headers = NULL
+)
 }
 \arguments{
 \item{elog}{Event log, a \code{data.frame} with columns \code{cust} and

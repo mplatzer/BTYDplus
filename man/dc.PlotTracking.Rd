@@ -4,9 +4,17 @@
 \alias{dc.PlotTracking}
 \title{Generic Method for Tracking Plots}
 \usage{
-dc.PlotTracking(actual, expected, T.cal = NULL, xlab = "", ylab = "",
-  title = "", xticklab = NULL, ymax = NULL, legend = c("Actual",
-  "Model"))
+dc.PlotTracking(
+  actual,
+  expected,
+  T.cal = NULL,
+  xlab = "",
+  ylab = "",
+  title = "",
+  xticklab = NULL,
+  ymax = NULL,
+  legend = c("Actual", "Model")
+)
 }
 \description{
 Generic Method for Tracking Plots

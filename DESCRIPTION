@@ -31,7 +31,6 @@ Suggests:
     knitr,
     rmarkdown,
     lintr (>= 1.0.0)
-Roxygen: list(wrap = FALSE)
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.1
 LazyData: true
 VignetteBuilder: knitr

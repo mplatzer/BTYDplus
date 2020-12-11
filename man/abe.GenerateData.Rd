@@ -4,8 +4,14 @@
 \alias{abe.GenerateData}
 \title{Simulate data according to Pareto/NBD (Abe) model assumptions}
 \usage{
-abe.GenerateData(n, T.cal, T.star, params, date.zero = "2000-01-01",
-  covariates = NULL)
+abe.GenerateData(
+  n,
+  T.cal,
+  T.star,
+  params,
+  date.zero = "2000-01-01",
+  covariates = NULL
+)
 }
 \arguments{
 \item{n}{Number of customers.}

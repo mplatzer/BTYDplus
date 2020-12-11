@@ -5,8 +5,14 @@
 \title{Expected Cumulative Transactions for Pareto/GGG, Pareto/NBD (HB) and
 Pareto/NBD (Abe)}
 \usage{
-mcmc.ExpectedCumulativeTransactions(draws, T.cal, T.tot, n.periods.final,
-  sample_size = 10000, covariates = NULL)
+mcmc.ExpectedCumulativeTransactions(
+  draws,
+  T.cal,
+  T.tot,
+  n.periods.final,
+  sample_size = 10000,
+  covariates = NULL
+)
 }
 \arguments{
 \item{draws}{MCMC draws as returned by \code{*.mcmc.DrawParameters}}

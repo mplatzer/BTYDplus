@@ -4,9 +4,11 @@
 \name{groceryElog}
 \alias{groceryElog}
 \title{Event log for customers of an online grocery store.}
-\format{A data frame with 10483 rows and 2 variables: \describe{
+\format{
+A data frame with 10483 rows and 2 variables: \describe{
   \item{cust}{customer ID, factor vector} \item{date}{transaction date,
-  Date vector} }}
+  Date vector} }
+}
 \source{
 Thomas Reutterer <thomas.reutterer@wu.ac.at>
 }

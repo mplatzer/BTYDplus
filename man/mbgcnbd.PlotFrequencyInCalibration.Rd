@@ -5,13 +5,23 @@
 \alias{bgcnbd.PlotFrequencyInCalibration}
 \title{(M)BG/CNBD-k Plot Frequency in Calibration Period}
 \usage{
-mbgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = 7,
-  xlab = "Calibration period transactions", ylab = "Customers",
-  title = "Frequency of Repeat Transactions")
+mbgcnbd.PlotFrequencyInCalibration(
+  params,
+  cal.cbs,
+  censor = 7,
+  xlab = "Calibration period transactions",
+  ylab = "Customers",
+  title = "Frequency of Repeat Transactions"
+)
 
-bgcnbd.PlotFrequencyInCalibration(params, cal.cbs, censor = 7,
-  xlab = "Calibration period transactions", ylab = "Customers",
-  title = "Frequency of Repeat Transactions")
+bgcnbd.PlotFrequencyInCalibration(
+  params,
+  cal.cbs,
+  censor = 7,
+  xlab = "Calibration period transactions",
+  ylab = "Customers",
+  title = "Frequency of Repeat Transactions"
+)
 }
 \arguments{
 \item{params}{A vector with model parameters \code{k}, \code{r},

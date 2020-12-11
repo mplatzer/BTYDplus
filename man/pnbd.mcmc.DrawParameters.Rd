@@ -4,9 +4,17 @@
 \alias{pnbd.mcmc.DrawParameters}
 \title{Pareto/NBD (HB) Parameter Draws}
 \usage{
-pnbd.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
-  chains = 2, mc.cores = NULL, use_data_augmentation = TRUE,
-  param_init = NULL, trace = 100)
+pnbd.mcmc.DrawParameters(
+  cal.cbs,
+  mcmc = 2500,
+  burnin = 500,
+  thin = 50,
+  chains = 2,
+  mc.cores = NULL,
+  use_data_augmentation = TRUE,
+  param_init = NULL,
+  trace = 100
+)
 }
 \arguments{
 \item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)

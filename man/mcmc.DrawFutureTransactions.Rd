@@ -4,8 +4,12 @@
 \alias{mcmc.DrawFutureTransactions}
 \title{Draws number of future transactions based on MCMC parameter draws}
 \usage{
-mcmc.DrawFutureTransactions(cal.cbs, draws, T.star = cal.cbs$T.star,
-  sample_size = NULL)
+mcmc.DrawFutureTransactions(
+  cal.cbs,
+  draws,
+  T.star = cal.cbs$T.star,
+  sample_size = NULL
+)
 }
 \arguments{
 \item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)

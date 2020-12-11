@@ -5,11 +5,9 @@
 \alias{bgcnbd.GenerateData}
 \title{Simulate data according to (M)BG/CNBD-k model assumptions}
 \usage{
-mbgcnbd.GenerateData(n, T.cal, T.star = NULL, params,
-  date.zero = "2000-01-01")
+mbgcnbd.GenerateData(n, T.cal, T.star = NULL, params, date.zero = "2000-01-01")
 
-bgcnbd.GenerateData(n, T.cal, T.star = NULL, params,
-  date.zero = "2000-01-01")
+bgcnbd.GenerateData(n, T.cal, T.star = NULL, params, date.zero = "2000-01-01")
 }
 \arguments{
 \item{n}{Number of customers.}

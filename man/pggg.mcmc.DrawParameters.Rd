@@ -4,8 +4,16 @@
 \alias{pggg.mcmc.DrawParameters}
 \title{Pareto/GGG Parameter Draws}
 \usage{
-pggg.mcmc.DrawParameters(cal.cbs, mcmc = 2500, burnin = 500, thin = 50,
-  chains = 2, mc.cores = NULL, param_init = NULL, trace = 100)
+pggg.mcmc.DrawParameters(
+  cal.cbs,
+  mcmc = 2500,
+  burnin = 500,
+  thin = 50,
+  chains = 2,
+  mc.cores = NULL,
+  param_init = NULL,
+  trace = 100
+)
 }
 \arguments{
 \item{cal.cbs}{Calibration period customer-by-sufficient-statistic (CBS)

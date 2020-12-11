@@ -5,15 +5,31 @@
 \alias{bgcnbd.PlotTrackingCum}
 \title{(M)BG/CNBD-k Tracking Cumulative Transactions Plot}
 \usage{
-mbgcnbd.PlotTrackingCum(params, T.cal, T.tot, actual.cu.tracking.data,
-  xlab = "Week", ylab = "Cumulative Transactions", xticklab = NULL,
-  title = "Tracking Cumulative Transactions", ymax = NULL,
-  legend = c("Actual", "Model"))
+mbgcnbd.PlotTrackingCum(
+  params,
+  T.cal,
+  T.tot,
+  actual.cu.tracking.data,
+  xlab = "Week",
+  ylab = "Cumulative Transactions",
+  xticklab = NULL,
+  title = "Tracking Cumulative Transactions",
+  ymax = NULL,
+  legend = c("Actual", "Model")
+)
 
-bgcnbd.PlotTrackingCum(params, T.cal, T.tot, actual.cu.tracking.data,
-  xlab = "Week", ylab = "Cumulative Transactions", xticklab = NULL,
-  title = "Tracking Cumulative Transactions", ymax = NULL,
-  legend = c("Actual", "Model"))
+bgcnbd.PlotTrackingCum(
+  params,
+  T.cal,
+  T.tot,
+  actual.cu.tracking.data,
+  xlab = "Week",
+  ylab = "Cumulative Transactions",
+  xticklab = NULL,
+  title = "Tracking Cumulative Transactions",
+  ymax = NULL,
+  legend = c("Actual", "Model")
+)
 }
 \arguments{
 \item{params}{A vector with model parameters \code{k}, \code{r},
