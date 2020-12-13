@@ -33,7 +33,7 @@ event log of a customer cohort with \code{\link{elog2cbs}}.}
 
 \item{mc.cores}{Number of cores to use in parallel (Unix only). Defaults to \code{min(chains, detectCores())}.}
 
-\item{use_data_augmentation}{determines MCMC method to be used}
+\item{use_data_augmentation}{deprecated}
 
 \item{param_init}{List of start values for cohort-level parameters.}
 
@@ -52,17 +52,6 @@ parameters, on cohort as well as on customer level.
 }
 \details{
 See \code{demo('pareto-ggg')} for how to apply this model.
-
-method 1) If \code{use_data_augmentation==TRUE} MCMC scheme takes advantage of
-conjugate priors for drawing lambda and mu, by augmenting the parameter space
-with unobserved lifetime 'tau' and activity status 'z'. See technical appendix
-to (Abe 2009).
-
-method 2) If \code{use_data_augmentation==FALSE} then implementation follows
-Shao-Hui Ma & Jin-Lan Liu paper
-\url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}, i.e. no data
-augmentation and draws on individual level need to be done via slice
-sampling. As such it is 10x slower than method 1)
 }
 \examples{
 data("groceryElog")

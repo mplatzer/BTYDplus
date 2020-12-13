@@ -1,5 +1,6 @@
-1.1.x
+1.2.0
 - add `legend` argument to `(m)bgcnbd.PlotTrackingInc`, `(m)bgcnbd.PlotTrackingCum`, `mcmc.PlotTrackingCum`, and `mcmc.PlotTrackingInc`
+- deprecated inefficient alternative sampling method for Pareto/NBD MCMC
 
 1.1.4
 - `elog2cbs` handles now empty elogs gracefully (#58)

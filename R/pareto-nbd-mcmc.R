@@ -6,17 +6,6 @@
 #'
 #' See \code{demo('pareto-ggg')} for how to apply this model.
 #'
-#' method 1) If \code{use_data_augmentation==TRUE} MCMC scheme takes advantage of
-#' conjugate priors for drawing lambda and mu, by augmenting the parameter space
-#' with unobserved lifetime 'tau' and activity status 'z'. See technical appendix
-#' to (Abe 2009).
-#'
-#' method 2) If \code{use_data_augmentation==FALSE} then implementation follows
-#' Shao-Hui Ma & Jin-Lan Liu paper
-#' \url{http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4344404}, i.e. no data
-#' augmentation and draws on individual level need to be done via slice
-#' sampling. As such it is 10x slower than method 1)
-#'
 #' @param cal.cbs Calibration period customer-by-sufficient-statistic (CBS)
 #'   data.frame. It must contain a row for each customer, and columns \code{x}
 #'   for frequency, \code{t.x} for recency and \code{T.cal} for the total time
@@ -27,7 +16,7 @@
 #' @param thin Only every \code{thin}-th MCMC step will be returned.
 #' @param chains Number of MCMC chains to be run.
 #' @param mc.cores Number of cores to use in parallel (Unix only). Defaults to \code{min(chains, detectCores())}.
-#' @param use_data_augmentation determines MCMC method to be used
+#' @param use_data_augmentation deprecated
 #' @param param_init List of start values for cohort-level parameters.
 #' @param trace Print logging statement every \code{trace}-th iteration. Not available for \code{mc.cores > 1}.
 #' @return 2-element list:
@@ -132,24 +121,6 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     return(tau)
   }
 
-  # ** methods to sample individual-level parameters (without data augmentation) **
-
-  draw_lambda_ma_liu <- function(data, level_1, level_2) {
-    slice_sample_ma_liu("lambda",
-                        x = data$x, tx = data$t.x, Tcal = data$T.cal,
-                        lambda = level_1["lambda", ], mu = level_1["mu", ],
-                        r = level_2["r"], alpha = level_2["alpha"],
-                        s = level_2["s"], beta = level_2["beta"])
-  }
-
-  draw_mu_ma_liu <- function(data, level_1, level_2) {
-    slice_sample_ma_liu("mu",
-                        x = data$x, tx = data$t.x, Tcal = data$T.cal,
-                        lambda = level_1["lambda", ], mu = level_1["mu", ],
-                        r = level_2["r"], alpha = level_2["alpha"],
-                        s = level_2["s"], beta = level_2["beta"])
-  }
-
   run_single_chain <- function(chain_id = 1, data, hyper_prior) {
 
     ## initialize arrays for storing draws ##
@@ -189,10 +160,6 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
       }
 
       # draw individual-level parameters
-      draw_lambda <- if (use_data_augmentation)
-        draw_lambda else draw_lambda_ma_liu
-      draw_mu <- if (use_data_augmentation)
-        draw_mu else draw_mu_ma_liu
       level_1["lambda", ] <- draw_lambda(data, level_1, level_2)
       level_1["mu", ] <- draw_mu(data, level_1, level_2)
       level_1["tau", ] <- draw_tau(data, level_1)

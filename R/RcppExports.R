@@ -5,10 +5,6 @@ slice_sample_gamma_parameters <- function(data, init, hyper, steps = 20, w = 1) 
     .Call('_BTYDplus_slice_sample_gamma_parameters', PACKAGE = 'BTYDplus', data, init, hyper, steps, w)
 }
 
-slice_sample_ma_liu <- function(what, x, tx, Tcal, lambda, mu, r, alpha, s, beta) {
-    .Call('_BTYDplus_slice_sample_ma_liu', PACKAGE = 'BTYDplus', what, x, tx, Tcal, lambda, mu, r, alpha, s, beta)
-}
-
 pggg_palive <- function(x, tx, Tcal, k, lambda, mu) {
     .Call('_BTYDplus_pggg_palive', PACKAGE = 'BTYDplus', x, tx, Tcal, k, lambda, mu)
 }

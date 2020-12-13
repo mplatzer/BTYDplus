@@ -20,26 +20,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// slice_sample_ma_liu
-NumericVector slice_sample_ma_liu(String what, NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector lambda, NumericVector mu, double r, double alpha, double s, double beta);
-RcppExport SEXP _BTYDplus_slice_sample_ma_liu(SEXP whatSEXP, SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP rSEXP, SEXP alphaSEXP, SEXP sSEXP, SEXP betaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< String >::type what(whatSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type tx(txSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Tcal(TcalSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< double >::type r(rSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< double >::type s(sSEXP);
-    Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(slice_sample_ma_liu(what, x, tx, Tcal, lambda, mu, r, alpha, s, beta));
-    return rcpp_result_gen;
-END_RCPP
-}
 // pggg_palive
 NumericVector pggg_palive(NumericVector x, NumericVector tx, NumericVector Tcal, NumericVector k, NumericVector lambda, NumericVector mu);
 RcppExport SEXP _BTYDplus_pggg_palive(SEXP xSEXP, SEXP txSEXP, SEXP TcalSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP muSEXP) {
@@ -111,7 +91,6 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BTYDplus_slice_sample_gamma_parameters", (DL_FUNC) &_BTYDplus_slice_sample_gamma_parameters, 5},
-    {"_BTYDplus_slice_sample_ma_liu", (DL_FUNC) &_BTYDplus_slice_sample_ma_liu, 10},
     {"_BTYDplus_pggg_palive", (DL_FUNC) &_BTYDplus_pggg_palive, 6},
     {"_BTYDplus_pggg_slice_sample", (DL_FUNC) &_BTYDplus_pggg_slice_sample, 15},
     {"_BTYDplus_xbgcnbd_pmf_cpp", (DL_FUNC) &_BTYDplus_xbgcnbd_pmf_cpp, 4},
