@@ -23,8 +23,7 @@ Imports:
     mvtnorm,
     bayesm,
     stats,
-    graphics,
-    hypergeo
+    graphics
 Suggests:
     testthat,
     covr,

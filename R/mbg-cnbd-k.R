@@ -510,8 +510,8 @@ xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
   b <- params[5]
   if (round(a, 2) == 1)
     a <- a + 0.01  # P1 not defined for a=1, so we add slight noise in such rare cases
-  if (requireNamespace("hypergeo", quietly = TRUE)) {
-    h2f1 <- hypergeo::hypergeo
+  if (requireNamespace("gsl", quietly = TRUE)) {
+    h2f1 <- gsl::hyperg_2F1
   } else {
     # custom R implementation of h2f1 taken from BTYD source code
     h2f1 <- function(a, b, c, z) {
