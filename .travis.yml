@@ -3,15 +3,13 @@ cache: packages
 sudo: required
 
 apt_packages:
-  - libgsl2
-  #- libgsl0-dev
+  #- libgsl2
 
 r_binary_packages:
   - mvtnorm
   - bayesm
   - coda
   - Rcpp
-  - gsl
 
 r_packages:
   - BTYD

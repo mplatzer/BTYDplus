@@ -23,10 +23,10 @@ Imports:
     mvtnorm,
     bayesm,
     stats,
-    graphics
+    graphics,
+    hypergeo
 Suggests:
     testthat,
-    gsl,
     covr,
     knitr,
     rmarkdown,
