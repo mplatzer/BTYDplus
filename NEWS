@@ -1,5 +1,6 @@
 1.2.0
 - add `legend` argument to `(m)bgcnbd.PlotTrackingInc`, `(m)bgcnbd.PlotTrackingCum`, `mcmc.PlotTrackingCum`, and `mcmc.PlotTrackingInc`
+- made vignette code compatible with BTYD 2.4.2
 - deprecated inefficient alternative sampling method for Pareto/NBD MCMC
 
 1.1.4

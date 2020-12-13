@@ -212,11 +212,11 @@ if (!exists("groceryCBS")) {
   groceryCBS <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 }
 # estimate Pareto/NBD parameters
-params.pnbd <- BTYD::pnbd.EstimateParameters(groceryCBS)
+params.pnbd <- BTYD::pnbd.EstimateParameters(groceryCBS[, c("x", "t.x", "T.cal")])
 names(params.pnbd) <- c("r", "alpha", "s", "beta")
 round(params.pnbd, 3)
 # report log-likelihood
-BTYD::pnbd.cbs.LL(params.pnbd, groceryCBS)
+BTYD::pnbd.cbs.LL(params.pnbd, groceryCBS[, c("x", "t.x", "T.cal")])
 ```
 
 For one, we can note, that the maximized log-likelihood of Pareto/NBD is higher than for the NBD model, implying that its data fit is better. And second, by estimating a mean lifetime $1/(\beta/s)$ of `r round(1/(params.pnbd[3]/params.pnbd[4]), 2)` weeks, the estimated mean intertransaction times change from `r round(params.nbd[2] / params.nbd[1], 2)` to `r round(1/(params.pnbd[1]/params.pnbd[2]), 2)` weeks, when compared to NBD.
@@ -404,7 +404,7 @@ head(as.matrix(cohort.draws), 5)
 # estimates
 round(
   rbind(`Pareto/NBD (HB)` = apply(as.matrix(cohort.draws), 2, median),
-      `Pareto/NBD`      = BTYD::pnbd.EstimateParameters(groceryCBS))
+        `Pareto/NBD`      = BTYD::pnbd.EstimateParameters(groceryCBS[, c("x", "t.x", "T.cal")]))
 , 2)
 ```
 
