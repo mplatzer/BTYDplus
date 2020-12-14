@@ -471,7 +471,7 @@ dc.PlotTracking <- function(actual, expected, T.cal = NULL,
 dc.PlotFreqVsConditionalExpectedFrequency <- function(x, actual, expected, censor,
                                                       xlab, ylab, xticklab, title) {
 
-  bin <- NULL # suppress checkUsage warnings
+  bin <- bin.size <- transaction.actual <- transaction.expected <- N <- NULL # suppress checkUsage warnings
   if (length(x) != length(actual) | length(x) != length(expected) |
       !is.numeric(x) | !is.numeric(actual) | !is.numeric(expected) |
       any(x < 0) | any(actual < 0) | any(expected < 0))
@@ -480,9 +480,9 @@ dc.PlotFreqVsConditionalExpectedFrequency <- function(x, actual, expected, censo
   if (censor > max(x)) censor <- max(x)
   dt <- data.table(x, actual, expected)
   dt[, bin := pmin(x, censor)]
-  st <- dt[, .(transaction.actual = mean(actual),
-               transaction.expected = mean(expected),
-               bin.size = .N), keyby = bin]
+  st <- dt[, list(transaction.actual = mean(actual),
+                  transaction.expected = mean(expected),
+                  bin.size = .N), keyby = bin]
   st <- merge(data.table(bin = 0:censor), st, all.x = TRUE, by = "bin")
   comparison <- t(st)[-1, ]
   col.names <- paste(rep("freq", length(censor + 1)), (0:censor), sep = ".")
@@ -514,8 +514,7 @@ dc.PlotFreqVsConditionalExpectedFrequency <- function(x, actual, expected, censo
 #' @keywords internal
 dc.PlotRecVsConditionalExpectedFrequency <- function(t.x, actual, expected,
                                                      xlab, ylab, xticklab, title) {
-
-  bin <- NULL # suppress checkUsage warnings
+  bin <- bin.size <- N <- NULL # suppress checkUsage warnings
   if (length(t.x) != length(actual) | length(t.x) != length(expected) |
       !is.numeric(t.x) | !is.numeric(actual) | !is.numeric(expected) |
       any(t.x < 0) | any(actual < 0) | any(expected < 0))
@@ -523,9 +522,9 @@ dc.PlotRecVsConditionalExpectedFrequency <- function(t.x, actual, expected,
 
   dt <- data.table(t.x, actual, expected)
   dt[, bin := floor(t.x)]
-  st <- dt[, .(actual = mean(actual),
-               expected = mean(expected),
-               bin.size = .N), keyby = bin]
+  st <- dt[, list(actual = mean(actual),
+                  expected = mean(expected),
+                  bin.size = .N), keyby = bin]
   st <- merge(data.table(bin = 1:floor(max(t.x))), st[bin > 0], all.x = TRUE, by = "bin")
   comparison <- t(st)[-1, ]
   x.labels <- NULL
