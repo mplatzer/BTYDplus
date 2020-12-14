@@ -1,7 +1,6 @@
 # BTYDplus
 
 [![Travis-CI Build Status](https://travis-ci.org/mplatzer/BTYDplus.svg?branch=master)](https://travis-ci.org/mplatzer/BTYDplus)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/mplatzer/BTYDplus?branch=master&svg=true)](https://ci.appveyor.com/project/mplatzer/BTYDplus)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/BTYDplus)]( https://CRAN.R-project.org/package=BTYDplus)
 ![CRAN Downloads month](http://cranlogs.r-pkg.org/badges/BTYDplus)

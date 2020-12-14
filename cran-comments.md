@@ -1,22 +1,17 @@
 ## Resubmission
-This is a resubmission. In this version I have:
-* reduced run time of code examples and tests
-* added source info for included `groceryElog` dataset
-
-Plus, I've bumped version number from 1.0.0 to 1.0.1 to reflect above changes.
-
-fyi: code runs much faster on my laptop & on Travis-CI than on CRAN server farm, that's why I haven't caught the NOTE about overly long example runtimes locally
+* bumped version number to 1.2.0
+* adjusted to upstream changes in BTYD package
+* deprecated inefficient alternative sampling method for Pareto/NBD MCMC
 
 ## Test environments
-* local OS X install, devel R 3.4.0
-* ubuntu 12.04, devel R 3.3.1 https://travis-ci.org/mplatzer/BTYDplus/builds/183864580
-* windows, R 3.3.2 https://ci.appveyor.com/project/mplatzer/btydplus/build/1.0.119
-* win-builder (devel R 3.4.0 and release R 3.3.2)
+* local OS X install, devel R 4.0.2
+* ubuntu 18.04 R 4.0.2 https://travis-ci.org/github/mplatzer/BTYDplus/builds/749549598
+* windows checked via  https://win-builder.r-project.org
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 3 notes
 
 ## Reverse dependencies
 
-This is a new release, so there are no reverse dependencies.
+There are no reverse dependencies.
