@@ -2,7 +2,6 @@
 - add `legend` argument to `(m)bgcnbd.PlotTrackingInc`, `(m)bgcnbd.PlotTrackingCum`, `mcmc.PlotTrackingCum`, and `mcmc.PlotTrackingInc`
 - made vignette code compatible with BTYD 2.4.2
 - deprecated inefficient alternative sampling method for Pareto/NBD MCMC
-- removed dependency on gsl
 
 1.1.4
 - `elog2cbs` handles now empty elogs gracefully (#58)

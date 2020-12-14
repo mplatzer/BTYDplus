@@ -1,8 +1,10 @@
+dist: bionic
 language: r
 cache: packages
 sudo: required
 
 apt_packages:
+  - libgsl-dev
   #- libgsl2
 
 r_binary_packages:
@@ -10,6 +12,7 @@ r_binary_packages:
   - bayesm
   - coda
   - Rcpp
+  - gsl
 
 r_packages:
   - BTYD
