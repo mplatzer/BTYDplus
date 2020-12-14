@@ -1,4 +1,5 @@
 ## Resubmission
+* strong dependency BTYD has been un-archived
 * bumped version number to 1.2.0
 * adjusted to upstream changes in BTYD package
 * deprecated inefficient alternative sampling method for Pareto/NBD MCMC
@@ -10,7 +11,7 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 3 notes
+0 errors | 0 warnings | 0 notes
 
 ## Reverse dependencies
 
