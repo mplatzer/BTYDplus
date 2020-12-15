@@ -234,7 +234,7 @@ double pggg_palive_integrand(double x, double params[6]) {
 }
 
 double simpson38(double (*fn)(double, double[6]), double a, double b, double fn_params[6]) {
-  // http://en.wikipedia.org/wiki/Simpson%27s_rule#Simpson.27s_3.2F8_rule_.28for_n_intervals.29
+  // https://en.wikipedia.org/wiki/Simpson%27s_rule#Simpson.27s_3.2F8_rule_.28for_n_intervals.29
   double n = 12.0;
   double integral = (3.0/8.0) * ((b-a)/n) *
     (fn(a, fn_params) +
@@ -370,7 +370,7 @@ NumericVector pggg_slice_sample(String what,
 
 /*** R
   # unit-test slice sampling of pggg_post_tau, by comparing results to pareto/nbd (k=1),
-  #   where we can draw directly via http://en.wikipedia.org/wiki/Inverse_transform_sampling
+  #   where we can draw directly via https://en.wikipedia.org/wiki/Inverse_transform_sampling
   x <- 0
   tx <- 8
   Tcal <- 14

@@ -42,7 +42,7 @@
 #'   learning and departure behaviour.'  Journal of the Operational Research
 #'   Society (2000): 583-591.
 #' @references
-#'   \url{http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf}
+#'   \url{https://tminka.github.io/papers/minka-gamma.pdf}
 #'
 #' @export
 #' @examples
@@ -102,7 +102,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
   } else {
     if (method == "mle") {
       # Maximum Likelihood Estimator
-      # http://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation
+      # https://en.wikipedia.org/wiki/Gamma_distribution#Maximum_likelihood_estimation
       est_k <- function(itts) {
         s <- log(sum(itts) / length(itts)) - sum(log(itts)) / length(itts)
         fn <- function(v) return( (log(v) - digamma(v) - s) ^ 2)
@@ -111,7 +111,7 @@ estimateRegularity <- function(elog, method = "wheat", plot = FALSE, title = "",
       }
     } else if (method == "mle-minka") {
       # Approximation for MLE by Minka
-      # http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf
+      # https://tminka.github.io/papers/minka-gamma.pdf
       est_k <- function(itts) {
         s <- log(sum(itts) / length(itts)) - sum(log(itts)) / length(itts)
         k <- (3 - s + sqrt( (s - 3) ^ 2 + 24 * s)) / (12 * s)

@@ -73,5 +73,5 @@ Wu, Couchen, and H-L. Chen. 'A consumer purchasing model with
   learning and departure behaviour.'  Journal of the Operational Research
   Society (2000): 583-591.
 
-\url{http://research.microsoft.com/en-us/um/people/minka/papers/minka-gamma.pdf}
+\url{https://tminka.github.io/papers/minka-gamma.pdf}
 }
