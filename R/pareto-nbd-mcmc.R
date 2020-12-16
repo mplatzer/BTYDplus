@@ -113,7 +113,7 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
     if (any(!alive)) {
       mu_lam_tx <- pmin(700, mu_lam[!alive] * tx[!alive])
       mu_lam_Tcal <- pmin(700, mu_lam[!alive] * Tcal[!alive])
-      # sample with http://en.wikipedia.org/wiki/Inverse_transform_sampling
+      # sample with https://en.wikipedia.org/wiki/Inverse_transform_sampling
       rand <- runif(n = sum(!alive))
       tau[!alive] <- -log((1 - rand) * exp(-mu_lam_tx) + rand * exp(-mu_lam_Tcal)) / mu_lam[!alive] # nolint
     }
