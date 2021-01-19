@@ -25,7 +25,7 @@
 #' @export
 #' @references Platzer, M., & Reutterer, T. (2016). Ticking away the moments:
 #'   Timing regularity helps to better predict customer activity. Marketing
-#'   Science, 35(5), 779-799. <doi:10.1287/mksc.2015.0963>
+#'   Science, 35(5), 779-799. \doi{10.1287/mksc.2015.0963}
 #' @seealso \code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 #' @examples
 #' data("groceryElog")
@@ -245,7 +245,7 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #'
 #' @references Platzer, M., & Reutterer, T. (2016). Ticking away the moments:
 #'   Timing regularity helps to better predict customer activity. Marketing
-#'   Science, 35(5), 779-799. <doi:10.1287/mksc.2015.0963>
+#'   Science, 35(5), 779-799. \doi{10.1287/mksc.2015.0963}
 #' @export
 #' @examples
 #' data("groceryElog")
@@ -287,7 +287,7 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
 #' @export
 #' @references Platzer, M., & Reutterer, T. (2016). Ticking away the moments:
 #'   Timing regularity helps to better predict customer activity. Marketing
-#'   Science, 35(5), 779-799. <doi:10.1287/mksc.2015.0963>
+#'   Science, 35(5), 779-799. \doi{10.1287/mksc.2015.0963}
 #' @examples
 #' params <- list(t = 4.5, gamma = 1.5, r = 5, alpha = 10, s = 0.8, beta = 12)
 #' data <- pggg.GenerateData(n = 1000, T.cal = 32, T.star = 32, params)

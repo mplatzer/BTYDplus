@@ -10,7 +10,7 @@
 #'
 #' @references Platzer, M., & Reutterer, T. (2016). Ticking away the moments:
 #'   Timing regularity helps to better predict customer activity. Marketing
-#'   Science, 35(5), 779-799. <doi:10.1287/mksc.2015.0963>
+#'   Science, 35(5), 779-799. \doi{10.1287/mksc.2015.0963}
 #'
 #' @format A data frame with 10483 rows and 2 variables: \describe{
 #'   \item{cust}{customer ID, factor vector} \item{date}{transaction date,

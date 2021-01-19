@@ -25,7 +25,7 @@
 #' @seealso \code{\link{abe.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 #' @references Abe, M. (2009). "Counting your customers" one by one: A
 #'   hierarchical Bayes extension to the Pareto/NBD model. Marketing Science,
-#'   28(3), 541-553. <doi:10.1287/mksc.1090.0502>
+#'   28(3), 541-553. \doi{10.1287/mksc.1090.0502}
 #' @examples
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")

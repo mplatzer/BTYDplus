@@ -68,7 +68,7 @@ head(xstar.est)
 \references{
 Platzer, M., & Reutterer, T. (2016). Ticking away the moments:
   Timing regularity helps to better predict customer activity. Marketing
-  Science, 35(5), 779-799. <doi:10.1287/mksc.2015.0963>
+  Science, 35(5), 779-799. \doi{10.1287/mksc.2015.0963}
 }
 \seealso{
 \code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }

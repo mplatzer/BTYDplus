@@ -29,10 +29,10 @@
 #' @references Ma, S. H., & Liu, J. L. (2007, August). The MCMC approach for
 #'   solving the Pareto/NBD model and possible extensions. In Third
 #'   international conference on natural computation (ICNC 2007) (Vol. 2, pp.
-#'   505-512). IEEE. <doi:10.1109/ICNC.2007.728>
+#'   505-512). IEEE. \doi{10.1109/ICNC.2007.728}
 #' @references Abe, M. (2009). "Counting your customers" one by one: A
 #'   hierarchical Bayes extension to the Pareto/NBD model. Marketing Science,
-#'   28(3), 541-553. <doi:10.1287/mksc.1090.0502>
+#'   28(3), 541-553. \doi{10.1287/mksc.1090.0502}
 #' @examples
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")

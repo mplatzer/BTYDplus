@@ -73,11 +73,11 @@ head(xstar.est)
 Ma, S. H., & Liu, J. L. (2007, August). The MCMC approach for
   solving the Pareto/NBD model and possible extensions. In Third
   international conference on natural computation (ICNC 2007) (Vol. 2, pp.
-  505-512). IEEE. <doi:10.1109/ICNC.2007.728>
+  505-512). IEEE. \doi{10.1109/ICNC.2007.728}
 
 Abe, M. (2009). "Counting your customers" one by one: A
   hierarchical Bayes extension to the Pareto/NBD model. Marketing Science,
-  28(3), 541-553. <doi:10.1287/mksc.1090.0502>
+  28(3), 541-553. \doi{10.1287/mksc.1090.0502}
 }
 \seealso{
 \code{\link{pnbd.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }

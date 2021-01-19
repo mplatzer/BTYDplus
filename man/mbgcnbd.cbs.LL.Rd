@@ -46,5 +46,5 @@ Calculates the log-likelihood of the (M)BG/CNBD-k model.
 (M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
   Leveraging purchase regularity for predicting customer behavior the easy
   way. International Journal of Research in Marketing.
-  <doi:10.1016/j.ijresmar.2020.09.002>
+  \doi{10.1016/j.ijresmar.2020.09.002}
 }

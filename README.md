@@ -32,12 +32,12 @@ demo("pareto-ggg")   # Demonstration of Pareto/NBD (HB) & Pareto/GGG model with 
 
 These R source files extend the functionality of the BTYD package by providing functions for parameter estimation and scoring for NBD, MBG/NBD, BG/CNBD-k, MBG/CNBD-k, Pareto/NBD (HB), Pareto/NBD (Abe) and Pareto/GGG.
 
-* **NBD** Ehrenberg, Andrew SC. "The pattern of consumer purchases." Applied Statistics (1959): 26-41. <doi:10.2307/2985810>
-* **MBG/NBD** Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical validation and comparison of models for customer base analysis. International Journal of Research in Marketing 24(3) 201–209. <doi:10.1016/j.ijresmar.2006.12.005>
-* **(M)BG/CNBD-k** Reutterer, T., Platzer, M., & Schroeder, N. (2020). "Leveraging purchase regularity for predicting customer behavior the easy way." International Journal of Research in Marketing. <doi:10.1016/j.ijresmar.2020.09.002>
-* **Pareto/NBD (HB)** Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. <doi:10.1109/ICNC.2007.728>
-* **Pareto/NBD (Abe)** Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553. <doi:10.1287/mksc.1090.0502>
-* **Pareto/GGG** Platzer, Michael, and Thomas Reutterer. "Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity." Marketing Science (2016). <doi:10.1287/mksc.2015.0963>
+* **NBD** Ehrenberg, Andrew SC. "The pattern of consumer purchases." Applied Statistics (1959): 26-41. \doi{10.2307/2985810}
+* **MBG/NBD** Batislam, E.P., M. Denizel, A. Filiztekin. 2007. Empirical validation and comparison of models for customer base analysis. International Journal of Research in Marketing 24(3) 201–209. \doi{10.1016/j.ijresmar.2006.12.005}
+* **(M)BG/CNBD-k** Reutterer, T., Platzer, M., & Schroeder, N. (2020). "Leveraging purchase regularity for predicting customer behavior the easy way." International Journal of Research in Marketing. \doi{10.1016/j.ijresmar.2020.09.002}
+* **Pareto/NBD (HB)** Ma, Shao-Hui, and Jin-Lan Liu. "The MCMC approach for solving the Pareto/NBD model and possible extensions." Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \doi{10.1109/ICNC.2007.728}
+* **Pareto/NBD (Abe)** Abe, Makoto. "Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model." Marketing Science 28.3 (2009): 541-553. \doi{10.1287/mksc.1090.0502}
+* **Pareto/GGG** Platzer, Michael, and Thomas Reutterer. "Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity." Marketing Science (2016). \doi{10.1287/mksc.2015.0963}
 
 ## Contributions
 
