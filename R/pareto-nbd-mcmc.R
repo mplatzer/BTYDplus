@@ -26,8 +26,13 @@
 #' }
 #' @export
 #' @seealso \code{\link{pnbd.GenerateData} } \code{\link{mcmc.DrawFutureTransactions} } \code{\link{mcmc.PAlive} }
-#' @references Ma, Shao-Hui, and Jin-Lan Liu. 'The MCMC approach for solving the Pareto/NBD model and possible extensions.' Natural Computation, 2007. ICNC 2007. Third International Conference on. Vol. 2. IEEE, 2007. \url{https://ieeexplore.ieee.org/document/4344404}
-#' @references Abe, Makoto. 'Counting your customers one by one: A hierarchical Bayes extension to the Pareto/NBD model.' Marketing Science 28.3 (2009): 541-553.
+#' @references Ma, S. H., & Liu, J. L. (2007, August). The MCMC approach for
+#'   solving the Pareto/NBD model and possible extensions. In Third
+#'   international conference on natural computation (ICNC 2007) (Vol. 2, pp.
+#'   505-512). IEEE. <doi:10.1109/ICNC.2007.728>
+#' @references Abe, M. (2009). "Counting your customers" one by one: A
+#'   hierarchical Bayes extension to the Pareto/NBD model. Marketing Science,
+#'   28(3), 541-553. <doi:10.1287/mksc.1090.0502>
 #' @examples
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")

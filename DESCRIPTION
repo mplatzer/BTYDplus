@@ -9,7 +9,10 @@ Description: Provides advanced statistical methods to describe and predict custo
   as well as on a customer level (Customer Lifetime Value, Customer Equity, P(alive), etc.). This
   package complements the BTYD package by providing several additional buy-till-you-die models, that
   have been published in the marketing literature, but whose implementation are complex and non-trivial.
-  These models are: NBD, MBG/NBD, BG/CNBD-k, MBG/CNBD-k, Pareto/NBD (HB), Pareto/NBD (Abe) and Pareto/GGG.
+  These models are: NBD [Ehrenberg (1959) <doi:10.2307/2985810>], MBG/NBD [Batislam et al (2007) 
+  <doi:10.1016/j.ijresmar.2006.12.005>], (M)BG/CNBD-k [Reutterer et al (2020) 
+  <doi:10.1016/j.ijresmar.2020.09.002>], Pareto/NBD (HB) [Abe (2009) <doi:10.1287/mksc.1090.0502>] 
+  and Pareto/GGG [Platzer and Reutterer (2016) <doi:10.1287/mksc.2015.0963>].
 URL: https://github.com/mplatzer/BTYDplus#readme
 BugReports: https://github.com/mplatzer/BTYDplus/issues
 License: GPL-3

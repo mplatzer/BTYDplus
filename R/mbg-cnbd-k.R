@@ -24,10 +24,14 @@
 #' @return A vector of estimated parameters.
 #' @export
 #' @seealso \code{\link[BTYD]{bgnbd.EstimateParameters}}
-#' @references (M)BG/CNBD-k: Platzer Michael, and Thomas Reutterer (submitted)
-#' @references MBG/NBD: Batislam, E.P., M. Denizel, A. Filiztekin. 2007.
-#'   Empirical validation and comparison of models for customer base analysis.
-#'   International Journal of Research in Marketing 24(3) 201-209.
+#' @references (M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
+#'   Leveraging purchase regularity for predicting customer behavior the easy
+#'   way. International Journal of Research in Marketing.
+#'   <doi:10.1016/j.ijresmar.2020.09.002>
+#' @references Batislam, E. P., Denizel, M., & Filiztekin, A. (2007). Empirical
+#'   validation and comparison of models for customer base analysis.
+#'   International Journal of Research in Marketing, 24(3), 201-209.
+#'   <doi:10.1016/j.ijresmar.2006.12.005>
 #' @examples
 #' \dontrun{
 #' data("groceryElog")
@@ -149,7 +153,10 @@ xbgcnbd.EstimateParameters <- function(cal.cbs, k = NULL,
 #' @return For \code{bgcnbd.cbs.LL}, the total log-likelihood of the provided
 #'   data. For \code{bgcnbd.LL}, a vector of log-likelihoods as long as the
 #'   longest input vector (\code{x}, \code{t.x}, or \code{T.cal}).
-#' @references Platzer Michael, and Thomas Reutterer (submitted)
+#' @references (M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
+#'   Leveraging purchase regularity for predicting customer behavior the easy
+#'   way. International Journal of Research in Marketing.
+#'   <doi:10.1016/j.ijresmar.2020.09.002>
 #' @export
 mbgcnbd.cbs.LL <- function(params, cal.cbs) {
   xbgcnbd.cbs.LL(params, cal.cbs, dropout_at_zero = TRUE)
@@ -257,7 +264,10 @@ xbgcnbd.LL <- function(params, x, t.x, T.cal, litt, dropout_at_zero = NULL) {
 #'   vector, then the output will be a vector as well. If both are vectors, the
 #'   output will be a matrix.
 #' @export
-#' @references Platzer Michael, and Thomas Reutterer (submitted)
+#' @references (M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
+#'   Leveraging purchase regularity for predicting customer behavior the easy
+#'   way. International Journal of Research in Marketing.
+#'   <doi:10.1016/j.ijresmar.2020.09.002>
 #' @examples
 #' \dontrun{
 #' data("groceryElog")
@@ -310,7 +320,10 @@ xbgcnbd.pmf <- function(params, t, x, dropout_at_zero = NULL) {
 #' @param t Length of time for which we are calculating the expected number of repeat transactions.
 #' @return Number of repeat transactions a customer is expected to make in a time period of length t.
 #' @export
-#' @references Platzer Michael, and Thomas Reutterer (submitted)
+#' @references (M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
+#'   Leveraging purchase regularity for predicting customer behavior the easy
+#'   way. International Journal of Research in Marketing.
+#'   <doi:10.1016/j.ijresmar.2020.09.002>
 #' @examples
 #' \dontrun{
 #' data("groceryElog")
@@ -370,7 +383,10 @@ xbgcnbd.Expectation <- function(params, t, dropout_at_zero = NULL) {
 #' @return Probability that the customer is still alive at the end of the
 #'   calibration period.
 #' @export
-#' @references Platzer Michael, and Thomas Reutterer (submitted)
+#' @references (M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
+#'   Leveraging purchase regularity for predicting customer behavior the easy
+#'   way. International Journal of Research in Marketing.
+#'   <doi:10.1016/j.ijresmar.2020.09.002>
 #' @examples
 #' \dontrun{
 #' data("groceryElog")
@@ -454,7 +470,10 @@ xbgcnbd.PAlive <- function(params, x, t.x, T.cal, dropout_at_zero = NULL) {
 #'   parameters has a length greater than 1, this will be a vector of expected
 #'   number of transactions.
 #' @export
-#' @references Platzer Michael, and Thomas Reutterer (submitted)
+#' @references (M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
+#'   Leveraging purchase regularity for predicting customer behavior the easy
+#'   way. International Journal of Research in Marketing.
+#'   <doi:10.1016/j.ijresmar.2020.09.002>
 #' @examples
 #' \dontrun{
 #' data("groceryElog")
@@ -570,7 +589,10 @@ xbgcnbd.ConditionalExpectedTransactions <- function(params, T.star, x, t.x, T.ca
 #' @return Calibration period repeat transaction frequency comparison matrix
 #'   (actual vs. expected).
 #' @export
-#' @references Platzer Michael, and Thomas Reutterer (submitted)
+#' @references (M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
+#'   Leveraging purchase regularity for predicting customer behavior the easy
+#'   way. International Journal of Research in Marketing.
+#'   <doi:10.1016/j.ijresmar.2020.09.002>
 #' @examples
 #' \dontrun{
 #' data("groceryElog")
@@ -964,7 +986,10 @@ bgcnbd.PlotRecVsConditionalExpectedFrequency <- function(
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 #' @export
-#' @references Platzer Michael, and Thomas Reutterer (submitted)
+#' @references (M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
+#'   Leveraging purchase regularity for predicting customer behavior the easy
+#'   way. International Journal of Research in Marketing.
+#'   <doi:10.1016/j.ijresmar.2020.09.002>
 #' @examples
 #' params <- c(k = 3, r = 0.85, alpha = 1.45, a = 0.79, b = 2.42)
 #' data <- mbgcnbd.GenerateData(n = 1000, T.cal = 24, T.star = 32, params)

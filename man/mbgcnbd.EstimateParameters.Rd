@@ -67,11 +67,15 @@ cbs <- elog2cbs(groceryElog)
 }
 }
 \references{
-(M)BG/CNBD-k: Platzer Michael, and Thomas Reutterer (submitted)
+(M)BG/CNBD-k: Reutterer, T., Platzer, M., & Schroeder, N. (2020).
+  Leveraging purchase regularity for predicting customer behavior the easy
+  way. International Journal of Research in Marketing.
+  <doi:10.1016/j.ijresmar.2020.09.002>
 
-MBG/NBD: Batislam, E.P., M. Denizel, A. Filiztekin. 2007.
-  Empirical validation and comparison of models for customer base analysis.
-  International Journal of Research in Marketing 24(3) 201-209.
+Batislam, E. P., Denizel, M., & Filiztekin, A. (2007). Empirical
+  validation and comparison of models for customer base analysis.
+  International Journal of Research in Marketing, 24(3), 201-209.
+  <doi:10.1016/j.ijresmar.2006.12.005>
 }
 \seealso{
 \code{\link[BTYD]{bgnbd.EstimateParameters}}

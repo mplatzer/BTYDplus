@@ -3,7 +3,7 @@
 * bumped version number to 1.2.0
 * adjusted to upstream changes in BTYD package
 * deprecated inefficient alternative sampling method for Pareto/NBD MCMC
-* updated referenced URLs (to HTTPs or redirected pages)
+* updated referenced papers and URLs (to HTTPs or redirected pages)
 
 ## Test environments
 * local OS X install, devel R 4.0.2

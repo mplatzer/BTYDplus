@@ -23,7 +23,9 @@
 #' \item{\code{level_1}}{list of \code{\link{mcmc.list}}s, one for each customer, with draws for customer-level parameters \code{k}, \code{lambda}, \code{tau}, \code{z}, \code{mu}}
 #' \item{\code{level_2}}{\code{\link{mcmc.list}}, with draws for cohort-level parameters \code{r}, \code{alpha}, \code{s}, \code{beta}, \code{t}, \code{gamma}}
 #' @export
-#' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
+#' @references Platzer, M., & Reutterer, T. (2016). Ticking away the moments:
+#'   Timing regularity helps to better predict customer activity. Marketing
+#'   Science, 35(5), 779-799. <doi:10.1287/mksc.2015.0963>
 #' @seealso \code{\link{pggg.GenerateData} } \code{\link{mcmc.PAlive} } \code{\link{mcmc.DrawFutureTransactions} }
 #' @examples
 #' data("groceryElog")
@@ -241,7 +243,9 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #' @param fn Optional function to summarize individual-level draws for k, e.g. 'mean'.
 #' @param title Plot title.
 #'
-#' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
+#' @references Platzer, M., & Reutterer, T. (2016). Ticking away the moments:
+#'   Timing regularity helps to better predict customer activity. Marketing
+#'   Science, 35(5), 779-799. <doi:10.1287/mksc.2015.0963>
 #' @export
 #' @examples
 #' data("groceryElog")
@@ -281,7 +285,9 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
 #' \item{\code{cbs}}{A data.frame with a row for each customer and the summary statistic as columns.}
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 #' @export
-#' @references Platzer, Michael, and Thomas Reutterer. 'Ticking Away the Moments: Timing Regularity Helps to Better Predict Customer Activity.' Marketing Science (2016).
+#' @references Platzer, M., & Reutterer, T. (2016). Ticking away the moments:
+#'   Timing regularity helps to better predict customer activity. Marketing
+#'   Science, 35(5), 779-799. <doi:10.1287/mksc.2015.0963>
 #' @examples
 #' params <- list(t = 4.5, gamma = 1.5, r = 5, alpha = 10, s = 0.8, beta = 12)
 #' data <- pggg.GenerateData(n = 1000, T.cal = 32, T.star = 32, params)
