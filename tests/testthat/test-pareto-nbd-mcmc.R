@@ -45,7 +45,6 @@ test_that("Pareto/NBD MCMC", {
   expect_equal(sum(cbs1[-n]$x.star), sum(cbs2[-n]$x.star), tolerance = 0.2)
 
 
-  skip_on_cran()
 
   # generate artificial Pareto/NBD data
   set.seed(1)
@@ -63,6 +62,7 @@ test_that("Pareto/NBD MCMC", {
                                     param_init = list(r = 1, alpha = 1, s = 1, beta = 1))
 
   # test parameter recovery
+  skip("skip long-running test of MCMC parameter recovery")
   draws <- pnbd.mcmc.DrawParameters(cbs, mc.cores = 1, trace = 1000)
   est <- as.list(summary(draws$level_2)$quantiles[, "50%"])
 

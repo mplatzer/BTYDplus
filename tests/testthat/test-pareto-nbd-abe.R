@@ -1,7 +1,6 @@
 context("mcmc")
 
 test_that("Pareto/NBD (Abe) MCMC", {
-  skip_on_cran()
 
   # test basic data simulation
   n <- 100
@@ -51,6 +50,7 @@ test_that("Pareto/NBD (Abe) MCMC", {
                                    mcmc = 10, burnin = 0, thin = 1, mc.cores = 1)
 
   # test parameter recovery
+  skip("skip long-running test of MCMC parameter recovery")
   draws <- abe.mcmc.DrawParameters(cbs, covariates = c("covariate_1", "covariate_2"), mc.cores = 1)
 
   expect_true(all(c("level_1", "level_2") %in% names(draws)))
