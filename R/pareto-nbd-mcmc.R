@@ -37,7 +37,7 @@
 #' data("groceryElog")
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 #' param.draws <- pnbd.mcmc.DrawParameters(cbs,
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
+#'   mcmc = 100, burnin = 50, thin = 10, chains = 1) # short MCMC to run demo fast
 #'
 #' # cohort-level parameter draws
 #' as.matrix(param.draws$level_2)
@@ -239,7 +239,7 @@ pnbd.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
 #' @export
 #' @examples
 #' params <- list(r = 5, alpha = 10, s = 0.8, beta = 12)
-#' data <- pnbd.GenerateData(n = 1000, T.cal = 32, T.star = 32, params)
+#' data <- pnbd.GenerateData(n = 200, T.cal = 32, T.star = 32, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
 pnbd.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01") {

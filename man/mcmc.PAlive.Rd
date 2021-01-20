@@ -20,7 +20,7 @@ Calculates P(alive) based on MCMC parameter draws
 data("groceryElog")
 cbs <- elog2cbs(groceryElog)
 param.draws <- pnbd.mcmc.DrawParameters(cbs,
-  mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
+  mcmc = 100, burnin = 50, thin = 10, chains = 1) # short MCMC to run demo fast
 palive <- mcmc.PAlive(param.draws)
 head(palive)
 mean(palive)

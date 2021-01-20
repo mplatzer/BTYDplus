@@ -31,7 +31,7 @@
 #' cbs <- elog2cbs(groceryElog, T.cal = "2006-12-31")
 #' cbs$cov1 <- as.integer(cbs$cust) %% 2 # create dummy covariate
 #' param.draws <- abe.mcmc.DrawParameters(cbs, c("cov1"),
-#'   mcmc = 200, burnin = 100, thin = 20, chains = 1) # short MCMC to run demo fast
+#'   mcmc = 100, burnin = 50, thin = 10, chains = 1) # short MCMC to run demo fast
 #'
 #' # cohort-level parameter draws
 #' as.matrix(param.draws$level_2)
@@ -273,7 +273,7 @@ abe.mcmc.DrawParameters <- function(cal.cbs, covariates = c(), mcmc = 2500, burn
 #' params <- list()
 #' params$beta  <- matrix(c(0.18, -2.5, 0.5, -0.3, -0.2, 0.8), byrow = TRUE, ncol = 2)
 #' params$gamma <- matrix(c(0.05, 0.1, 0.1, 0.2), ncol = 2)
-#' data <- abe.GenerateData(n = 2000, T.cal = 32, T.star = 32, params)
+#' data <- abe.GenerateData(n = 200, T.cal = 32, T.star = 32, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
 abe.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01", covariates = NULL) {

@@ -148,7 +148,7 @@ nbd.ConditionalExpectedTransactions <- function(params, T.star, x, T.cal) {
 #' \item{\code{elog}}{A data.frame with a row for each transaction, and columns \code{cust}, \code{date} and \code{t}.}
 #' @export
 #' @examples
-#' n <- 1000  # no. of customers
+#' n <- 200  # no. of customers
 #' T.cal <- 32  # length of calibration period
 #' T.star <- 32  # length of hold-out period
 #' params <- c(r = 0.85, alpha = 4.45)  # purchase frequency lambda_i ~ Gamma(r, alpha)

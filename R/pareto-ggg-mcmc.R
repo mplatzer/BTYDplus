@@ -290,7 +290,7 @@ pggg.plotRegularityRateHeterogeneity <- function(draws, xmax = NULL, fn = NULL,
 #'   Science, 35(5), 779-799. \doi{10.1287/mksc.2015.0963}
 #' @examples
 #' params <- list(t = 4.5, gamma = 1.5, r = 5, alpha = 10, s = 0.8, beta = 12)
-#' data <- pggg.GenerateData(n = 1000, T.cal = 32, T.star = 32, params)
+#' data <- pggg.GenerateData(n = 200, T.cal = 32, T.star = 32, params)
 #' cbs <- data$cbs  # customer by sufficient summary statistic - one row per customer
 #' elog <- data$elog  # Event log - one row per event/purchase
 pggg.GenerateData <- function(n, T.cal, T.star, params, date.zero = "2000-01-01") {
