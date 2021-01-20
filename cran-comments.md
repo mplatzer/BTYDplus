@@ -7,8 +7,8 @@
 
 ## Test environments
 * local OS X install, devel R 4.0.2
-* ubuntu 18.04 R 4.0.2 https://travis-ci.org/github/mplatzer/BTYDplus/builds/755254057
-* windows checked via  https://win-builder.r-project.org
+* ubuntu 18.04 R 4.0.2 https://travis-ci.org/github/mplatzer/BTYDplus/builds/755366590
+* windows checked https://win-builder.r-project.org/5T72wCQ9CgEO
 
 ## R CMD check results
 
