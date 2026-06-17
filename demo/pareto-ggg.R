@@ -23,7 +23,7 @@ pggg.draws <- pggg.mcmc.DrawParameters(cal.cbs = cbs,
 
 round(rbind(`Pareto/GGG`= summary(pggg.draws$level_2)$quantiles[, "50%"],
       `Pareto/NBD (HB)` = c(NA, NA, summary(pnbd.draws$level_2)$quantiles[, "50%"]),
-      `Pareto/NBD`      = c(NA, NA, BTYD::pnbd.EstimateParameters(cbs))), 2)
+      `Pareto/NBD`      = c(NA, NA, BTYD::pnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal")]))), 2)
 
 #' plot estimated parameter distributions
 plot(pggg.draws$level_2, density = TRUE, trace = FALSE)
