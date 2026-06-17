@@ -62,11 +62,11 @@ mean(cbs$palive.mbgcnbd)
 
 x <- readline("Compare Log-Likelihoods of various models (press Enter)")
 
-params.pnbd <- BTYD::pnbd.EstimateParameters(cbs) # estimate Pareto/NBD
+params.pnbd <- BTYD::pnbd.EstimateParameters(cbs[, c("x", "t.x", "T.cal")]) # estimate Pareto/NBD
 params.bgcnbd <- bgcnbd.EstimateParameters(cbs)  # estimate BG/CNBD-k
 
 (ll <- c(`NBD`        = nbd.cbs.LL(params.nbd, cbs),
-        `Pareto/NBD` = BTYD::pnbd.cbs.LL(params.pnbd, cbs),
+        `Pareto/NBD` = BTYD::pnbd.cbs.LL(params.pnbd, cbs[, c("x", "t.x", "T.cal")]),
         `BG/CNBD-k`  = bgcnbd.cbs.LL(params.bgcnbd, cbs),
         `MBG/CNBD-k` = mbgcnbd.cbs.LL(params.mbgcnbd, cbs)))
 names(which.max(ll))
@@ -86,7 +86,7 @@ x <- readline("Plot Incremental Transactions (press Enter)")
 inc <- elog2inc(cdnowElog)
 op <- par(mfrow = c(1, 2))
 nil <- mbgcnbd.PlotTrackingInc(params.mbgcnbd, cbs$T.cal, T.tot = 78, inc, title = "MBG/CNBD-k")
-nil <- BTYD::pnbd.PlotTrackingInc(params.pnbd, cbs$T.cal, T.tot = 78, inc, title = "Pareto/NBD")
+nil <- BTYD::pnbd.PlotTrackingInc(params.pnbd, cbs$T.cal, T.tot = 78, inc, n.periods.final = length(inc), title = "Pareto/NBD")
 par(op)
 
 

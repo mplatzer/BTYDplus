@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // slice_sample_gamma_parameters
 NumericVector slice_sample_gamma_parameters(NumericVector data, NumericVector init, NumericVector hyper, double steps, double w);
 RcppExport SEXP _BTYDplus_slice_sample_gamma_parameters(SEXP dataSEXP, SEXP initSEXP, SEXP hyperSEXP, SEXP stepsSEXP, SEXP wSEXP) {

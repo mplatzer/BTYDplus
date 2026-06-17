@@ -202,9 +202,12 @@ pggg.mcmc.DrawParameters <- function(cal.cbs, mcmc = 2500, burnin = 500, thin = 
   if (is.null(param_init)) {
     try({
         df <- cal.cbs[sample(nrow(cal.cbs), min(nrow(cal.cbs), 1000)), ]
-        param_init <- c(1, 1, BTYD::pnbd.EstimateParameters(df))
-        names(param_init) <- c("t", "gamma", "r", "alpha", "s", "beta")
-        param_init <- as.list(param_init)
+        est <- BTYD::pnbd.EstimateParameters(df[, c("x", "t.x", "T.cal")])
+        if (all(is.finite(est))) {
+          param_init <- c(1, 1, est)
+          names(param_init) <- c("t", "gamma", "r", "alpha", "s", "beta")
+          param_init <- as.list(param_init)
+        }
       },
       silent = TRUE)
     if (is.null(param_init))
