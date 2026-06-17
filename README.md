@@ -14,8 +14,8 @@ This package complements the [BTYD](https://cran.r-project.org/package=BTYD) pac
 ## Installation
 
 ```
-# install.packages("devtools")
-devtools::install_github("mplatzer/BTYDplus", dependencies=TRUE)
+# install.packages("pak")
+pak::pak("mplatzer/BTYDplus", dependencies=TRUE)
 library(BTYDplus)
 ```
 
